@@ -2,12 +2,43 @@ type aggregate_t = {count: option<int>}
 
 type transactions_aggregate_t = {aggregate: option<aggregate_t>}
 
+type internal_val_t = {
+  consensusAddress: string,
+  operatorAddress: string,
+  moniker: string,
+  identity: string,
+}
+
 type internal_t = {
   timestamp: MomentRe.Moment.t,
   hash: Hash.t,
   inflation: float,
-  validator: ValidatorSub.Mini.t,
+  validator: internal_val_t,
   transactions_aggregate: transactions_aggregate_t,
+}
+
+type t = {
+  hash: Hash.t,
+  inflation: float,
+  timestamp: MomentRe.Moment.t,
+  validator: ValidatorSub.Mini.t,
+  txn: int,
+}
+
+let toExternal = ({hash, inflation, timestamp, validator, transactions_aggregate}) => {
+  hash: hash,
+  inflation: inflation,
+  timestamp: timestamp,
+  validator: {
+    consensusAddress: validator.consensusAddress,
+    operatorAddress: validator.operatorAddress |> Address.fromBech32,
+    moniker: validator.moniker,
+    identity: validator.identity,
+  },
+  txn: switch transactions_aggregate.aggregate {
+  | Some(aggregate) => aggregate.count |> Belt.Option.getExn
+  | _ => 0
+  },
 }
 
 module MultiConfig = %graphql(`
@@ -16,9 +47,9 @@ module MultiConfig = %graphql(`
       timestamp @ppxCustom(module: "GraphQLParserModule.Date")
       hash @ppxCustom(module: "GraphQLParserModule.Hash")
       inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
-      validator @ppxAs(type: "ValidatorSub.Mini.t"){
+      validator @ppxAs(type: "internal_val_t"){
         consensusAddress: consensus_address
-        operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
+        operatorAddress: operator_address 
         moniker
         identity
       }
@@ -37,9 +68,9 @@ module SingleConfig = %graphql(`
       timestamp @ppxCustom(module: "GraphQLParserModule.Date")
       hash @ppxCustom(module: "GraphQLParserModule.Hash")
       inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
-      validator @ppxAs(type: "ValidatorSub.Mini.t"){
+      validator @ppxAs(type: "internal_val_t"){
         consensusAddress: consensus_address
-        operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
+        operatorAddress: operator_address
         moniker
         identity
       }
@@ -56,8 +87,7 @@ let getList = (~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({limit: pageSize, offset: offset})
 
-  // result |> Sub.fromData |> Sub.map(_, ({blocks}) => blocks)
-  result
+  result |> Sub.fromData |> Sub.map(_, ({blocks}) => blocks->Belt_Array.map(toExternal))
 }
 
 let get = (~height, ()) => {
