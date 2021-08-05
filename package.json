@@ -32,6 +32,7 @@
     "bs-css-emotion": "^3.0.0",
     "bs-moment": "^0.6.0",
     "bs-webapi": "^0.19.1",
+    "change-case": "^4.1.2",
     "graphql": "15.3.0",
     "moment": "^2.29.1",
     "react": "16.13.1",

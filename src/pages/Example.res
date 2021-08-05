@@ -12,6 +12,10 @@ let make = () => {
 
   let next = () => setPage(prev => prev + 1)
 
+  let capitalizedName = "hello world" |> ChangeCase.pascalCase
+
+  Js.log(capitalizedName)
+
   <div className=Styles.root>
     {switch blockSub {
     | {data: Some({blocks_by_pk}), loading: false} => {
