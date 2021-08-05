@@ -1,7 +1,13 @@
 module Styles = {
   open CssJs
 
-  let root = style(. [backgroundColor(black), color(white), padding2(~v=px(10), ~h=px(20))])
+  let root = style(. [
+    backgroundColor(black),
+    color(white),
+    padding2(~v=px(10), ~h=px(20)),
+    marginTop(Spacing.lg),
+    Media.mobile([backgroundColor(pink)]),
+  ])
 }
 
 @react.component
@@ -15,6 +21,7 @@ let make = () => {
   let capitalizedName = "hello world" |> ChangeCase.pascalCase
 
   Js.log(capitalizedName)
+  Js.log(Theme.get(Theme.Day))
 
   <div className=Styles.root>
     {switch blockSub {
