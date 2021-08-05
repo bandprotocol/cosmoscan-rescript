@@ -5,12 +5,14 @@
   "private": true,
   "scripts": {
     "clean": "bsb -clean-world",
-    "graphql-server": "graphql-client-example-server",
+    "build": "rm -rf dist/ && bsb -make-world && webpack",
+    "serve": "webpack serve --open",
     "server": "webpack-dev-server",
     "start": "bsb -make-world -w"
   },
   "devDependencies": {
     "@reasonml-community/graphql-ppx": "1.0.0",
+    "@webpack-cli/serve": "^1.5.1",
     "bs-platform": "9.0.0",
     "graphql-client-example-server": "1.2.0",
     "html-webpack-plugin": "4.3.0",

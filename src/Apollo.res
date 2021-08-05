@@ -11,7 +11,7 @@ let httpLink = ApolloClient.Link.HttpLink.make(
 let wsLink = {
   open ApolloClient.Link.WebSocketLink
   make(
-    ~uri="ws://" ++ graphqlEndpoint,
+    ~uri="wss://" ++ graphqlEndpoint,
     ~options=ClientOptions.make(
       ~connectionParams=ConnectionParams(Obj.magic({"headers": headers})),
       ~reconnect=true,
