@@ -13,11 +13,13 @@ module Styles = {
 @react.component
 let make = () => {
   let pageSize = 5
-  let (page, setPage) = React.useState(_ => 1)
+  let (value, setValue) = React.useState(_ => 0.)
+  let (preValue, setPreValue) = React.useState(_ => 0.)
   let blockSub = BlockSub.get(~height=10030000, ())
 
-  let next = () => setPage(prev => prev + 1)
-  let value = "### Hello Word ``` code ``` **strong**"
+  let markDown = "### Hello Word ``` code ``` **strong**"
+
+  let update = () => setValue(prev => prev +. 20.)
 
   let capitalizedName = "hello world" |> ChangeCase.pascalCase
 
@@ -45,9 +47,29 @@ let make = () => {
   }, [])
   LocalStorage.setItem(keyword, "Hello World")
 
+  let countUp = CountUp.context(
+    CountUp.props(
+      ~start=preValue,
+      ~end=value,
+      ~delay=0,
+      ~decimals=6,
+      ~duration=4,
+      ~useEasing=false,
+      ~separator=",",
+      ~ref="counter",
+    ),
+  )
+
+  React.useEffect1(_ => {
+    countUp.update(value)
+    let timeoutId = Js.Global.setTimeout(() => setPreValue(_ => value), 800)
+    Some(() => Js.Global.clearTimeout(timeoutId))
+  }, [value])
+
   Js.log(LocalStorage.getItem(keyword))
+
   <>
-    <MarkDown value />
+    <MarkDown value=markDown />
     <div
       onClick={_ => {
         Copy.copy("Hello World")
@@ -55,6 +77,8 @@ let make = () => {
       {"Copy" |> React.string}
     </div>
     <QRCode value={"Wow QR Code"} size=200 />
+    <span id="counter" />
+    <button onClick={_ => update()}> {"update" |> React.string} </button>
     <div className=Styles.root>
       {switch blockSub {
       | {data: Some({blocks_by_pk}), loading: false} => {
