@@ -14,6 +14,15 @@ let make = () => {
 
   let capitalizedName = "hello world" |> ChangeCase.pascalCase
 
+  let client = BandChainJS.createClient("https://api-gm-lb.bandchain.org")
+  let _ =
+    client
+    ->BandChainJS.getReferenceData(["BAND/USD", "BAND/BTC"])
+    ->Promise.then(result => {
+      Js.log(result)
+      Promise.resolve()
+    })
+
   Js.log(capitalizedName)
 
   <div className=Styles.root>
