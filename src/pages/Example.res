@@ -20,6 +20,8 @@ let make = () => {
 
   let capitalizedName = "hello world" |> ChangeCase.pascalCase
 
+  let keyword = "testing"
+
   let client = BandChainJS.createClient("https://api-gm-lb.bandchain.org")
   let _ =
     client
@@ -40,6 +42,9 @@ let make = () => {
     Document.addKeyboardEventListener("keydown", handleKey)
     Some(() => Document.removeKeyboardEventListener("keydown", handleKey))
   }, [])
+  LocalStorage.setItem(keyword, "Hello World")
+
+  Js.log(LocalStorage.getItem(keyword))
 
   <div className=Styles.root>
     {switch blockSub {
