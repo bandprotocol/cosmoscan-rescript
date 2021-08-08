@@ -57,6 +57,17 @@ let make = () => {
   }, [])
   LocalStorage.setItem(keyword, "Hello World")
 
+  // address
+  let mnemonic = "absurd exhibit garbage gun flush gown basic chicken east image chimney stand skill own bracket"
+  let bandChain = CosmosJS.network("rpcUrl", "chainID")
+  bandChain->CosmosJS.setPath("m/44'/494'/0'/0/0")
+  bandChain->CosmosJS.setBech32MainPrefix("band")
+  Js.log2(
+    "private",
+    bandChain |> CosmosJS.getECPairPriv(_, mnemonic) |> JsBuffer.toHex(~with0x=false),
+  )
+  Js.log2("address", bandChain |> CosmosJS.getAddress(_, mnemonic))
+
   let countUp = CountUp.context(
     CountUp.props(
       ~start=preValue,
