@@ -56,6 +56,7 @@ let make = () => {
     Some(() => Document.removeKeyboardEventListener("keydown", handleKey))
   }, [])
   LocalStorage.setItem(keyword, "Hello World")
+  Js.log(Semver.gte("5.2.3", "3.2.1"))
 
   // address
   let mnemonic = "absurd exhibit garbage gun flush gown basic chicken east image chimney stand skill own bracket"

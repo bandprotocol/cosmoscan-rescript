@@ -24,6 +24,11 @@
     {
       "dir": "src",
       "subdirs": true
+    },
+    {
+      "dir": "__tests__",
+      "subdirs": true,
+      "type": "dev"
     }
   ],
   "suffix": ".bs.js",
@@ -39,5 +44,6 @@
     "bs-axios",
     "@ryyppy/rescript-promise",
     "@glennsl/bs-json"
-  ]
+  ],
+  "bs-dev-dependencies": ["@glennsl/bs-jest"]
 }
