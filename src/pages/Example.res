@@ -36,12 +36,22 @@ let make = () => {
 
   Js.log(capitalizedName)
   Js.log(Theme.get(Theme.Day))
+  let identity = "94C57647B928FAF1"
+  let useTest = AxiosHooks.use(j`https://keybase.io/_/api/1.0/user/lookup.json?key_suffix=$identity&fields=pictures`)
+  Js.log2("use", useTest)
+
+  let (
+    data,
+    reload,
+  ) = AxiosHooks.useWithReload(j`https://keybase.io/_/api/1.0/user/lookup.json?key_suffix=$identity&fields=pictures`)
+
+  Js.log2("useWithReloadData", data)
+
   React.useEffect1(() => {
     let handleKey = event =>
       if ReactEvent.Keyboard.keyCode(event) == 27 {
         Js.log("trigger")
       }
-
     Document.addKeyboardEventListener("keydown", handleKey)
     Some(() => Document.removeKeyboardEventListener("keydown", handleKey))
   }, [])

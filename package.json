@@ -27,6 +27,8 @@
     "@rescript/react": "0.10.1",
     "@ryyppy/rescript-promise": "^2.1.0",
     "add": "^2.0.6",
+    "axios": "^0.21.1",
+    "axios-hooks": "^2.6.3",
     "bandchainjs": "^0.0.4",
     "bech32": "^2.0.0",
     "bs-axios": "^0.0.43",
