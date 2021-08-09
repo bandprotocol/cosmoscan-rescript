@@ -31,6 +31,15 @@ let make = () => {
 
   Js.log(capitalizedName)
   Js.log(Theme.get(Theme.Day))
+  React.useEffect1(() => {
+    let handleKey = event =>
+      if ReactEvent.Keyboard.keyCode(event) == 27 {
+        Js.log("trigger")
+      }
+
+    Document.addKeyboardEventListener("keydown", handleKey)
+    Some(() => Document.removeKeyboardEventListener("keydown", handleKey))
+  }, [])
 
   <div className=Styles.root>
     {switch blockSub {
