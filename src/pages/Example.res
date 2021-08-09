@@ -17,6 +17,7 @@ let make = () => {
   let blockSub = BlockSub.get(~height=10030000, ())
 
   let next = () => setPage(prev => prev + 1)
+  let value = "### Hello Word ``` code ``` **strong**"
 
   let capitalizedName = "hello world" |> ChangeCase.pascalCase
 
@@ -46,6 +47,7 @@ let make = () => {
 
   Js.log(LocalStorage.getItem(keyword))
   <>
+    <MarkDown value />
     <div
       onClick={_ => {
         Copy.copy("Hello World")
