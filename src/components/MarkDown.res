@@ -9,5 +9,6 @@ module Styles = {
 
 @react.component
 let make = (~value) => {
+  // TODO: Add theme context later
   <div className=Styles.container> {value->MarkedJS.marked->MarkedJS.parse} </div>
 }
