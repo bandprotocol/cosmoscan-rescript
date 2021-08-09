@@ -8,6 +8,8 @@ module Styles = {
     marginTop(Spacing.lg),
     Media.mobile([backgroundColor(pink)]),
   ])
+
+  let padding = style(. [padding(px(20))])
 }
 
 @react.component
@@ -111,6 +113,9 @@ let make = () => {
     <QRCode value={"Wow QR Code"} size=200 />
     <span id="counter" />
     <button onClick={_ => update()}> {"update" |> React.string} </button>
+    <ReactHighlight className=Styles.padding>
+      {"let x = hello world; console.log(x);" |> React.string}
+    </ReactHighlight>
     <div className=Styles.root>
       {switch blockSub {
       | {data: Some({blocks_by_pk}), loading: false} => {
