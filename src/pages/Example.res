@@ -90,6 +90,15 @@ let make = () => {
   Js.log(LocalStorage.getItem(keyword))
 
   <>
+    <Tooltip
+      title={"hello world" |> React.string}
+      placement="bottom"
+      arrow=true
+      leaveDelay=0
+      leaveTouchDelay=3000
+      enterTouchDelay=0>
+      <span> {React.string("Hello World")} </span>
+    </Tooltip>
     <ReactSelectCustom />
     <MarkDown value=markDown />
     <div
