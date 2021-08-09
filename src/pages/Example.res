@@ -69,6 +69,7 @@ let make = () => {
   Js.log(LocalStorage.getItem(keyword))
 
   <>
+    <ReactSelectCustom />
     <MarkDown value=markDown />
     <div
       onClick={_ => {
