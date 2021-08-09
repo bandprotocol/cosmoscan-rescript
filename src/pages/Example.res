@@ -45,29 +45,37 @@ let make = () => {
   LocalStorage.setItem(keyword, "Hello World")
 
   Js.log(LocalStorage.getItem(keyword))
-
-  <div className=Styles.root>
-    {switch blockSub {
-    | {data: Some({blocks_by_pk}), loading: false} => {
-        Js.log2("Data is ", blocks_by_pk)
-        React.null
-      }
-    | {loading: true, data: Some(x)} => {
-        Js.log2("Loading with Some", x)
-        <div> {"Loading with Some" |> React.string} </div>
-      }
-    | {loading: true, data: None} => {
-        Js.log("Loading with None")
-        <div> {"Loading with None" |> React.string} </div>
-      }
-    | {error: Some(error)} => {
-        Js.log(error)
-        React.null
-      }
-    | {loading: false, data: None, error: None} => {
-        Js.log("No data")
-        <div> {"No data" |> React.string} </div>
-      }
-    }}
-  </div>
+  <>
+    <div
+      onClick={_ => {
+        Copy.copy("Hello World")
+      }}>
+      {"Copy" |> React.string}
+    </div>
+    <QRCode value={"Wow QR Code"} size=200 />
+    <div className=Styles.root>
+      {switch blockSub {
+      | {data: Some({blocks_by_pk}), loading: false} => {
+          Js.log2("Data is ", blocks_by_pk)
+          React.null
+        }
+      | {loading: true, data: Some(x)} => {
+          Js.log2("Loading with Some", x)
+          <div> {"Loading with Some" |> React.string} </div>
+        }
+      | {loading: true, data: None} => {
+          Js.log("Loading with None")
+          <div> {"Loading with None" |> React.string} </div>
+        }
+      | {error: Some(error)} => {
+          Js.log(error)
+          React.null
+        }
+      | {loading: false, data: None, error: None} => {
+          Js.log("No data")
+          <div> {"No data" |> React.string} </div>
+        }
+      }}
+    </div>
+  </>
 }
