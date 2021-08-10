@@ -8,9 +8,11 @@
     "build": "rm -rf dist/ && bsb -make-world && webpack",
     "serve": "webpack serve --open",
     "server": "webpack-dev-server",
-    "start": "bsb -make-world -w"
+    "start": "bsb -make-world -w",
+    "test": "yarn jest --coverage"
   },
   "devDependencies": {
+    "@glennsl/bs-jest": "^0.7.0",
     "@reasonml-community/graphql-ppx": "1.0.0",
     "@webpack-cli/serve": "^1.5.1",
     "bs-platform": "9.0.0",
@@ -50,6 +52,9 @@
     "react-select": "^4.3.1",
     "reason-promise": "1.1.1",
     "rescript-apollo-client": "2.0.1",
+    "ripemd160": "^2.0.2",
+    "secp256k1": "^4.0.2",
+    "semver": "^7.3.2",
     "subscriptions-transport-ws": "0.9.16",
     "yarn": "^1.22.10"
   }
