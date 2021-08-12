@@ -14,16 +14,14 @@ let fromBech32 = bech32str => {
     : raise(WrongPrefixAddress("Address is not correct prefix."))
 }
 
-// let fromBech32Opt = bech32str => {
-//   let decodedOpt = bech32str |> Bech32.decodeOpt
-//   %Opt({
-//     let decoded = decodedOpt
-
-//     validatePrefix(decoded)
-//       ? Some(Address(decoded->Bech32.wordsGet->Bech32.fromWords->JsBuffer.arrayToHex))
-//       : None
-//   })
-// }
+let fromBech32Opt = bech32str => {
+  let decodedOpt = bech32str |> Bech32.decodeOpt
+  decodedOpt->Belt.Option.flatMap(decoded =>
+    validatePrefix(decoded)
+      ? Some(Address(decoded->Bech32.wordsGet->Bech32.fromWords->JsBuffer.arrayToHex))
+      : None
+  )
+}
 
 let fromHex = hexstr => Address(hexstr->HexUtils.normalizeHexString)
 
