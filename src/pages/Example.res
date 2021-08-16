@@ -140,5 +140,12 @@ let make = () => {
         }
       }}
     </div>
+    {
+      let dict = Js.Dict.empty()
+      Js.Dict.set(dict, "name", Js.Json.string("John Doe"))
+      let src = Js.Json.object_(dict)
+
+      <JsonViewer src />
+    }
   </>
 }
