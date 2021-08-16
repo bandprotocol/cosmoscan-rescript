@@ -50,6 +50,7 @@
     "react-countup": "^5.2.0",
     "react-dom": "16.13.1",
     "react-select": "^4.3.1",
+    "react-highlight": "^0.14.0",
     "reason-promise": "1.1.1",
     "rescript-apollo-client": "2.0.1",
     "ripemd160": "^2.0.2",
