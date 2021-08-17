@@ -159,7 +159,27 @@ let make = () => {
   }
 
   <>
-    <div className={Styles.root}>
+    <Tooltip
+      title={"hello world" |> React.string}
+      placement="bottom"
+      arrow=true
+      leaveDelay=0
+      leaveTouchDelay=3000
+      enterTouchDelay=0>
+      <span> {React.string("Hello World")} </span>
+    </Tooltip>
+    <ReactSelectCustom />
+    <div
+      onClick={_ => {
+        Copy.copy("Hello World")
+      }}>
+      {"Copy" |> React.string}
+    </div>
+    <QRCode value={"Wow QR Code"} size=200 />
+    <ReactHighlight className=Styles.padding>
+      {"let x = hello world; console.log(x);" |> React.string}
+    </ReactHighlight>
+    <div className=Styles.root>
       {switch blockSub {
       | Data(blocks) => {
           Js.log2("Data is ", blocks)
