@@ -5,8 +5,7 @@ type t =
 let createFromMnemonic = mnemonic => Mnemonic(Mnemonic.create(mnemonic))
 
 let createFromLedger = (ledgerApp, accountIndex) => {
-  let ledger = Ledger.create(ledgerApp, accountIndex)
-  ledger->Promise.then(ledger => Ledger(ledger) |> Promise.resolve)
+  Ledger.create(ledgerApp, accountIndex)->Promise.then(ledger => Ledger(ledger) |> Promise.resolve)
 }
 
 let getAddressAndPubKey = x =>

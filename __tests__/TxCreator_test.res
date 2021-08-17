@@ -89,6 +89,9 @@ describe("expect TxCreator to give the correct message", () => {
               min_count: "4",
               sender: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
               client_id: "",
+              fee_limit: [{amount: "100.", denom: "uband"}],
+              prepare_gas: "30000",
+              execute_gas: "50000",
             })
             |> Belt_Option.getExn
             |> Js.Json.parseExn,
@@ -136,6 +139,9 @@ describe("expect TxCreator to give the correct message", () => {
                 min_count: "4",
                 sender: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
                 client_id: "",
+                fee_limit: [{amount: "100.", denom: "uband"}],
+                prepare_gas: "30000",
+                execute_gas: "50000",
               })
               |> Belt_Option.getExn
               |> Js.Json.parseExn,

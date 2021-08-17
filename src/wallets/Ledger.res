@@ -52,11 +52,11 @@ let create = (ledgerApp, accountIndex) => {
   let path = getPath(ledgerApp, accountIndex)
   let prefix = "band"
 
-  let transport = Os.isWindows()
+  let transportPromise = Os.isWindows()
     ? LedgerJS.createTransportWebHID(timeout)
     : LedgerJS.createTransportWebUSB(timeout)
 
-  transport->then(transport => {
+  transportPromise->then(transport => {
     let app = LedgerJS.createApp(transport)
 
     LedgerJS.publicKey(app, path)->then(pubKeyInfo => {
