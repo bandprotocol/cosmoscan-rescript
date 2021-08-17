@@ -16,6 +16,8 @@ type variant<'a> =
   | Loading
   | NoData
 
+let resolve = data => Data(data)
+
 let fromData = result =>
   switch result {
   | {data: Some(data)} => Data(data)
