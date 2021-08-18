@@ -14,6 +14,15 @@ module Styles = {
 
 @react.component
 let make = () => {
+  let ({ThemeContext.isDarkMode: isDarkMode, theme}, toggle) = React.useContext(
+    ThemeContext.context,
+  )
+
+  let currentTime =
+    React.useContext(TimeContext.context) |> MomentRe.Moment.format(Config.timestampUseFormat)
+
+  Js.log(currentTime)
+
   // let pageSize = 5
   // let (value, setValue) = React.useState(_ => 0.)
   // let (preValue, setPreValue) = React.useState(_ => 0.)
@@ -128,7 +137,16 @@ let make = () => {
     ->ignore
   }
 
-  <button onClick={_ => createLedger()}> {"Click to connection ledger" |> React.string} </button>
+  <>
+    <button onClick={_ => createLedger()}> {"Click to connection ledger" |> React.string} </button>
+    <button
+      onClick={_ => {
+        toggle()
+        Js.log(isDarkMode)
+      }}>
+      {"Change Theme" |> React.string}
+    </button>
+  </>
 
   // React.useEffect1(_ => {
   //   countUp.update(value)
@@ -159,6 +177,9 @@ let make = () => {
   //   <QRCode value={"Wow QR Code"} size=200 />
   //   <span id="counter" />
   //   <button onClick={_ => update()}> {"update" |> React.string} </button>
+  //   <ReactHighlight className=Styles.padding>
+  //     {"let x = hello world; console.log(x);" |> React.string}
+  //   </ReactHighlight>
   //   <div className=Styles.root>
   //     {switch blockSub {
   //     | {data: Some({blocks_by_pk}), loading: false} => {
@@ -183,5 +204,12 @@ let make = () => {
   //       }
   //     }}
   //   </div>
+  //   {
+  //     let dict = Js.Dict.empty()
+  //     Js.Dict.set(dict, "name", Js.Json.string("John Doe"))
+  //     let src = Js.Json.object_(dict)
+
+  //     <JsonViewer src />
+  //   }
   // </>
 }
