@@ -100,50 +100,64 @@ let make = () => {
 
   Js.log(Env.rpc)
 
-  let createLedger = () => {
-    // let _ = Wallet.createFromLedger(Ledger.Cosmos, 0)->Promise.then(wallet => {
-    //   wallet
-    //   ->Wallet.getAddressAndPubKey
-    //   ->Promise.then(((address, pubKey)) => {
-    //     Js.log2("address: ", address)
-    //     Js.log2("pubKey: ", pubKey)
-    //     Promise.resolve()
-    //   })
-    //   ->Promise.catch(err => {
-    //     Js.Console.log(err)
-    //     Promise.resolve()
-    //   })
-    // })
-    let msgs = [
-      TxCreator.Send(
-        "band1jrhuqrymzt4mnvgw8cvy3s9zhx3jj0dq30qpte" |> Address.fromBech32,
-        {amount: 1000000. |> Js.Float.toString, denom: "uband"},
-      ),
-    ]
+  let chainID = "band-laozi-testnet2"
 
-    TxCreator.createRawTx(
-      ~address="band1jrhuqrymzt4mnvgw8cvy3s9zhx3jj0dq30qpte" |> Address.fromBech32,
-      ~msgs,
-      ~chainID="band-laozi-testnet2",
-      ~feeAmount=5000. |> Js.Float.toString,
-      ~gas=200000 |> string_of_int,
-      ~memo="",
-      (),
-    )
-    ->Promise.then(rawTx => {
-      let jsonTx = TxCreator.sortAndStringify(rawTx)
-      Js.log(jsonTx)
-      let wallet = Wallet.createFromMnemonic("s")
-      Wallet.sign(jsonTx, wallet)->Promise.then(signature => {
-        Js.log(signature)
+  let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
+
+  let connectMnemonic = () => {
+    let wallet = Wallet.createFromMnemonic("s")
+    let _ =
+      wallet
+      ->Wallet.getAddressAndPubKey
+      ->Promise.then(((address, pubKey)) => {
+        dispatchAccount(Connect(wallet, address, pubKey, chainID))
+        Js.log(accountOpt)
         Promise.resolve()
       })
-    })
-    ->ignore
+      ->Promise.catch(err => {
+        Js.Console.log(err)
+        Promise.resolve()
+      })
   }
-  Js.log(Images.noOracleLight)
+
+  let connectLedger = () => {
+    let wallet = Wallet.createFromMnemonic("s")
+    let _ =
+      wallet
+      ->Wallet.getAddressAndPubKey
+      ->Promise.then(((address, pubKey)) => {
+        dispatchAccount(Connect(wallet, address, pubKey, chainID))
+        Js.log(accountOpt)
+        Promise.resolve()
+      })
+      ->Promise.catch(err => {
+        Js.Console.log(err)
+        Promise.resolve()
+      })
+  }
+
+  let connectLedger = () => {
+    let _ =
+      Wallet.createFromLedger(Ledger.Cosmos, 0)
+      ->Promise.then(wallet => {
+        wallet
+        ->Wallet.getAddressAndPubKey
+        ->Promise.then(((address, pubKey)) => {
+          dispatchAccount(Connect(wallet, address, pubKey, chainID))
+          Promise.resolve()
+        })
+      })
+      ->Promise.catch(err => {
+        Js.Console.log(err)
+        Promise.resolve()
+      })
+  }
+
+  let disconnect = () => {
+    dispatchAccount(Disconnect)
+  }
+
   <>
-    <button onClick={_ => createLedger()}> {"Click to connection ledger" |> React.string} </button>
     <button
       onClick={_ => {
         toggle()
@@ -152,6 +166,13 @@ let make = () => {
       {"Change Theme" |> React.string}
     </button>
     <button onClick={_ => send()}> {"Send modal" |> React.string} </button>
+    <button onClick={_ => connectMnemonic()}> {"Connect Wallets Mnemonic" |> React.string} </button>
+    <button onClick={_ => connectLedger()}> {"Connect Wallets Ledger" |> React.string} </button>
+    <button onClick={_ => disconnect()}> {"Disconnected" |> React.string} </button>
+    {switch accountOpt {
+    | Some({address}) => address |> Address.toBech32 |> React.string
+    | None => "not connected" |> React.string
+    }}
   </>
 
   // React.useEffect1(_ => {
