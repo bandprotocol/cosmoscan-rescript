@@ -17,11 +17,16 @@ let make = () => {
   let ({ThemeContext.isDarkMode: isDarkMode, theme}, toggle) = React.useContext(
     ThemeContext.context,
   )
+  let (_, dispatchModal) = React.useContext(ModalContext.context)
 
   let currentTime =
     React.useContext(TimeContext.context) |> MomentRe.Moment.format(Config.timestampUseFormat)
 
   Js.log(currentTime)
+
+  let send = () => {
+    None->SubmitMsg.Send->SubmitTx->OpenModal->dispatchModal
+  }
 
   // let pageSize = 5
   // let (value, setValue) = React.useState(_ => 0.)
@@ -136,8 +141,9 @@ let make = () => {
     })
     ->ignore
   }
-
+  // Js.log(Images.noOracleLight)
   <>
+    // <img src=Images.noOracleLight />
     <button onClick={_ => createLedger()}> {"Click to connection ledger" |> React.string} </button>
     <button
       onClick={_ => {
@@ -146,6 +152,7 @@ let make = () => {
       }}>
       {"Change Theme" |> React.string}
     </button>
+    <button onClick={_ => send()}> {"Send modal" |> React.string} </button>
   </>
 
   // React.useEffect1(_ => {
