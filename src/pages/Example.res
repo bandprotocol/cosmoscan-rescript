@@ -141,9 +141,8 @@ let make = () => {
     })
     ->ignore
   }
-  // Js.log(Images.noOracleLight)
+  Js.log(Images.noOracleLight)
   <>
-    // <img src=Images.noOracleLight />
     <button onClick={_ => createLedger()}> {"Click to connection ledger" |> React.string} </button>
     <button
       onClick={_ => {

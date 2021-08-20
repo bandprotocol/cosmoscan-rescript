@@ -1,2 +1,2 @@
-@module external closeButton: string = "./closeButton.svg"
-@module external noOracleLight: string = "./no-oracle-light.png"
+@module("./closeButton.svg") external closeButton: string = "default"
+@module("./no-oracle-light.png") external noOracleLight: string = "default"
