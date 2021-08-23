@@ -2,7 +2,7 @@ type aggregate_t = {count: option<int>}
 
 type transactions_aggregate_t = {aggregate: option<aggregate_t>}
 
-type internal_val_t = {
+type internal_validator_t = {
   consensusAddress: string,
   operatorAddress: string,
   moniker: string,
@@ -13,7 +13,7 @@ type internal_t = {
   timestamp: MomentRe.Moment.t,
   hash: Hash.t,
   inflation: float,
-  validator: internal_val_t,
+  validator: internal_validator_t,
   transactions_aggregate: transactions_aggregate_t,
 }
 
@@ -47,7 +47,7 @@ module MultiConfig = %graphql(`
       timestamp @ppxCustom(module: "GraphQLParserModule.Date")
       hash @ppxCustom(module: "GraphQLParserModule.Hash")
       inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
-      validator @ppxAs(type: "internal_val_t"){
+      validator @ppxAs(type: "internal_validator_t"){
         consensusAddress: consensus_address
         operatorAddress: operator_address 
         moniker
@@ -68,7 +68,7 @@ module SingleConfig = %graphql(`
       timestamp @ppxCustom(module: "GraphQLParserModule.Date")
       hash @ppxCustom(module: "GraphQLParserModule.Hash")
       inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
-      validator @ppxAs(type: "internal_val_t"){
+      validator @ppxAs(type: "internal_validator_t"){
         consensusAddress: consensus_address
         operatorAddress: operator_address
         moniker
