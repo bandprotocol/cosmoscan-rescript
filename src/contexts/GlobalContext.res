@@ -8,12 +8,13 @@ let make = (~children) => {
   let (financialOpt, setFinancialOpt) = React.useState(_ => None)
 
   React.useEffect0(() => {
-    let fetchData = () => {
-      let _ = PriceHook.getBandInfo(client)->Promise.then(bandInfoOpt => {
+    let fetchData = () =>
+      PriceHook.getBandInfo(client)
+      ->Promise.then(bandInfoOpt => {
         setFinancialOpt(_ => bandInfoOpt)
         Promise.resolve()
       })
-    }
+      ->ignore
 
     fetchData()
     let intervalID = Js.Global.setInterval(fetchData, 60000)
