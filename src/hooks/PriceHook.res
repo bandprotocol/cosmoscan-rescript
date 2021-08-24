@@ -7,48 +7,38 @@ type t = {
   circulatingSupply: float,
 }
 
-let getBandUsd24Change = () =>
+let getBandUsd24Change = () => {
+  open! JsonUtils.Decode
   Axios.get(
     "https://api.coingecko.com/api/v3/simple/price?ids=band-protocol&vs_currencies=usd&include_market_cap=true&include_24hr_change=true",
   )
   ->Promise.then(result =>
-    Promise.resolve(
-      result["data"] |> JsonUtils.Decode.at(
-        list{"band-protocol", "usd_24h_change"},
-        JsonUtils.Decode.float,
-      ),
-    )
+    Promise.resolve(result["data"] |> at(list{"band-protocol", "usd_24h_change"}, float))
   )
   ->Promise.catch(_ => {
     Js.Console.log("swapped to use cryptocompare api")
     Axios.get(
       "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BAND&tsyms=USD",
     )->Promise.then(result =>
-      Promise.resolve(
-        result["data"] |> JsonUtils.Decode.at(
-          list{"RAW", "BAND", "USD", "CHANGEPCT24HOUR"},
-          JsonUtils.Decode.float,
-        ),
-      )
+      Promise.resolve(result["data"] |> at(list{"RAW", "BAND", "USD", "CHANGEPCT24HOUR"}, float))
     )
   })
+}
 
-let getCirculatingSupply = () =>
+let getCirculatingSupply = () => {
+  open! JsonUtils.Decode
+
   Axios.get("https://supply.bandchain.org/circulating")
-  ->Promise.then(result => Promise.resolve(result["data"] |> JsonUtils.Decode.float))
+  ->Promise.then(result => Promise.resolve(result["data"] |> float))
   ->Promise.catch(_ => {
     Js.Console.log("swapped to use coingekco api")
     Axios.get(
       "https://api.coingecko.com/api/v3/coins/band-protocol?tickers=false&community_data=false&developer_data=false&sparkline=false",
     )->Promise.then(result =>
-      Promise.resolve(
-        result["data"] |> JsonUtils.Decode.at(
-          list{"market_data", "circulating_supply"},
-          JsonUtils.Decode.float,
-        ),
-      )
+      Promise.resolve(result["data"] |> at(list{"market_data", "circulating_supply"}, float))
     )
   })
+}
 
 module Price = {
   type t = {
@@ -59,8 +49,8 @@ module Price = {
   let decode = json => {
     open JsonUtils.Decode
     {
-      multiplier: json |> at(list{"multiplier"}, JsonUtils.Decode.string) |> float_of_string,
-      px: json |> at(list{"px"}, JsonUtils.Decode.string) |> float_of_string,
+      multiplier: json |> at(list{"multiplier"}, string) |> float_of_string,
+      px: json |> at(list{"px"}, string) |> float_of_string,
     }
   }
 }
