@@ -22,8 +22,8 @@ type a =
   | Disconnect
   | SendRequest(send_request_t)
 
-let reducer = (state, x) =>
-  switch x {
+let reducer = (state, action) =>
+  switch action {
   | Connect(wallet, address, pubKey, chainID) =>
     Some({wallet: wallet, pubKey: pubKey, address: address, chainID: chainID})
   | Disconnect =>
