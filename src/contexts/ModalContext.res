@@ -47,7 +47,7 @@ let make = (~children) => {
   let isClosing = state->Belt_Option.mapWithDefault(false, ({closing}) => closing)
   React.useEffect1(() => {
     if isClosing {
-      let _ = Js.Global.setTimeout(() => dispatch(KillModal), Config.modalFadingDutation)
+      Js.Global.setTimeout(() => dispatch(KillModal), Config.modalFadingDutation)->ignore
     }
     None
   }, [isClosing])

@@ -55,6 +55,7 @@ module Styles = {
   let ledgerImageContainer = active => style(. [opacity(active ? 1.0 : 0.5), marginRight(#px(15))])
 }
 
+//Re-consider to remove ledgerWithBandChain
 type login_method_t =
   | Mnemonic
   | LedgerWithCosmos
@@ -65,6 +66,7 @@ let make = (~chainID) => {
   let (loginMethod, setLoginMethod) = React.useState(_ => Mnemonic)
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
+  //TODO: will patch to modal component later
   <div>
     {switch loginMethod {
     | Mnemonic => "Connect Mnemonic Modal" |> React.string

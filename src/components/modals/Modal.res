@@ -84,8 +84,6 @@ let make = () => {
 
   let closeModal = () => dispatchModal(CloseModal)
 
-  Js.log("trigger")
-
   React.useEffect1(() => {
     let handleKey = event =>
       if ReactEvent.Keyboard.keyCode(event) == 27 {
@@ -110,13 +108,16 @@ let make = () => {
           id="closeModal" onClick={_ => canExit ? closeModal() : ()} className=Styles.closeButton>
           <Icon name="fal fa-times" color=theme.textPrimary size=18 />
         </div>
-        {switch modal {
-        | Connect(_) => "Connect" |> React.string
-        | SubmitTx(_) => "SubmitTx" |> React.string
-        | QRCode(_) => "QRCode" |> React.string
-        | IBCPacketError(_) => "Connect" |> React.string
-        | Syncing => "Sync" |> React.string
-        }}
+        {
+          //TODO: Will patch the modal component later
+          switch modal {
+          | Connect(_) => "Connect" |> React.string
+          | SubmitTx(_) => "SubmitTx" |> React.string
+          | QRCode(_) => "QRCode" |> React.string
+          | IBCPacketError(_) => "Connect" |> React.string
+          | Syncing => "Sync" |> React.string
+          }
+        }
       </div>
     </div>
   }
