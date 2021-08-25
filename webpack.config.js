@@ -14,6 +14,7 @@ module.exports = {
     path: outputDir,
     filename: "clientBundle.js",
   },
+
   plugins: [
     new HtmlWebpackPlugin({
       template: "src/index.html",
@@ -26,6 +27,16 @@ module.exports = {
       FAUCET_URL: JSON.stringify(process.env.FAUCET_URL),
     })
   ],
+  module: {
+    rules: [
+        {
+          test: /\.(png|svg|jpg|gif)$/,
+          use: [
+            'file-loader',
+          ],
+        },
+    ]
+  },
   devServer: {
     compress: true,
     contentBase: outputDir,
