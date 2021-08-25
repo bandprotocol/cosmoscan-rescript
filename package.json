@@ -26,7 +26,7 @@
   "dependencies": {
     "@apollo/client": "3.3.21",
     "@bandprotocol/bandchain.js": "^1.2.1",
-    "@cosmostation/cosmosjs": "^0.5.5",
+    "@cosmostation/cosmosjs": "0.5.5",
     "@glennsl/bs-json": "^5.0.4",
     "@ledgerhq/hw-transport-webhid": "^6.4.1",
     "@ledgerhq/hw-transport-webusb": "^6.3.0",

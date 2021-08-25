@@ -1,56 +1,55 @@
-// TODO: Add route
 module type RawIDSig = {
-  //   type tab_t
+  type tab_t
   let prefix: string
   let color: Css.Types.Color.t
-  //   let route: (int, tab_t) => Route.t
-  //   let defaultTab: tab_t
+  let route: (int, tab_t) => Route.t
+  let defaultTab: tab_t
 }
 
 module RawDataSourceID = {
-  //   type tab_t = Route.data_source_tab_t
+  type tab_t = Route.data_source_tab_t
   let prefix = "#D"
   let color = Theme.baseBlue
-  //   let route = (id, tab) => Route.DataSourceIndexPage(id, tab)
-  //   let defaultTab = Route.DataSourceRequests
+  let route = (id, tab) => Route.DataSourceIndexPage(id, tab)
+  let defaultTab = Route.DataSourceRequests
 }
 
 module RawOracleScriptID = {
-  //   type tab_t = Route.oracle_script_tab_t
+  type tab_t = Route.oracle_script_tab_t
   let prefix = "#O"
   let color = Theme.baseBlue
-  //   let route = (id, tab) => Route.OracleScriptIndexPage(id, tab)
-  //   let defaultTab = Route.OracleScriptRequests
+  let route = (id, tab) => Route.OracleScriptIndexPage(id, tab)
+  let defaultTab = Route.OracleScriptRequests
 }
 
 module RawRequestID = {
-  //   type tab_t = unit
+  type tab_t = unit
   let prefix = "#R"
   let color = Theme.baseBlue
-  //   let route = (id, _) => Route.RequestIndexPage(id)
-  //   let defaultTab = ()
+  let route = (id, _) => Route.RequestIndexPage(id)
+  let defaultTab = ()
 }
 
 module RawProposalID = {
-  //   type tab_t = unit
+  type tab_t = unit
   let prefix = "#P"
   let color = Theme.baseBlue
-  //   let route = (id, _) => Route.ProposalIndexPage(id)
-  //   let defaultTab = ()
+  let route = (id, _) => Route.ProposalIndexPage(id)
+  let defaultTab = ()
 }
 
 module RawBlock = {
-  //   type tab_t = unit
+  type tab_t = unit
   let prefix = "#B"
   let color = Theme.baseBlue
-  //   let route = (height, _) => Route.BlockIndexPage(height)
-  //   let defaultTab = ()
+  let route = (height, _) => Route.BlockIndexPage(height)
+  let defaultTab = ()
 }
 
 module type IDSig = {
   include RawIDSig
   type t
-  //   let getRoute: t => Route.t
+  let getRoute: t => Route.t
   let toString: t => string
 }
 
@@ -59,12 +58,12 @@ module IDCreator = (RawID: RawIDSig) => {
 
   type t = ID(int)
 
-  //   let getRoute = x =>
-  //     switch x {
-  //     | ID(id) => RawID.route(id, RawID.defaultTab)
-  //     }
+  let getRoute = x =>
+    switch x {
+    | ID(id) => RawID.route(id, RawID.defaultTab)
+    }
 
-  //   let getRouteWithTab = (ID(id), tab) => RawID.route(id, tab)
+  let getRouteWithTab = (ID(id), tab) => RawID.route(id, tab)
 
   let toString = x =>
     switch x {
