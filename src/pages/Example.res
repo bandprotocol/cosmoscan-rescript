@@ -28,10 +28,11 @@ let make = () => {
     None->SubmitMsg.Send->SubmitTx->OpenModal->dispatchModal
   }
 
-  // let pageSize = 5
-  // let (value, setValue) = React.useState(_ => 0.)
-  // let (preValue, setPreValue) = React.useState(_ => 0.)
-  // let blockSub = BlockSub.get(~height=10030000, ())
+  let pageSize = 5
+  let (value, setValue) = React.useState(_ => 0.)
+  let (preValue, setPreValue) = React.useState(_ => 0.)
+  let (page, setPage) = React.useState(_ => 1)
+  let blockSub = BlockSub.getList(~page, ~pageSize, ())
 
   // let markDown = "### Hello Word ``` code ``` **strong**"
 
@@ -158,6 +159,38 @@ let make = () => {
   }
 
   <>
+    <Tooltip
+      title={"hello world" |> React.string}
+      placement="bottom"
+      arrow=true
+      leaveDelay=0
+      leaveTouchDelay=3000
+      enterTouchDelay=0>
+      <span> {React.string("Hello World")} </span>
+    </Tooltip>
+    <ReactSelectCustom />
+    <div
+      onClick={_ => {
+        Copy.copy("Hello World")
+      }}>
+      {"Copy" |> React.string}
+    </div>
+    <QRCode value={"Wow QR Code"} size=200 />
+    <ReactHighlight className=Styles.padding>
+      {"let x = hello world; console.log(x);" |> React.string}
+    </ReactHighlight>
+    <div className=Styles.root>
+      {switch blockSub {
+      | Data(blocks) => {
+          Js.log2("Data is ", blocks)
+          React.null
+        }
+      | _ => {
+          Js.log("Loading...")
+          "Loading...." |> React.string
+        }
+      }}
+    </div>
     <button
       onClick={_ => {
         toggle()
@@ -173,6 +206,17 @@ let make = () => {
     | Some({address}) => address |> Address.toBech32 |> React.string
     | None => "not connected" |> React.string
     }}
+    <QRCode value={"Wow QR Code"} size=200 />
+    <ReactHighlight className=Styles.padding>
+      {"let x = hello world; console.log(x);" |> React.string}
+    </ReactHighlight>
+    {
+      let dict = Js.Dict.empty()
+      Js.Dict.set(dict, "name", Js.Json.string("John Doe"))
+      let src = Js.Json.object_(dict)
+
+      <JsonViewer src />
+    }
   </>
 
   // React.useEffect1(_ => {
