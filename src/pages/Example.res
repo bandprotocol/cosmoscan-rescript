@@ -33,6 +33,28 @@ let make = () => {
   let (preValue, setPreValue) = React.useState(_ => 0.)
   let (page, setPage) = React.useState(_ => 1)
   let blockSub = BlockSub.getList(~page, ~pageSize, ())
+  let run = () =>
+    AxiosRequest.execute(
+      AxiosRequest.t(
+        ~executable="IyEvdXNyL2Jpbi9lbnYgcHl0aG9uMwppbXBvcnQgcmVxdWVzdHMKaW1wb3J0IHN5cwoKVVJMID0gImh0dHBzOi8vYXNpYS1zb3V0aGVhc3QyLXByaWNlLWNhY2hpbmcuY2xvdWRmdW5jdGlvbnMubmV0L3F1ZXJ5LXByaWNlIgpIRUFERVJTID0geyJDb250ZW50LVR5cGUiOiAiYXBwbGljYXRpb24vanNvbiJ9CgoKZGVmIG1haW4oc3ltYm9scyk6CiAgICBwYXlsb2FkID0geyJzb3VyY2UiOiAiY3J5cHRvX2NvbXBhcmUiLCAic3ltYm9scyI6IHN5bWJvbHN9CiAgICByID0gcmVxdWVzdHMucG9zdChVUkwsIGhlYWRlcnM9SEVBREVSUywganNvbj1wYXlsb2FkKQogICAgci5yYWlzZV9mb3Jfc3RhdHVzKCkKCiAgICBweHMgPSByLmpzb24oKQoKICAgIGlmIGxlbihweHMpICE9IGxlbihzeW1ib2xzKToKICAgICAgICByYWlzZSBFeGNlcHRpb24oIlNMVUdfQU5EX1NZTUJPTF9MRU5fTk9UX01BVENIIikKCiAgICByZXR1cm4gIiwiLmpvaW4ocHhzKQoKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICB0cnk6CiAgICAgICAgcHJpbnQobWFpbihzeXMuYXJndlsxOl0pKQogICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgIHByaW50KHN0cihlKSwgZmlsZT1zeXMuc3RkZXJyKQogICAgICAgIHN5cy5leGl0KDEpCg==",
+        ~calldata="BTC",
+        ~timeout=5000,
+      ),
+    )
+    ->Promise.then(res => {
+      Js.log(res)
+      Promise.resolve()
+    })
+    ->Promise.catch(err => {
+      Js.log(err)
+      Promise.resolve()
+    })
+    ->ignore
+    
+  // let pageSize = 5
+  // let (value, setValue) = React.useState(_ => 0.)
+  // let (preValue, setPreValue) = React.useState(_ => 0.)
+  // let blockSub = BlockSub.get(~height=10030000, ())
 
   // let markDown = "### Hello Word ``` code ``` **strong**"
 
@@ -222,6 +244,7 @@ let make = () => {
       }
     | _ => React.null
     }}
+    <button onClick={_ => run()}> {"Send request " |> React.string} </button>
   </>
   // let pageSize = 5
   // let (value, setValue) = React.useState(_ => 0.)
