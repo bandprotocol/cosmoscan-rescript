@@ -1,14 +1,25 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [
-    selector("a", [wordBreak(#breakAll), textDecoration(#none), transition(~duration=200, "all")]),
-    selector("p + p", [marginTop(#em(1.))]),
-  ])
+  let container = (theme: Theme.t) =>
+    style(. [
+      selector(
+        "a",
+        [
+          wordBreak(#breakAll),
+          color(theme.textPrimary),
+          textDecoration(#none),
+          transition(~duration=200, "all"),
+          hover([color(theme.baseBlue)]),
+        ],
+      ),
+      selector("p", [color(theme.textSecondary)]),
+      selector("p + p", [marginTop(#em(1.))]),
+    ])
 }
 
 @react.component
 let make = (~value) => {
-  // TODO: Add theme context later
-  <div className=Styles.container> {value->MarkedJS.marked->MarkedJS.parse} </div>
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  <div className={Styles.container(theme)}> {value->MarkedJS.marked->MarkedJS.parse} </div>
 }
