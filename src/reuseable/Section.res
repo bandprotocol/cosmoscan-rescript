@@ -1,0 +1,23 @@
+module Styles = {
+  open CssJs
+
+  let base = (~pt, ~pb, ()) => style(. [paddingTop(#px(pt)), paddingBottom(#px(pb))])
+
+  let mobile = (~ptSm, ~pbSm, ()) =>
+    style(. [Media.mobile([paddingTop(#px(ptSm)), paddingBottom(#px(pbSm))])])
+
+  let bgColor = color => style(. [backgroundColor(color)])
+}
+
+@react.component
+let make = (~children, ~pt=60, ~pb=60, ~ptSm=32, ~pbSm=32, ~bg=?, ~style="") => {
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let css = CssJs.merge(. [
+    Styles.bgColor(bg->Belt.Option.getWithDefault(theme.mainBg)),
+    Styles.base(~pt, ~pb, ()),
+    Styles.mobile(~ptSm, ~pbSm, ()),
+    style,
+  ])
+
+  <section className=css> children </section>
+}
