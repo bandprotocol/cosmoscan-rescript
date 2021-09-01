@@ -4,6 +4,10 @@
 @module("./closeButton.svg") external closeButton: string = "default"
 @module("./no-oracle-light.png") external noOracleLight: string = "default"
 @module("./no-oracle-dark.png") external noOracleDark: string = "default"
+@module("./success.svg") external success: string = "default"
+@module("./fail.svg") external fail: string = "default"
+@module("./loading-circle-light.svg") external loadingCircleLight: string = "default"
+@module("./loading-circle-dark.svg") external loadingCircleDark: string = "default"
 
 // Theme Toggle
 @module("./sun-icon.png") external sunIcon: string = "default"
