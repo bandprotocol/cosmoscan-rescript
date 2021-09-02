@@ -51,7 +51,7 @@ module InnerPanel = {
   @react.component
   let make = (~values, ~idx) => {
     values
-    ->Belt_List.mapWithIndex((index, (heading, value)) => {
+    ->Belt.Array.mapWithIndex((index, (heading, value)) => {
       let alignItem = switch value {
       | InfoMobileCard.Messages(_)
       | PubKey(_) =>
@@ -85,7 +85,6 @@ module InnerPanel = {
         <div className={Styles.infoContainer(isOneColumn)}> <InfoMobileCard info=value /> </div>
       </div>
     })
-    ->Belt.List.toArray
     ->React.array
   }
 }

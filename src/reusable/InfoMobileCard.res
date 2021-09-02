@@ -134,9 +134,7 @@ let make = (~info) => {
   // <Timestamp time size=Text.Md weight=Text.Regular />
   | Validator(address, moniker, identity) =>
     <ValidatorMonikerLink validatorAddress=address moniker size=Text.Md identity width={#px(230)} />
-  | PubKey(publicKey) => React.null
-  // TODO: do it later
-  // <PubKeyRender alignLeft=true pubKey=publicKey display=block />
+  | PubKey(publicKey) => <PubKeyRender alignLeft=true pubKey=publicKey display=#block />
   | TxHash(txHash, width) => <TxLink txHash width />
   | BlockHash(hash) =>
     <Text
