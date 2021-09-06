@@ -43,6 +43,7 @@ let darkBlue = hex("3719B8")
 let darkenBlue = hex("29138A")
 let black = hex("000000")
 let white = hex("ffffff")
+let gray = hex("555555")
 
 let successColor = hex("5FD3C8")
 let pendingColor = hex("F4D23E")

@@ -50,7 +50,7 @@ let make = () => {
       Promise.resolve()
     })
     ->ignore
-    
+
   // let pageSize = 5
   // let (value, setValue) = React.useState(_ => 0.)
   // let (preValue, setPreValue) = React.useState(_ => 0.)
@@ -245,6 +245,20 @@ let make = () => {
     | _ => React.null
     }}
     <button onClick={_ => run()}> {"Send request " |> React.string} </button>
+    <MobileCard
+      values=[
+        (
+          "TX Hash",
+          InfoMobileCard.Address(
+            "band1q72cy88h8je89lqhqhcskmzak25uyavdg79y95" |> Address.fromBech32,
+            149,
+            #account,
+          ),
+        ),
+        ("XXXX", InfoMobileCard.Height(ID.Block.ID(1299))),
+      ]
+      idx={"aksdaksdkasd"}
+    />
   </>
   // let pageSize = 5
   // let (value, setValue) = React.useState(_ => 0.)
