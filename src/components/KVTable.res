@@ -10,15 +10,15 @@ module Styles = {
   open CssJs
   let tabletContainer = (theme: Theme.t) =>
     style(. [
-      padding2(~v=px(8), ~h=px(24)),
+      padding2(~v=#px(8), ~h=#px(24)),
       backgroundColor(theme.secondaryTableBg),
       borderRadius(px(8)),
-      Media.mobile([padding2(~v=px(8), ~h=px(12))]),
+      Media.mobile([padding2(~v=#px(8), ~h=#px(12))]),
     ])
 
   let tableSpacing = style(. [
-    padding2(~v=px(8), ~h=zero),
-    Media.mobile([padding2(~v=px(4), ~h=zero)]),
+    padding2(~v=#px(8), ~h=zero),
+    Media.mobile([padding2(~v=#px(4), ~h=zero)]),
   ])
 
   let valueContainer = mw =>
