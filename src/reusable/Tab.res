@@ -19,9 +19,9 @@ module Styles = {
       justifyContent(center),
       alignItems(center),
       cursor(pointer),
-      padding2(~v=px(32), ~h=zero),
-      borderBottom(px(4), solid, active ? Theme.baseBlue : transparent),
-      Media.mobile([whiteSpace(nowrap), padding2(~v=px(24), ~h=zero)]),
+      padding2(~v=#px(32), ~h=zero),
+      borderBottom(#px(4), solid, active ? Theme.baseBlue : transparent),
+      Media.mobile([whiteSpace(nowrap), padding2(~v=#px(24), ~h=zero)]),
     ])
 
   let childrenContainer = style(. [Media.mobile([padding2(~h=px(16), ~v=zero)])])
