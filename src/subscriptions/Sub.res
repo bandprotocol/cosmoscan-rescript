@@ -26,6 +26,14 @@ let fromData = result =>
   | {data: None, error: None, loading: false} => NoData
   }
 
+let flatMap = (result, f) =>
+  switch result {
+  | Data(data) => f(data)
+  | Loading => Loading
+  | Error(e) => Error(e)
+  | NoData => NoData
+  }
+
 // 1. loading: true, data: None
 // 2. loading: false, data: Some
 // 3. loading: true, data: Some

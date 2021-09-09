@@ -24,6 +24,20 @@ module FloatString = {
 module Address = {
   type t = Address.t
   //Note: just mock
-  let parse = json => json->GraphQLParser.string->Address.fromBech32
-  let serialize = x => "empty"->Js.Json.string
+  let parse = json => json->Address.fromBech32
+  let serialize = addr => addr->Address.toBech32
+}
+
+module Coins = {
+  type t = list<Coin.t>
+  let parse = json => json->GraphQLParser.coins
+  //TODO: implement for coins
+  let serialize = coins => "coins"
+}
+
+module BlockID = {
+  type t = ID.Block.t
+  let parse = blockID => blockID->ID.Block.fromInt
+  //Note: just mock
+  let serialize = blockID => blockID->ID.Block.toInt
 }

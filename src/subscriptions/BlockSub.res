@@ -4,7 +4,7 @@ type transactions_aggregate_t = {aggregate: option<aggregate_t>}
 
 type internal_validator_t = {
   consensusAddress: string,
-  operatorAddress: string,
+  operatorAddress: Address.t,
   moniker: string,
   identity: string,
 }
@@ -31,7 +31,7 @@ let toExternal = ({hash, inflation, timestamp, validator, transactions_aggregate
   timestamp: timestamp,
   validator: {
     consensusAddress: validator.consensusAddress,
-    operatorAddress: validator.operatorAddress |> Address.fromBech32,
+    operatorAddress: validator.operatorAddress,
     moniker: validator.moniker,
     identity: validator.identity,
   },
@@ -49,7 +49,7 @@ module MultiConfig = %graphql(`
       inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
       validator @ppxAs(type: "internal_validator_t"){
         consensusAddress: consensus_address
-        operatorAddress: operator_address 
+        operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
         moniker
         identity
       }
@@ -70,7 +70,7 @@ module SingleConfig = %graphql(`
       inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
       validator @ppxAs(type: "internal_validator_t"){
         consensusAddress: consensus_address
-        operatorAddress: operator_address
+        operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
         moniker
         identity
       }

@@ -1,4 +1,4 @@
-let graphqlEndpoint = "graphql-lt2.bandchain.org/v1/graphql" //laozi-testnet2
+let graphqlEndpoint = Env.graphql //laozi-testnet2
 
 let headers = {"project": "cosmoscan"}
 
@@ -11,7 +11,7 @@ let httpLink = ApolloClient.Link.HttpLink.make(
 let wsLink = {
   open ApolloClient.Link.WebSocketLink
   make(
-    ~uri="wss://" ++ graphqlEndpoint,
+    ~uri=graphqlEndpoint,
     ~options=ClientOptions.make(
       ~connectionParams=ConnectionParams(Obj.magic({"headers": headers})),
       ~reconnect=true,
