@@ -1,11 +1,9 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const outputDir = path.join(__dirname, "dist/");
-const webpack = require('webpack'); //to access built-in plugins
+const path = require("path")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+const outputDir = path.join(__dirname, "dist/")
+const webpack = require("webpack") //to access built-in plugins
 
-const isProd = process.env.NODE_ENV === "production";
-
-
+const isProd = process.env.NODE_ENV === "production"
 
 module.exports = {
   entry: "./src/WebpackEntry.bs.js",
@@ -25,17 +23,19 @@ module.exports = {
       GRAPHQL_URL: JSON.stringify(process.env.GRAPHQL_URL),
       LAMBDA_URL: JSON.stringify(process.env.LAMBDA_URL),
       FAUCET_URL: JSON.stringify(process.env.FAUCET_URL),
-    })
+    }),
   ],
   module: {
     rules: [
-        {
-          test: /\.(png|svg|jpg|gif)$/,
-          use: [
-            'file-loader',
-          ],
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        loader: "file-loader",
+        options: {
+          name: "[name].[ext]",
+          outputPath: "/images",
         },
-    ]
+      },
+    ],
   },
   devServer: {
     compress: true,
@@ -43,5 +43,4 @@ module.exports = {
     port: process.env.PORT || 8000,
     historyApiFallback: true,
   },
-};
-
+}
