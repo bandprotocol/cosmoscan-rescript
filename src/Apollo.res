@@ -1,4 +1,4 @@
-let graphqlEndpoint = Env.graphql //laozi-testnet2
+let graphqlEndpoint = Env.graphql
 
 let headers = {"project": "cosmoscan"}
 

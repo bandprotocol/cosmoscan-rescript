@@ -292,6 +292,16 @@ module RequestMsg = {
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
+          value="Fee Limit"
+          size=Heading.H4
+          weight=Heading.Regular
+          marginBottom=8
+          color={theme.textSecondary}
+        />
+        <AmountRender coins={request.feeLimit} pos=AmountRender.TxIndex />
+      </Col>
+      <Col col=Col.Six mb=24>
+        <Heading
           value="Prepare Gas"
           size=Heading.H4
           weight=Heading.Regular
