@@ -33,7 +33,7 @@ type t =
   | TxHash(Hash.t, int)
   | BlockHash(Hash.t)
   | Validator(Address.t, string, string)
-  | Messages(Hash.t, array<MsgDecoder.t>, bool, string)
+  | Messages(Hash.t, list<MsgDecoder.t>, bool, string)
   | PubKey(PubKey.t)
   | Badge(MsgDecoder.badge_theme_t)
   | VotingPower(Coin.t, float)
@@ -145,7 +145,7 @@ let make = (~info) => {
       ellipsis=true
       color={theme.textPrimary}
     />
-  | Messages(txHash, messages, success, errMsg) => React.null
+  | Messages(txHash, messages, success, errMsg) => <TxMessages txHash messages success errMsg />
   // TODO: do it later
   // <TxMessages txHash messages success errMsg />
   | Badge({name, category}) => React.null
