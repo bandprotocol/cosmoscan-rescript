@@ -404,6 +404,36 @@ module RequestFailMsg = {
           <TypeID.OracleScript position=TypeID.Subtitle id=request.oracleScriptID />
         </div>
       </Col>
+      <Col col=Col.Six mb=24>
+        <Heading
+          value="Fee Limit"
+          size=Heading.H4
+          weight=Heading.Regular
+          marginBottom=8
+          color={theme.textSecondary}
+        />
+        <AmountRender coins={request.feeLimit} pos=AmountRender.TxIndex />
+      </Col>
+      <Col col=Col.Six mb=24>
+        <Heading
+          value="Prepare Gas"
+          size=Heading.H4
+          weight=Heading.Regular
+          marginBottom=8
+          color=theme.textSecondary
+        />
+        <Text value={request.prepareGas |> string_of_int} size=Text.Lg />
+      </Col>
+      <Col col=Col.Six mb=24>
+        <Heading
+          value="Execute Gas"
+          size=Heading.H4
+          weight=Heading.Regular
+          marginBottom=8
+          color=theme.textSecondary
+        />
+        <Text value={request.executeGas |> string_of_int} size=Text.Lg />
+      </Col>
       <Col mb=24>
         <Heading
           value="Calldata"
