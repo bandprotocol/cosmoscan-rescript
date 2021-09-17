@@ -1,8 +1,8 @@
 @deriving(abstract)
 type props = {
-  ref: string,
   start: float,
-  end: float,
+  @as("end")
+  end_: float,
   delay: int,
   decimals: int,
   duration: int,
@@ -10,9 +10,10 @@ type props = {
   separator: string,
 }
 
+@deriving(abstract)
 type t = {
   countUp: float,
   update: float => unit,
 }
 
-@module("react-countup") @val external context: props => t = "useCountUp"
+@val @module("react-countup") external context: props => t = "useCountUp"

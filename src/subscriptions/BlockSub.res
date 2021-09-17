@@ -49,7 +49,7 @@ module MultiConfig = %graphql(`
       inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
       validator @ppxAs(type: "internal_validator_t"){
         consensusAddress: consensus_address
-        operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
+        operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Addr")
         moniker
         identity
       }
@@ -70,7 +70,7 @@ module SingleConfig = %graphql(`
       inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
       validator @ppxAs(type: "internal_validator_t"){
         consensusAddress: consensus_address
-        operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
+        operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Addr")
         moniker
         identity
       }
