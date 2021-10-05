@@ -378,18 +378,11 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
                 },
               ]
               currentRoute=Route.AccountIndexPage(address, hashtag)>
-              {
-                // {switch hashtag {
-                // | AccountDelegations => <AccountIndexDelegations address />
-                // | AccountUnbonding => <AccountIndexUnbonding address />
-                // | AccountRedelegate => <AccountIndexRedelegate address />
-                // }}
-                switch hashtag {
-                | AccountDelegations => <AccountIndexDelegations address />
-                | AccountUnbonding => <AccountIndexUnbonding address />
-                | AccountRedelegate => React.null
-                }
-              }
+              {switch hashtag {
+              | AccountDelegations => <AccountIndexDelegations address />
+              | AccountUnbonding => <AccountIndexUnbonding address />
+              | AccountRedelegate => <AccountIndexRedelegate address />
+              }}
             </Tab.Route>
           </Table>
         </Col>

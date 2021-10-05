@@ -7,39 +7,61 @@ module Styles = {
 
 module RenderBody = {
   @react.component
-  let make = (~unbondingListSub: Sub.variant<UnbondingSub.unbonding_list_t>) =>
+  let make = (~redelegateListSub: Sub.variant<RedelegateSub.redelegate_list_t>) =>
     <TBody>
       <Row alignItems=Row.Center>
-        <Col col=Col.Six>
-          {switch unbondingListSub {
-          | Data({validator: {operatorAddress, moniker, identity}}) =>
-            <div className={CssHelper.flexBox()}>
-              <ValidatorMonikerLink
-                validatorAddress=operatorAddress
-                moniker
-                identity
-                width=#px(300)
-                avatarWidth=30
-                size=Text.Lg
-              />
-            </div>
+        <Col col=Col.Three>
+          {switch redelegateListSub {
+          | Data({
+              srcValidator: {
+                operatorAddress: srcAddress,
+                moniker: srcMoniker,
+                identity: srcIdentity,
+              },
+            }) =>
+            <ValidatorMonikerLink
+              validatorAddress=srcAddress
+              moniker=srcMoniker
+              identity=srcIdentity
+              width=#px(200)
+              avatarWidth=30
+              size=Text.Lg
+            />
           | _ => <LoadingCensorBar width=200 height=20 />
           }}
         </Col>
         <Col col=Col.Three>
-          <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-            {switch unbondingListSub {
-            | Data({amount}) =>
-              <Text value={amount |> Coin.getBandAmountFromCoin |> Format.fPretty} />
+          <div className={CssHelper.flexBox()}>
+            {switch redelegateListSub {
+            | Data({
+                dstValidator: {
+                  operatorAddress: dstAddress,
+                  moniker: dstMoniker,
+                  identity: dstIdentity,
+                },
+              }) =>
+              <ValidatorMonikerLink
+                validatorAddress=dstAddress moniker=dstMoniker identity=dstIdentity width=#px(200)
+              />
+
             | _ => <LoadingCensorBar width=200 height=20 />
             }}
           </div>
         </Col>
         <Col col=Col.Three>
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-            {switch unbondingListSub {
+            {switch redelegateListSub {
+            | Data({amount}) =>
+              <Text value={amount |> Coin.getBandAmountFromCoin |> Format.fPretty} />
+            | _ => <LoadingCensorBar width=145 height=20 />
+            }}
+          </div>
+        </Col>
+        <Col col=Col.Three>
+          <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+            {switch redelegateListSub {
             | Data({completionTime}) =>
-              <Timestamp
+              <Timestamp.Grid
                 time=completionTime size=Text.Md weight=Text.Regular textAlign=Text.Right
               />
             | _ => <LoadingCensorBar width=200 height=20 />
@@ -52,20 +74,28 @@ module RenderBody = {
 
 module RenderBodyMobile = {
   @react.component
-  let make = (~reserveIndex, ~unbondingListSub: Sub.variant<UnbondingSub.unbonding_list_t>) =>
-    switch unbondingListSub {
-    | Data({validator: {operatorAddress, moniker, identity}, amount, completionTime}) =>
+  let make = (~reserveIndex, ~redelegateListSub: Sub.variant<RedelegateSub.redelegate_list_t>) =>
+    switch redelegateListSub {
+    | Data({
+        srcValidator: {operatorAddress: srcAddress, moniker: srcMoniker, identity: srcIdentity},
+        dstValidator: {operatorAddress: dstAddress, moniker: dstMoniker, identity: dstIdentity},
+        completionTime,
+        amount,
+      }) =>
       let key_ =
-        (operatorAddress |> Address.toBech32) ++
+        (srcAddress |> Address.toBech32) ++
+          ((dstAddress |> Address.toBech32) ++
           ((completionTime |> MomentRe.Moment.toISOString) ++
-          (reserveIndex |> string_of_int))
+            ((amount |> Coin.getBandAmountFromCoin |> Js.Float.toString) ++
+            (reserveIndex |> string_of_int))))
       <MobileCard
         values={
           open InfoMobileCard
           [
-            ("Validator", Validator(operatorAddress, moniker, identity)),
+            ("Source\nValidator", Validator(srcAddress, srcMoniker, srcIdentity)),
+            ("Destination\nValidator", Validator(dstAddress, dstMoniker, dstIdentity)),
             ("Amount\n(BAND)", Coin({value: list{amount}, hasDenom: false})),
-            ("Unbonded At", Timestamp(completionTime)),
+            ("Redelegate\nComplete At", Timestamp(completionTime)),
           ]
         }
         key=key_
@@ -76,9 +106,10 @@ module RenderBodyMobile = {
         values={
           open InfoMobileCard
           [
-            ("Validator", Loading(230)),
-            ("Amount\n(BAND)", Loading(230)),
-            ("Unbonded At", Loading(230)),
+            ("Source\nValidator", Loading(230)),
+            ("Destination\nValidator", Loading(100)),
+            ("Amount\n(BAND)", Loading(100)),
+            ("Redelegate\nComplete At", Loading(230)),
           ]
         }
         key={reserveIndex |> string_of_int}
@@ -96,14 +127,14 @@ let make = (~address) => {
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 5
 
-  let unbondingListSub = UnbondingSub.getUnbondingByDelegator(
+  let redelegateCountSub = RedelegateSub.getRedelegateCountByDelegator(address, currentTime)
+  let redelegateListSub = RedelegateSub.getRedelegationByDelegator(
     address,
     currentTime,
     ~pageSize,
     ~page,
     (),
   )
-  let unbondingCountSub = UnbondingSub.getUnbondingCountByDelegator(address, currentTime)
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -111,12 +142,12 @@ let make = (~address) => {
     {isMobile
       ? <Row marginBottom=16>
           <Col>
-            {switch unbondingCountSub {
-            | Data(unbondingCount) =>
+            {switch redelegateCountSub {
+            | Data(redelegateCount) =>
               <div className={CssHelper.flexBox()}>
                 <Text
                   block=true
-                  value={unbondingCount |> string_of_int}
+                  value={redelegateCount |> string_of_int}
                   weight=Text.Semibold
                   size=Text.Sm
                   transform=Text.Uppercase
@@ -124,7 +155,7 @@ let make = (~address) => {
                 <HSpacing size=Spacing.xs />
                 <Text
                   block=true
-                  value="Unbonding Entries"
+                  value="Redelegate Entries"
                   weight=Text.Semibold
                   size=Text.Sm
                   transform=Text.Uppercase
@@ -136,13 +167,13 @@ let make = (~address) => {
         </Row>
       : <THead>
           <Row alignItems=Row.Center>
-            <Col col=Col.Six>
-              {switch unbondingCountSub {
-              | Data(unbondingCount) =>
+            <Col col=Col.Three>
+              {switch redelegateCountSub {
+              | Data(redelegateCount) =>
                 <div className={CssHelper.flexBox()}>
                   <Text
                     block=true
-                    value={unbondingCount |> string_of_int}
+                    value={redelegateCount |> string_of_int}
                     weight=Text.Semibold
                     size=Text.Sm
                     transform=Text.Uppercase
@@ -150,7 +181,7 @@ let make = (~address) => {
                   <HSpacing size=Spacing.xs />
                   <Text
                     block=true
-                    value="Unbonding Entries"
+                    value="Redelegate Entries"
                     weight=Text.Semibold
                     size=Text.Sm
                     transform=Text.Uppercase
@@ -158,6 +189,15 @@ let make = (~address) => {
                 </div>
               | _ => <LoadingCensorBar width=100 height=15 />
               }}
+            </Col>
+            <Col col=Col.Three>
+              <Text
+                block=true
+                value="Desination Validator"
+                weight=Text.Semibold
+                size=Text.Sm
+                transform=Text.Uppercase
+              />
             </Col>
             <Col col=Col.Three>
               <Text
@@ -172,7 +212,7 @@ let make = (~address) => {
             <Col col=Col.Three>
               <Text
                 block=true
-                value="Unbonded At"
+                value="Redelegate Complete At"
                 weight=Text.Semibold
                 size=Text.Sm
                 transform=Text.Uppercase
@@ -181,26 +221,23 @@ let make = (~address) => {
             </Col>
           </Row>
         </THead>}
-    {switch unbondingListSub {
-    | Data(unbondingList) =>
-      unbondingList->Belt.Array.size > 0
-        ? unbondingList
-          ->Belt_Array.mapWithIndex((i, e) =>
+    {switch redelegateListSub {
+    | Data(redelegateList) =>
+      redelegateList->Belt.Array.size > 0
+        ? redelegateList
+          ->Belt_Array.mapWithIndex((i, e) => {
+            let componentKey =
+              (e.srcValidator.operatorAddress |> Address.toBech32) ++
+                ((e.dstValidator.operatorAddress |> Address.toBech32) ++
+                ((e.amount |> Coin.getBandAmountFromCoin |> Js.Float.toString) ++
+                  ((e.completionTime |> MomentRe.Moment.format(Config.timestampDisplayFormat)) ++
+                  (i |> string_of_int))))
             isMobile
               ? <RenderBodyMobile
-                  key={(e.validator.operatorAddress |> Address.toBech32) ++
-                    ((e.completionTime |> MomentRe.Moment.toISOString) ++
-                    (i |> string_of_int))}
-                  reserveIndex=i
-                  unbondingListSub={Sub.resolve(e)}
+                  redelegateListSub={Sub.resolve(e)} reserveIndex=i key=componentKey
                 />
-              : <RenderBody
-                  key={(e.validator.operatorAddress |> Address.toBech32) ++
-                    ((e.completionTime |> MomentRe.Moment.toISOString) ++
-                    (i |> string_of_int))}
-                  unbondingListSub={Sub.resolve(e)}
-                />
-          )
+              : <RenderBody redelegateListSub={Sub.resolve(e)} key=componentKey />
+          })
           ->React.array
         : <EmptyContainer>
             <img
@@ -208,7 +245,7 @@ let make = (~address) => {
             />
             <Heading
               size=Heading.H4
-              value="No Unbonding"
+              value="No redelegation"
               align=Heading.Center
               weight=Heading.Regular
               color=theme.textSecondary
@@ -218,14 +255,14 @@ let make = (~address) => {
       Belt_Array.make(pageSize, Sub.NoData)
       ->Belt_Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile key={i |> string_of_int} reserveIndex=i unbondingListSub=noData />
-          : <RenderBody key={i |> string_of_int} unbondingListSub=noData />
+          ? <RenderBodyMobile redelegateListSub=noData reserveIndex=i key={i |> string_of_int} />
+          : <RenderBody redelegateListSub=noData key={i |> string_of_int} />
       )
       ->React.array
     }}
-    {switch unbondingCountSub {
-    | Data(unbondingCount) =>
-      let pageCount = Page.getPageCount(unbondingCount, pageSize)
+    {switch redelegateCountSub {
+    | Data(redelegateCount) =>
+      let pageCount = Page.getPageCount(redelegateCount, pageSize)
       <Pagination currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)} />
     | _ => React.null
     }}
