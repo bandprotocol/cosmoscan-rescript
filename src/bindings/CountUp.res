@@ -1,8 +1,7 @@
 @deriving(abstract)
 type props = {
   start: float,
-  @as("end")
-  end_: float,
+  end: float,
   delay: int,
   decimals: int,
   duration: int,

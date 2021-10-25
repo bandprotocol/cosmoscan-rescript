@@ -28,7 +28,7 @@ module FloatWithDefault = {
   let serialize = float => Some(float->Js.Float.toString->Js.Json.parseExn)
 }
 
-module Addr = {
+module Address = {
   type t = Address.t
   //Note: just mock
   let parse = json => json->Address.fromBech32

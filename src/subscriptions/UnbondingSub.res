@@ -58,7 +58,7 @@ module UnbondingByDelegatorConfig = %graphql(`
           amount @ppxCustom(module: "GraphQLParserModule.Coin")
           completionTime: completion_time @ppxCustom(module: "GraphQLParserModule.Date")
           validator @ppxAs(type: "validator_t"){
-            operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Addr")
+            operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
             moniker
             identity
           }

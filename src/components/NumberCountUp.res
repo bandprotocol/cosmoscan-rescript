@@ -4,7 +4,7 @@ let make = (~value, ~size, ~weight, ~spacing=?, ~color=?, ~code=true, ~smallNumb
   let countUp = CountUp.context(
     CountUp.props(
       ~start=value,
-      ~end_=value,
+      ~end=value,
       ~delay=0,
       ~decimals=6,
       ~duration=4,

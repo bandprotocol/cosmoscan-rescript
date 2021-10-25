@@ -222,38 +222,38 @@ let make = (~address) => {
           </Row>
         </THead>}
     {switch delegationsSub {
-    | Data(delegations) =>
-      delegations->Belt.Array.size > 0
-        ? delegations
-          ->Belt_Array.mapWithIndex((i, e) =>
-            isMobile
-              ? <RenderBodyMobile
-                  key={(e.operatorAddress |> Address.toBech32) ++
-                    ((address |> Address.toBech32) ++
-                    (i |> string_of_int))}
-                  reserveIndex=i
-                  delegationsSub={Sub.resolve(e)}
-                />
-              : <RenderBody
-                  key={(e.operatorAddress |> Address.toBech32) ++
-                    ((address |> Address.toBech32) ++
-                    (i |> string_of_int))}
-                  delegationsSub={Sub.resolve(e)}
-                />
-          )
-          ->React.array
-        : <EmptyContainer>
-            <img
-              src={isDarkMode ? Images.noDataDark : Images.noDataLight} className=Styles.noDataImage
+    | Data(delegations) if delegations->Belt.Array.size > 0 =>
+      delegations
+      ->Belt_Array.mapWithIndex((i, e) =>
+        isMobile
+          ? <RenderBodyMobile
+              key={(e.operatorAddress |> Address.toBech32) ++
+                ((address |> Address.toBech32) ++
+                (i |> string_of_int))}
+              reserveIndex=i
+              delegationsSub={Sub.resolve(e)}
             />
-            <Heading
-              size=Heading.H4
-              value="No Delegation"
-              align=Heading.Center
-              weight=Heading.Regular
-              color=theme.textSecondary
+          : <RenderBody
+              key={(e.operatorAddress |> Address.toBech32) ++
+                ((address |> Address.toBech32) ++
+                (i |> string_of_int))}
+              delegationsSub={Sub.resolve(e)}
             />
-          </EmptyContainer>
+      )
+      ->React.array
+    | Data(delegations) if delegations->Belt.Array.size > 0 =>
+      <EmptyContainer>
+        <img
+          src={isDarkMode ? Images.noDataDark : Images.noDataLight} className=Styles.noDataImage
+        />
+        <Heading
+          size=Heading.H4
+          value="No Delegation"
+          align=Heading.Center
+          weight=Heading.Regular
+          color=theme.textSecondary
+        />
+      </EmptyContainer>
     | _ =>
       Belt_Array.make(pageSize, Sub.NoData)
       ->Belt_Array.mapWithIndex((i, noData) =>

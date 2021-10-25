@@ -73,10 +73,6 @@ let toExternal = ({
   errMsg: errMsg->Belt.Option.getWithDefault(""),
 }
 
-// module TxCount = {
-
-// }
-
 module SingleConfig = %graphql(`
   subscription Transaction($tx_hash: bytea!) {
     transactions_by_pk(hash: $tx_hash) @ppxAs(type: "internal_t") {
@@ -88,7 +84,7 @@ module SingleConfig = %graphql(`
       gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
       gasLimit: gas_limit
       gasUsed: gas_used
-      sender  @ppxCustom(module: "GraphQLParserModule.Addr")
+      sender  @ppxCustom(module: "GraphQLParserModule.Address")
       messages
       errMsg: err_msg
       block @ppxAs(type:"block_t") {
@@ -109,7 +105,7 @@ module MultiConfig = %graphql(`
       gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
       gasLimit: gas_limit
       gasUsed: gas_used
-      sender  @ppxCustom(module: "GraphQLParserModule.Addr")
+      sender  @ppxCustom(module: "GraphQLParserModule.Address")
       messages
       errMsg: err_msg
       block @ppxAs(type:"block_t") {
@@ -130,7 +126,7 @@ module MultiByHeightConfig = %graphql(`
       gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
       gasLimit: gas_limit
       gasUsed: gas_used
-      sender  @ppxCustom(module: "GraphQLParserModule.Addr")
+      sender  @ppxCustom(module: "GraphQLParserModule.Address")
       messages
       errMsg: err_msg
       block @ppxAs(type: "block_t") {
@@ -153,7 +149,7 @@ module MultiBySenderConfig = %graphql(`
           gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
           gasLimit: gas_limit
           gasUsed: gas_used
-          sender  @ppxCustom(module: "GraphQLParserModule.Addr")
+          sender  @ppxCustom(module: "GraphQLParserModule.Address")
           messages
           errMsg: err_msg
           block @ppxAs(type: "block_t") {
