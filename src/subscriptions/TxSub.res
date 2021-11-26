@@ -30,7 +30,7 @@ type internal_t = {
   errMsg: option<string>,
 }
 
-// type account_transaction_t = {transaction: internal_t}
+type account_transaction_t = {transaction: internal_t}
 
 // module Mini = {
 //   type block_t = {timestamp: string}
@@ -115,74 +115,64 @@ module MultiConfig = %graphql(`
   }
 `)
 
-// module MultiByHeightConfig = %graphql(`
-//   subscription TransactionsByHeight($height: Int!) {
-//     transactions(where: {block_height: {_eq: $height}}, order_by: {id: desc}) @ppxAs(type: "internal_t") {
-//       id
-//       txHash: hash @ppxCustom(module: "GraphQLParserModule.Hash")
-//       blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.Hash")
-//       success
-//       memo
-//       gasFee: gas_fee @ppxCustom(module: "GraphQLParser.Coins")
-//       gasLimit: gas_limit
-//       gasUsed: gas_used
-//       sender  @ppxCustom(module: "GraphQLParser.Address")
-//       messages
-//       errMsg: err_msg
-//       block @ppxAs("block_t") {
-//         timestamp @ppxCustom(module: "GraphQLParser.Date")
-//       }
-//     }
-//   }
-// `)
+module MultiByHeightConfig = %graphql(`
+  subscription TransactionsByHeight($height: Int!) {
+    transactions(where: {block_height: {_eq: $height}}, order_by: [{id: desc}]) @ppxAs(type: "internal_t") {
+      id
+      txHash: hash @ppxCustom(module: "GraphQLParserModule.Hash")
+      blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
+      success
+      memo
+      gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
+      gasLimit: gas_limit
+      gasUsed: gas_used
+      sender  @ppxCustom(module: "GraphQLParserModule.Address")
+      messages
+      errMsg: err_msg
+      block @ppxAs(type: "block_t") {
+        timestamp @ppxCustom(module: "GraphQLParserModule.Date")
+      }
+    }
+  }
+`)
 
-// module MultiBySenderConfig = %graphql(`
-//   subscription TransactionsBySender($sender: String!, $limit: Int!, $offset: Int!) {
-//     accounts_by_pk(address: $sender) {
-//       account_transactions(offset: $offset, limit: $limit, order_by: {transaction_id: desc}) @bsRecord{
-//         transaction @bsRecord {
-//           id
-//           txHash: hash @bsDecoder(fn: "GraphQLParser.hash")
-//           blockHeight: block_height @bsDecoder(fn: "ID.Block.fromInt")
-//           success
-//           memo
-//           gasFee: gas_fee @bsDecoder(fn: "GraphQLParser.coins")
-//           gasLimit: gas_limit
-//           gasUsed: gas_used
-//           sender  @bsDecoder(fn: "Address.fromBech32")
-//           messages
-//           errMsg: err_msg
-//           block @bsRecord {
-//             timestamp  @bsDecoder(fn: "GraphQLParser.timestamp")
-//           }
-//         }
-//       }
-//     }
+module MultiBySenderConfig = %graphql(`
+  subscription TransactionsBySender($sender: String!, $limit: Int!, $offset: Int!) {
+    accounts_by_pk(address: $sender) {
+      account_transactions(offset: $offset, limit: $limit, order_by: [{transaction_id: desc}]) @ppxAs(type: "account_transaction_t"){
+        transaction @ppxAs(type: "internal_t") {
+          id
+          txHash: hash @ppxCustom(module: "GraphQLParserModule.Hash")
+          blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
+          success
+          memo
+          gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
+          gasLimit: gas_limit
+          gasUsed: gas_used
+          sender  @ppxCustom(module: "GraphQLParserModule.Address")
+          messages
+          errMsg: err_msg
+          block @ppxAs(type: "block_t") {
+            timestamp  @ppxCustom(module: "GraphQLParserModule.Date")
+          }
+        }
+      }
+    }
 
-//   }
-// `)
+  }
+`)
 
-// module TxCountConfig = %graphql(`
-//   subscription TransactionsCount {
-//     transactions_aggregate {
-//       aggregate {
-//         count @bsDecoder(fn: "Belt_Option.getExn")
-//       }
-//     }
-//   }
-// `)
-
-// module TxCountBySenderConfig = %graphql(`
-//   subscription TransactionsCountBySender($sender: String!) {
-//     accounts_by_pk(address: $sender) {
-//       account_transactions_aggregate {
-//         aggregate {
-//           count @bsDecoder(fn: "Belt_Option.getExn")
-//         }
-//       }
-//     }
-//   }
-// `)
+module TxCountBySenderConfig = %graphql(`
+  subscription TransactionsCountBySender($sender: String!) {
+    accounts_by_pk(address: $sender) {
+      account_transactions_aggregate {
+        aggregate {
+          count 
+        }
+      }
+    }
+  }
+`)
 
 let get = txHash => {
   let hash = txHash |> Hash.toHex |> (x => "\\x" ++ x) |> Js.Json.string
@@ -206,53 +196,44 @@ let getList = (~page, ~pageSize, ()) => {
   result |> Sub.fromData |> Sub.map(_, ({transactions}) => transactions->Belt_Array.map(toExternal))
 }
 
-// let getListBySender = (sender, ~page, ~pageSize, ()) => {
-//   let offset = (page - 1) * pageSize
-//   let (result, _) = ApolloHooks.useSubscription(
-//     MultiBySenderConfig.definition,
-//     ~variables=MultiBySenderConfig.makeVariables(
-//       ~sender=sender |> Address.toBech32,
-//       ~limit=pageSize,
-//       ~offset,
-//       (),
-//     ),
-//   )
-//   result |> Sub.map(_, x =>
-//     switch x["accounts_by_pk"] {
-//     | Some(x') =>
-//       x'["account_transactions"]->Belt_Array.map(({transaction}) => transaction->toExternal)
-//     | None => []
-//     }
-//   )
-// }
+let getListBySender = (sender, ~page, ~pageSize, ()) => {
+  let offset = (page - 1) * pageSize
+  let result = MultiBySenderConfig.use({
+    limit: pageSize,
+    offset: offset,
+    sender: sender |> Address.toBech32,
+  })
 
-// let getListByBlockHeight = (height, ()) => {
-//   let (result, _) = ApolloHooks.useSubscription(
-//     MultiByHeightConfig.definition,
-//     ~variables=MultiByHeightConfig.makeVariables(~height=height |> ID.Block.toInt, ()),
-//   )
-//   result |> Sub.map(_, x => x["transactions"]->Belt_Array.map(toExternal))
-// }
+  result
+  |> Sub.fromData
+  |> Sub.flatMap(_, ({accounts_by_pk}) => {
+    switch accounts_by_pk {
+    | Some(data) =>
+      Sub.resolve(
+        data.account_transactions->Belt_Array.map(({transaction}) => transaction->toExternal),
+      )
+    | None => Sub.resolve([])
+    }
+  })
+}
 
-// let count = () => {
-//   let (result, _) = ApolloHooks.useSubscription(TxCountConfig.definition)
-//   result |> Sub.map(_, x =>
-//     x["transactions_aggregate"]["aggregate"] |> Belt_Option.getExn |> (y => y["count"])
-//   )
-// }
+let getListByBlockHeight = (height, ()) => {
+  let result = MultiByHeightConfig.use({height: height |> ID.Block.toInt})
 
-// let countBySender = sender => {
-//   let (result, _) = ApolloHooks.useSubscription(
-//     TxCountBySenderConfig.definition,
-//     ~variables=TxCountBySenderConfig.makeVariables(~sender=sender |> Address.toBech32, ()),
-//   )
-//   result |> Sub.map(_, a =>
-//     switch a["accounts_by_pk"] {
-//     | Some(account) =>
-//       account["account_transactions_aggregate"]["aggregate"]
-//       |> Belt_Option.getExn
-//       |> (y => y["count"])
-//     | None => 0
-//     }
-//   )
-// }
+  result |> Sub.fromData |> Sub.map(_, ({transactions}) => transactions->Belt_Array.map(toExternal))
+}
+
+let countBySender = sender => {
+  let result = TxCountBySenderConfig.use({sender: sender |> Address.toBech32})
+  result
+  |> Sub.fromData
+  |> Sub.map(_, data =>
+    switch data.accounts_by_pk {
+    | Some(account) =>
+      account.account_transactions_aggregate.aggregate
+      |> Belt_Option.getExn
+      |> (y => y.count |> Belt_Option.getExn)
+    | None => 0
+    }
+  )
+}

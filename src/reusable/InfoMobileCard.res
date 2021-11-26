@@ -129,9 +129,7 @@ let make = (~info) => {
   // <CopyButton data={calldata |> JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125 />
   | Percentage(value, digits) => <Text value={value |> Format.fPercent(~digits?)} />
   | Text(text) => <Text value=text spacing={Text.Em(0.02)} nowrap=true ellipsis=true block=true />
-  | Timestamp(time) => React.null
-  // TODO: do it later
-  // <Timestamp time size=Text.Md weight=Text.Regular />
+  | Timestamp(time) => <Timestamp time size=Text.Md weight=Text.Regular />
   | Validator(address, moniker, identity) =>
     <ValidatorMonikerLink validatorAddress=address moniker size=Text.Md identity width={#px(230)} />
   | PubKey(publicKey) => <PubKeyRender alignLeft=true pubKey=publicKey display=#block />

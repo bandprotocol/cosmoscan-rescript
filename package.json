@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@glennsl/bs-jest": "^0.7.0",
-    "@reasonml-community/graphql-ppx": "1.0.0",
+    "@reasonml-community/graphql-ppx": "^1.2.2",
     "@webpack-cli/serve": "^1.5.1",
     "bs-platform": "9.0.0",
     "file-loader": "^6.2.0",
@@ -54,7 +54,7 @@
     "obi.js": "1.0.2",
     "qrcode.react": "^1.0.1",
     "react": "16.13.1",
-    "react-countup": "^5.2.0",
+    "react-countup": "4.3.3",
     "react-dom": "16.13.1",
     "react-highlight": "^0.14.0",
     "react-json-view": "^1.21.3",

@@ -45,3 +45,20 @@ let map = (result, f) =>
   | Error(e) => Error(e)
   | NoData => NoData
   }
+
+let all2 = (s1, s2) => flatMap(s1, s1' => flatMap(s2, s2' => Data((s1', s2'))))
+
+let all3 = (s1, s2, s3) =>
+  flatMap(s1, s1' => flatMap(s2, s2' => flatMap(s3, s3' => Data((s1', s2', s3')))))
+
+let all4 = (s1, s2, s3, s4) =>
+  flatMap(s1, s1' =>
+    flatMap(s2, s2' => flatMap(s3, s3' => flatMap(s4, s4' => Data((s1', s2', s3', s4')))))
+  )
+
+let all5 = (s1, s2, s3, s4, s5) =>
+  flatMap(s1, s1' =>
+    flatMap(s2, s2' =>
+      flatMap(s3, s3' => flatMap(s4, s4' => flatMap(s5, s5' => Data((s1', s2', s3', s4', s5')))))
+    )
+  )
