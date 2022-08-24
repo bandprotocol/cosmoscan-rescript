@@ -1,4 +1,4 @@
-type aggregate_t = {count: option<int>}
+type aggregate_t = {count: int}
 
 type transactions_aggregate_t = {aggregate: option<aggregate_t>}
 
@@ -26,9 +26,9 @@ type t = {
 }
 
 let toExternal = ({hash, inflation, timestamp, validator, transactions_aggregate}) => {
-  hash: hash,
-  inflation: inflation,
-  timestamp: timestamp,
+  hash,
+  inflation,
+  timestamp,
   validator: {
     consensusAddress: validator.consensusAddress,
     operatorAddress: validator.operatorAddress,
@@ -36,7 +36,7 @@ let toExternal = ({hash, inflation, timestamp, validator, transactions_aggregate
     identity: validator.identity,
   },
   txn: switch transactions_aggregate.aggregate {
-  | Some(aggregate) => aggregate.count |> Belt.Option.getExn
+  | Some(aggregate) => aggregate.count
   | _ => 0
   },
 }
@@ -85,7 +85,7 @@ module SingleConfig = %graphql(`
 
 let getList = (~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
-  let result = MultiConfig.use({limit: pageSize, offset: offset})
+  let result = MultiConfig.use({limit: pageSize, offset})
 
   result |> Sub.fromData |> Sub.map(_, ({blocks}) => blocks->Belt_Array.map(toExternal))
 }

@@ -81,7 +81,6 @@ let getRedelegateCountByDelegator = (delegatorAddress, currentTime) => {
         x'.redelegations_aggregate.aggregate
         |> Belt.Option.getExn
         |> (y => y.count)
-        |> Belt.Option.getExn,
       )
     | None => Sub.resolve(0)
     }

@@ -12,6 +12,8 @@
     "test": "yarn jest --coverage"
   },
   "devDependencies": {
+    "eslint-plugin-prettier": "3.2.0",
+    "eslint-plugin-react-hooks": "2.0.1",
     "@glennsl/bs-jest": "^0.7.0",
     "@reasonml-community/graphql-ppx": "^1.2.2",
     "@webpack-cli/serve": "^1.5.1",

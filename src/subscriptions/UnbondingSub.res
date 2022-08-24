@@ -166,7 +166,6 @@ let getUnbondingCountByDelegator = (delegatorAddress, currentTime) => {
         x'.unbonding_delegations_aggregate.aggregate
         |> Belt.Option.getExn
         |> (y => y.count)
-        |> Belt.Option.getExn,
       )
     | None => Sub.resolve(0)
     }

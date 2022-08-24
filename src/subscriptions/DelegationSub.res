@@ -76,12 +76,12 @@ module StakeWithDefault = {
 }
 
 module StakeCount = {
-  type aggregate_t = {count: option<int>}
+  type aggregate_t = {count: int}
   type internal_t = {aggregate: option<aggregate_t>}
 
   type t = int
 
-  let toExternal = ({count}: aggregate_t) => count |> Belt_Option.getExn
+  let toExternal = ({count}: aggregate_t) => count
 }
 
 module StakeConfig = %graphql(`
@@ -160,7 +160,7 @@ let getStakeList = (delegatorAddress, ~page, ~pageSize, ()) => {
   let result = StakeConfig.use({
     delegator_address: delegatorAddress |> Address.toBech32,
     limit: pageSize,
-    offset: offset,
+    offset,
   })
 
   result
@@ -174,7 +174,7 @@ let getDelegatorsByValidator = (validatorAddress, ~page, ~pageSize, ()) => {
   let result = DelegatorsByValidatorConfig.use({
     operator_address: validatorAddress |> Address.toOperatorBech32,
     limit: pageSize,
-    offset: offset,
+    offset,
   })
 
   result

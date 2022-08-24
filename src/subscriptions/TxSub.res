@@ -232,7 +232,7 @@ let countBySender = sender => {
     | Some(account) =>
       account.account_transactions_aggregate.aggregate
       |> Belt_Option.getExn
-      |> (y => y.count |> Belt_Option.getExn)
+      |> (y => y.count)
     | None => 0
     }
   )
