@@ -23,7 +23,7 @@ let make = (~route, ~className, ~onClick=() => (), ~isTab=false, ~children) =>
         !isTab
           ? {
               open Webapi.Dom
-              window |> Window.scrollTo(0., 0.)
+              window -> Window.scrollTo(0., 0.)
             }
           : ()
       }}>

@@ -302,10 +302,10 @@ let createSignedTx = (~signature, ~pubKey, ~tx: raw_tx_t, ~mode, ()) => {
 let broadcast = signedTx => {
   /* TODO: FIX THIS MESS */
   let convert: t => 'a = %raw(`
-function(data) {return {...data};}
+    function(data) {return {...data};}
   `)
 
-  Axios.postData(Env.rpc ++ "/txs", convert(signedTx))->Promise.then(rawResponse => {
+  Axios.post(Env.rpc ++ "/txs", convert(signedTx))->Promise.then(rawResponse => {
     let response = rawResponse["data"]
     Promise.resolve(
       Tx({
