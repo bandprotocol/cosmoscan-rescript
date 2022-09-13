@@ -55,3 +55,10 @@ module BlockID = {
   //Note: just mock
   let serialize = blockID => blockID->ID.Block.toInt
 }
+
+module ProposalID = {
+  type t = ID.Proposal.t
+
+  let parse = proposalID => proposalID->ID.Proposal.fromInt
+  let serialize = proposalID => proposalID->ID.Proposal.toInt
+}

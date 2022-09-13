@@ -6110,11 +6110,6 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
-reason-promise@^1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/reason-promise/-/reason-promise-1.1.5.tgz#ea1d074428e13cbf75f749425b0fd698e94a0cd9"
-  integrity sha512-T4VI8e3WrQ30HbQcmQ8HvJPZckD4AeTcZ+1aNdpJ/pjjRwjlBy63hr4v8fMSID0/6kPh1KrhN+5+4n7MouoZKQ==
-
 rechoir@^0.7.0:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/rechoir/-/rechoir-0.7.1.tgz#9478a96a1ca135b5e88fc027f03ee92d6c645686"
@@ -6200,17 +6195,12 @@ rescript-apollo-client@2.0.1:
   resolved "https://registry.yarnpkg.com/rescript-apollo-client/-/rescript-apollo-client-2.0.1.tgz#c08af3668e45dbbac8e8fc7637e62d92f1a8e14a"
   integrity sha512-1329IpMGefknnKRhtPbzcwm3KwEbfhoP2tsMlanR6QbYm3L3zFZFywSTEnJLq/SmddjI4kdsJ8mJKJNsMQ/dNw==
 
-rescript-axios@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/rescript-axios/-/rescript-axios-1.0.1.tgz#bf56708ae2f9e6d77fcc9ede621be84dd58328f5"
-  integrity sha512-D+iSsMovJ2k/nO2TXz9IkwuB+3PxnCNreQt7qRTYvIJxMQWGsUS/jybe+lsaYXNtIgKi5vWAhyVIdPOp0BJ5fQ==
-
 rescript-webapi@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/rescript-webapi/-/rescript-webapi-0.6.1.tgz#b7e578c743b08e09f259938a6e9300c238020591"
   integrity sha512-I/eeHOcsUfWbCf6u15zd+rKxMz9awSjjdRa8eFtl2X+HjDNs0mJxoC4uFFK9dIazYcmY2VpuK5TTpOPXvdkhDw==
 
-rescript@10:
+rescript@^10.0.1:
   version "10.0.1"
   resolved "https://registry.yarnpkg.com/rescript/-/rescript-10.0.1.tgz#5b2da8a8bcfb994bed1eb24820bf10cfb9d8c440"
   integrity sha512-XwO1GPDtoEU4H03xQE5bp0/qtSVR6YLaJRPxWKrfFgKc+LI36ODOCie7o9UJfgzQdoMYkkZyiTGZ4N9OQEaiUw==
