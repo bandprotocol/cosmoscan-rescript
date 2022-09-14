@@ -13,6 +13,22 @@ module Hash = {
   let serialize = x => "empty"->Js.Json.string
 }
 
+module FloatExn = {
+  type t = float
+
+  let parse = json => json -> Js.Json.decodeNumber
+  //Note: just mock
+  let serialize = float => float->Js.Float.toString->Js.Json.parseExn
+}
+
+module Test = {
+  type t = float
+
+  let parse = json => json -> Belt.Option.getExn -> Js.Json.decodeNumber -> Belt.Option.getExn
+  //Note: just mock
+  let serialize = float => float->Js.Float.toString->Js.Json.parseExn
+}
+
 module FloatString = {
   type t = float
 

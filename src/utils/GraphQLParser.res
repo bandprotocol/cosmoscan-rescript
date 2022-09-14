@@ -106,3 +106,6 @@ let floatWithDefault = jsonOpt =>
   |> Belt.Option.mapWithDefault(_, 0., float_of_string)
 
 let floatString = json => json |> Js.Json.decodeString |> Belt.Option.getExn |> float_of_string
+
+let floatExn = jsonOpt => 
+  jsonOpt |> Js.Json.decodeNumber |> Belt.Option.getExn;
