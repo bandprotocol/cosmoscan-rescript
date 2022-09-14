@@ -36,8 +36,8 @@ type t =
   | RequestHomePage
   | RequestIndexPage(int)
   | AccountIndexPage(Address.t, account_tab_t)
-  | ValidatorHomePage
-  | ValidatorIndexPage(Address.t, validator_tab_t)
+  | ValidatorsPage
+  | ValidatorDetailsPage(Address.t, validator_tab_t)
   | ProposalHomePage
   | ProposalIndexPage(int)
   | IBCHomePage
@@ -75,7 +75,7 @@ let fromUrl = (url: RescriptReactRouter.url) =>
 
   | (list{"txs"}, _) => TxHomePage
   | (list{"tx", txHash}, _) => TxIndexPage(Hash.fromHex(txHash))
-  | (list{"validators"}, _) => ValidatorHomePage
+  | (list{"validators"}, _) => ValidatorsPage
   | (list{"blocks"}, _) => BlockHomePage
   | (list{"block", blockHeight}, _) =>
     let blockHeightIntOpt = blockHeight |> int_of_string_opt
@@ -106,7 +106,7 @@ let fromUrl = (url: RescriptReactRouter.url) =>
       | _ => Reports
       }
     switch address |> Address.fromBech32Opt {
-    | Some(address) => ValidatorIndexPage(address, urlHash(hash))
+    | Some(address) => ValidatorDetailsPage(address, urlHash(hash))
     | None => NotFound
     }
   | (list{"proposals"}, _) => ProposalHomePage
@@ -140,7 +140,7 @@ let toString = route =>
     `/oracle-script/${oracleScriptID |> string_of_int}#revisions`
   | TxHomePage => "/txs"
   | TxIndexPage(txHash) => `/tx/${txHash |> Hash.toHex}`
-  | ValidatorHomePage => "/validators"
+  | ValidatorsPage => "/validators"
   | BlockHomePage => "/blocks"
   | BlockIndexPage(height) => `/block/${height |> string_of_int}`
   | RequestHomePage => "/requests"
@@ -157,19 +157,19 @@ let toString = route =>
       let addressBech32 = address |> Address.toBech32
       `/account/${addressBech32}#redelegate`
     }
-  | ValidatorIndexPage(validatorAddress, Delegators) => {
+  | ValidatorDetailsPage(validatorAddress, Delegators) => {
       let validatorAddressBech32 = validatorAddress |> Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#delegators`
     }
-  | ValidatorIndexPage(validatorAddress, Reports) => {
+  | ValidatorDetailsPage(validatorAddress, Reports) => {
       let validatorAddressBech32 = validatorAddress |> Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#reports`
     }
-  | ValidatorIndexPage(validatorAddress, Reporters) => {
+  | ValidatorDetailsPage(validatorAddress, Reporters) => {
       let validatorAddressBech32 = validatorAddress |> Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#reporters`
     }
-  | ValidatorIndexPage(validatorAddress, ProposedBlocks) => {
+  | ValidatorDetailsPage(validatorAddress, ProposedBlocks) => {
       let validatorAddressBech32 = validatorAddress |> Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#proposed-blocks`
     }
@@ -190,7 +190,7 @@ let search = (str: string) => {
   | Some(blockID) => Some(BlockIndexPage(blockID))
   | None =>
     if str |> Js.String.startsWith("bandvaloper") {
-      Some(ValidatorIndexPage(str |> Address.fromBech32, Reports))
+      Some(ValidatorDetailsPage(str |> Address.fromBech32, Reports))
     } else if str |> Js.String.startsWith("band") {
       Some(AccountIndexPage(str |> Address.fromBech32, AccountDelegations))
     } else if len == 64 || (str |> Js.String.startsWith("0x") && len == 66) {

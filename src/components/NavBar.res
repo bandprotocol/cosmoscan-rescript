@@ -132,7 +132,7 @@ module RenderMobile = {
 let make = () => {
   let routes = list{
     ("Home", Route.HomePage),
-    ("Validators", ValidatorHomePage),
+    ("Validators", ValidatorsPage),
     ("Blocks", BlockHomePage),
     ("Transactions", TxHomePage),
     ("Proposals", ProposalHomePage),

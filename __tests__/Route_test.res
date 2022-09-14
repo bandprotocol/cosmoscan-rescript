@@ -40,7 +40,7 @@ describe("Expect Search Functionality to work correctly", () => {
   )
   test("test validator route", () =>
     expect("bandvaloper1p40yh3zkmhcv0ecqp3mcazy83sa57rgjde6wec" |> search) |> toEqual(
-      ValidatorIndexPage(
+      ValidatorDetailsPage(
         "bandvaloper1p40yh3zkmhcv0ecqp3mcazy83sa57rgjde6wec" |> Address.fromBech32,
         Reports,
       ),
