@@ -65,6 +65,13 @@ module Coin = {
   let serialize = coin => "coin" |> Js.Json.string
 }
 
+module CoinWithDefault = {
+  type t = Coin.t
+  let parse = json => json->GraphQLParser.coinWithDefault
+  //TODO: implement for coins
+  let serialize = coin => "coin" |> Js.Json.string
+}
+
 module BlockID = {
   type t = ID.Block.t
   let parse = blockID => blockID->ID.Block.fromInt

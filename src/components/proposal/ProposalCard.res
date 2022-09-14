@@ -25,38 +25,38 @@ module Styles = {
 };
 
 // TODO: need to implement ValidatorSub first
-// module Turnout = {
-//   @react.component
-//   let make = (~id) => {
-//     let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
-//     let voteSub = VoteSub.getVoteStatByProposalID(id);
-//     let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount();
+module Turnout = {
+  @react.component
+  let make = (~id) => {
+    let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
+    let voteSub = VoteSub.getVoteStatByProposalID(id);
+    let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount();
 
-//     let allSub = Sub.all2(voteSub, bondedTokenCountSub);
-//     <>
-//       {switch (allSub) {
-//        | Data(({total}, bondedTokenCount)) =>
-//          let turnoutRate = total /. (bondedTokenCount |> Coin.getBandAmountFromCoin) *. 100.;
+    let allSub = Sub.all2(voteSub, bondedTokenCountSub);
+    <>
+      {switch (allSub) {
+       | Data(({total}, bondedTokenCount)) =>
+         let turnoutRate = total /. (bondedTokenCount |> Coin.getBandAmountFromCoin) *. 100.;
 
-//          <Col col=Col.Four colSm=Col.Five>
-//            <Heading
-//              value="Turnout"
-//              size=Heading.H5
-//              marginBottom=8
-//              color={theme.textSecondary}
-//              weight=Heading.Thin
-//            />
-//            <Text
-//              value={turnoutRate |> Format.fPercent(~digits=2)}
-//              size=Text.Lg
-//              color={theme.textPrimary}
-//            />
-//          </Col>;
-//        | _ => React.null
-//        }}
-//     </>;
-//   };
-// };
+         <Col col=Col.Four colSm=Col.Five>
+           <Heading
+             value="Turnout"
+             size=Heading.H5
+             marginBottom=8
+             color={theme.textSecondary}
+             weight=Heading.Thin
+           />
+           <Text
+             value={turnoutRate |> Format.fPercent(~digits=2)}
+             size=Text.Lg
+             color={theme.textPrimary}
+           />
+         </Col>;
+       | _ => React.null
+       }}
+    </>;
+  };
+};
 
 @react.component
 let make = (~reserveIndex,  ~proposalSub: Sub.variant<ProposalSub.t>) => {
@@ -197,7 +197,7 @@ let make = (~reserveIndex,  ~proposalSub: Sub.variant<ProposalSub.t>) => {
              | Voting
              | Passed
              | Rejected
-             | Failed => React.null
+             | Failed => <Turnout id />
              }
            | _ =>
              <Col col=Col.Four colSm=Col.Five>
