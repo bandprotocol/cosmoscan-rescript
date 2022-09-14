@@ -6,12 +6,14 @@ let make = () =>
     <GlobalContext>
       <TimeContext>
         <ThemeContext>
-          <ModalContext>
-            <AccountContext>
-              <App />
-              <Modal />
-            </AccountContext> 
-          </ModalContext>
+          <EmotionThemeContext>
+            <ModalContext>
+              <AccountContext>
+                <App />
+                <Modal />
+              </AccountContext> 
+            </ModalContext>
+          </EmotionThemeContext>
         </ThemeContext>
       </TimeContext>
     </GlobalContext>

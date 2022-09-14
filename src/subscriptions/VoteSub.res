@@ -268,97 +268,80 @@ module DelegatorVoteByProposalIDConfig = %graphql(`
 //     }
 // `)
 
-// let getList = (proposalID, answer, ~page, ~pageSize, ()) => {
-//   let offset = (page - 1) * pageSize;
+let getList = (proposalID, answer, ~page, ~pageSize, ()) => {
+  let offset = (page - 1) * pageSize;
 
-//   let (result, _) =
-//     switch (answer) {
-//     | Yes =>
-//       ApolloHooks.useSubscription(
-//         YesVoteConfig.definition,
-//         ~variables=
-//           YesVoteConfig.makeVariables(
-//             ~proposalID=proposalID |> ID.Proposal.toInt,
-//             ~limit=pageSize,
-//             ~offset,
-//             (),
-//           ),
-//       )
-//     | No =>
-//       ApolloHooks.useSubscription(
-//         NoVoteConfig.definition,
-//         ~variables=
-//           NoVoteConfig.makeVariables(
-//             ~proposalID=proposalID |> ID.Proposal.toInt,
-//             ~limit=pageSize,
-//             ~offset,
-//             (),
-//           ),
-//       )
-//     | NoWithVeto =>
-//       ApolloHooks.useSubscription(
-//         NoWithVetoVoteConfig.definition,
-//         ~variables=
-//           NoWithVetoVoteConfig.makeVariables(
-//             ~proposalID=proposalID |> ID.Proposal.toInt,
-//             ~limit=pageSize,
-//             ~offset,
-//             (),
-//           ),
-//       )
-//     | Abstain =>
-//       ApolloHooks.useSubscription(
-//         AbstainVoteConfig.definition,
-//         ~variables=
-//           AbstainVoteConfig.makeVariables(
-//             ~proposalID=proposalID |> ID.Proposal.toInt,
-//             ~limit=pageSize,
-//             ~offset,
-//             (),
-//           ),
-//       )
-//     };
+  switch (answer) {
+    | Yes => {
+      YesVoteConfig.use({
+        proposalID: proposalID |> ID.Proposal.toInt,
+        limit: pageSize,
+        offset
+      })
+      -> Sub.fromData 
+      -> Sub.map(x => x.votes->Belt.Array.map(toExternal))
+    }
+    | No =>{
+      NoVoteConfig.use({
+        proposalID: proposalID |> ID.Proposal.toInt,
+        limit: pageSize,
+        offset
+      })
+      -> Sub.fromData 
+      -> Sub.map(x => x.votes->Belt.Array.map(toExternal))
+    }
+    | NoWithVeto =>{
+      NoWithVetoVoteConfig.use({
+        proposalID: proposalID |> ID.Proposal.toInt,
+        limit: pageSize,
+        offset
+      })
+      -> Sub.fromData 
+      -> Sub.map(x => x.votes->Belt.Array.map(toExternal))
+    }
+    | Abstain =>
+      AbstainVoteConfig.use({
+        proposalID: proposalID |> ID.Proposal.toInt,
+        limit: pageSize,
+        offset
+      })
+      -> Sub.fromData 
+      -> Sub.map(x => x.votes->Belt.Array.map(toExternal))
+  }
+};
 
-//   result |> Sub.map(_, x => x##votes->Belt.Array.map(toExternal));
-// };
-
-// let count = (proposalID, answer) => {
-//   let (result, _) =
-//     switch (answer) {
-//     | Yes =>
-//       ApolloHooks.useSubscription(
-//         YesVoteCountConfig.definition,
-//         ~variables=
-//           YesVoteCountConfig.makeVariables(~proposalID=proposalID |> ID.Proposal.toInt, ()),
-//       )
-//     | No =>
-//       ApolloHooks.useSubscription(
-//         NoVoteCountConfig.definition,
-//         ~variables=
-//           NoVoteCountConfig.makeVariables(~proposalID=proposalID |> ID.Proposal.toInt, ()),
-//       )
-//     | NoWithVeto =>
-//       ApolloHooks.useSubscription(
-//         NoWithVetoVoteCountConfig.definition,
-//         ~variables=
-//           NoWithVetoVoteCountConfig.makeVariables(
-//             ~proposalID=proposalID |> ID.Proposal.toInt,
-//             (),
-//           ),
-//       )
-//     | Abstain =>
-//       ApolloHooks.useSubscription(
-//         AbstainVoteCountConfig.definition,
-//         ~variables=
-//           AbstainVoteCountConfig.makeVariables(~proposalID=proposalID |> ID.Proposal.toInt, ()),
-//       )
-//     };
-
-//   result
-//   |> Sub.map(_, x =>
-//        x##votes_aggregate##aggregate |> Belt_Option.getExn |> (y => y##count) |> Belt.Option.getExn
-//      );
-// };
+let count = (proposalID, answer) => {
+  switch (answer) {
+    | Yes => {
+      YesVoteCountConfig.use({
+        proposalID: proposalID |> ID.Proposal.toInt,
+      })
+      -> Sub.fromData 
+      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count))
+    }
+    | No =>{
+      NoVoteCountConfig.use({
+        proposalID: proposalID |> ID.Proposal.toInt,
+      })
+      -> Sub.fromData 
+      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count))
+    }
+    | NoWithVeto =>{
+      NoWithVetoVoteCountConfig.use({
+        proposalID: proposalID |> ID.Proposal.toInt,
+      })
+      -> Sub.fromData 
+      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count))
+    }
+    | Abstain =>
+      AbstainVoteCountConfig.use({
+        proposalID: proposalID |> ID.Proposal.toInt,
+      })
+      -> Sub.fromData 
+      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count))
+  }
+  
+};
 
 // TODO: mess a lot with option need to clean
 let getVoteStatByProposalID = proposalID => {
