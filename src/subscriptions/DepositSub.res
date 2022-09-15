@@ -61,6 +61,6 @@ let count = (proposalID) => {
 
   result
   -> Sub.fromData
-  -> Sub.map(x => x.deposits_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count));
+  -> Sub.map(x => x.deposits_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count));
 };
 

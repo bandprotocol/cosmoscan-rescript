@@ -92,8 +92,8 @@ let getUnbondingBalance = (delegatorAddress, currentTime) => {
     | Some(data) =>
       Sub.resolve(
         data.unbonding_delegations_aggregate.aggregate
-        |> Belt_Option.getExn
-        |> (data => data.sum |> Belt_Option.getExn |> Unbonding.toExternal),
+        |> Belt.Option.getExn
+        |> (data => data.sum |> Belt.Option.getExn |> Unbonding.toExternal),
       )
     | None => Sub.resolve(Coin.newUBANDFromAmount(0.))
     }
@@ -118,8 +118,8 @@ let getUnbondingBalance = (delegatorAddress, currentTime) => {
 //     | Some(account) =>
 //       (
 //         (
-//           account["unbonding_delegations_aggregate"]["aggregate"] |> Belt_Option.getExn
-//         )["sum"] |> Belt_Option.getExn
+//           account["unbonding_delegations_aggregate"]["aggregate"] |> Belt.Option.getExn
+//         )["sum"] |> Belt.Option.getExn
 //       )["amount"]
 //     | None => Coin.newUBANDFromAmount(0.)
 //     }

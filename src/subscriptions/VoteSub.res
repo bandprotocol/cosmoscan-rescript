@@ -317,28 +317,28 @@ let count = (proposalID, answer) => {
         proposalID: proposalID |> ID.Proposal.toInt,
       })
       -> Sub.fromData 
-      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count))
+      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count))
     }
     | No =>{
       NoVoteCountConfig.use({
         proposalID: proposalID |> ID.Proposal.toInt,
       })
       -> Sub.fromData 
-      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count))
+      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count))
     }
     | NoWithVeto =>{
       NoWithVetoVoteCountConfig.use({
         proposalID: proposalID |> ID.Proposal.toInt,
       })
       -> Sub.fromData 
-      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count))
+      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count))
     }
     | Abstain =>
       AbstainVoteCountConfig.use({
         proposalID: proposalID |> ID.Proposal.toInt,
       })
       -> Sub.fromData 
-      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count))
+      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count))
   }
   
 };

@@ -144,7 +144,7 @@ let getAccountInfo = address => {
         accountNumber: data |> at(list{"result", "value", "account_number"}, decodeAccountInt),
         sequence: data
         |> optional(at(list{"result", "value", "sequence"}, decodeAccountInt))
-        |> Belt_Option.getWithDefault(_, 0),
+        |> Belt.Option.getWithDefault(_, 0),
       }
     })
   })
@@ -192,7 +192,7 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
       to_address: toAddress |> Address.toBech32,
       amount: [coins],
     })
-    |> Belt_Option.getExn
+    |> Belt.Option.getExn
     |> Js.Json.parseExn
   | Delegate(validator, amount) =>
     Js.Json.stringifyAny({
@@ -200,7 +200,7 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
       validator_address: validator |> Address.toOperatorBech32,
       amount: amount,
     })
-    |> Belt_Option.getExn
+    |> Belt.Option.getExn
     |> Js.Json.parseExn
   | Undelegate(validator, amount) =>
     Js.Json.stringifyAny({
@@ -208,7 +208,7 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
       validator_address: validator |> Address.toOperatorBech32,
       amount: amount,
     })
-    |> Belt_Option.getExn
+    |> Belt.Option.getExn
     |> Js.Json.parseExn
   | Redelegate(fromValidator, toValidator, amount) =>
     Js.Json.stringifyAny({
@@ -217,14 +217,14 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
       validator_dst_address: toValidator |> Address.toOperatorBech32,
       amount: amount,
     })
-    |> Belt_Option.getExn
+    |> Belt.Option.getExn
     |> Js.Json.parseExn
   | WithdrawReward(validator) =>
     Js.Json.stringifyAny({
       delegator_address: sender |> Address.toBech32,
       validator_address: validator |> Address.toOperatorBech32,
     })
-    |> Belt_Option.getExn
+    |> Belt.Option.getExn
     |> Js.Json.parseExn
   | Request(
       ID.OracleScript.ID(oracleScriptID),
@@ -248,7 +248,7 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
       prepare_gas: prepareGas,
       execute_gas: executeGas,
     })
-    |> Belt_Option.getExn
+    |> Belt.Option.getExn
     |> Js.Json.parseExn
   | Vote(ID.Proposal.ID(proposalID), answer) =>
     Js.Json.stringifyAny({
@@ -256,7 +256,7 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
       voter: sender |> Address.toBech32,
       option: answer,
     })
-    |> Belt_Option.getExn
+    |> Belt.Option.getExn
     |> Js.Json.parseExn
   }
   {type_: msgType, value: msgValue}

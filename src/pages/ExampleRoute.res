@@ -10,8 +10,8 @@ let make = () => {
         Js.log(hashtag)
         `data source index ${dataSourceID |> string_of_int} ` |> React.string
       }
-    | OracleScriptHomePage => "oracle script home" |> React.string
-    | OracleScriptIndexPage(oracleScriptID, hashtag) => {
+    | OracleScriptPage => "oracle script home" |> React.string
+    | OracleScriptDetailsPage(oracleScriptID, hashtag) => {
         Js.log(hashtag)
         `oracle script index ${oracleScriptID |> string_of_int} ` |> React.string
       }

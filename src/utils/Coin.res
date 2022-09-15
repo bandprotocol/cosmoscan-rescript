@@ -21,7 +21,7 @@ let getBandAmountFromCoins = coins =>
   coins
   ->Belt_List.keep(coin => coin.denom == "uband")
   ->Belt_List.get(0)
-  ->Belt_Option.mapWithDefault(0., getBandAmountFromCoin)
+  ->Belt.Option.mapWithDefault(0., getBandAmountFromCoin)
 
 let getUBandAmountFromCoin = coin => coin.amount
 
@@ -29,4 +29,4 @@ let getUBandAmountFromCoins = coins =>
   coins
   ->Belt_List.keep(coin => coin.denom == "uband")
   ->Belt_List.get(0)
-  ->Belt_Option.mapWithDefault(0., getUBandAmountFromCoin)
+  ->Belt.Option.mapWithDefault(0., getUBandAmountFromCoin)

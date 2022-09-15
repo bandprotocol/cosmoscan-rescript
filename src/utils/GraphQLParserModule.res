@@ -40,7 +40,7 @@ module FloatString = {
 module FloatWithDefault = {
   type t = float
 
-  let parse = jsonOpt => jsonOpt->GraphQLParser.floatWithDefault
+  let parse = json => json->GraphQLParser.floatWithDefault
   let serialize = float => Some(float->Js.Float.toString->Js.Json.parseExn)
 }
 
@@ -84,4 +84,18 @@ module ProposalID = {
 
   let parse = proposalID => proposalID->ID.Proposal.fromInt
   let serialize = proposalID => proposalID->ID.Proposal.toInt
+}
+
+module OracleScriptID = {
+  type t = ID.OracleScript.t
+
+  let parse = oracleScriptID => oracleScriptID->ID.OracleScript.fromInt
+  let serialize = oracleScriptID => oracleScriptID->ID.OracleScript.toInt
+}
+
+module DataSourceID = {
+  type t = ID.DataSource.t
+
+  let parse = datasourceID => datasourceID->ID.DataSource.fromInt
+  let serialize = datasourceID => datasourceID->ID.DataSource.toInt
 }

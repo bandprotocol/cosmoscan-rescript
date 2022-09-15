@@ -9,7 +9,7 @@ module ProposalStatus = {
   type t = proposal_status_t
   let parse = json => {
     exception NotFound(string);
-    let status = json |> Js.Json.decodeString |> Belt_Option.getExn;
+    let status = json -> Js.Json.decodeString -> Belt.Option.getExn;
     switch (status) {
     | "DepositPeriod" => Deposit
     | "VotingPeriod" => Voting
@@ -20,7 +20,7 @@ module ProposalStatus = {
     };
   };
   //TODO: implement for status
-  let serialize = status => "status" |> Js.Json.string
+  let serialize = status => "status" -> Js.Json.string
 }
 
 
@@ -147,16 +147,15 @@ let getList = (~page, ~pageSize, ()) => {
 };
 
 let get = id => {
-  let result = SingleConfig.use({id: id |> ID.Proposal.toInt})
+  let result = SingleConfig.use({id: id -> ID.Proposal.toInt})
   
-  result |> Sub.fromData
-  |> Sub.flatMap(_, ({proposals_by_pk}) => {
+  result -> Sub.fromData
+  -> Sub.flatMap(({proposals_by_pk}) => {
     switch proposals_by_pk {
-    | Some(data) => Sub.resolve(data |> toExternal)
+    | Some(data) => Sub.resolve(data -> toExternal)
     | None => Sub.NoData
     }
   })
-
 };
 
 let count = () => {
@@ -164,5 +163,5 @@ let count = () => {
 
   result
   -> Sub.fromData
-  -> Sub.map(x => x.proposals_aggregate.aggregate |> Belt_Option.getExn |> (y => y.count));
+  -> Sub.map(x => x.proposals_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count));
 };

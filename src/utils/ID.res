@@ -18,7 +18,7 @@ module RawOracleScriptID = {
   type tab_t = Route.oracle_script_tab_t
   let prefix = "#O"
   let color = Theme.baseBlue
-  let route = (id, tab) => Route.OracleScriptIndexPage(id, tab)
+  let route = (id, tab) => Route.OracleScriptDetailsPage(id, tab)
   let defaultTab = Route.OracleScriptRequests
 }
 
@@ -34,7 +34,7 @@ module RawProposalID = {
   type tab_t = unit
   let prefix = "#P"
   let color = Theme.baseBlue
-  let route = (id, _) => Route.ProposalIndexPage(id)
+  let route = (id, _) => Route.ProposalDetailsPage(id)
   let defaultTab = ()
 }
 

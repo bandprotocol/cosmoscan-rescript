@@ -33,10 +33,10 @@ describe("Expect Search Functionality to work correctly", () => {
     expect("r123" |> search) |> toEqual(RequestIndexPage(123))
   )
   test("test oracle script route prefix is O", () =>
-    expect("O123" |> search) |> toEqual(OracleScriptIndexPage(123, OracleScriptRequests))
+    expect("O123" |> search) |> toEqual(OracleScriptDetailsPage(123, OracleScriptRequests))
   )
   test("test oracle script route prefix is o", () =>
-    expect("O123" |> search) |> toEqual(OracleScriptIndexPage(123, OracleScriptRequests))
+    expect("O123" |> search) |> toEqual(OracleScriptDetailsPage(123, OracleScriptRequests))
   )
   test("test validator route", () =>
     expect("bandvaloper1p40yh3zkmhcv0ecqp3mcazy83sa57rgjde6wec" |> search) |> toEqual(

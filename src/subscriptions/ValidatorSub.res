@@ -27,9 +27,9 @@ let getTotalBondedAmount = () => {
   -> Sub.fromData
   -> Sub.map(
     x => x.validators_aggregate.aggregate 
-    |> Belt_Option.getExn 
+    |> Belt.Option.getExn 
     |> (y => y.sum) 
-    |> Belt_Option.getExn
+    |> Belt.Option.getExn
     |> (y => y.tokens) 
     |> GraphQLParser.coinWithDefault
   );

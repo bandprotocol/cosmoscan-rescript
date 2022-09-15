@@ -1,6 +1,6 @@
 let pythonMatch = str => {
   let reg = "def main\(\s*([^)]+?)\s*\)" |> Js.Re.fromString
-  let rawResult = reg |> Js.Re.exec_(_, str) |> Belt_Option.mapWithDefault(_, [], Js.Re.captures)
+  let rawResult = reg |> Js.Re.exec_(_, str) |> Belt.Option.mapWithDefault(_, [], Js.Re.captures)
 
   switch rawResult->Belt.Array.get(1) {
   | Some(resultNullable) =>

@@ -135,9 +135,9 @@ let make = () => {
     ("Validators", ValidatorHomePage),
     ("Blocks", BlockHomePage),
     ("Transactions", TxHomePage),
-    ("Proposals", ProposalHomePage),
+    ("Proposals", ProposalPage),
     ("Data Sources", DataSourceHomePage),
-    ("Oracle Scripts", OracleScriptHomePage),
+    ("Oracle Scripts", OracleScriptPage),
     ("Requests", RequestHomePage),
     ("IBCs", IBCHomePage),
   }
