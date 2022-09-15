@@ -43,8 +43,8 @@ let timestampOpt = Belt_Option.map(_, timestamp)
 
 let timestampWithDefault = jsonOpt =>
   jsonOpt
-  |> Belt_Option.flatMap(_, x => Some(timestamp(x)))
-  |> Belt.Option.getWithDefault(_, MomentRe.momentNow())
+  -> Belt.Option.flatMap(x => Some(timestamp(x)))
+  -> Belt.Option.getWithDefault(_, MomentRe.momentNow())
 
 let optionBuffer = Belt_Option.map(_, buffer)
 
@@ -68,14 +68,14 @@ let coin = json =>
 
 let coinExn = jsonOpt =>
   jsonOpt
-  |> Belt_Option.flatMap(_, Js.Json.decodeString)
+  -> Belt.Option.flatMap(Js.Json.decodeString)
   |> Belt.Option.getExn
   |> float_of_string
   |> Coin.newUBANDFromAmount
   
 let coinWithDefault = jsonOpt =>
   jsonOpt
-  |> Belt_Option.flatMap(_, Js.Json.decodeNumber)
+  -> Belt.Option.flatMap(Js.Json.decodeNumber)
   |> Belt.Option.getWithDefault(_, 0.0)
   |> Coin.newUBANDFromAmount
 
@@ -99,11 +99,11 @@ let addressExn = jsonOpt => jsonOpt |> Belt_Option.getExn |> Address.fromBech32
 let addressOpt = jsonOpt => jsonOpt |> Belt.Option.map(_, Address.fromBech32)
 
 let numberWithDefault = jsonOpt =>
-  jsonOpt |> Belt_Option.flatMap(_, Js.Json.decodeNumber) |> Belt.Option.getWithDefault(_, 0.0)
+  jsonOpt -> Belt.Option.flatMap( Js.Json.decodeNumber) |> Belt.Option.getWithDefault(_, 0.0)
 
 let floatWithDefault = jsonOpt =>
   jsonOpt
-  |> Belt_Option.flatMap(_, Js.Json.decodeString)
+  -> Belt.Option.flatMap( Js.Json.decodeString)
   |> Belt.Option.mapWithDefault(_, 0., float_of_string)
 
 let floatString = json => json |> Js.Json.decodeString |> Belt.Option.getExn |> float_of_string

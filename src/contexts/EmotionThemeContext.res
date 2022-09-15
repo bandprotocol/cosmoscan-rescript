@@ -8,7 +8,7 @@ let context = React.createContext(ContextHelper.default)
 
 let getThemeMode = () => {
   LocalStorage.getItem(keyword)
-  |> Belt_Option.flatMap(_, local => {
+  -> Belt.Option.flatMap( local => {
     local == "dark" ? Some(EmotionTheme.Dark) : Some(Day)
   })
   |> Belt.Option.getWithDefault(_, Day)

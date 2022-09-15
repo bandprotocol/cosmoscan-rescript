@@ -62,9 +62,9 @@ let getPrices = () =>
     Promise.resolve({
       let prices = result["data"]["price_results"] |> Belt.Array.map(_, Price.decode)
       prices->Belt.Array.get(0)
-        |> Belt_Option.flatMap(_, bandPrice => {
+        -> Belt.Option.flatMap( bandPrice => {
           prices->Belt.Array.get(1)
-            |> Belt_Option.flatMap(_, btcPrice => {
+            -> Belt.Option.flatMap( btcPrice => {
               let bandUsdPrice = bandPrice.px /. bandPrice.multiplier
               let btcUsdPrice = btcPrice.px /. btcPrice.multiplier
               let bandBtcPrice = bandUsdPrice /. btcUsdPrice

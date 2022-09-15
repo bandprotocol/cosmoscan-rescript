@@ -86,7 +86,7 @@ module TxNotFoundOrSyncing = {
 
     let decodeHeight = json => json |> JsonUtils.Decode.at(list{"height"}, JsonUtils.Decode.string)
     let heightOpt = {
-      AxiosHooks.use(path) |> Belt_Option.flatMap(_, result => {
+      AxiosHooks.use(path) -> Belt.Option.flatMap( result => {
         Some(decodeHeight(result))
       })
     }
