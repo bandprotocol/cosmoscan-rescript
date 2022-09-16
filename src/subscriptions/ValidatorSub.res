@@ -198,7 +198,7 @@ let getTotalBondedAmount = () => {
   -> Sub.map(a =>
     a.validators_aggregate.aggregate
     -> Belt_Option.getExn
-    -> (y => y.sum)
+    -> ((y: TotalBondedAmount.aggregate_t) => y.sum)
     -> Belt_Option.getExn
     -> TotalBondedAmount.toExternal
   )

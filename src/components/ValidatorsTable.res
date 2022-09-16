@@ -55,7 +55,7 @@ let getName = x =>
   }
 
 let compareString = (a, b) => {
-  let removeEmojiRegex = %re("/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g")
+  let removeEmojiRegex = %re(`/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g`)
   // let removeEmojiRegex = %re("/([\u2700-\u27BF]|[\uE000-\uF8FF]|/g")
   let a_ = a->Js.String2.replaceByRe(removeEmojiRegex, "")
   let b_ = b->Js.String2.replaceByRe(removeEmojiRegex, "")
@@ -258,7 +258,7 @@ module RenderBody = {
                         commission == 100.
                           ? {
                               open Webapi.Dom
-                              window |> Window.alert(
+                              window -> Window.alert(
                                 "Delegation to foundation validator nodes is not advised.",
                               )
                             }
