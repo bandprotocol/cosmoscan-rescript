@@ -28,6 +28,13 @@ module FloatWithDefault = {
   let serialize = float => Some(float->Js.Float.toString->Js.Json.parseExn)
 }
 
+module FloatStringExn = {
+  type t = float
+
+  let parse = json => json->Belt.Float.fromString->Belt.Option.getExn
+  let serialize = float => float->Js.Float.toString
+}
+
 module Address = {
   type t = Address.t
   //Note: just mock
@@ -47,6 +54,11 @@ module Coin = {
   let parse = json => json->GraphQLParser.coin
   //TODO: implement for coins
   let serialize = coin => "coin" |> Js.Json.string
+}
+
+module CoinWithDefault = {
+  type t = Coin.t
+  let parse = jsonOpt => jsonOpt->GraphQLParser.coinWithDefault
 }
 
 module BlockID = {

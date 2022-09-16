@@ -2,6 +2,8 @@ type aggregate_t = {count: int}
 
 type transactions_aggregate_t = {aggregate: option<aggregate_t>}
 
+type blocks_aggregate_t = {aggregate: option<aggregate_t>}
+
 type internal_validator_t = {
   consensusAddress: string,
   operatorAddress: Address.t,
@@ -74,7 +76,7 @@ module SingleConfig = %graphql(`
         moniker
         identity
       }
-      transactions_aggregate @ppxAs(type: "transactions_aggregate_t"){
+      transactions_aggregate @ppxAs(type: "transactions_aggregate_t") {
         aggregate @ppxAs(type: "aggregate_t"){
           count 
         }
@@ -82,6 +84,20 @@ module SingleConfig = %graphql(`
     }
   }
 `)
+
+module PastDayBlockCountConfig = %graphql(`
+  subscription AvgDayBlocksCount($greater: timestamp!, $less: timestamp!) {
+    blocks_aggregate(where: {timestamp: {_lte: $less, _gte: $greater}}) @ppxAs(type: "blocks_aggregate_t") {
+      aggregate  @ppxAs(type: "aggregate_t") {
+        count
+      }
+    }
+  }
+`)
+
+module BlockSum = {
+  let toExternal = (count: int) => (24 * 60 * 60 |> float_of_int) /. count->float_of_int
+}
 
 let getList = (~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
@@ -93,4 +109,28 @@ let getList = (~page, ~pageSize, ()) => {
 let get = (~height, ()) => {
   let result = SingleConfig.use({height: height})
   result
+}
+
+let getAvgBlockTime = (greater, less) => {
+  let result = PastDayBlockCountConfig.use({
+    greater: greater->Js.Json.string,
+    less: less->Js.Json.string,
+  })
+
+  result
+  |> Sub.fromData
+  |> Sub.map(_, ({blocks_aggregate}) =>
+    blocks_aggregate.aggregate->Belt_Option.getExn->(y => y.count)->BlockSum.toExternal
+  )
+}
+
+let getLatest = () => {
+  let result = getList(~pageSize=1, ~page=1, ())
+
+  result |> Sub.flatMap(_, blocks => {
+    switch blocks->Belt_Array.get(0) {
+    | Some(latestBlock) => latestBlock |> Sub.resolve
+    | None => NoData
+    }
+  })
 }
