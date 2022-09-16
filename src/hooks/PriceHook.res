@@ -57,7 +57,7 @@ module Price = {
 
 let getPrices = () =>
   Axios.get(
-    "https://lcd-lp.bandchain.org/oracle/v1/request_prices?ask_count=4&min_count=3&symbols=BAND&symbols=BTC",
+    "https://laozi1.bandchain.org/api/oracle/v1/request_prices?ask_count=16&min_count=10&symbols=BTC",
   )->Promise.then(result =>
     Promise.resolve({
       let prices = result["data"]["price_results"] |> Belt.Array.map(_, Price.decode)
@@ -68,9 +68,9 @@ let getPrices = () =>
               let bandUsdPrice = bandPrice.px /. bandPrice.multiplier
               let btcUsdPrice = btcPrice.px /. btcPrice.multiplier
               let bandBtcPrice = bandUsdPrice /. btcUsdPrice
-
-              Some((bandUsdPrice, bandBtcPrice))
-            })
+                Some((bandUsdPrice, bandBtcPrice))
+              },
+            )
         })
     })
   )
@@ -90,7 +90,7 @@ let getBandInfo = client => {
         Some({
           usdPrice: bandUsd,
           usdMarketCap: bandUsd *. supply,
-          usd24HrChange: usd24HrChange,
+          usd24HrChange,
           btcPrice: bandBtc,
           btcMarketCap: bandBtc *. supply,
           circulatingSupply: supply,
