@@ -231,7 +231,7 @@ let countBySender = sender => {
     switch data.accounts_by_pk {
     | Some(account) =>
       account.account_transactions_aggregate.aggregate
-      |> Belt_Option.getExn
+      |> Belt.Option.getExn
       |> (y => y.count)
     | None => 0
     }

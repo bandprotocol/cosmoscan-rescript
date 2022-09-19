@@ -27,8 +27,8 @@ type t =
   | HomePage
   | DataSourceHomePage
   | DataSourceIndexPage(int, data_source_tab_t)
-  | OracleScriptHomePage
-  | OracleScriptIndexPage(int, oracle_script_tab_t)
+  | OracleScriptPage
+  | OracleScriptDetailsPage(int, oracle_script_tab_t)
   | TxHomePage
   | TxIndexPage(Hash.t)
   | BlockHomePage
@@ -38,8 +38,8 @@ type t =
   | AccountIndexPage(Address.t, account_tab_t)
   | ValidatorsPage
   | ValidatorDetailsPage(Address.t, validator_tab_t)
-  | ProposalHomePage
-  | ProposalIndexPage(int)
+  | ProposalPage
+  | ProposalDetailsPage(int)
   | IBCHomePage
 
 let fromUrl = (url: RescriptReactRouter.url) =>
@@ -58,7 +58,7 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     | Some(dataSourceIDInt) => DataSourceIndexPage(dataSourceIDInt, urlHash(hash))
     | None => NotFound
     }
-  | (list{"oracle-scripts"}, _) => OracleScriptHomePage
+  | (list{"oracle-scripts"}, _) => OracleScriptPage
   | (list{"oracle-script", oracleScriptID}, hash) =>
     let urlHash = hash =>
       switch hash {
@@ -69,7 +69,7 @@ let fromUrl = (url: RescriptReactRouter.url) =>
       | _ => OracleScriptRequests
       }
     switch oracleScriptID |> int_of_string_opt {
-    | Some(oracleScriptIDInt) => OracleScriptIndexPage(oracleScriptIDInt, urlHash(hash))
+    | Some(oracleScriptIDInt) => OracleScriptDetailsPage(oracleScriptIDInt, urlHash(hash))
     | None => NotFound
     }
 
@@ -109,8 +109,8 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     | Some(address) => ValidatorDetailsPage(address, urlHash(hash))
     | None => NotFound
     }
-  | (list{"proposals"}, _) => ProposalHomePage
-  | (list{"proposal", proposalID}, _) => ProposalIndexPage(proposalID |> int_of_string)
+  | (list{"proposals"}, _) => ProposalPage
+  | (list{"proposal", proposalID}, _) => ProposalDetailsPage(proposalID |> int_of_string)
   | (list{"ibcs"}, _) => IBCHomePage
   | (list{}, _) => HomePage
   | (_, _) => NotFound
@@ -127,16 +127,16 @@ let toString = route =>
     `/data-source/${dataSourceID |> string_of_int}#execute`
   | DataSourceIndexPage(dataSourceID, DataSourceRevisions) =>
     `/data-source/${dataSourceID |> string_of_int}#revisions`
-  | OracleScriptHomePage => "/oracle-scripts"
-  | OracleScriptIndexPage(oracleScriptID, OracleScriptRequests) =>
+  | OracleScriptPage => "/oracle-scripts"
+  | OracleScriptDetailsPage(oracleScriptID, OracleScriptRequests) =>
     `/oracle-script/${oracleScriptID |> string_of_int}`
-  | OracleScriptIndexPage(oracleScriptID, OracleScriptCode) =>
+  | OracleScriptDetailsPage(oracleScriptID, OracleScriptCode) =>
     `/oracle-script/${oracleScriptID |> string_of_int}#code`
-  | OracleScriptIndexPage(oracleScriptID, OracleScriptBridgeCode) =>
+  | OracleScriptDetailsPage(oracleScriptID, OracleScriptBridgeCode) =>
     `/oracle-script/${oracleScriptID |> string_of_int}#bridge`
-  | OracleScriptIndexPage(oracleScriptID, OracleScriptExecute) =>
+  | OracleScriptDetailsPage(oracleScriptID, OracleScriptExecute) =>
     `/oracle-script/${oracleScriptID |> string_of_int}#execute`
-  | OracleScriptIndexPage(oracleScriptID, OracleScriptRevisions) =>
+  | OracleScriptDetailsPage(oracleScriptID, OracleScriptRevisions) =>
     `/oracle-script/${oracleScriptID |> string_of_int}#revisions`
   | TxHomePage => "/txs"
   | TxIndexPage(txHash) => `/tx/${txHash |> Hash.toHex}`
@@ -173,8 +173,8 @@ let toString = route =>
       let validatorAddressBech32 = validatorAddress |> Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#proposed-blocks`
     }
-  | ProposalHomePage => "/proposals"
-  | ProposalIndexPage(proposalID) => `/proposal/${proposalID |> string_of_int}`
+  | ProposalPage => "/proposals"
+  | ProposalDetailsPage(proposalID) => `/proposal/${proposalID |> string_of_int}`
   | IBCHomePage => "/ibcs"
   | HomePage => "/"
   | NotFound => "/notfound"
@@ -209,12 +209,12 @@ let search = (str: string) => {
       requestIDOpt->Belt.Option.map(requestID => RequestIndexPage(requestID))
     } else if capStr |> Js.String.startsWith("O") {
       let oracleScriptIDOpt = str |> String.sub(_, 1, len - 1) |> int_of_string_opt
-      oracleScriptIDOpt->Belt.Option.map(oracleScriptID => OracleScriptIndexPage(
+      oracleScriptIDOpt->Belt.Option.map(oracleScriptID => OracleScriptDetailsPage(
         oracleScriptID,
         OracleScriptRequests,
       ))
     } else {
       None
     }
-  } |> Belt_Option.getWithDefault(_, NotFound)
+  } |> Belt.Option.getWithDefault(_, NotFound)
 }

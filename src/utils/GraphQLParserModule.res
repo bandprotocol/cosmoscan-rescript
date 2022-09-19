@@ -13,6 +13,22 @@ module Hash = {
   let serialize = x => "empty"->Js.Json.string
 }
 
+module FloatExn = {
+  type t = float
+
+  let parse = json => json -> Js.Json.decodeNumber
+  //Note: just mock
+  let serialize = float => float->Js.Float.toString->Js.Json.parseExn
+}
+
+module Test = {
+  type t = float
+
+  let parse = json => json -> Belt.Option.getExn -> Js.Json.decodeNumber -> Belt.Option.getExn
+  //Note: just mock
+  let serialize = float => float->Js.Float.toString->Js.Json.parseExn
+}
+
 module FloatString = {
   type t = float
 
@@ -24,7 +40,7 @@ module FloatString = {
 module FloatWithDefault = {
   type t = float
 
-  let parse = jsonOpt => jsonOpt->GraphQLParser.floatWithDefault
+  let parse = json => json->GraphQLParser.floatWithDefault
   let serialize = float => Some(float->Js.Float.toString->Js.Json.parseExn)
 }
 
@@ -59,6 +75,7 @@ module Coin = {
 module CoinWithDefault = {
   type t = Coin.t
   let parse = jsonOpt => jsonOpt->GraphQLParser.coinWithDefault
+  let serialize = coin => "coin" |> Js.Json.string
 }
 
 module BlockID = {
@@ -66,4 +83,25 @@ module BlockID = {
   let parse = blockID => blockID->ID.Block.fromInt
   //Note: just mock
   let serialize = blockID => blockID->ID.Block.toInt
+}
+
+module ProposalID = {
+  type t = ID.Proposal.t
+
+  let parse = proposalID => proposalID->ID.Proposal.fromInt
+  let serialize = proposalID => proposalID->ID.Proposal.toInt
+}
+
+module OracleScriptID = {
+  type t = ID.OracleScript.t
+
+  let parse = oracleScriptID => oracleScriptID->ID.OracleScript.fromInt
+  let serialize = oracleScriptID => oracleScriptID->ID.OracleScript.toInt
+}
+
+module DataSourceID = {
+  type t = ID.DataSource.t
+
+  let parse = datasourceID => datasourceID->ID.DataSource.fromInt
+  let serialize = datasourceID => datasourceID->ID.DataSource.toInt
 }

@@ -40,9 +40,7 @@
     "bs-css-emotion",
     "bs-css",
     "bs-moment",
-    "bs-webapi",
-    "bs-axios",
-    "@ryyppy/rescript-promise",
+    "rescript-webapi",
     "@glennsl/bs-json"
   ],
   "bs-dev-dependencies": ["@glennsl/bs-jest"]

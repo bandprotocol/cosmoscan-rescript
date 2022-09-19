@@ -46,6 +46,7 @@ module Mini = {
   }
 }
 
+
 let toExternal = (
   {
     operatorAddress,
@@ -161,9 +162,10 @@ module MultiLast100VotedConfig = %graphql(`
 
 let getList = (~isActive, ()) => {
   let result = MultiConfig.use({jailed: !isActive})
+  
   result
-  |> Sub.fromData
-  |> Sub.map(_, ({validators}) =>
+  -> Sub.fromData
+  -> Sub.map(({validators}) =>
     validators->Belt_Array.mapWithIndex((idx, each) => toExternal(each, idx + 1))
   )
 }
@@ -172,8 +174,8 @@ let count = () => {
   let result = ValidatorCountConfig.use()
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, ({validators_aggregate}) =>
+  -> Sub.fromData
+  -> Sub.map(({validators_aggregate}) =>
     validators_aggregate.aggregate |> Belt_Option.getExn |> (y => y |> ValidatorAggCount.toExternal)
   )
 }
@@ -182,8 +184,8 @@ let countByActive = isActive => {
   let result = ValidatorCountByJailedConfig.use({jailed: !isActive})
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, ({validators_aggregate}) =>
+  -> Sub.fromData
+  -> Sub.map(({validators_aggregate}) =>
     validators_aggregate.aggregate |> Belt_Option.getExn |> (y => y |> ValidatorAggCount.toExternal)
   )
 }
@@ -192,13 +194,13 @@ let getTotalBondedAmount = () => {
   let result = TotalBondedAmountConfig.use()
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, a =>
+  -> Sub.fromData
+  -> Sub.map(a =>
     a.validators_aggregate.aggregate
-    |> Belt_Option.getExn
-    |> (y => y.sum)
-    |> Belt_Option.getExn
-    |> TotalBondedAmount.toExternal
+    -> Belt_Option.getExn
+    -> ((y: TotalBondedAmount.aggregate_t) => y.sum)
+    -> Belt_Option.getExn
+    -> TotalBondedAmount.toExternal
   )
 }
 
@@ -206,8 +208,8 @@ let getListVotesBlock = () => {
   let result = MultiLast100VotedConfig.use()
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, x =>
+  -> Sub.fromData
+  -> Sub.map(x =>
     x.validator_last_100_votes->Belt_Array.map(each => {
       consensusAddress: each.consensus_address->Belt.Option.getExn->Address.fromHex,
       count: each.count->Belt.Option.getExn->GraphQLParser.int64,

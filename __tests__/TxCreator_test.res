@@ -22,7 +22,7 @@ describe("expect TxCreator to give the correct message", () => {
               from_address: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
               to_address: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
             })
-            |> Belt_Option.getExn
+            |> Belt.Option.getExn
             |> Js.Json.parseExn,
           },
         ],
@@ -66,7 +66,7 @@ describe("expect TxCreator to give the correct message", () => {
                 from_address: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
                 to_address: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
               })
-              |> Belt_Option.getExn
+              |> Belt.Option.getExn
               |> Js.Json.parseExn,
             },
           ],
@@ -93,7 +93,7 @@ describe("expect TxCreator to give the correct message", () => {
               prepare_gas: "30000",
               execute_gas: "50000",
             })
-            |> Belt_Option.getExn
+            |> Belt.Option.getExn
             |> Js.Json.parseExn,
           },
         ],
@@ -143,7 +143,7 @@ describe("expect TxCreator to give the correct message", () => {
                 prepare_gas: "30000",
                 execute_gas: "50000",
               })
-              |> Belt_Option.getExn
+              |> Belt.Option.getExn
               |> Js.Json.parseExn,
             },
           ],

@@ -1,6 +1,6 @@
 type t = {
   isDarkMode: bool,
-  theme: Theme.t,
+  theme: EmotionTheme.t,
 }
 
 let keyword = "theme"
@@ -9,14 +9,14 @@ let context = React.createContext(ContextHelper.default)
 let getThemeMode = () => {
   LocalStorage.getItem(keyword)
   -> Belt.Option.flatMap( local => {
-    local == "dark" ? Some(Theme.Dark) : Some(Day)
+    local == "dark" ? Some(EmotionTheme.Dark) : Some(Day)
   })
   |> Belt.Option.getWithDefault(_, Day)
 }
 
 let setThemeMode = x =>
   switch x {
-  | Theme.Day => LocalStorage.setItem(keyword, "day")
+  | EmotionTheme.Day => LocalStorage.setItem(keyword, "day")
   | Dark => LocalStorage.setItem(keyword, "dark")
   }
 
@@ -36,7 +36,7 @@ let make = (~children) => {
       }
     )
 
-  let theme = React.useMemo1(() => Theme.get(mode), [mode])
+  let theme = React.useMemo1(() => EmotionTheme.get(mode), [mode])
   let data = {isDarkMode: mode == Dark, theme: theme}
 
   React.createElement(

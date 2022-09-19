@@ -190,7 +190,7 @@ let getTotalStakeByDelegator = delegatorAddress => {
   result
   |> Sub.fromData
   |> Sub.flatMap(_, ({delegations_view_aggregate}) => {
-    let agg = delegations_view_aggregate.aggregate |> Belt_Option.getExn
+    let agg = delegations_view_aggregate.aggregate |> Belt.Option.getExn
     switch agg.sum {
     | Some(data) => Sub.resolve(data |> StakeSummary.toExternal)
     | None => Sub.NoData
@@ -209,7 +209,7 @@ let getStakeByValidator = (delegatorAddress, operatorAddress) => {
   |> Sub.map(_, ({delegations_view}) =>
     delegations_view
     ->Belt_Array.get(0)
-    ->Belt_Option.mapWithDefault(
+    ->Belt.Option.mapWithDefault(
       (
         {
           amount: Coin.newUBANDFromAmount(0.),
@@ -229,7 +229,7 @@ let getStakeCountByDelegator = delegatorAddress => {
   result
   |> Sub.fromData
   |> Sub.map(_, ({delegations_view_aggregate}) =>
-    delegations_view_aggregate.aggregate |> Belt_Option.getExn |> (y => y |> StakeCount.toExternal)
+    delegations_view_aggregate.aggregate |> Belt.Option.getExn |> (y => y |> StakeCount.toExternal)
   )
 }
 
@@ -241,6 +241,6 @@ let getDelegatorCountByValidator = validatorAddress => {
   result
   |> Sub.fromData
   |> Sub.map(_, ({delegations_view_aggregate}) =>
-    delegations_view_aggregate.aggregate |> Belt_Option.getExn |> (y => y |> StakeCount.toExternal)
+    delegations_view_aggregate.aggregate |> Belt.Option.getExn |> (y => y |> StakeCount.toExternal)
   )
 }

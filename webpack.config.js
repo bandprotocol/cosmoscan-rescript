@@ -1,5 +1,6 @@
 const path = require("path")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const outputDir = path.join(__dirname, "dist/")
 const webpack = require("webpack") //to access built-in plugins
 
@@ -14,6 +15,7 @@ module.exports = {
   },
 
   plugins: [
+    new NodePolyfillPlugin(),
     new HtmlWebpackPlugin({
       template: "src/index.html",
       inject: false,
@@ -28,6 +30,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
+      {
         test: /\.(png|svg|jpg|gif)$/,
         loader: "file-loader",
         options: {
@@ -39,7 +45,7 @@ module.exports = {
   },
   devServer: {
     compress: true,
-    contentBase: outputDir,
+    static: outputDir,
     port: process.env.PORT || 8000,
     historyApiFallback: true,
   },

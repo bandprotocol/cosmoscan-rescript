@@ -10,6 +10,6 @@ function(data) {
   `)
 
 let request = (data: t) =>
-  Axios.postData(Env.faucet, convert(data))->Promise.then(response => {
+  Axios.post(Env.faucet, convert(data))->Promise.then(response => {
     Promise.resolve(response)
   })

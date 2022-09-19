@@ -30,25 +30,25 @@ let decode = json => {
 let parseErr = msg => {
   let err =
     msg
-    |> Json.parse
-    |> Belt_Option.flatMap(_, json =>
+    -> Json.parse
+    -> Belt.Option.flatMap(json =>
       json
-      |> Js.Json.decodeArray
-      |> Belt_Option.flatMap(_, x =>
+      -> Js.Json.decodeArray
+      -> Belt.Option.flatMap(x =>
         x->Belt.Array.get(0)
-          |> Belt_Option.flatMap(_, y =>
-            (y |> decode).log |> Belt_Option.flatMap(_, logStr => {
+          -> Belt.Option.flatMap(y =>
+            (y -> decode).log -> Belt.Option.flatMap( logStr => {
               logStr
-              |> Json.parse
-              |> Belt_Option.flatMap(_, logJson => {
-                let log = logJson |> decodeLog
+              -> Json.parse
+              -> Belt.Option.flatMap( logJson => {
+                let log = logJson -> decodeLog
                 Some(log.message)
               })
             })
           )
       )
     )
-    |> Belt.Option.getWithDefault(_, msg)
+    -> Belt.Option.getWithDefault(_, msg)
 
   "Error: " ++ err
 }
@@ -65,7 +65,7 @@ module Full = {
       })}>
       <Icon name="fal fa-exclamation-circle" size=14 color=theme.failColor />
       <Text
-        value={msg |> parseErr}
+        value={msg -> parseErr}
         size=Text.Lg
         spacing=Text.Em(0.02)
         breakAll=true
@@ -80,6 +80,6 @@ module Mini = {
   let make = (~msg) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    <Text value={msg |> parseErr} code=true size=Text.Sm breakAll=true color=theme.failColor />
+    <Text value={msg -> parseErr} code=true size=Text.Sm breakAll=true color=theme.failColor />
   }
 }

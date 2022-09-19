@@ -34,9 +34,9 @@ let make = () => {
       | DataSourceHomePage => <DataSourceHomePage />
       | DataSourceIndexPage(dataSourceID, hashtag) =>
         <DataSourceIndexPage dataSourceID=ID.DataSource.ID(dataSourceID) hashtag />
-      | OracleScriptHomePage => <OracleScriptHomePage />
-      | OracleScriptIndexPage(oracleScriptID, hashtag) =>
-        <OracleScriptIndexPage oracleScriptID=ID.OracleScript.ID(oracleScriptID) hashtag />
+      | OracleScriptPage => <OracleScriptPage />
+      | OracleScriptDetailsPage(oracleScriptID, hashtag) =>
+        <OracleScriptDetailsPage oracleScriptID=ID.OracleScript.ID(oracleScriptID) hashtag />
       | TxHomePage => <TxHomePage />
       | TxIndexPage(txHash) => <TxIndexPage txHash />
       | BlockHomePage => <BlockHomePage />
@@ -46,8 +46,8 @@ let make = () => {
       | RequestHomePage => <RequestHomePage />
       | RequestIndexPage(reqID) => <RequestIndexPage reqID=ID.Request.ID(reqID) />
       | AccountIndexPage(address, hashtag) => <AccountIndexPage address hashtag />
-      | ProposalHomePage => <ProposalHomePage />
-      | ProposalIndexPage(proposalID) => <ProposalIndexPage proposalID=ID.Proposal.ID(proposalID) />
+      | ProposalPage => <ProposalPage />
+      | ProposalDetailsPage(proposalID) => <ProposalDetailsPage proposalID=ID.Proposal.ID(proposalID) />
       | IBCHomePage => <IBCHomePage />
       | NotFound => <NotFound />
       }}

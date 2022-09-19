@@ -1,16 +1,19 @@
-@val external document: {..} = "document"
-
-let style = document["createElement"]("style")
-document["head"]["appendChild"](style)
-style["innerHTML"] = AppStyle.style
+%%raw("require('./index.css')")
 
 @react.component
-let make = () =>
+let make = () => 
   <ApolloClient.React.ApolloProvider client=Apollo.client>
     <GlobalContext>
       <TimeContext>
         <ThemeContext>
-          <ModalContext> <AccountContext> <App /> <Modal /> </AccountContext> </ModalContext>
+          <EmotionThemeContext>
+            <ModalContext>
+              <AccountContext>
+                <App />
+                <Modal />
+              </AccountContext> 
+            </ModalContext>
+          </EmotionThemeContext>
         </ThemeContext>
       </TimeContext>
     </GlobalContext>

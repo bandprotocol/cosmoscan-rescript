@@ -185,7 +185,7 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
       if sender == address {
         {
           open Webapi.Dom
-          window |> Window.confirm("Are you sure you want to send tokens to yourself?")
+          window -> Window.confirm("Are you sure you want to send tokens to yourself?")
         }
           ? openSendModal()
           : ()

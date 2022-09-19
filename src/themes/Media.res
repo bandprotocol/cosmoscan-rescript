@@ -26,8 +26,8 @@ let useQuery = (~size, ()) => {
   }
 
   React.useEffect0(() => {
-    Window.addEventListener("resize", handleWindowResize, window)
-    Some(() => Window.removeEventListener("resize", handleWindowResize, window))
+    window -> Window.addEventListener("resize", handleWindowResize)
+    Some(() => window -> Window.removeEventListener("resize", handleWindowResize))
   })
 
   width <= breakpoint
