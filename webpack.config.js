@@ -22,6 +22,7 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       RPC_URL: JSON.stringify(process.env.RPC_URL),
+      GRPC: JSON.stringify(process.env.GRPC),
       GRAPHQL_URL: JSON.stringify(process.env.GRAPHQL_URL),
       LAMBDA_URL: JSON.stringify(process.env.LAMBDA_URL),
       FAUCET_URL: JSON.stringify(process.env.FAUCET_URL),

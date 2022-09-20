@@ -32,15 +32,15 @@ type internal_t = {
 
 type account_transaction_t = {transaction: internal_t}
 
-// module Mini = {
-//   type block_t = {timestamp: string}
-//   type t = {
-//     hash: Hash.t,
-//     blockHeight: ID.Block.t,
-//     block: block_t,
-//     gasFee: list<Coin.t>,
-//   }
-// }
+module Mini = {
+  type block_t = {timestamp: MomentRe.Moment.t}
+  type t = {
+    hash: Hash.t,
+    blockHeight: ID.Block.t,
+    block: block_t,
+    gasFee: list<Coin.t>,
+  }
+}
 
 let toExternal = ({
   id,

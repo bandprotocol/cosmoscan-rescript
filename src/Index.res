@@ -4,17 +4,19 @@
 let make = () => 
   <ApolloClient.React.ApolloProvider client=Apollo.client>
     <GlobalContext>
-      <TimeContext>
-        <ThemeContext>
-          <EmotionThemeContext>
-            <ModalContext>
-              <AccountContext>
-                <App />
-                <Modal />
-              </AccountContext> 
-            </ModalContext>
-          </EmotionThemeContext>
-        </ThemeContext>
-      </TimeContext>
+      <ClientContext>
+        <TimeContext>
+          <ThemeContext>
+            <EmotionThemeContext>
+              <ModalContext>
+                <AccountContext>
+                  <App />
+                  <Modal />
+                </AccountContext> 
+              </ModalContext>
+            </EmotionThemeContext>
+          </ThemeContext>
+        </TimeContext>
+      </ClientContext>
     </GlobalContext>
   </ApolloClient.React.ApolloProvider>

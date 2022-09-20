@@ -18,6 +18,12 @@ type variant<'a> =
 
 let resolve = data => Data(data)
 
+let default = (result, value) =>
+  switch (result) {
+  | Data(data) => data
+  | _ => value
+  };
+
 let fromData = result =>
   switch result {
   | {data: Some(data)} => Data(data)

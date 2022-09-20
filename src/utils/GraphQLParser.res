@@ -21,6 +21,9 @@ let timeS = json =>
 let fromUnixSecondOpt = timeOpt =>
   timeOpt->Belt.Option.map(x => x |> MomentRe.momentWithUnix |> MomentRe.Moment.defaultUtc)
 
+let fromUnixSecond = timeInt =>
+  timeInt -> MomentRe.momentWithUnix -> MomentRe.Moment.defaultUtc
+  
 let timeMS = json =>
   json
   |> Js.Json.decodeNumber

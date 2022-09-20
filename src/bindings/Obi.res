@@ -208,16 +208,16 @@ let assignSolidity = ({name, varType}) => {
 
 // TODO: abstract it out
 let optionsAll = options =>
-  options |> Belt_Array.reduce(_, Some([]), (acc, obj) => {
+  options -> Belt_Array.reduce(_, Some([]), (acc, obj) => {
     switch (acc, obj) {
-    | (Some(acc'), Some(obj')) => Some(acc' |> Js.Array.concat([obj']))
+    | (Some(acc'), Some(obj')) => Some(acc' -> Js.Array.concat([obj']))
     | (_, _) => None
     }
   })
 
 let generateDecodeLibSolidity = (schema, dataType) => {
-  let dataTypeString = dataType |> dataTypeToString
-  let name = dataType |> dataTypeToSchemaField
+  let dataTypeString = dataType -> dataTypeToString
+  let name = dataType -> dataTypeToSchemaField
   let template = (structs, functions) =>
     `library ${dataTypeString}Decoder {
     using Obi for Obi.Data;
@@ -239,14 +239,14 @@ let generateDecodeLibSolidity = (schema, dataType) => {
 `
   let fieldPairsOpt = extractFields(schema, name)
   fieldPairsOpt->Belt.Option.flatMap(fieldsPairs => {
-    let fieldsOpt = fieldsPairs |> Belt_Array.map(_, parse) |> optionsAll
+    let fieldsOpt = fieldsPairs -> Belt.Array.map(parse) -> optionsAll
     fieldsOpt->Belt.Option.flatMap(fields => {
       let indent = "\n        "
 
       Some(
         template(
-          fields |> Belt_Array.map(_, declareSolidity) |> Js.Array.joinWith(indent),
-          fields |> Belt_Array.map(_, assignSolidity) |> Js.Array.joinWith(indent),
+          fields -> Belt.Array.map(declareSolidity) -> Js.Array.joinWith(indent, _),
+          fields -> Belt.Array.map(assignSolidity) -> Js.Array.joinWith(indent, _),
         ),
       )
     })
@@ -267,4 +267,86 @@ import "./Obi.sol";
   })
 }
 
-// TODO: implement GO generator later
+// TODO: revisit when using this.
+let declareGo = ({name, varType}) => {
+  let capitalizedName = name -> ChangeCase.pascalCase;
+  let type_ =
+    switch varType {
+    | Single(String) => "string"
+    | Single(U64) => "uint64"
+    | Single(U32) => "uint32"
+    | Single(U8) => "uint8"
+    | Array(String) => "[]string"
+    | Array(U64) => "[]uint64"
+    | Array(U32) => "[]uint32"
+    | Array(U8) => "[]uint8"
+    };
+  j`$capitalizedName $type_`;
+};
+
+let assignGo = ({name, varType}) => {
+  switch (varType) {
+  | Single(String) => j`$name, err := decoder.DecodeString()
+	if err !== nil {
+		return Result{}, err
+	}`
+  | Single(U64) => j`$name, err := decoder.DecodeU64()
+	if err !== nil {
+		return Result{}, err
+	}`
+  | Single(U32) => j`$name, err := decoder.DecodeU32()
+	if err !== nil {
+		return Result{}, err
+	}`
+  | Single(U8) => j`$name, err := decoder.DecodeU8()
+	if err !== nil {
+		return Result{}, err
+	}`
+  | _ => "// TODO: implement later"
+  };
+};
+
+let resultGo = ({name}) => {
+  let capitalizedName = name -> ChangeCase.pascalCase;
+  j`$capitalizedName: $name`;
+};
+
+// TODO: Implement input/params decoding
+let generateDecoderGo = (packageName, schema, dataType) => {
+  switch (dataType) {
+  | Params => Some("Code is not available.")
+  | Result =>
+    let name = dataType -> dataTypeToSchemaField;
+    let template = (structs, functions, results) => j`package $packageName
+
+import "github.com/bandchain/chain/pkg/obi"
+
+type Result struct {
+\t$structs
+}
+
+func DecodeResult(data []byte) (Result, error) {
+\tdecoder := obi.NewObiDecoder(data)
+
+\t$functions
+
+\tif !decoder.Finished() {
+\t\treturn Result{}, errors.New("Obi: bytes left when decode result")
+\t}
+
+\treturn Result{
+\t\t$results
+\t}, nil
+}`;
+
+    let fieldsPair = extractFields(schema, name) -> Belt.Option.getExn;
+    let fields = fieldsPair -> Belt_Array.map(parse) -> optionsAll -> Belt.Option.getExn;
+    Some(
+      template(
+        fields -> Belt_Array.map(declareGo) -> Js.Array.joinWith("\n\t", _),
+        fields -> Belt_Array.map(assignGo) -> Js.Array.joinWith("\n\t", _),
+        fields -> Belt_Array.map(resultGo) -> Js.Array.joinWith("\n\t\t", _),
+      ),
+    );
+  };
+};
