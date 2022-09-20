@@ -10,7 +10,7 @@ type resolve_status_t =
 
 module ResolveStatus = {
   let parse = json => {
-    let status = json |> Js.Json.decodeString |> Belt_Option.getExn;
+    let status = json -> Js.Json.decodeString -> Belt_Option.getExn;
     switch (status) {
     | "Open" => Pending
     | "Success" => Success
@@ -19,7 +19,7 @@ module ResolveStatus = {
     | _ => Unknown
     };
   };
-  let serialize = coin => "status" |> Js.Json.string
+  let serialize = status => "status" -> Js.Json.string
 }
 
 module Mini = {
@@ -419,7 +419,7 @@ let toExternal =
   executeGas,
   feeLimit,
   feeUsed,
-  resolveHeight: resolveHeight |> Belt.Option.map(_, ID.Block.fromInt),
+  resolveHeight: resolveHeight -> Belt.Option.map(ID.Block.fromInt),
   requestedValidators,
   minCount,
   resolveStatus,
@@ -604,7 +604,7 @@ let get = id => {
   })
 };
 
-let getList = (~page, ~pageSize, ()) => {
+let getList = (~page, ~pageSize) => {
   let offset = (page - 1) * pageSize;
   let result = MultiRequestConfig.use({limit: pageSize, offset: offset})
 

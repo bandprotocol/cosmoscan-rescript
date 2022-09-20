@@ -53,7 +53,7 @@ let make = (~id: ID.Request.t) => {
      | Some(proof) =>
        <div className={Css.merge(list{CssHelper.flexBox(), Styles.proofContainer})}>
          <CopyButton
-           data={proof.evmProofBytes |> JsBuffer.toHex(~with0x=false)}
+           data={proof.evmProofBytes -> JsBuffer.toHex(~with0x=false)}
            title={isMobile ? "EVM" : "Copy EVM proof"}
            py=10
            px=14
@@ -62,7 +62,7 @@ let make = (~id: ID.Request.t) => {
           switch (nonEVMProofOpt) {
           | Some(proof) =>
             <CopyButton
-              data={proof |> JsBuffer.toHex(~with0x=false)}
+              data={proof -> JsBuffer.toHex(~with0x=false)}
               title={isMobile ? "non-EVM" : "Copy non-EVM proof"}
               py=10
               px=14

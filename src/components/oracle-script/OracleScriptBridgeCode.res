@@ -43,7 +43,7 @@ module Styles = {
 
 let renderCode = content => {
   <div className=Styles.scriptContainer>
-    <ReactHighlight className=Styles.padding> {content |> React.string} </ReactHighlight>
+    <ReactHighlight className=Styles.padding> {content -> React.string} </ReactHighlight>
   </div>;
 };
 
@@ -193,7 +193,7 @@ module GenerateDecodeCode = {
           </div>
         </Col>
       </Row>
-      <div className=Styles.tableLowerContainer> {code |> renderCode} </div>
+      <div className=Styles.tableLowerContainer> {code -> renderCode} </div>
     </>;
   };
 };
@@ -254,7 +254,7 @@ let make = (~schema) => {
             <select
               className=Styles.selectContent
               onChange={event => {
-                let newLanguage = ReactEvent.Form.target(event)["value"] |> toLanguageVariant;
+                let newLanguage = ReactEvent.Form.target(event)["value"] -> toLanguageVariant;
                 setLanguage(_ => newLanguage);
               }}>
               {targetPlatform
@@ -282,7 +282,7 @@ let make = (~schema) => {
         </div>
       </Col>
     </Row>
-    <div className=Styles.tableLowerContainer> {schema |> renderCode} </div>
+    <div className=Styles.tableLowerContainer> {schema -> renderCode} </div>
     <GenerateDecodeCode language schema dataType=Obi.Params />
   </div>;
 };

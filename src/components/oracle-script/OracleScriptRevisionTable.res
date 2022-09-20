@@ -36,7 +36,7 @@ let make = (~id) =>
                  <Col> <HSpacing size=Spacing.md /> </Col>
                  <Col col=Col.Three>
                    <div className={CssHelper.flexBox()}>
-                     <Text value={numRevisions |> string_of_int} weight=Text.Semibold />
+                     <Text value={numRevisions -> string_of_int} weight=Text.Semibold />
                      <HSpacing size={#px(5)} />
                      <Text
                        value={numRevisions > 0 ? "Revisions" : "Revision"}
@@ -62,7 +62,7 @@ let make = (~id) =>
                     paddingH={#px(24)}
                     key={
                       switch (transaction) {
-                      | Some(tx) => tx.hash |> Hash.toHex(~upper=true)
+                      | Some(tx) => tx.hash -> Hash.toHex(~upper=true)
                       | None => "Genesis"
                       }
                     }>

@@ -103,8 +103,8 @@ module RenderBodyMobile = {
             ),
           ]
         }
-        key={id |> ID.Request.toString}
-        idx={id |> ID.Request.toString}
+        key={id -> ID.Request.toString}
+        idx={id -> ID.Request.toString}
         requestStatus=resolveStatus
       />
     | _ =>
@@ -118,8 +118,8 @@ module RenderBodyMobile = {
             ("Timestamp", Loading(166)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex -> string_of_int}
+        idx={reserveIndex -> string_of_int}
       />
     };
   };
@@ -148,7 +148,7 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                   <div className={CssHelper.flexBox()}>
                     <Text
                       block=true
-                      value={totalRequestCount |> Format.iPretty}
+                      value={totalRequestCount -> Format.iPretty}
                       weight=Text.Semibold
                       size=Text.Sm
                     />
@@ -169,7 +169,7 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                     <div className={CssHelper.flexBox()}>
                       <Text
                         block=true
-                        value={totalRequestCount |> Format.iPretty}
+                        value={totalRequestCount -> Format.iPretty}
                         weight=Text.Semibold
                         size=Text.Sm
                       />
@@ -221,11 +221,11 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                    isMobile
                      ? <RenderBodyMobile
                          reserveIndex=i
-                         key={e.id |> ID.Request.toString}
+                         key={e.id -> ID.Request.toString}
                          requestsSub={Sub.resolve(e)}
                        />
                      : <RenderBody
-                         key={e.id |> ID.Request.toString}
+                         key={e.id -> ID.Request.toString}
                          requestsSub={Sub.resolve(e)}
                        />
                  )
@@ -244,10 +244,10 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                 isMobile
                   ? <RenderBodyMobile
                       reserveIndex=i
-                      key={i |> string_of_int}
+                      key={i -> string_of_int}
                       requestsSub=noData
                     />
-                  : <RenderBody key={i |> string_of_int} requestsSub=noData />
+                  : <RenderBody key={i -> string_of_int} requestsSub=noData />
               )
             ->React.array
           }}

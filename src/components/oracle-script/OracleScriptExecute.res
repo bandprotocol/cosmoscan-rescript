@@ -450,8 +450,8 @@ module ExecutionPart = {
                                   askCount,
                                   minCount,
                                   clientID: {
-                                    switch (clientID |> String.trim == "") {
-                                    | false => clientID |> String.trim
+                                    switch (clientID -> String.trim == "") {
+                                    | false => clientID -> String.trim
                                     | true => "from_scan"
                                     };
                                   },

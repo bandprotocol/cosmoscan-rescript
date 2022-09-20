@@ -71,7 +71,7 @@ let make = (~url: string) => {
           </div>
         </Col>
       </Row>
-      <div className=Styles.tableLowerContainer> {code |> renderCode} </div>
+      <div className=Styles.tableLowerContainer> {code -> renderCode} </div>
     </div>
   | (None, false) =>
     <EmptyContainer>

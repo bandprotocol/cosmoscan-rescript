@@ -53,7 +53,7 @@ module Content = {
               {switch (oracleScriptSub) {
                | Data({requestCount}) =>
                  <Text
-                   value={requestCount |> Format.iPretty}
+                   value={requestCount -> Format.iPretty}
                    size=Text.Xxxl
                    block=true
                    weight=Text.Bold
@@ -149,7 +149,7 @@ module Content = {
                          ? relatedDataSources
                            ->Belt.List.map(({dataSourceName, dataSourceID}) =>
                                <div
-                                 key={dataSourceID |> ID.DataSource.toString}
+                                 key={dataSourceID -> ID.DataSource.toString}
                                  className={CssHelper.flexBox()}>
                                  <TypeID.DataSource id=dataSourceID position=TypeID.Subtitle />
                                  <Text
@@ -194,32 +194,32 @@ module Content = {
               {
                 name: "Requests",
                 route:
-                  oracleScriptID |> ID.OracleScript.getRouteWithTab(_, Route.OracleScriptRequests),
+                  oracleScriptID -> ID.OracleScript.getRouteWithTab(Route.OracleScriptRequests),
               },
               {
                 name: "OWASM Code",
                 route:
-                  oracleScriptID |> ID.OracleScript.getRouteWithTab(_, Route.OracleScriptCode),
+                  oracleScriptID -> ID.OracleScript.getRouteWithTab(Route.OracleScriptCode),
               },
               {
                 name: "Bridge Code",
                 route:
                   oracleScriptID
-                  |> ID.OracleScript.getRouteWithTab(_, Route.OracleScriptBridgeCode),
+                  -> ID.OracleScript.getRouteWithTab(Route.OracleScriptBridgeCode),
               },
               {
                 name: "Make New Request",
                 route:
-                  oracleScriptID |> ID.OracleScript.getRouteWithTab(_, Route.OracleScriptExecute),
+                  oracleScriptID -> ID.OracleScript.getRouteWithTab(Route.OracleScriptExecute),
               },
               // {
               //   name: "Revisions",
               //   route:
               //     oracleScriptID
-              //     |> ID.OracleScript.getRouteWithTab(_, Route.OracleScriptRevisions),
+              //     -> ID.OracleScript.getRouteWithTab(Route.OracleScriptRevisions),
               // },
             ]
-            currentRoute={oracleScriptID |> ID.OracleScript.getRouteWithTab(_, hashtag)}>
+            currentRoute={oracleScriptID -> ID.OracleScript.getRouteWithTab(hashtag)}>
             {switch (hashtag) {
              | OracleScriptExecute =>
                switch (oracleScriptSub) {
