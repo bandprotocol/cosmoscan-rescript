@@ -4,11 +4,11 @@ type decoded_t = {
   words: array<int>,
 }
 
-@module("bech32") @val external fromWords: array<int> => array<int> = "fromWords"
-@module("bech32") @val external toWords: array<int> => array<int> = "toWords"
+@module("bech32") external fromWords: array<int> => array<int> = "fromWords"
+@module("bech32") external toWords: array<int> => array<int> = "toWords"
 
-@module("bech32") @val external decode: string => decoded_t = "decode"
-@module("bech32") @val external encode: (string, array<int>) => string = "encode"
+@module("bech32") external decode: string => decoded_t = "decode"
+@module("bech32") external encode: (string, array<int>) => string = "encode"
 
 let decodeOpt = str =>
   switch str->decode {

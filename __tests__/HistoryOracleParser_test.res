@@ -6,7 +6,7 @@ let getDayAgo = days =>
   MomentRe.momentNow()
   |> MomentRe.Moment.defaultUtc
   |> MomentRe.Moment.startOf(#day)
-  |> MomentRe.Moment.subtract(~duration=MomentRe.duration(days |> float_of_int, #days))
+  |> MomentRe.Moment.subtract(~duration=MomentRe.duration(days->float_of_int, #days))
   |> MomentRe.Moment.toUnix
 
 describe("Expect HistoryOracleParser works correctly", () => {
@@ -19,7 +19,7 @@ describe("Expect HistoryOracleParser works correctly", () => {
         ~startDate=dates[0],
         (),
       ),
-    ) |> toEqual([
+    )->toEqual([
       {timestamp: dates[1], status: true},
       {timestamp: dates[2], status: true},
       {timestamp: dates[3], status: true},
@@ -34,7 +34,7 @@ describe("Expect HistoryOracleParser works correctly", () => {
         ~startDate=dates[0],
         (),
       ),
-    ) |> toEqual([
+    )->toEqual([
       {timestamp: dates[1], status: false},
       {timestamp: dates[2], status: true},
       {timestamp: dates[3], status: true},
@@ -49,7 +49,7 @@ describe("Expect HistoryOracleParser works correctly", () => {
         ~startDate=dates[0],
         (),
       ),
-    ) |> toEqual([
+    )->toEqual([
       {timestamp: dates[1], status: true},
       {timestamp: dates[2], status: false},
       {timestamp: dates[3], status: false},
@@ -69,7 +69,7 @@ describe("Expect HistoryOracleParser works correctly", () => {
         ~startDate=dates[0],
         (),
       ),
-    ) |> toEqual([
+    )->toEqual([
       {timestamp: dates[1], status: true},
       {timestamp: dates[2], status: false},
       {timestamp: dates[3], status: true},
@@ -90,7 +90,7 @@ describe("Expect HistoryOracleParser works correctly", () => {
         ~startDate=dates[0],
         (),
       ),
-    ) |> toEqual([
+    )->toEqual([
       {timestamp: dates[1], status: true},
       {timestamp: dates[2], status: false},
       {timestamp: dates[3], status: true},

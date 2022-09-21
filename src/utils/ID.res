@@ -10,7 +10,7 @@ module RawDataSourceID = {
   type tab_t = Route.data_source_tab_t
   let prefix = "#D"
   let color = Theme.baseBlue
-  let route = (id, tab) => Route.DataSourceIndexPage(id, tab)
+  let route = (id, tab) => Route.DataSourceDetailsPage(id, tab)
   let defaultTab = Route.DataSourceRequests
 }
 

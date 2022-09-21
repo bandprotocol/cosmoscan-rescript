@@ -136,7 +136,7 @@ let make = () => {
     ("Blocks", BlockHomePage),
     ("Transactions", TxHomePage),
     ("Proposals", ProposalPage),
-    ("Data Sources", DataSourceHomePage),
+    ("Data Sources", DataSourcePage),
     ("Oracle Scripts", OracleScriptPage),
     ("Requests", RequestHomePage),
     ("IBCs", IBCHomePage),

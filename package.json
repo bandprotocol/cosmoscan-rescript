@@ -12,7 +12,7 @@
     "test": "yarn jest --coverage"
   },
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.7.0",
+    "@glennsl/rescript-jest": "^0.9.2",
     "@reasonml-community/graphql-ppx": "^1.2.2",
     "@webpack-cli/serve": "^1.5.1",
     "css-loader": "^6.7.1",

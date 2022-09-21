@@ -198,7 +198,7 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
     Js.Json.stringifyAny({
       delegator_address: sender |> Address.toBech32,
       validator_address: validator |> Address.toOperatorBech32,
-      amount: amount,
+      amount,
     })
     |> Belt.Option.getExn
     |> Js.Json.parseExn
@@ -206,7 +206,7 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
     Js.Json.stringifyAny({
       delegator_address: sender |> Address.toBech32,
       validator_address: validator |> Address.toOperatorBech32,
-      amount: amount,
+      amount,
     })
     |> Belt.Option.getExn
     |> Js.Json.parseExn
@@ -215,7 +215,7 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
       delegator_address: sender |> Address.toBech32,
       validator_src_address: fromValidator |> Address.toOperatorBech32,
       validator_dst_address: toValidator |> Address.toOperatorBech32,
-      amount: amount,
+      amount,
     })
     |> Belt.Option.getExn
     |> Js.Json.parseExn
@@ -265,20 +265,20 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
 let createRawTx = (~address, ~msgs, ~chainID, ~feeAmount, ~gas, ~memo, ()) =>
   getAccountInfo(address)->Promise.then(accountInfo => {
     Promise.resolve({
-      msgs: msgs->Belt_Array.map(createMsg(address)),
+      msgs: msgs->Belt.Array.map(createMsg(address)),
       chain_id: chainID,
       fee: {
         amount: [{amount: feeAmount, denom: "uband"}],
-        gas: gas,
+        gas,
       },
-      memo: memo,
+      memo,
       account_number: accountInfo.accountNumber |> string_of_int,
       sequence: accountInfo.sequence |> string_of_int,
     })
   })
 
 let createSignedTx = (~signature, ~pubKey, ~tx: raw_tx_t, ~mode, ()) => {
-  let newPubKey = "eb5ae98721" ++ (pubKey |> PubKey.toHex) |> JsBuffer.hexToBase64
+  let newPubKey = "eb5ae98721" ++ pubKey->PubKey.toHex->JsBuffer.hexToBase64
   let signedTx = {
     fee: tx.fee,
     memo: tx.memo,
@@ -288,15 +288,15 @@ let createSignedTx = (~signature, ~pubKey, ~tx: raw_tx_t, ~mode, ()) => {
         pub_key: Js.Json.object_(
           Js.Dict.fromList(list{
             ("type", Js.Json.string("tendermint/PubKeySecp256k1")),
-            ("value", Js.Json.string(pubKey |> PubKey.toBase64)),
+            ("value", Js.Json.string(pubKey->PubKey.toBase64)),
           }),
         ),
         public_key: newPubKey,
-        signature: signature,
+        signature,
       },
     ],
   }
-  {mode: mode, tx: signedTx}
+  {mode, tx: signedTx}
 }
 
 let broadcast = signedTx => {

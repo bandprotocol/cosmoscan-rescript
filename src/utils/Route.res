@@ -2,7 +2,6 @@ type data_source_tab_t =
   | DataSourceExecute
   | DataSourceCode
   | DataSourceRequests
-  | DataSourceRevisions
 
 type oracle_script_tab_t =
   | OracleScriptExecute
@@ -25,8 +24,8 @@ type validator_tab_t =
 type t =
   | NotFound
   | HomePage
-  | DataSourceHomePage
-  | DataSourceIndexPage(int, data_source_tab_t)
+  | DataSourcePage
+  | DataSourceDetailsPage(int, data_source_tab_t)
   | OracleScriptPage
   | OracleScriptDetailsPage(int, oracle_script_tab_t)
   | TxHomePage
@@ -45,17 +44,16 @@ type t =
 let fromUrl = (url: RescriptReactRouter.url) =>
   // TODO: We'll handle the NotFound case for Datasources and Oraclescript later
   switch (url.path, url.hash) {
-  | (list{"data-sources"}, _) => DataSourceHomePage
+  | (list{"data-sources"}, _) => DataSourcePage
   | (list{"data-source", dataSourceID}, hash) =>
     let urlHash = hash =>
       switch hash {
       | "code" => DataSourceCode
       | "execute" => DataSourceExecute
-      | "revisions" => DataSourceRevisions
       | _ => DataSourceRequests
       }
     switch dataSourceID |> int_of_string_opt {
-    | Some(dataSourceIDInt) => DataSourceIndexPage(dataSourceIDInt, urlHash(hash))
+    | Some(dataSourceIDInt) => DataSourceDetailsPage(dataSourceIDInt, urlHash(hash))
     | None => NotFound
     }
   | (list{"oracle-scripts"}, _) => OracleScriptPage
@@ -118,15 +116,13 @@ let fromUrl = (url: RescriptReactRouter.url) =>
 
 let toString = route =>
   switch route {
-  | DataSourceHomePage => "/data-sources"
-  | DataSourceIndexPage(dataSourceID, DataSourceRequests) =>
+  | DataSourcePage => "/data-sources"
+  | DataSourceDetailsPage(dataSourceID, DataSourceRequests) =>
     `/data-source/${dataSourceID |> string_of_int}`
-  | DataSourceIndexPage(dataSourceID, DataSourceCode) =>
+  | DataSourceDetailsPage(dataSourceID, DataSourceCode) =>
     `/data-source/${dataSourceID |> string_of_int}#code`
-  | DataSourceIndexPage(dataSourceID, DataSourceExecute) =>
+  | DataSourceDetailsPage(dataSourceID, DataSourceExecute) =>
     `/data-source/${dataSourceID |> string_of_int}#execute`
-  | DataSourceIndexPage(dataSourceID, DataSourceRevisions) =>
-    `/data-source/${dataSourceID |> string_of_int}#revisions`
   | OracleScriptPage => "/oracle-scripts"
   | OracleScriptDetailsPage(oracleScriptID, OracleScriptRequests) =>
     `/oracle-script/${oracleScriptID |> string_of_int}`
@@ -149,30 +145,37 @@ let toString = route =>
       let addressBech32 = address |> Address.toBech32
       `/account/${addressBech32}#delegations`
     }
+
   | AccountIndexPage(address, AccountUnbonding) => {
       let addressBech32 = address |> Address.toBech32
       `/account/${addressBech32}#unbonding`
     }
+
   | AccountIndexPage(address, AccountRedelegate) => {
       let addressBech32 = address |> Address.toBech32
       `/account/${addressBech32}#redelegate`
     }
+
   | ValidatorDetailsPage(validatorAddress, Delegators) => {
       let validatorAddressBech32 = validatorAddress |> Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#delegators`
     }
+
   | ValidatorDetailsPage(validatorAddress, Reports) => {
       let validatorAddressBech32 = validatorAddress |> Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#reports`
     }
+
   | ValidatorDetailsPage(validatorAddress, Reporters) => {
       let validatorAddressBech32 = validatorAddress |> Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#reporters`
     }
+
   | ValidatorDetailsPage(validatorAddress, ProposedBlocks) => {
       let validatorAddressBech32 = validatorAddress |> Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#proposed-blocks`
     }
+
   | ProposalPage => "/proposals"
   | ProposalDetailsPage(proposalID) => `/proposal/${proposalID |> string_of_int}`
   | IBCHomePage => "/ibcs"
@@ -200,7 +203,7 @@ let search = (str: string) => {
       blockIDOpt->Belt.Option.map(blockID => BlockIndexPage(blockID))
     } else if capStr |> Js.String.startsWith("D") {
       let dataSourceIDOpt = str |> String.sub(_, 1, len - 1) |> int_of_string_opt
-      dataSourceIDOpt->Belt.Option.map(dataSourceID => DataSourceIndexPage(
+      dataSourceIDOpt->Belt.Option.map(dataSourceID => DataSourceDetailsPage(
         dataSourceID,
         DataSourceRequests,
       ))
