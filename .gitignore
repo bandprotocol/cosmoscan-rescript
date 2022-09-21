@@ -7,4 +7,8 @@
 /.graphql_ppx_cache/
 /lib/bs/
 /coverage/
+<<<<<<< HEAD
 .DS_Store
+=======
+.DS_Store
+>>>>>>> 2099676c6e961dc51b39d5288bc94c2d2c6ad188
