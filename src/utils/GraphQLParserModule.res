@@ -56,14 +56,22 @@ module Coin = {
   let serialize = coin => "coin" |> Js.Json.string
 }
 
-module CoinWithDefault = {
-  type t = Coin.t
-  let parse = jsonOpt => jsonOpt->GraphQLParser.coinWithDefault
-}
-
 module BlockID = {
   type t = ID.Block.t
   let parse = blockID => blockID->ID.Block.fromInt
   //Note: just mock
   let serialize = blockID => blockID->ID.Block.toInt
+}
+
+module Buffer = {
+  type t = JsBuffer.t
+  let parse = json => json->GraphQLParser.buffer
+  let serialize = buffer => buffer->Js.Json.string
+}
+
+module DataSourceID = {
+  type t = ID.DataSource.t
+
+  let parse = datasourceID => datasourceID->ID.DataSource.fromInt
+  let serialize = datasourceID => datasourceID->ID.DataSource.toInt
 }
