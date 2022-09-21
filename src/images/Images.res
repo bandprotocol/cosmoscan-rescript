@@ -23,9 +23,12 @@
 // Loading
 @module("./loading-circle-light.png") external loadingCircleLight: string = "default"
 @module("./loading-circle-dark.png") external loadingCircleDark: string = "default"
+@module("./pending.svg") external pending: string = "default"
+@module("./expired.svg") external expired: string = "default"
+@module("./unknown.svg") external unknown: string = "default"
+@module("./no-revision.png") external noRevisionIcon: string = "default"
 
 // Empty Data
-
 @module("./no-block-dark.png") external noBlockDark: string = "default"
 @module("./no-tx-dark.png") external noTxDark: string = "default"
 @module("./no-delegator-dark.png") external noDelegatorDark: string = "default"
@@ -38,5 +41,11 @@
 @module("./no-oracle-light.png") external noOracleLight: string = "default"
 @module("./no-data-light.png") external noDataLight: string = "default"
 
-//IBC
+// IBC
 @module("./tx-ibc-icon.svg") external ibcIcon: string = "default"
+
+// ICON
+@module("./ethereum.svg") external ethereumIcon: string = "default"
+@module("./cosmosibc.svg") external cosmosIBCIcon: string = "default"
+@module("./solidity.svg") external solidityIcon: string = "default"
+@module("./golang.svg") external golangIcon: string = "default"
