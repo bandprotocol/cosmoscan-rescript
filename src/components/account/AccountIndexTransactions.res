@@ -20,7 +20,7 @@ let make = (~accountAddress: Address.t) => {
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 10
 
-  let txsSub = TxSub.getListBySender(accountAddress, ~pageSize, ~page, ())
+  let txsSub = TxSub.getListBySender(accountAddress, ~pageSize, ~page)
   let txsCountSub = TxSub.countBySender(accountAddress)
 
   let isMobile = Media.isMobile()

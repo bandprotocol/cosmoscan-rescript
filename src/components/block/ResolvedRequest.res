@@ -71,6 +71,6 @@ let make = (~blockSub: Sub.variant<BlockSub.t>) => {
         </InfoContainer>
       </Col>
     </Row>;
-  | _ => React.null
+  | Data(_) | Error(_) | Loading | NoData => React.null
   };
 };

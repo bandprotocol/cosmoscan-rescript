@@ -26,7 +26,7 @@ let make = (~height) => {
   let isMobile = Media.isMobile();
   let blockSub = BlockSub.get(height);
   let latestBlockSub = BlockSub.getLatest();
-  let txsSub = TxSub.getListByBlockHeight(height, ());
+  let txsSub = TxSub.getListByBlockHeight(height);
   let ibcTxsSub = txsSub -> Sub.map(txs => txs->Belt.Array.keepMap(tx => isIBCTx(tx) ? Some(tx) : None))
   let commonTxsSub = txsSub -> Sub.map(txs => txs->Belt.Array.keepMap(tx => !isIBCTx(tx) ? Some(tx) : None))
 

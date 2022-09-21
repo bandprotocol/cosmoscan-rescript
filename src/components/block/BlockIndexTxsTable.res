@@ -12,7 +12,7 @@ module RenderBody = {
         <Col col=Col.Two>
           {switch txSub {
            | Data({txHash}) => <TxLink txHash width=140 />
-           | _ => <LoadingCensorBar width=170 height=15 />
+           | Error(_) | Loading | NoData => <LoadingCensorBar width=170 height=15 />
            }}
         </Col>
         <Col col=Col.Two>
@@ -27,14 +27,14 @@ module RenderBody = {
                  weight=Text.Medium
                />
              </div>
-           | _ => <LoadingCensorBar width=30 height=15 isRight=true />
+           | Error(_) | Loading | NoData => <LoadingCensorBar width=30 height=15 isRight=true />
            }}
         </Col>
         <Col col=Col.Eight>
           {switch txSub {
            | Data({messages, txHash, success, errMsg}) =>
              <TxMessages txHash messages success errMsg />
-           | _ => <LoadingCensorBar width=530 height=15 />
+           | Error(_) | Loading | NoData => <LoadingCensorBar width=530 height=15 />
            }}
         </Col>
       </Row>
@@ -59,7 +59,7 @@ module RenderBodyMobile = {
         idx={txHash -> Hash.toHex}
         status=success
       />
-    | _ =>
+    | Error(_) | Loading | NoData =>
       <MobileCard
         values={
           open InfoMobileCard
@@ -144,12 +144,12 @@ let make = (~txsSub: Sub.variant<array<TxSub.t>>) => {
                color={theme.textSecondary}
              />
            </EmptyContainer>
-     | _ =>
+     | Error(_) | Loading | NoData =>
        Belt.Array.make(isMobile ? 1 : 10, Sub.NoData)
        ->Belt.Array.mapWithIndex((i, noData) =>
            isMobile
-             ? <RenderBodyMobile reserveIndex=i txSub=noData key={i -> string_of_int} />
-             : <RenderBody txSub=noData key={i -> string_of_int} />
+             ? <RenderBodyMobile reserveIndex=i txSub=noData key={i -> Belt.Int.toString} />
+             : <RenderBody txSub=noData key={i -> Belt.Int.toString} />
          )
        ->React.array
      }}
