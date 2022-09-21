@@ -388,7 +388,7 @@ let make = () => {
             <Heading value="Most Requested" size=Heading.H4 marginBottom=16 />
             <Row>
               {Belt_Array.make(mostRequestedPageSize, Sub.NoData)
-              ->Belt_Array.mapWithIndex((i, e) =>
+              ->Belt_Array.mapWithIndex((i, _) =>
                   <RenderMostRequestedCard
                     key={i |> string_of_int}
                     reserveIndex=i
@@ -521,7 +521,7 @@ let make = () => {
            | _ =>
              <div className=Styles.tbodyContainer>
                {Belt_Array.make(10, Sub.NoData)
-                ->Belt_Array.mapWithIndex((i, e) =>
+                ->Belt_Array.mapWithIndex((i, _) =>
                     isMobile
                       ? <RenderBodyMobile
                           key={i -> string_of_int}

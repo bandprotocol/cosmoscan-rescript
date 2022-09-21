@@ -133,7 +133,7 @@ let make = () => {
   let routes = list{
     ("Home", Route.HomePage),
     ("Validators", ValidatorsPage),
-    ("Blocks", BlockHomePage),
+    ("Blocks", BlockPage),
     ("Transactions", TxHomePage),
     ("Proposals", ProposalPage),
     ("Data Sources", DataSourceHomePage),

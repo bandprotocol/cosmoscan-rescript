@@ -42,7 +42,7 @@ module RawBlock = {
   type tab_t = unit
   let prefix = "#B"
   let color = Theme.baseBlue
-  let route = (height, _) => Route.BlockIndexPage(height)
+  let route = (height, _) => Route.BlockDetailsPage(height)
   let defaultTab = ()
 }
 

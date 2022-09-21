@@ -31,8 +31,8 @@ type t =
   | OracleScriptDetailsPage(int, oracle_script_tab_t)
   | TxHomePage
   | TxIndexPage(Hash.t)
-  | BlockHomePage
-  | BlockIndexPage(int)
+  | BlockPage
+  | BlockDetailsPage(int)
   | RequestHomePage
   | RequestIndexPage(int)
   | AccountIndexPage(Address.t, account_tab_t)
@@ -76,11 +76,11 @@ let fromUrl = (url: RescriptReactRouter.url) =>
   | (list{"txs"}, _) => TxHomePage
   | (list{"tx", txHash}, _) => TxIndexPage(Hash.fromHex(txHash))
   | (list{"validators"}, _) => ValidatorsPage
-  | (list{"blocks"}, _) => BlockHomePage
+  | (list{"blocks"}, _) => BlockPage
   | (list{"block", blockHeight}, _) =>
     let blockHeightIntOpt = blockHeight |> int_of_string_opt
     switch blockHeightIntOpt {
-    | Some(block) => BlockIndexPage(block)
+    | Some(block) => BlockDetailsPage(block)
     | None => NotFound
     }
 
@@ -141,8 +141,8 @@ let toString = route =>
   | TxHomePage => "/txs"
   | TxIndexPage(txHash) => `/tx/${txHash |> Hash.toHex}`
   | ValidatorsPage => "/validators"
-  | BlockHomePage => "/blocks"
-  | BlockIndexPage(height) => `/block/${height |> string_of_int}`
+  | BlockPage => "/blocks"
+  | BlockDetailsPage(height) => `/block/${height |> string_of_int}`
   | RequestHomePage => "/requests"
   | RequestIndexPage(reqID) => `/request/${reqID |> string_of_int}`
   | AccountIndexPage(address, AccountDelegations) => {
@@ -187,7 +187,7 @@ let search = (str: string) => {
   let capStr = str |> String.capitalize_ascii
 
   switch str |> int_of_string_opt {
-  | Some(blockID) => Some(BlockIndexPage(blockID))
+  | Some(blockID) => Some(BlockDetailsPage(blockID))
   | None =>
     if str |> Js.String.startsWith("bandvaloper") {
       Some(ValidatorDetailsPage(str |> Address.fromBech32, Reports))
@@ -197,7 +197,7 @@ let search = (str: string) => {
       Some(TxIndexPage(str |> Hash.fromHex))
     } else if capStr |> Js.String.startsWith("B") {
       let blockIDOpt = str |> String.sub(_, 1, len - 1) |> int_of_string_opt
-      blockIDOpt->Belt.Option.map(blockID => BlockIndexPage(blockID))
+      blockIDOpt->Belt.Option.map(blockID => BlockDetailsPage(blockID))
     } else if capStr |> Js.String.startsWith("D") {
       let dataSourceIDOpt = str |> String.sub(_, 1, len - 1) |> int_of_string_opt
       dataSourceIDOpt->Belt.Option.map(dataSourceID => DataSourceIndexPage(

@@ -39,8 +39,8 @@ let make = () => {
         <OracleScriptDetailsPage oracleScriptID=ID.OracleScript.ID(oracleScriptID) hashtag />
       | TxHomePage => <TxHomePage />
       | TxIndexPage(txHash) => <TxIndexPage txHash />
-      | BlockHomePage => <BlockHomePage />
-      | BlockIndexPage(height) => <BlockIndexPage height=ID.Block.ID(height) />
+      | BlockPage => <BlockPage />
+      | BlockDetailsPage(height) => <BlockDetailsPage height=ID.Block.ID(height) />
       | ValidatorsPage => <ValidatorsPage />
       | ValidatorDetailsPage(address, hashtag) => <ValidatorDetailsPage address hashtag />
       | RequestHomePage => <RequestHomePage />

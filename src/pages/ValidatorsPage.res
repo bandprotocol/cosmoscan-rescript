@@ -24,7 +24,7 @@ let make = () => {
   let (prevDayTime, setPrevDayTime) = React.useState(getPrevDay)
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
   let (sortedBy, setSortedBy) = React.useState(_ => ValidatorsTable.VotingPowerDesc)
-  let (isActive, setIsActive) = React.useState(_ => true)
+  let (isActive, _) = React.useState(_ => true)
 
   React.useEffect0(() => {
     let timeOutID = Js.Global.setInterval(() => {setPrevDayTime(getPrevDay)}, 60_000)
