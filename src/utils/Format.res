@@ -1,20 +1,19 @@
 let withCommas = value =>
   value
-  |> Js.String.split(".")
-  |> Js.Array.mapi((part, idx) =>
+  ->Js.String2.split(".")
+  ->Belt.Array.mapWithIndex((idx, part) => {
     if idx == 0 {
       part
-      |> Js.String.split("")
-      |> Js.Array.reverseInPlace
-      |> Js.Array.reducei(
-        (acc, ch, idx) => mod(idx, 3) == 0 && idx != 0 ? ch ++ "," ++ acc : ch ++ acc,
-        "",
+      ->Js.String2.split("")
+      ->Belt.Array.reverse
+      ->Belt.Array.reduceWithIndex("", (acc, ch, idx) =>
+        mod(idx, 3) == 0 && idx != 0 ? ch ++ "," ++ acc : ch ++ acc
       )
     } else {
       "." ++ part
     }
-  )
-  |> Js.Array.reduce((a, b) => a ++ b, "")
+  })
+  ->Belt.Array.reduce("", (a, b) => a ++ b)
 
 let fPretty = (~digits=?, value) => {
   switch digits {
@@ -36,13 +35,13 @@ let fPretty = (~digits=?, value) => {
 
 let fCurrency = value =>
   if value >= 1e9 {
-    (value /. 1e9 |> fPretty(~digits=2)) ++ "B"
+    (value /. 1e9)->fPretty(~digits=2) ++ "B"
   } else if value >= 1e6 {
-    (value /. 1e6 |> fPretty(~digits=2)) ++ "M"
+    (value /. 1e6)->fPretty(~digits=2) ++ "M"
   } else if value >= 1e3 {
-    (value /. 1e3 |> fPretty(~digits=2)) ++ "K"
+    (value /. 1e3)->fPretty(~digits=2) ++ "K"
   } else {
-    value |> fPretty(~digits=2)
+    value->fPretty(~digits=2)
   }
 
 let fPercentChange = value =>
@@ -62,4 +61,4 @@ let fPercent = (~digits=?, value) => {
   } ++ " %"
 }
 
-let iPretty = value => withCommas(value->string_of_int)
+let iPretty = value => withCommas(value->Belt.Int.toString)

@@ -78,14 +78,14 @@ let make = (~currentPage, ~pageCount, ~onPageChange: int => unit) => {
             Styles.paginationBox,
           })}>
           <Text
-            value={currentPage |> Format.iPretty}
+            value={currentPage->Format.iPretty}
             size=Text.Lg
             weight=Text.Semibold
             color=theme.textPrimary
           />
           <Text value="of" size=Text.Lg />
           <Text
-            value={pageCount |> Format.iPretty}
+            value={pageCount->Format.iPretty}
             weight=Text.Semibold
             size=Text.Lg
             color=theme.textPrimary

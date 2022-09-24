@@ -61,7 +61,7 @@ module Styles = {
 module ParameterInput = {
   @react.component
   let make = (~name, ~index, ~setCalldataList) => {
-    let name = Js.String.replaceByRe(%re(`/[_]/g`), " ", name)
+    let name = name->Js.String2.replaceByRe(%re(`/[_]/g`), " ")
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.listContainer>
@@ -127,7 +127,7 @@ module ResultRender = {
             <Text value="Exit Status" weight=Text.Semibold />
           </div>
           <div className=Styles.resultWrapper>
-            <Text value={returncode |> string_of_int} />
+            <Text value={returncode->Belt.Int.toString} />
           </div>
         </div>
         <div className={Css.merge(list{CssHelper.flexBox(), Styles.resultBox})}>
@@ -180,7 +180,7 @@ let make = (~executable: JsBuffer.t) => {
         {numParams > 0
           ? <>
               {params
-              ->Belt_Array.mapWithIndex((i, param) =>
+              ->Belt.Array.mapWithIndex((i, param) =>
                 <ParameterInput key=param name=param index=i setCalldataList />
               )
               ->React.array}
@@ -208,7 +208,7 @@ let make = (~executable: JsBuffer.t) => {
                       ~executable=executable->JsBuffer.toBase64,
                       ~calldata={
                         callDataList
-                        ->Belt_List.reduce("", (acc, calldata) => acc ++ " " ++ calldata)
+                        ->Belt.List.reduce("", (acc, calldata) => acc ++ " " ++ calldata)
                         ->String.trim
                       },
                       ~timeout=5000,
@@ -229,7 +229,7 @@ let make = (~executable: JsBuffer.t) => {
                     Promise.resolve()
                   })
               }}>
-            {(result == Loading ? "Executing ... " : "Test Execution") |> React.string}
+            {(result == Loading ? "Executing ... " : "Test Execution")->React.string}
           </Button>
         </div>
         <ResultRender result />

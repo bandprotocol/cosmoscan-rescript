@@ -126,13 +126,14 @@ let getList = (~page, ~pageSize, ~searchTerm, ()) => {
   let keyword = {j`%$searchTerm%`}
   let result = MultiConfig.use({limit: pageSize, offset, searchTerm: keyword})
 
-  result->Sub.fromData->Sub.map(internal => internal.data_sources->Belt_Array.map(toExternal))
+  result->Sub.fromData->Sub.map(internal => internal.data_sources->Belt.Array.map(toExternal))
 }
 
 let count = (~searchTerm, ()) => {
   let keyword = {j`%$searchTerm%`}
   let result = DataSourcesCountConfig.use({searchTerm: keyword})
+
   result
   ->Sub.fromData
-  ->Sub.map(x => x.data_sources_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count))
+  ->Sub.map(x => x.data_sources_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
 }

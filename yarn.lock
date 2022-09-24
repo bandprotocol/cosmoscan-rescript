@@ -677,11 +677,6 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@glennsl/bs-json@^5.0.4":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@glennsl/bs-json/-/bs-json-5.0.4.tgz#8a80906f3b5e04d78dc06722e5987ff6499c89a8"
-  integrity sha512-Th9DetZjRlMZrb74kgGJ44oWcoFyOTE884WlSuXft0Cd+J09vHRxiB7eVyK7Gthb4cSevsBBJDHYAbGGL25wPw==
-
 "@glennsl/rescript-jest@^0.9.2":
   version "0.9.2"
   resolved "https://registry.yarnpkg.com/@glennsl/rescript-jest/-/rescript-jest-0.9.2.tgz#d896d3b1bec5caa93ec26a49d2794a5883ab963f"
@@ -689,6 +684,11 @@
   dependencies:
     "@ryyppy/rescript-promise" "^2.1.0"
     jest "^27.3.1"
+
+"@glennsl/rescript-json-combinators@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@glennsl/rescript-json-combinators/-/rescript-json-combinators-1.0.0.tgz#a9104597eab540cbaa184356c29fcf5e95dab7a0"
+  integrity sha512-LpdrSfd2M2FIxDH52LsrZ1HBwiUnZz1ypAB7hbY44ocHOEn/MDMoeXvzTfDGpj+u/81WbPyBv02uaKwuFGvq+Q==
 
 "@graphql-typed-document-node/core@^3.1.1":
   version "3.1.1"

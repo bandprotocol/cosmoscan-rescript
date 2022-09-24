@@ -72,8 +72,8 @@ let make = (
   let prefix = isValidator ? "bandvaloper" : "band"
 
   let noPrefixAddress = isValidator
-    ? address |> Address.toOperatorBech32 |> Js.String.sliceToEnd(~from=11)
-    : address |> Address.toBech32 |> Js.String.sliceToEnd(~from=4)
+    ? address->Address.toOperatorBech32->Js.String2.sliceToEnd(~from=11)
+    : address->Address.toBech32->Js.String2.sliceToEnd(~from=4)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -95,8 +95,8 @@ let make = (
           Styles.font(position),
           wordBreak ? Styles.wordBreak : "",
         ])}>
-        <span className=Styles.prefix> {prefix |> React.string} </span>
-        {noPrefixAddress |> React.string}
+        <span className=Styles.prefix> {prefix->React.string} </span>
+        {noPrefixAddress->React.string}
       </span>
     </Link>
     {copy
@@ -110,9 +110,7 @@ let make = (
             | Title => 15
             | _ => 12
             }}
-            message={isValidator
-              ? address |> Address.toOperatorBech32
-              : address |> Address.toBech32}
+            message={isValidator ? address->Address.toOperatorBech32 : address->Address.toBech32}
           />
         </>
       : React.null}

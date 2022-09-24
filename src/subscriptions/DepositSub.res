@@ -2,22 +2,22 @@ type t = {
   depositor: Address.t,
   amount: list<Coin.t>,
   txHashOpt: option<Hash.t>,
-};
+}
 
-type account_t = {address: Address.t};
-type transaction_t = {hash: Hash.t};
+type account_t = {address: Address.t}
+type transaction_t = {hash: Hash.t}
 
 type internal_t = {
   account: account_t,
   amount: list<Coin.t>,
   transactionOpt: option<transaction_t>,
-};
+}
 
 let toExternal = ({account, amount, transactionOpt}) => {
   depositor: account.address,
   amount,
   txHashOpt: transactionOpt->Belt.Option.map(({hash}) => hash),
-};
+}
 
 module MultiConfig = %graphql(`
     subscription Deposits($limit: Int!, $offset: Int!, $proposal_id: Int!) {
@@ -44,23 +44,20 @@ module DepositCountConfig = %graphql(`
 `)
 
 let getList = (proposalID, ~page, ~pageSize, ()) => {
-  let offset = (page - 1) * pageSize;
+  let offset = (page - 1) * pageSize
   let result = MultiConfig.use({
-    proposal_id: proposalID |> ID.Proposal.toInt,
+    proposal_id: proposalID->ID.Proposal.toInt,
     limit: pageSize,
-    offset: offset
+    offset,
   })
 
-  result
-  -> Sub.fromData
-  -> Sub.map(internal => internal.deposits->Belt_Array.map(toExternal));
-};
+  result->Sub.fromData->Sub.map(internal => internal.deposits->Belt.Array.map(toExternal))
+}
 
-let count = (proposalID) => {
-  let result = DepositCountConfig.use({proposal_id: proposalID |> ID.Proposal.toInt})
+let count = proposalID => {
+  let result = DepositCountConfig.use({proposal_id: proposalID->ID.Proposal.toInt})
 
   result
-  -> Sub.fromData
-  -> Sub.map(x => x.deposits_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count));
-};
-
+  ->Sub.fromData
+  ->Sub.map(x => x.deposits_aggregate.aggregate->Belt.Option.mapWithDefault(0, a => a.count))
+}

@@ -54,7 +54,7 @@ module Transfer = {
         />
         <Text
           size=Text.Lg
-          value={(msg.token.amount |> Format.fPretty) ++ (" " ++ msg.token.denom)}
+          value={msg.token.amount->Format.fPretty ++ (" " ++ msg.token.denom)}
           breakAll=true
         />
       </Col>

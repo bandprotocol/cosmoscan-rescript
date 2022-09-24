@@ -40,7 +40,7 @@ let getName = x =>
 
 let defaultCompare = (a: OracleScriptSub.t, b: OracleScriptSub.t) =>
   if a.timestamp !== b.timestamp {
-    compare(b.id |> ID.OracleScript.toInt, a.id |> ID.OracleScript.toInt)
+    compare(b.id->ID.OracleScript.toInt, a.id->ID.OracleScript.toInt)
   } else {
     compare(b.requestCount, a.requestCount)
   }
@@ -77,7 +77,7 @@ module RenderMostRequestedCard = {
     <Col
       key={switch oracleScriptSub {
       | Data({id}) => id->ID.OracleScript.toString
-      | _ => reserveIndex->string_of_int
+      | _ => reserveIndex->Belt.Int.toString
       }}
       col=Col.Four>
       <div
@@ -138,7 +138,7 @@ module RenderMostRequestedCard = {
             />
             {switch oracleScriptSub {
             | Data({requestCount}) =>
-              <Text value={requestCount |> Format.iPretty} block=true color={theme.textPrimary} />
+              <Text value={requestCount->Format.iPretty} block=true color={theme.textPrimary} />
             | _ => <LoadingCensorBar width=100 height=15 />
             }}
           </div>
@@ -156,7 +156,7 @@ module RenderMostRequestedCard = {
               switch resultOpt {
               | Some({responseTime}) =>
                 <Text
-                  value={(responseTime |> Format.fPretty(~digits=2)) ++ " s"}
+                  value={responseTime->Format.fPretty(~digits=2) ++ " s"}
                   block=true
                   color={theme.textPrimary}
                 />
@@ -184,8 +184,8 @@ module RenderBody = {
 
     <TBody
       key={switch oracleScriptSub {
-      | Data({id}) => id |> ID.OracleScript.toString
-      | _ => reserveIndex |> string_of_int
+      | Data({id}) => id->ID.OracleScript.toString
+      | _ => reserveIndex->Belt.Int.toString
       }}>
       <Row alignItems=Row.Center>
         <Col col=Col.Four>
@@ -215,10 +215,7 @@ module RenderBody = {
               <>
                 <div>
                   <Text
-                    value={requestCount |> Format.iPretty}
-                    weight=Text.Medium
-                    block=true
-                    ellipsis=true
+                    value={requestCount->Format.iPretty} weight=Text.Medium block=true ellipsis=true
                   />
                 </div>
                 <HSpacing size={#px(2)} />
@@ -226,7 +223,7 @@ module RenderBody = {
                   <Text
                     value={switch resultOpt {
                     | Some({responseTime}) =>
-                      "(" ++ (responseTime |> Format.fPretty(~digits=2)) ++ " s)"
+                      "(" ++ responseTime->Format.fPretty(~digits=2) ++ " s)"
                     | None => "(TBD)"
                     }}
                     weight=Text.Medium
@@ -293,8 +290,8 @@ module RenderBodyMobile = {
             ),
           ]
         }
-        key={id |> ID.OracleScript.toString}
-        idx={id |> ID.OracleScript.toString}
+        key={id->ID.OracleScript.toString}
+        idx={id->ID.OracleScript.toString}
       />
     | _ =>
       <MobileCard
@@ -307,8 +304,8 @@ module RenderBodyMobile = {
             ("Timestamp", Loading(180)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
   }
@@ -358,7 +355,7 @@ let make = () => {
             />
             <Row>
               {oracleScripts
-              ->Belt_Array.mapWithIndex((i, e) =>
+              ->Belt.Array.mapWithIndex((i, e) =>
                 <RenderMostRequestedCard
                   key={e.id->ID.OracleScript.toString}
                   reserveIndex=i
@@ -373,13 +370,11 @@ let make = () => {
           <>
             <Heading value="Most Requested" size=Heading.H4 marginBottom=16 />
             <Row>
-              {Belt_Array.make(mostRequestedPageSize, Sub.NoData)
-              ->Belt_Array.mapWithIndex((i, e) =>
+              {Belt.Array.makeBy(mostRequestedPageSize, i =>
                 <RenderMostRequestedCard
-                  key={i |> string_of_int} reserveIndex=i oracleScriptSub=NoData statsSub=NoData
+                  key={i->Belt.Int.toString} reserveIndex=i oracleScriptSub=NoData statsSub=NoData
                 />
-              )
-              ->React.array}
+              )->React.array}
             </Row>
           </>
         }}
@@ -387,9 +382,7 @@ let make = () => {
           <Col>
             {switch allSub {
             | Data((_, oracleScriptsCount)) =>
-              <Heading
-                value={(oracleScriptsCount |> Format.iPretty) ++ " In total"} size=Heading.H3
-              />
+              <Heading value={oracleScriptsCount->Format.iPretty ++ " In total"} size=Heading.H3 />
             | _ => <LoadingCensorBar width=65 height=21 />
             }}
           </Col>
@@ -476,7 +469,7 @@ let make = () => {
             <>
               {oracleScripts
               ->sorting(sortedBy)
-              ->Belt_Array.mapWithIndex((i, e) =>
+              ->Belt.Array.mapWithIndex((i, e) =>
                 isMobile
                   ? <RenderBodyMobile
                       key={e.id->ID.OracleScript.toString}
@@ -500,17 +493,21 @@ let make = () => {
             </>
           | _ =>
             <div className=Styles.tbodyContainer>
-              {Belt_Array.make(10, Sub.NoData)
-              ->Belt_Array.mapWithIndex((i, e) =>
+              {Belt.Array.makeBy(10, i =>
                 isMobile
                   ? <RenderBodyMobile
-                      key={i->string_of_int} reserveIndex=i oracleScriptSub=NoData statsSub=NoData
+                      key={i->Belt.Int.toString}
+                      reserveIndex=i
+                      oracleScriptSub=NoData
+                      statsSub=NoData
                     />
                   : <RenderBody
-                      key={i->string_of_int} reserveIndex=i oracleScriptSub=NoData statsSub=NoData
+                      key={i->Belt.Int.toString}
+                      reserveIndex=i
+                      oracleScriptSub=NoData
+                      statsSub=NoData
                     />
-              )
-              ->React.array}
+              )->React.array}
             </div>
           }}
         </Table>

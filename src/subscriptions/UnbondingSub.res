@@ -18,7 +18,7 @@ module Unbonding = {
 
   type t = Coin.t
 
-  let toExternal = (sum: sum_t) => sum.amount |> GraphQLParser.coinWithDefault
+  let toExternal = (sum: sum_t) => sum.amount->GraphQLParser.coinWithDefault
 }
 
 module SingleConfig = %graphql(`
@@ -81,19 +81,20 @@ module UnbondingCountByDelegatorConfig = %graphql(`
 
 let getUnbondingBalance = (delegatorAddress, currentTime) => {
   let result = SingleConfig.use({
-    delegator_address: delegatorAddress |> Address.toBech32,
-    current_time: currentTime |> Js.Json.string,
+    delegator_address: delegatorAddress->Address.toBech32,
+    current_time: currentTime->Js.Json.string,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.flatMap(_, ({accounts_by_pk}) => {
+  ->Sub.fromData
+  ->Sub.flatMap(({accounts_by_pk}) => {
     switch accounts_by_pk {
     | Some(data) =>
       Sub.resolve(
-        data.unbonding_delegations_aggregate.aggregate
-        |> Belt.Option.getExn
-        |> (data => data.sum |> Belt.Option.getExn |> Unbonding.toExternal),
+        data.unbonding_delegations_aggregate.aggregate->Belt.Option.mapWithDefault(
+          Coin.newUBANDFromAmount(0.),
+          data => data.sum->Belt.Option.getExn->Unbonding.toExternal,
+        ),
       )
     | None => Sub.resolve(Coin.newUBANDFromAmount(0.))
     }
@@ -106,20 +107,20 @@ let getUnbondingBalance = (delegatorAddress, currentTime) => {
 //   let (result, _) = ApolloHooks.useSubscription(
 //     UnbondingByValidatorConfig.definition,
 //     ~variables=UnbondingByValidatorConfig.makeVariables(
-//       ~delegator_address=delegatorAddress |> Address.toBech32,
-//       ~operator_address=operatorAddress |> Address.toOperatorBech32,
-//       ~current_time=currentTime |> Js.Json.string,
+//       ~delegator_address=delegatorAddress -> Address.toBech32,
+//       ~operator_address=operatorAddress -> Address.toOperatorBech32,
+//       ~current_time=currentTime -> Js.Json.string,
 //       (),
 //     ),
 //   )
 
-//   let unbondingInfoSub = result |> Sub.map(_, a =>
+//   let unbondingInfoSub = result -> Sub.map(_, a =>
 //     switch a["accounts_by_pk"] {
 //     | Some(account) =>
 //       (
 //         (
-//           account["unbonding_delegations_aggregate"]["aggregate"] |> Belt.Option.getExn
-//         )["sum"] |> Belt.Option.getExn
+//           account["unbonding_delegations_aggregate"]["aggregate"] -> Belt.Option.getExn
+//         )["sum"] -> Belt.Option.getExn
 //       )["amount"]
 //     | None => Coin.newUBANDFromAmount(0.)
 //     }
@@ -127,7 +128,7 @@ let getUnbondingBalance = (delegatorAddress, currentTime) => {
 
 //   %Sub({
 //     let unbondingInfo = unbondingInfoSub
-//     unbondingInfo |> Sub.resolve
+//     unbondingInfo -> Sub.resolve
 //   })
 // }
 
@@ -135,15 +136,15 @@ let getUnbondingByDelegator = (delegatorAddress, currentTime, ~page, ~pageSize, 
   let offset = (page - 1) * pageSize
 
   let result = UnbondingByDelegatorConfig.use({
-    delegator_address: delegatorAddress |> Address.toBech32,
+    delegator_address: delegatorAddress->Address.toBech32,
     limit: pageSize,
-    current_time: currentTime |> Js.Json.string,
-    offset: offset,
+    current_time: currentTime->Js.Json.string,
+    offset,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.flatMap(_, data =>
+  ->Sub.fromData
+  ->Sub.flatMap(data =>
     switch data.accounts_by_pk {
     | Some(x') => Sub.resolve(x'.unbonding_delegations)
     | None => Sub.resolve([])
@@ -153,19 +154,17 @@ let getUnbondingByDelegator = (delegatorAddress, currentTime, ~page, ~pageSize, 
 
 let getUnbondingCountByDelegator = (delegatorAddress, currentTime) => {
   let result = UnbondingCountByDelegatorConfig.use({
-    delegator_address: delegatorAddress |> Address.toBech32,
-    current_time: currentTime |> Js.Json.string,
+    delegator_address: delegatorAddress->Address.toBech32,
+    current_time: currentTime->Js.Json.string,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.flatMap(_, data =>
+  ->Sub.fromData
+  ->Sub.flatMap(data =>
     switch data.accounts_by_pk {
     | Some(x') =>
       Sub.resolve(
-        x'.unbonding_delegations_aggregate.aggregate
-        |> Belt.Option.getExn
-        |> (y => y.count)
+        x'.unbonding_delegations_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count),
       )
     | None => Sub.resolve(0)
     }

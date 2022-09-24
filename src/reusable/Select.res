@@ -29,7 +29,9 @@ let make = (~options, ~setSelectOption, ~selectLabel, ~selectedOption, ~disabled
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   <div className=Styles.selectWrapper>
-    <div className={CssHelper.mb(~size=8, ())}> <Text value=selectLabel /> </div>
+    <div className={CssHelper.mb(~size=8, ())}>
+      <Text value=selectLabel />
+    </div>
     <div className={CssHelper.selectWrapper(~fontColor=theme.textPrimary, ~mW=770, ())}>
       <select
         disabled
@@ -39,13 +41,11 @@ let make = (~options, ~setSelectOption, ~selectLabel, ~selectedOption, ~disabled
           let newVal = ReactEvent.Form.target(event)["value"]
           setSelectOption(newVal)
         }}>
-        <option value=""> {"All " ++ (selectLabel ++ "s") |> React.string} </option>
-        {options |> Belt.Array.length > 0
+        <option value=""> {("All " ++ selectLabel ++ "s")->React.string} </option>
+        {options->Belt.Array.length > 0
           ? options
-            |> Belt.Array.map(_, value =>
-              <option key=value value> {value |> React.string} </option>
-            )
-            |> React.array
+            ->Belt.Array.map(_, value => <option key=value value> {value->React.string} </option>)
+            ->React.array
           : React.null}
       </select>
     </div>

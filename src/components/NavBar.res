@@ -17,7 +17,7 @@ module RenderDesktop = {
 
   @react.component
   let make = (~routes) => {
-    let currentRoute = RescriptReactRouter.useUrl() |> Route.fromUrl
+    let currentRoute = RescriptReactRouter.useUrl()->Route.fromUrl
 
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -26,7 +26,7 @@ module RenderDesktop = {
       ->Belt.List.map(((v, route)) =>
         <div key=v className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
           <Link className={Styles.nav(currentRoute == route, theme)} route>
-            {v |> React.string}
+            {v->React.string}
           </Link>
         </div>
       )

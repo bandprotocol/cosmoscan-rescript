@@ -115,36 +115,47 @@ type t = {
 
 type tx_response_t = {
   txHash: Hash.t,
-  success: bool,
   code: int,
+}
+
+let decode_tx_response = {
+  open JsonUtils.Decode
+  object(fields => {
+    txHash: fields.required(. "txhash", hashFromHex),
+    code: fields.optional(. "code", int)->Belt.Option.getWithDefault(0),
+  })
 }
 
 type response_t =
   | Tx(tx_response_t)
   | Unknown
 
-let decodeAccountInt = json =>
-  switch {
-    open JsonUtils.Decode
-    (optional(int, json), optional(intstr, json))
-  } {
-  | (Some(x), _) => x
-  | (_, Some(x)) => x
-  | (None, None) => raise(Not_found)
-  }
+let decodeAccountInt = {
+  // switch {
+  //   open JsonUtils.Decode
+  //   (decode(json, int), decode(json, intstr))
+  // } {
+  // | (Ok(x), _) => x
+  // | (_, Ok(x)) => x
+  // | (_, _) => raise(Not_found)
+  open JsonUtils.Decode
+  oneOf([int, intstr])
+}
 
 let getAccountInfo = address => {
-  let url = Env.rpc ++ ("/auth/accounts/" ++ (address |> Address.toBech32))
+  let url = Env.rpc ++ ("/auth/accounts/" ++ address->Address.toBech32)
 
   Axios.get(url)->Promise.then(info => {
     let data = info["data"]
     Promise.resolve({
       open JsonUtils.Decode
       {
-        accountNumber: data |> at(list{"result", "value", "account_number"}, decodeAccountInt),
+        accountNumber: data
+        ->decode(at(list{"result", "value", "account_number"}, decodeAccountInt))
+        ->Belt.Result.getExn,
         sequence: data
-        |> optional(at(list{"result", "value", "sequence"}, decodeAccountInt))
-        |> Belt.Option.getWithDefault(_, 0),
+        ->decode(at(list{"result", "value", "sequence"}, decodeAccountInt))
+        ->Belt.Result.getWithDefault(0),
       }
     })
   })
@@ -188,44 +199,44 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
   let msgValue = switch msg {
   | Send(toAddress, coins) =>
     Js.Json.stringifyAny({
-      from_address: sender |> Address.toBech32,
-      to_address: toAddress |> Address.toBech32,
+      from_address: sender->Address.toBech32,
+      to_address: toAddress->Address.toBech32,
       amount: [coins],
     })
-    |> Belt.Option.getExn
-    |> Js.Json.parseExn
+    ->Belt.Option.getExn
+    ->Js.Json.parseExn
   | Delegate(validator, amount) =>
     Js.Json.stringifyAny({
-      delegator_address: sender |> Address.toBech32,
-      validator_address: validator |> Address.toOperatorBech32,
+      delegator_address: sender->Address.toBech32,
+      validator_address: validator->Address.toOperatorBech32,
       amount,
     })
-    |> Belt.Option.getExn
-    |> Js.Json.parseExn
+    ->Belt.Option.getExn
+    ->Js.Json.parseExn
   | Undelegate(validator, amount) =>
     Js.Json.stringifyAny({
-      delegator_address: sender |> Address.toBech32,
-      validator_address: validator |> Address.toOperatorBech32,
+      delegator_address: sender->Address.toBech32,
+      validator_address: validator->Address.toOperatorBech32,
       amount,
     })
-    |> Belt.Option.getExn
-    |> Js.Json.parseExn
+    ->Belt.Option.getExn
+    ->Js.Json.parseExn
   | Redelegate(fromValidator, toValidator, amount) =>
     Js.Json.stringifyAny({
-      delegator_address: sender |> Address.toBech32,
-      validator_src_address: fromValidator |> Address.toOperatorBech32,
-      validator_dst_address: toValidator |> Address.toOperatorBech32,
+      delegator_address: sender->Address.toBech32,
+      validator_src_address: fromValidator->Address.toOperatorBech32,
+      validator_dst_address: toValidator->Address.toOperatorBech32,
       amount,
     })
-    |> Belt.Option.getExn
-    |> Js.Json.parseExn
+    ->Belt.Option.getExn
+    ->Js.Json.parseExn
   | WithdrawReward(validator) =>
     Js.Json.stringifyAny({
-      delegator_address: sender |> Address.toBech32,
-      validator_address: validator |> Address.toOperatorBech32,
+      delegator_address: sender->Address.toBech32,
+      validator_address: validator->Address.toOperatorBech32,
     })
-    |> Belt.Option.getExn
-    |> Js.Json.parseExn
+    ->Belt.Option.getExn
+    ->Js.Json.parseExn
   | Request(
       ID.OracleScript.ID(oracleScriptID),
       calldata,
@@ -238,26 +249,26 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
       executeGas,
     ) =>
     Js.Json.stringifyAny({
-      oracle_script_id: oracleScriptID |> string_of_int,
-      calldata: calldata |> JsBuffer.toBase64,
+      oracle_script_id: oracleScriptID->Belt.Int.toString,
+      calldata: calldata->JsBuffer.toBase64,
       ask_count: askCount,
       min_count: minCount,
-      sender: sender |> Address.toBech32,
+      sender: sender->Address.toBech32,
       client_id: clientID,
       fee_limit: [feeLimit],
       prepare_gas: prepareGas,
       execute_gas: executeGas,
     })
-    |> Belt.Option.getExn
-    |> Js.Json.parseExn
+    ->Belt.Option.getExn
+    ->Js.Json.parseExn
   | Vote(ID.Proposal.ID(proposalID), answer) =>
     Js.Json.stringifyAny({
-      proposal_id: proposalID |> string_of_int,
-      voter: sender |> Address.toBech32,
+      proposal_id: proposalID->Belt.Int.toString,
+      voter: sender->Address.toBech32,
       option: answer,
     })
-    |> Belt.Option.getExn
-    |> Js.Json.parseExn
+    ->Belt.Option.getExn
+    ->Js.Json.parseExn
   }
   {type_: msgType, value: msgValue}
 }
@@ -272,8 +283,8 @@ let createRawTx = (~address, ~msgs, ~chainID, ~feeAmount, ~gas, ~memo, ()) =>
         gas,
       },
       memo,
-      account_number: accountInfo.accountNumber |> string_of_int,
-      sequence: accountInfo.sequence |> string_of_int,
+      account_number: accountInfo.accountNumber->Belt.Int.toString,
+      sequence: accountInfo.sequence->Belt.Int.toString,
     })
   })
 
@@ -307,17 +318,6 @@ let broadcast = signedTx => {
 
   Axios.post(Env.rpc ++ "/txs", convert(signedTx))->Promise.then(rawResponse => {
     let response = rawResponse["data"]
-    Promise.resolve(
-      Tx({
-        open JsonUtils.Decode
-        {
-          txHash: response |> at(list{"txhash"}, string) |> Hash.fromHex,
-          code: response |> optional(at(list{"code"}, int)) |> Belt.Option.getWithDefault(_, 0),
-          success: response
-          |> optional(field("code", int))
-          |> Belt.Option.mapWithDefault(_, true, code => code == 0),
-        }
-      }),
-    )
+    Promise.resolve(Tx(response->JsonUtils.Decode.mustDecode(decode_tx_response)))
   })
 }

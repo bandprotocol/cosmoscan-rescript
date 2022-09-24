@@ -29,8 +29,7 @@ module RenderBody = {
         <Col col=Col.Three>
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch unbondingListSub {
-            | Data({amount}) =>
-              <Text value={amount |> Coin.getBandAmountFromCoin |> Format.fPretty} />
+            | Data({amount}) => <Text value={amount->Coin.getBandAmountFromCoin->Format.fPretty} />
             | _ => <LoadingCensorBar width=200 height=20 />
             }}
           </div>
@@ -56,9 +55,9 @@ module RenderBodyMobile = {
     switch unbondingListSub {
     | Data({validator: {operatorAddress, moniker, identity}, amount, completionTime}) =>
       let key_ =
-        (operatorAddress |> Address.toBech32) ++
-          ((completionTime |> MomentRe.Moment.toISOString) ++
-          (reserveIndex |> string_of_int))
+        operatorAddress->Address.toBech32 ++
+          (completionTime->MomentRe.Moment.toISOString ++
+          reserveIndex->Belt.Int.toString)
       <MobileCard
         values={
           open InfoMobileCard
@@ -81,8 +80,8 @@ module RenderBodyMobile = {
             ("Unbonded At", Loading(230)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
 }
@@ -91,7 +90,7 @@ module RenderBodyMobile = {
 let make = (~address) => {
   let isMobile = Media.isMobile()
   let currentTime =
-    React.useContext(TimeContext.context) |> MomentRe.Moment.format(Config.timestampUseFormat)
+    React.useContext(TimeContext.context)->MomentRe.Moment.format(Config.timestampUseFormat, _)
 
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 5
@@ -116,7 +115,7 @@ let make = (~address) => {
               <div className={CssHelper.flexBox()}>
                 <Text
                   block=true
-                  value={unbondingCount |> string_of_int}
+                  value={unbondingCount->Belt.Int.toString}
                   weight=Text.Semibold
                   size=Text.Sm
                   transform=Text.Uppercase
@@ -142,7 +141,7 @@ let make = (~address) => {
                 <div className={CssHelper.flexBox()}>
                   <Text
                     block=true
-                    value={unbondingCount |> string_of_int}
+                    value={unbondingCount->Belt.Int.toString}
                     weight=Text.Semibold
                     size=Text.Sm
                     transform=Text.Uppercase
@@ -184,19 +183,19 @@ let make = (~address) => {
     {switch unbondingListSub {
     | Data(unbondingList) if unbondingList->Belt.Array.size > 0 =>
       unbondingList
-      ->Belt_Array.mapWithIndex((i, e) =>
+      ->Belt.Array.mapWithIndex((i, e) =>
         isMobile
           ? <RenderBodyMobile
-              key={(e.validator.operatorAddress |> Address.toBech32) ++
-                ((e.completionTime |> MomentRe.Moment.toISOString) ++
-                (i |> string_of_int))}
+              key={e.validator.operatorAddress->Address.toBech32 ++
+                (e.completionTime->MomentRe.Moment.toISOString ++
+                i->Belt.Int.toString)}
               reserveIndex=i
               unbondingListSub={Sub.resolve(e)}
             />
           : <RenderBody
-              key={(e.validator.operatorAddress |> Address.toBech32) ++
-                ((e.completionTime |> MomentRe.Moment.toISOString) ++
-                (i |> string_of_int))}
+              key={e.validator.operatorAddress->Address.toBech32 ++
+                (e.completionTime->MomentRe.Moment.toISOString ++
+                i->Belt.Int.toString)}
               unbondingListSub={Sub.resolve(e)}
             />
       )
@@ -216,11 +215,11 @@ let make = (~address) => {
         />
       </EmptyContainer>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile key={i |> string_of_int} reserveIndex=i unbondingListSub=noData />
-          : <RenderBody key={i |> string_of_int} unbondingListSub=noData />
+          ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i unbondingListSub=noData />
+          : <RenderBody key={i->Belt.Int.toString} unbondingListSub=noData />
       )
       ->React.array
     }}

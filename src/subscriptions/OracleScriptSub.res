@@ -1,20 +1,20 @@
 type data_source_t = {
   dataSourceID: ID.DataSource.t,
   dataSourceName: string,
-};
-type related_data_sources = {dataSource: data_source_t};
-type block_t = {timestamp: MomentRe.Moment.t};
-type transaction_t = {block: block_t};
-type request_stat_t = {count: int};
+}
+type related_data_sources = {dataSource: data_source_t}
+type block_t = {timestamp: MomentRe.Moment.t}
+type transaction_t = {block: block_t}
+type request_stat_t = {count: int}
 type response_last_1_day_t = {
   id: option<ID.OracleScript.t>,
   responseTime: option<float>,
-};
+}
 
 type response_last_1_day_external = {
   id: ID.OracleScript.t,
   responseTime: float,
-};
+}
 
 type internal_t = {
   id: ID.OracleScript.t,
@@ -26,7 +26,7 @@ type internal_t = {
   transaction: option<transaction_t>,
   relatedDataSources: array<related_data_sources>,
   requestStat: option<request_stat_t>,
-};
+}
 
 type t = {
   id: ID.OracleScript.t,
@@ -38,22 +38,19 @@ type t = {
   timestamp: option<MomentRe.Moment.t>,
   relatedDataSources: list<data_source_t>,
   requestCount: int,
-};
+}
 
-let toExternal =
-    (
-      {
-        id,
-        owner,
-        name,
-        description,
-        schema,
-        sourceCodeURL,
-        transaction: txOpt,
-        relatedDataSources,
-        requestStat: requestStatOpt,
-      },
-    ) => {
+let toExternal = ({
+  id,
+  owner,
+  name,
+  description,
+  schema,
+  sourceCodeURL,
+  transaction: txOpt,
+  relatedDataSources,
+  requestStat: requestStatOpt,
+}) => {
   id,
   owner,
   name,
@@ -61,14 +58,15 @@ let toExternal =
   schema,
   sourceCodeURL,
   timestamp: {
-    let tx = txOpt->Belt.Option.getExn;
-    Some(tx.block.timestamp);
+    let tx = txOpt->Belt.Option.getExn
+    Some(tx.block.timestamp)
   },
-  relatedDataSources:
-    relatedDataSources->Belt.Array.map(({dataSource}) => dataSource)->Belt.List.fromArray,
+  relatedDataSources: relatedDataSources
+  ->Belt.Array.map(({dataSource}) => dataSource)
+  ->Belt.List.fromArray,
   // Note: requestCount can't be nullable value.
   requestCount: requestStatOpt->Belt.Option.map(({count}) => count)->Belt.Option.getExn,
-};
+}
 
 module SingleConfig = %graphql(`
   subscription OracleScript($id: Int!) {
@@ -153,54 +151,51 @@ module SingleOracleScriptStatLast1DayConfig = %graphql(`
 `)
 
 let get = id => {
-  let result = SingleConfig.use({id: id -> ID.OracleScript.toInt})
+  let result = SingleConfig.use({id: id->ID.OracleScript.toInt})
 
-  result -> Sub.fromData
-  -> Sub.flatMap(({oracle_scripts_by_pk}) => {
+  result
+  ->Sub.fromData
+  ->Sub.flatMap(({oracle_scripts_by_pk}) => {
     switch oracle_scripts_by_pk {
-    | Some(data) => Sub.resolve(data -> toExternal)
+    | Some(data) => Sub.resolve(data->toExternal)
     | None => Sub.NoData
     }
   })
-};
+}
 
 let getList = (~page, ~pageSize, ~searchTerm, ()) => {
-  let offset = (page - 1) * pageSize;
-  let keyword = {j`%$searchTerm%`};
-  let result = MultiConfig.use({limit: pageSize, offset: offset, searchTerm:keyword})
+  let offset = (page - 1) * pageSize
+  let keyword = {j`%$searchTerm%`}
+  let result = MultiConfig.use({limit: pageSize, offset, searchTerm: keyword})
 
-  result
-  -> Sub.fromData
-  -> Sub.map(internal => internal.oracle_scripts->Belt_Array.map(toExternal));
-};
+  result->Sub.fromData->Sub.map(internal => internal.oracle_scripts->Belt.Array.map(toExternal))
+}
 
 let count = (~searchTerm, ()) => {
-  let keyword = {j`%$searchTerm%`};
+  let keyword = {j`%$searchTerm%`}
   let result = OracleScriptsCountConfig.use({searchTerm: keyword})
 
   result
-  -> Sub.fromData
-  -> Sub.map(x => x.oracle_scripts_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count));
-};
+  ->Sub.fromData
+  ->Sub.map(x => x.oracle_scripts_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+}
 
 let getResponseTimeList = () => {
   let result = MultiOracleScriptStatLast1DayConfig.use()
   result
-  -> Sub.fromData 
-  -> Sub.map(
-    internal => internal.oracle_script_statistic_last_1_day -> Belt.Array.map(
-      (element) => {
-        id: element.id -> Belt.Option.getExn,
-        responseTime: element.responseTime -> Belt.Option.getExn
-      }
-    )
+  ->Sub.fromData
+  ->Sub.map(internal =>
+    internal.oracle_script_statistic_last_1_day->Belt.Array.map(element => {
+      id: element.id->Belt.Option.getExn,
+      responseTime: element.responseTime->Belt.Option.getExn,
+    })
   )
-};
+}
 
 let getResponseTime = id => {
-  let result = SingleOracleScriptStatLast1DayConfig.use({id: id |> ID.OracleScript.toInt})
+  let result = SingleOracleScriptStatLast1DayConfig.use({id: id->ID.OracleScript.toInt})
 
   result
-  -> Sub.fromData 
-  -> Sub.map(internal => internal.oracle_script_statistic_last_1_day -> Belt.Array.get(0));
-};
+  ->Sub.fromData
+  ->Sub.map(internal => internal.oracle_script_statistic_last_1_day->Belt.Array.get(0))
+}

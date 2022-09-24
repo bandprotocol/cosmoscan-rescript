@@ -27,8 +27,6 @@ let make = (
   ~spacing=Text.Unset,
   ~color=?,
   ~code=false,
-  ~height=Text.Px(10),
-  ~upper=false,
 ) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 

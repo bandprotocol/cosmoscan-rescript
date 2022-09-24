@@ -51,12 +51,12 @@ module ComponentCreator = (RawID: ID.IDSig) => {
 
     <Link
       className={CssJs.merge(. [Styles.link(theme), Styles.pointerEvents(position)])}
-      route={id |> RawID.getRoute}>
+      route={id->RawID.getRoute}>
       <Text
-        value={id |> RawID.toString}
-        size={position |> fontSize}
+        value={id->RawID.toString}
+        size={position->fontSize}
         weight=Text.Semibold
-        height={position |> lineHeight}
+        height={position->lineHeight}
         nowrap=true
         code=true
         block=true
@@ -70,7 +70,7 @@ module PlainLinkCreator = (RawID: ID.IDSig) => {
   @react.component
   let make = (~id, ~children, ~style="") => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    <Link className={CssJs.merge(. [Styles.link(theme), style])} route={id |> RawID.getRoute}>
+    <Link className={CssJs.merge(. [Styles.link(theme), style])} route={id->RawID.getRoute}>
       children
     </Link>
   }

@@ -9,7 +9,10 @@ describe("Expect Coin to work correctly", () => {
     Js.Dict.set(dict, "amount", Js.Json.string("1000000"))
     let coin = Js.Json.object_(dict)
 
-    expect(coin->decodeCoin)->toEqual({denom: "uband", amount: 1000000.})
+    expect(coin->JsonUtils.Decode.mustDecode(decodeCoin))->toEqual({
+      denom: "uband",
+      amount: 1000000.,
+    })
   })
 
   test("should be able to create Coin by uband amount", () =>

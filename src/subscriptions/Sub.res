@@ -2,7 +2,7 @@
 
 // let map = (result, f) =>
 //   switch (result) {
-//   | ApolloClient__React_Hooks_UseSubscription.useSubscription_result<data, variables> => ApolloClient__React_Hooks_UseSubscription.useSubscription_result<data |> f>
+//   | ApolloClient__React_Hooks_UseSubscription.useSubscription_result<data, variables> => ApolloClient__React_Hooks_UseSubscription.useSubscription_result<data -> f>
 //   | Loading => Loading
 //   | Error(e) => Error(e)
 //   | NoData => NoData
@@ -19,10 +19,10 @@ type variant<'a> =
 let resolve = data => Data(data)
 
 let default = (result, value) =>
-  switch (result) {
+  switch result {
   | Data(data) => data
   | _ => value
-  };
+  }
 
 let fromData = result =>
   switch result {
@@ -46,7 +46,7 @@ let flatMap = (result, f) =>
 
 let map = (result, f) =>
   switch result {
-  | Data(data) => Data(data |> f)
+  | Data(data) => Data(data->f)
   | Loading => Loading
   | Error(e) => Error(e)
   | NoData => NoData

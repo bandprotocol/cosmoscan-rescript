@@ -4,10 +4,10 @@ open Expect
 
 let getDayAgo = days =>
   MomentRe.momentNow()
-  |> MomentRe.Moment.defaultUtc
-  |> MomentRe.Moment.startOf(#day)
-  |> MomentRe.Moment.subtract(~duration=MomentRe.duration(days->float_of_int, #days))
-  |> MomentRe.Moment.toUnix
+  ->MomentRe.Moment.defaultUtc
+  ->MomentRe.Moment.startOf(#day, _)
+  ->MomentRe.Moment.subtract(~duration=MomentRe.duration(days->float_of_int, #days))
+  ->MomentRe.Moment.toUnix
 
 describe("Expect HistoryOracleParser works correctly", () => {
   let dates = Belt.Array.makeBy(5, i => getDayAgo(i))->Belt.Array.reverse

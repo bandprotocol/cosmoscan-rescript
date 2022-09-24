@@ -32,7 +32,7 @@ let make = () => {
             })}>
             {mapImages
             ->Belt.Array.mapWithIndex((i, e) =>
-              <AbsoluteLink key={string_of_int(i)} href={e[0]}>
+              <AbsoluteLink key={Belt.Int.toString(i)} href={e[0]}>
                 <img src={e[1]} className=Styles.socialImg />
               </AbsoluteLink>
             )

@@ -18,6 +18,9 @@
   "ppx-flags": [
     "@reasonml-community/graphql-ppx/ppx"
   ],
+  "bsc-flags": [
+    "-open JsonCombinators"
+  ],
   "reason": {
     "react-jsx": 3
   },
@@ -43,7 +46,7 @@
     "bs-css",
     "bs-moment",
     "rescript-webapi",
-    "@glennsl/bs-json"
+    "@glennsl/rescript-json-combinators"
   ],
   "bs-dev-dependencies": [
     "@glennsl/rescript-jest"

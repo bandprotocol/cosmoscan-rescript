@@ -15,5 +15,5 @@ module Config = %graphql(`
 let use = () => {
   let result = Config.use()
 
-  result |> Sub.fromData |> Sub.map(_, ({tracking}) => tracking |> Belt.Array.getExn(_, 0))
+  result->Sub.fromData->Sub.map(({tracking}) => tracking->Belt.Array.getExn(_, 0))
 }

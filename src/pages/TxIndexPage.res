@@ -61,7 +61,7 @@ module TxSyncing = {
           </div>
           <VSpacing size=Spacing.md />
           <Text
-            value=j`This transaction is available on block #B$height but our database is syncing now.`
+            value={j`This transaction is available on block #B$height but our database is syncing now.`}
             size=Text.Lg
           />
           <VSpacing size=Spacing.lg />
@@ -81,12 +81,12 @@ module TxSyncing = {
 module TxNotFoundOrSyncing = {
   @react.component
   let make = (~txHash) => {
-    let txHash' = txHash |> Hash.toHex
+    let txHash' = txHash->Hash.toHex
     let path = j`/txs/$txHash'`
 
-    let decodeHeight = json => json |> JsonUtils.Decode.at(list{"height"}, JsonUtils.Decode.string)
+    let decodeHeight = json => json->JsonUtils.Decode.mustGet("height", JsonUtils.Decode.string)
     let heightOpt = {
-      AxiosHooks.use(path) -> Belt.Option.flatMap( result => {
+      AxiosHooks.use(path)->Belt.Option.flatMap(result => {
         Some(decodeHeight(result))
       })
     }
@@ -117,7 +117,7 @@ let make = (~txHash: Hash.t) => {
               | Data(_) =>
                 isMobile
                   ? <Text
-                      value={txHash |> Hash.toHex(~upper=true)}
+                      value={txHash->Hash.toHex(~upper=true)}
                       size=Text.Lg
                       weight=Text.Bold
                       nowrap=false
@@ -127,21 +127,22 @@ let make = (~txHash: Hash.t) => {
                     />
                   : <>
                       <Text
-                        value={txHash |> Hash.toHex(~upper=true)}
+                        value={txHash->Hash.toHex(~upper=true)}
                         size=Text.Xxl
                         nowrap=true
                         code=true
                         color=theme.textPrimary
                       />
                       <HSpacing size=Spacing.sm />
-                      <CopyRender width=15 message={txHash |> Hash.toHex(~upper=true)} />
+                      <CopyRender width=15 message={txHash->Hash.toHex(~upper=true)} />
                     </>
               | _ => <LoadingCensorBar width=270 height=15 />
               }}
             </div>
             <div className={Css.merge(list{CssHelper.flexBox(), CssHelper.mt(~size=16, ())})}>
               {switch txSub {
-              | Data({success}) => <>
+              | Data({success}) =>
+                <>
                   <img src={success ? Images.success : Images.fail} className=Styles.successLogo />
                   <Text
                     value={success ? "Success" : "Failed"}
@@ -152,7 +153,8 @@ let make = (~txHash: Hash.t) => {
                     color=theme.textPrimary
                   />
                 </>
-              | _ => <>
+              | _ =>
+                <>
                   <LoadingCensorBar width=20 height=20 radius=20 />
                   <HSpacing size=Spacing.sm />
                   <LoadingCensorBar width=60 height=15 />
@@ -163,7 +165,11 @@ let make = (~txHash: Hash.t) => {
         </Row>
         {switch txSub {
         | Data({success, errMsg}) if !success =>
-          <Row> <Col> <TxError.Full msg=errMsg /> </Col> </Row>
+          <Row>
+            <Col>
+              <TxError.Full msg=errMsg />
+            </Col>
+          </Row>
         | _ => React.null
         }}
         <Row marginBottom=24>
@@ -210,8 +216,8 @@ let make = (~txHash: Hash.t) => {
                     <div className={CssHelper.flexBox()}>
                       <Text
                         value={timestamp
-                        |> MomentRe.Moment.format(Config.timestampDisplayFormat)
-                        |> String.uppercase_ascii}
+                        ->MomentRe.Moment.format(Config.timestampDisplayFormat, _)
+                        ->String.uppercase_ascii}
                         size=Text.Lg
                       />
                       <HSpacing size=Spacing.sm />
@@ -243,7 +249,7 @@ let make = (~txHash: Hash.t) => {
                 </Col>
                 <Col col=Col.Eight>
                   {switch txSub {
-                  | Data({gasUsed}) => <Text value={gasUsed |> Format.iPretty} size=Text.Lg />
+                  | Data({gasUsed}) => <Text value={gasUsed->Format.iPretty} size=Text.Lg />
                   | _ => <LoadingCensorBar width=75 height=15 />
                   }}
                 </Col>
@@ -256,7 +262,7 @@ let make = (~txHash: Hash.t) => {
                 </Col>
                 <Col col=Col.Eight>
                   {switch txSub {
-                  | Data({gasLimit}) => <Text value={gasLimit |> Format.iPretty} size=Text.Lg />
+                  | Data({gasLimit}) => <Text value={gasLimit->Format.iPretty} size=Text.Lg />
                   | _ => <LoadingCensorBar width=75 height=15 />
                   }}
                 </Col>
@@ -274,8 +280,8 @@ let make = (~txHash: Hash.t) => {
                   {switch txSub {
                   | Data({gasFee, gasLimit}) =>
                     <Text
-                      value={(gasFee |> Coin.getBandAmountFromCoins) /.
-                      (gasLimit |> float_of_int) *. 1e6 |> Format.fPretty}
+                      value={(gasFee->Coin.getBandAmountFromCoins /.
+                      gasLimit->Belt.Float.fromInt *. 1e6)->Format.fPretty}
                       size=Text.Lg
                     />
                   | _ => <LoadingCensorBar width=75 height=15 />
@@ -292,7 +298,7 @@ let make = (~txHash: Hash.t) => {
                   {switch txSub {
                   | Data({gasFee}) =>
                     <Text
-                      value={gasFee |> Coin.getBandAmountFromCoins |> Format.fPretty} size=Text.Lg
+                      value={gasFee->Coin.getBandAmountFromCoins->Format.fPretty} size=Text.Lg
                     />
                   | _ => <LoadingCensorBar width=75 height=15 />
                   }}
@@ -305,9 +311,9 @@ let make = (~txHash: Hash.t) => {
           <Col>
             {switch txSub {
             | Data({messages}) =>
-              let msgCount = messages |> Belt.List.length
+              let msgCount = messages->Belt.List.length
               <div className={CssHelper.flexBox()}>
-                <Text value={msgCount |> string_of_int} size=Text.Xxl />
+                <Text value={msgCount->Belt.Int.toString} size=Text.Xxl />
                 <HSpacing size=Spacing.md />
                 <Text value={msgCount > 1 ? "Messages" : "Message"} size=Text.Xxl />
               </div>

@@ -17,7 +17,7 @@ let make = (~value, ~size, ~weight, ~spacing=?, ~color=?, ~code=true, ~smallNumb
     CountUp.updateGet(countUp, value)
     None
   }, [value])
-  let newVal = CountUp.countUpGet(countUp) |> Js.Float.toString
+  let newVal = CountUp.countUpGet(countUp)->Js.Float.toString
   let color_ = color->Belt.Option.getWithDefault(theme.textPrimary)
 
   smallNumber

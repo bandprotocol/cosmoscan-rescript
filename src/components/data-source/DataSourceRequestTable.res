@@ -118,8 +118,8 @@ module RenderBodyMobile = {
             ),
           ]
         }
-        key={id |> ID.Request.toString}
-        idx={id |> ID.Request.toString}
+        key={id->ID.Request.toString}
+        idx={id->ID.Request.toString}
         requestStatus=resolveStatus
       />
     | _ =>
@@ -134,8 +134,8 @@ module RenderBodyMobile = {
             ("Timestamp", Loading(166)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
   }
@@ -164,7 +164,7 @@ let make = (~dataSourceID: ID.DataSource.t) => {
                 <div className={CssHelper.flexBox()}>
                   <Text
                     block=true
-                    value={totalRequestCount |> Format.iPretty}
+                    value={totalRequestCount->Format.iPretty}
                     weight=Text.Semibold
                     size=Text.Sm
                   />
@@ -186,7 +186,7 @@ let make = (~dataSourceID: ID.DataSource.t) => {
                     <div className={CssHelper.flexBox()}>
                       <Text
                         block=true
-                        value={totalRequestCount |> Format.iPretty}
+                        value={totalRequestCount->Format.iPretty}
                         weight=Text.Semibold
                         transform=Text.Uppercase
                         size=Text.Sm
@@ -248,11 +248,9 @@ let make = (~dataSourceID: ID.DataSource.t) => {
             ->Belt.Array.mapWithIndex((i, e) =>
               isMobile
                 ? <RenderBodyMobile
-                    key={e.id |> ID.Request.toString} reserveIndex=i requestsSub={Sub.resolve(e)}
+                    key={e.id->ID.Request.toString} reserveIndex=i requestsSub={Sub.resolve(e)}
                   />
-                : <RenderBody
-                    key={e.id |> ID.Request.toString} theme requestsSub={Sub.resolve(e)}
-                  />
+                : <RenderBody key={e.id->ID.Request.toString} theme requestsSub={Sub.resolve(e)} />
             )
             ->React.array}
             {isMobile
@@ -265,8 +263,8 @@ let make = (~dataSourceID: ID.DataSource.t) => {
           Belt.Array.make(pageSize, Sub.NoData)
           ->Belt.Array.mapWithIndex((i, noData) =>
             isMobile
-              ? <RenderBodyMobile key={i |> string_of_int} reserveIndex=i requestsSub=noData />
-              : <RenderBody key={i |> string_of_int} theme requestsSub=noData />
+              ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i requestsSub=noData />
+              : <RenderBody key={i->Belt.Int.toString} theme requestsSub=noData />
           )
           ->React.array
         }}

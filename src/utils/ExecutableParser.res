@@ -16,7 +16,7 @@ let pythonMatch = str => {
 }
 
 let getVariables = str => {
-  Js.String.split("\n", str)
+  Js.String2.split("\n", str)
   ->Belt.Array.get(0)
   ->Belt.Option.flatMap(program =>
     switch program {
@@ -27,5 +27,5 @@ let getVariables = str => {
 }
 
 let parseExecutableScript = (buff: JsBuffer.t) => {
-  buff |> JsBuffer.toUTF8 |> getVariables
+  buff->JsBuffer.toUTF8->getVariables
 }

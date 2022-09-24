@@ -13,7 +13,7 @@ let toAddress = pubKey =>
   | PubKey(hexStr) =>
     hexStr
     ->JsBuffer.hexToArray
-    ->Belt_Array.sliceToEnd(-33)
+    ->Belt.Array.sliceToEnd(-33)
     ->Sha256.digest
     ->RIPEMD160.hexDigest
     ->Address.fromHex
@@ -26,18 +26,18 @@ let toHex = (~with0x=false, pubKey) =>
 
 let toBase64 = pubKey =>
   switch pubKey {
-  | PubKey(hexStr) => hexStr |> JsBuffer.hexToBase64
+  | PubKey(hexStr) => hexStr->JsBuffer.hexToBase64
   }
 
 let toPubKeyHexOnly = (~with0x=false, pubKey) =>
   switch pubKey {
   | PubKey(hexStr) =>
     (with0x ? "0x" : "") ++
-    hexStr->JsBuffer.hexToArray->Belt_Array.sliceToEnd(-33)->JsBuffer.arrayToHex
+    hexStr->JsBuffer.hexToArray->Belt.Array.sliceToEnd(-33)->JsBuffer.arrayToHex
   }
 
 let toBech32 = pubKey =>
   switch pubKey {
   | PubKey(hexStr) =>
-    hexStr |> JsBuffer.hexToArray |> Bech32.toWords |> Bech32.encode("bandvalconspub")
+    hexStr->JsBuffer.hexToArray->Bech32.toWords->Bech32.encode("bandvalconspub", _)
   }

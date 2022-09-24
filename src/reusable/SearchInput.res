@@ -38,7 +38,7 @@ let make = (~placeholder, ~onChange, ~debounce=500, ~maxWidth=240) => {
       className={Styles.searchBar(theme, maxWidth)}
       placeholder
       onChange={event => {
-        let newVal = ReactEvent.Form.target(event)["value"] |> String.lowercase_ascii |> String.trim
+        let newVal = ReactEvent.Form.target(event)["value"]->String.lowercase_ascii->String.trim
         setChangeValue(_ => newVal)
       }}
     />

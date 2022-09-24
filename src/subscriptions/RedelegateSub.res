@@ -50,15 +50,15 @@ let getRedelegationByDelegator = (delegatorAddress, currentTime, ~page, ~pageSiz
   let offset = (page - 1) * pageSize
 
   let result = RedelegationByDelegatorConfig.use({
-    delegator_address: delegatorAddress |> Address.toBech32,
+    delegator_address: delegatorAddress->Address.toBech32,
     limit: pageSize,
-    current_time: currentTime |> Js.Json.string,
-    offset: offset,
+    current_time: currentTime->Js.Json.string,
+    offset,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.flatMap(_, data =>
+  ->Sub.fromData
+  ->Sub.flatMap(data =>
     switch data.accounts_by_pk {
     | Some(x') => Sub.resolve(x'.redelegations)
     | None => Sub.resolve([])
@@ -68,20 +68,16 @@ let getRedelegationByDelegator = (delegatorAddress, currentTime, ~page, ~pageSiz
 
 let getRedelegateCountByDelegator = (delegatorAddress, currentTime) => {
   let result = RedelegateCountByDelegatorConfig.use({
-    delegator_address: delegatorAddress |> Address.toBech32,
-    current_time: currentTime |> Js.Json.string,
+    delegator_address: delegatorAddress->Address.toBech32,
+    current_time: currentTime->Js.Json.string,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.flatMap(_, data =>
+  ->Sub.fromData
+  ->Sub.flatMap(data =>
     switch data.accounts_by_pk {
     | Some(x') =>
-      Sub.resolve(
-        x'.redelegations_aggregate.aggregate
-        |> Belt.Option.getExn
-        |> (y => y.count)
-      )
+      Sub.resolve(x'.redelegations_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
     | None => Sub.resolve(0)
     }
   )

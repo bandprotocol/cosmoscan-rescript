@@ -232,7 +232,7 @@ let make = (
         Styles.placementSm(tooltipPlacementSm),
         mobile ? "" : Styles.hiddenTooltipSm,
       ])}>
-      {tooltipText |> React.string}
+      {tooltipText->React.string}
     </div>
     children
   </div>

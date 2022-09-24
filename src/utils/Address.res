@@ -15,7 +15,7 @@ let fromBech32 = bech32str => {
 }
 
 let fromBech32Opt = bech32str => {
-  let decodedOpt = bech32str |> Bech32.decodeOpt
+  let decodedOpt = bech32str->Bech32.decodeOpt
   decodedOpt->Belt.Option.flatMap(decoded =>
     validatePrefix(decoded)
       ? Some(Address(decoded->Bech32.wordsGet->Bech32.fromWords->JsBuffer.arrayToHex))
@@ -36,13 +36,12 @@ let bech32ToHex = bech32str => bech32str->fromBech32->toHex
 
 let toOperatorBech32 = x =>
   switch x {
-  | Address(hexstr) =>
-    hexstr |> JsBuffer.hexToArray |> Bech32.toWords |> Bech32.encode("bandvaloper")
+  | Address(hexstr) => hexstr->JsBuffer.hexToArray->Bech32.toWords->Bech32.encode("bandvaloper", _)
   }
 
 let toBech32 = x =>
   switch x {
-  | Address(hexstr) => hexstr |> JsBuffer.hexToArray |> Bech32.toWords |> Bech32.encode("band")
+  | Address(hexstr) => hexstr->JsBuffer.hexToArray->Bech32.toWords->Bech32.encode("band", _)
   }
 
 let hexToOperatorBech32 = hexstr => hexstr->fromHex->toOperatorBech32

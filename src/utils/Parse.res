@@ -21,3 +21,5 @@ let address = addr => {
   | None => Err("Invalid address")
   }
 }
+
+let mustParseInt = a => a->Belt.Int.fromString->Belt.Option.getExn

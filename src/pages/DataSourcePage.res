@@ -16,7 +16,7 @@ let getName = x =>
 
 let defaultCompare = (a: DataSourceSub.t, b: DataSourceSub.t) =>
   if a.timestamp !== b.timestamp {
-    compare(b.id |> ID.DataSource.toInt, a.id |> ID.DataSource.toInt)
+    compare(b.id->ID.DataSource.toInt, a.id->ID.DataSource.toInt)
   } else {
     compare(b.requestCount, a.requestCount)
   }
@@ -47,8 +47,8 @@ module RenderBody = {
 
     <TBody
       key={switch dataSourcesSub {
-      | Data({id}) => id |> ID.DataSource.toString
-      | _ => reserveIndex |> string_of_int
+      | Data({id}) => id->ID.DataSource.toString
+      | _ => reserveIndex->Belt.Int.toString
       }}>
       <Row alignItems=Row.Center>
         <Col col=Col.Three>
@@ -82,7 +82,7 @@ module RenderBody = {
           | Data({requestCount}) =>
             <div>
               <Text
-                value={requestCount |> Format.iPretty} weight=Text.Medium block=true ellipsis=true
+                value={requestCount->Format.iPretty} weight=Text.Medium block=true ellipsis=true
               />
             </div>
           | _ => <LoadingCensorBar width=70 height=15 />
@@ -128,8 +128,8 @@ module RenderBodyMobile = {
             ),
           ]
         }
-        key={id |> ID.DataSource.toString}
-        idx={id |> ID.DataSource.toString}
+        key={id->ID.DataSource.toString}
+        idx={id->ID.DataSource.toString}
       />
     | _ =>
       <MobileCard
@@ -143,8 +143,8 @@ module RenderBodyMobile = {
             ("Timestamp", Loading(166)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
   }
@@ -181,7 +181,7 @@ let make = () => {
             {switch allSub {
             | Data((_, dataSourcesCount)) =>
               <Heading
-                value={(dataSourcesCount |> Format.iPretty) ++ " In total"}
+                value={dataSourcesCount->Format.iPretty ++ " In total"}
                 size=Heading.H3
                 weight=Heading.Thin
                 color={theme.textSecondary}
@@ -281,15 +281,15 @@ let make = () => {
             <>
               {dataSources
               ->sorting(sortedBy)
-              ->Belt_Array.mapWithIndex((i, e) =>
+              ->Belt.Array.mapWithIndex((i, e) =>
                 isMobile
                   ? <RenderBodyMobile
-                      key={e.id |> ID.DataSource.toString}
+                      key={e.id->ID.DataSource.toString}
                       reserveIndex=i
                       dataSourcesSub={Sub.resolve(e)}
                     />
                   : <RenderBody
-                      key={e.id |> ID.DataSource.toString}
+                      key={e.id->ID.DataSource.toString}
                       reserveIndex=i
                       dataSourcesSub={Sub.resolve(e)}
                     />
@@ -302,13 +302,13 @@ let make = () => {
                   />}
             </>
           | _ =>
-            Belt_Array.make(10, Sub.NoData)
-            ->Belt_Array.mapWithIndex((i, noData) =>
+            Belt.Array.makeBy(10, i =>
               isMobile
-                ? <RenderBodyMobile key={i |> string_of_int} reserveIndex=i dataSourcesSub=noData />
-                : <RenderBody key={i |> string_of_int} reserveIndex=i dataSourcesSub=noData />
-            )
-            ->React.array
+                ? <RenderBodyMobile
+                    key={i->Belt.Int.toString} reserveIndex=i dataSourcesSub=NoData
+                  />
+                : <RenderBody key={i->Belt.Int.toString} reserveIndex=i dataSourcesSub=NoData />
+            )->React.array
           }}
         </Table>
       </div>

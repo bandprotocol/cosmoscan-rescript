@@ -24,11 +24,10 @@ type a =
 
 let reducer = (state, action) =>
   switch action {
-  | Connect(wallet, address, pubKey, chainID) =>
-    Some({wallet: wallet, pubKey: pubKey, address: address, chainID: chainID})
+  | Connect(wallet, address, pubKey, chainID) => Some({wallet, pubKey, address, chainID})
   | Disconnect =>
     switch state {
-    | Some({wallet}) => wallet |> Wallet.disconnect
+    | Some({wallet}) => wallet->Wallet.disconnect
     | None => ()
     }
     None
@@ -56,9 +55,9 @@ let reducer = (state, action) =>
               minCount,
               address,
               clientID,
-              {amount: feeLimit |> string_of_int, denom: "uband"},
-              prepareGas |> string_of_int,
-              executeGas |> string_of_int,
+              {amount: feeLimit->Belt.Int.toString, denom: "uband"},
+              prepareGas->Belt.Int.toString,
+              executeGas->Belt.Int.toString,
             ),
           ],
           ~chainID,
@@ -69,7 +68,7 @@ let reducer = (state, action) =>
         )->Promise.then(rawTx => {
           Wallet.sign(TxCreator.sortAndStringify(rawTx), wallet)->Promise.then(signature => {
             let signedTx = TxCreator.createSignedTx(
-              ~signature=signature |> JsBuffer.toBase64,
+              ~signature=signature->JsBuffer.toBase64,
               ~pubKey,
               ~tx=rawTx,
               ~mode="block",

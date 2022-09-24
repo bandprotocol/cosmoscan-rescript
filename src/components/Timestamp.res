@@ -13,7 +13,6 @@ let make = (
   ~weight=Text.Regular,
   ~spacing=Text.Unset,
   ~code=false,
-  ~upper=false,
   ~textAlign=Text.Left,
   ~color=?,
 ) => {
@@ -34,7 +33,7 @@ let make = (
         </>
       : React.null}
     <Text
-      value={time |> MomentRe.Moment.format("YYYY-MM-DD HH:mm:ss")}
+      value={time->MomentRe.Moment.format("YYYY-MM-DD HH:mm:ss", _)}
       size
       weight
       spacing
@@ -70,7 +69,6 @@ module Grid = {
     ~spacing=Text.Unset,
     ~color=?,
     ~code=false,
-    ~upper=false,
     ~textAlign=Text.Left,
   ) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
@@ -91,7 +89,7 @@ module Grid = {
         : React.null}
       <div>
         <Text
-          value={time |> MomentRe.Moment.format("YYYY-MM-DD")}
+          value={time->MomentRe.Moment.format("YYYY-MM-DD", _)}
           size
           weight
           spacing
@@ -104,7 +102,7 @@ module Grid = {
       </div>
       <div>
         <Text
-          value={time |> MomentRe.Moment.format("HH:mm:ss")}
+          value={time->MomentRe.Moment.format("HH:mm:ss", _)}
           size
           weight
           spacing

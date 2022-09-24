@@ -56,18 +56,18 @@ let toExternal = ({
   messages,
   errMsg,
 }) => {
-  id: id,
-  txHash: txHash,
-  blockHeight: blockHeight,
-  success: success,
-  gasFee: gasFee,
-  gasLimit: gasLimit,
-  gasUsed: gasUsed,
-  sender: sender,
-  memo: memo,
+  id,
+  txHash,
+  blockHeight,
+  success,
+  gasFee,
+  gasLimit,
+  gasUsed,
+  sender,
+  memo,
   timestamp: block.timestamp,
   messages: {
-    let msg = messages |> Js.Json.decodeArray |> Belt.Option.getExn |> Belt.List.fromArray
+    let msg = messages->Js.Json.decodeArray->Belt.Option.getExn->Belt.List.fromArray
     msg->Belt.List.map(success ? MsgDecoder.decodeAction : MsgDecoder.decodeFailAction)
   },
   errMsg: errMsg->Belt.Option.getWithDefault(""),
@@ -175,15 +175,15 @@ module TxCountBySenderConfig = %graphql(`
 `)
 
 let get = txHash => {
-  let hash = txHash |> Hash.toHex |> (x => "\\x" ++ x) |> Js.Json.string
+  let hash = txHash->Hash.toHex->(x => "\\x" ++ x)->Js.Json.string
 
   let result = SingleConfig.use({tx_hash: hash})
 
   result
-  |> Sub.fromData
-  |> Sub.flatMap(_, ({transactions_by_pk}) => {
+  ->Sub.fromData
+  ->Sub.flatMap(({transactions_by_pk}) => {
     switch transactions_by_pk {
-    | Some(data) => Sub.resolve(data |> toExternal)
+    | Some(data) => Sub.resolve(data->toExternal)
     | None => Sub.NoData
     }
   })
@@ -191,26 +191,26 @@ let get = txHash => {
 
 let getList = (~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
-  let result = MultiConfig.use({limit: pageSize, offset: offset})
+  let result = MultiConfig.use({limit: pageSize, offset})
 
-  result |> Sub.fromData |> Sub.map(_, ({transactions}) => transactions->Belt_Array.map(toExternal))
+  result->Sub.fromData->Sub.map(({transactions}) => transactions->Belt.Array.map(toExternal))
 }
 
 let getListBySender = (sender, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
   let result = MultiBySenderConfig.use({
     limit: pageSize,
-    offset: offset,
-    sender: sender |> Address.toBech32,
+    offset,
+    sender: sender->Address.toBech32,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.flatMap(_, ({accounts_by_pk}) => {
+  ->Sub.fromData
+  ->Sub.flatMap(({accounts_by_pk}) => {
     switch accounts_by_pk {
     | Some(data) =>
       Sub.resolve(
-        data.account_transactions->Belt_Array.map(({transaction}) => transaction->toExternal),
+        data.account_transactions->Belt.Array.map(({transaction}) => transaction->toExternal),
       )
     | None => Sub.resolve([])
     }
@@ -218,22 +218,18 @@ let getListBySender = (sender, ~page, ~pageSize, ()) => {
 }
 
 let getListByBlockHeight = (height, ()) => {
-  let result = MultiByHeightConfig.use({height: height |> ID.Block.toInt})
+  let result = MultiByHeightConfig.use({height: height->ID.Block.toInt})
 
-  result |> Sub.fromData |> Sub.map(_, ({transactions}) => transactions->Belt_Array.map(toExternal))
+  result->Sub.fromData->Sub.map(({transactions}) => transactions->Belt.Array.map(toExternal))
 }
 
 let countBySender = sender => {
-  let result = TxCountBySenderConfig.use({sender: sender |> Address.toBech32})
+  let result = TxCountBySenderConfig.use({sender: sender->Address.toBech32})
   result
-  |> Sub.fromData
-  |> Sub.map(_, data =>
-    switch data.accounts_by_pk {
-    | Some(account) =>
-      account.account_transactions_aggregate.aggregate
-      |> Belt.Option.getExn
-      |> (y => y.count)
-    | None => 0
-    }
+  ->Sub.fromData
+  ->Sub.map(data =>
+    data.accounts_by_pk->Belt.Option.mapWithDefault(0, account =>
+      account.account_transactions_aggregate.aggregate->Belt.Option.mapWithDefault(0, x => x.count)
+    )
   )
 }

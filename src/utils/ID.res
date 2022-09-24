@@ -67,7 +67,7 @@ module IDCreator = (RawID: RawIDSig) => {
 
   let toString = x =>
     switch x {
-    | ID(id) => RawID.prefix ++ string_of_int(id)
+    | ID(id) => RawID.prefix ++ Belt.Int.toString(id)
     }
 
   let toInt = x =>
@@ -75,15 +75,19 @@ module IDCreator = (RawID: RawIDSig) => {
     | ID(id) => id
     }
 
-  let fromJson = json => ID(json |> Js.Json.decodeNumber |> Belt.Option.getExn |> int_of_float)
+  let decoder = {
+    open JsonUtils.Decode
+    int->map((. a) => ID(a))
+  }
+  let fromJson = json => ID(json->Js.Json.decodeNumber->Belt.Option.getExn->int_of_float)
 
   let fromInt = x => ID(x)
 
-  let fromIntExn = x => ID(x |> Belt.Option.getExn)
+  let fromIntExn = x => ID(x->Belt.Option.getExn)
 
   let toJson = x =>
     switch x {
-    | ID(id) => id |> float_of_int |> Js.Json.number
+    | ID(id) => id->float_of_int->Js.Json.number
     }
 }
 

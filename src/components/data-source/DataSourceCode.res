@@ -40,13 +40,13 @@ module Styles = {
 
 let renderCode = content => {
   <div className=Styles.scriptContainer>
-    <ReactHighlight className=Styles.padding> {content |> React.string} </ReactHighlight>
+    <ReactHighlight className=Styles.padding> {content->React.string} </ReactHighlight>
   </div>
 }
 
 @react.component
 let make = (~executable) => {
-  let code = executable |> JsBuffer.toUTF8
+  let code = executable->JsBuffer.toUTF8
   React.useMemo1(() =>
     <div className=Styles.tableLowerContainer>
       <div
@@ -56,7 +56,7 @@ let make = (~executable) => {
         })}>
         <CopyButton data=code title="Copy Code" />
       </div>
-      {code |> renderCode}
+      {code->renderCode}
     </div>
   , [])
 }
