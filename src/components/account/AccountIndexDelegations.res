@@ -43,7 +43,7 @@ module RenderBody = {
                 operatorAddress->SubmitMsg.Redelegate->SubmitTx->OpenModal->dispatchModal
 
               <div className={CssHelper.flexBox(~direction=#column, ~align=#flexStart, ())}>
-                <Text value={amount |> Coin.getBandAmountFromCoin |> Format.fPretty} />
+                <Text value={amount->Coin.getBandAmountFromCoin->Format.fPretty} />
                 {switch accountOpt {
                 | Some({address}) if Address.isEqual(address, delegatorAddress) =>
                   <div className={CssHelper.flexBox()}>
@@ -78,7 +78,7 @@ module RenderBody = {
                 ->dispatchModal
 
               <div className={CssHelper.flexBox(~direction=#column, ~align=#flexStart, ())}>
-                <Text value={reward |> Coin.getBandAmountFromCoin |> Format.fPretty} />
+                <Text value={reward->Coin.getBandAmountFromCoin->Format.fPretty} />
                 {switch accountOpt {
                 | Some({address}) if Address.isEqual(address, delegatorAddress) =>
                   <div className={CssHelper.flexBox()}>
@@ -107,10 +107,10 @@ module RenderBodyMobile = {
     switch delegationsSub {
     | Data({amount, moniker, operatorAddress, reward, identity}) =>
       let key_ =
-        (operatorAddress |> Address.toHex) ++
-          ((amount |> Coin.getBandAmountFromCoin |> Js.Float.toString) ++
-          ((reward |> Coin.getBandAmountFromCoin |> Js.Float.toString) ++
-            (reserveIndex |> string_of_int)))
+        operatorAddress->Address.toHex ++
+          (amount->Coin.getBandAmountFromCoin->Js.Float.toString ++
+          (reward->Coin.getBandAmountFromCoin->Js.Float.toString ++
+            reserveIndex->Belt.Int.toString))
       <MobileCard
         values={
           open InfoMobileCard
@@ -133,8 +133,8 @@ module RenderBodyMobile = {
             ("Reward\n(BAND)", Loading(100)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
 }
@@ -158,7 +158,7 @@ let make = (~address) => {
               <div className={CssHelper.flexBox()}>
                 <Text
                   block=true
-                  value={delegationsCount |> string_of_int}
+                  value={delegationsCount->Belt.Int.toString}
                   weight=Text.Semibold
                   size=Text.Sm
                   transform=Text.Uppercase
@@ -184,7 +184,7 @@ let make = (~address) => {
                 <div className={CssHelper.flexBox()}>
                   <Text
                     block=true
-                    value={delegationsCount |> string_of_int}
+                    value={delegationsCount->Belt.Int.toString}
                     weight=Text.Semibold
                     size=Text.Sm
                     transform=Text.Uppercase
@@ -224,19 +224,19 @@ let make = (~address) => {
     {switch delegationsSub {
     | Data(delegations) if delegations->Belt.Array.size > 0 =>
       delegations
-      ->Belt_Array.mapWithIndex((i, e) =>
+      ->Belt.Array.mapWithIndex((i, e) =>
         isMobile
           ? <RenderBodyMobile
-              key={(e.operatorAddress |> Address.toBech32) ++
-                ((address |> Address.toBech32) ++
-                (i |> string_of_int))}
+              key={e.operatorAddress->Address.toBech32 ++
+                (address->Address.toBech32 ++
+                i->Belt.Int.toString)}
               reserveIndex=i
               delegationsSub={Sub.resolve(e)}
             />
           : <RenderBody
-              key={(e.operatorAddress |> Address.toBech32) ++
-                ((address |> Address.toBech32) ++
-                (i |> string_of_int))}
+              key={e.operatorAddress->Address.toBech32 ++
+                (address->Address.toBech32 ++
+                i->Belt.Int.toString)}
               delegationsSub={Sub.resolve(e)}
             />
       )
@@ -255,11 +255,11 @@ let make = (~address) => {
         />
       </EmptyContainer>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile key={i |> string_of_int} reserveIndex=i delegationsSub=noData />
-          : <RenderBody key={i |> string_of_int} delegationsSub=noData />
+          ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i delegationsSub=noData />
+          : <RenderBody key={i->Belt.Int.toString} delegationsSub=noData />
       )
       ->React.array
     }}

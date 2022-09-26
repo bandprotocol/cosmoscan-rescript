@@ -63,15 +63,16 @@ type login_method_t =
 
 @react.component
 let make = (~chainID) => {
-  let (loginMethod, setLoginMethod) = React.useState(_ => Mnemonic)
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  Js.log(chainID)
+  let (loginMethod, _) = React.useState(_ => Mnemonic)
+  // let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   //TODO: will patch to modal component later
   <div>
     {switch loginMethod {
-    | Mnemonic => "Connect Mnemonic Modal" |> React.string
-    | LedgerWithCosmos => "Connect LedgerWithCosmos" |> React.string
-    | LedgerWithBandChain => "Connect LedgerWithBandChain" |> React.string
+    | Mnemonic => "Connect Mnemonic Modal"->React.string
+    | LedgerWithCosmos => "Connect LedgerWithCosmos"->React.string
+    | LedgerWithBandChain => "Connect LedgerWithBandChain"->React.string
     }}
   </div>
 }

@@ -192,6 +192,7 @@ let assignSolidity = ({name, varType}) => {
       let decodeFunction = decode(x)
       `result.${name} = ${decodeFunction}`
     }
+
   | Array(x) => {
       let type_ = declarePrimitiveSol(x)
       let decodeFunction = decode(x)
@@ -207,17 +208,16 @@ let assignSolidity = ({name, varType}) => {
 }
 
 // TODO: abstract it out
-let optionsAll = options =>
-  options -> Belt.Array.reduce(_, Some([]), (acc, obj) => {
-    switch (acc, obj) {
-    | (Some(acc'), Some(obj')) => Some(acc' -> Js.Array.concat([obj']))
-    | (_, _) => None
-    }
-  })
+let optionsAll = options => {
+  switch options->Belt.Array.every(Belt.Option.isSome) {
+  | true => Some(options->Belt.Array.map(Belt.Option.getExn))
+  | false => None
+  }
+}
 
 let generateDecodeLibSolidity = (schema, dataType) => {
-  let dataTypeString = dataType -> dataTypeToString
-  let name = dataType -> dataTypeToSchemaField
+  let dataTypeString = dataType->dataTypeToString
+  let name = dataType->dataTypeToSchemaField
   let template = (structs, functions) =>
     `library ${dataTypeString}Decoder {
     using Obi for Obi.Data;
@@ -237,16 +237,17 @@ let generateDecodeLibSolidity = (schema, dataType) => {
 }
 
 `
+
   let fieldPairsOpt = extractFields(schema, name)
+
   fieldPairsOpt->Belt.Option.flatMap(fieldsPairs => {
-    let fieldsOpt = fieldsPairs -> Belt.Array.map(parse) -> optionsAll
+    let fieldsOpt = fieldsPairs->Belt.Array.map(parse)->optionsAll
     fieldsOpt->Belt.Option.flatMap(fields => {
       let indent = "\n        "
-
       Some(
         template(
-          fields -> Belt.Array.map(declareSolidity) -> Js.Array.joinWith(indent, _),
-          fields -> Belt.Array.map(assignSolidity) -> Js.Array.joinWith(indent, _),
+          fields->Belt.Array.map(declareSolidity)->Js.Array.joinWith(indent, _),
+          fields->Belt.Array.map(assignSolidity)->Js.Array.joinWith(indent, _),
         ),
       )
     })
@@ -269,23 +270,22 @@ import "./Obi.sol";
 
 // TODO: revisit when using this.
 let declareGo = ({name, varType}) => {
-  let capitalizedName = name -> ChangeCase.pascalCase;
-  let type_ =
-    switch varType {
-    | Single(String) => "string"
-    | Single(U64) => "uint64"
-    | Single(U32) => "uint32"
-    | Single(U8) => "uint8"
-    | Array(String) => "[]string"
-    | Array(U64) => "[]uint64"
-    | Array(U32) => "[]uint32"
-    | Array(U8) => "[]uint8"
-    };
-  j`$capitalizedName $type_`;
-};
+  let capitalizedName = name->ChangeCase.pascalCase
+  let type_ = switch varType {
+  | Single(String) => "string"
+  | Single(U64) => "uint64"
+  | Single(U32) => "uint32"
+  | Single(U8) => "uint8"
+  | Array(String) => "[]string"
+  | Array(U64) => "[]uint64"
+  | Array(U32) => "[]uint32"
+  | Array(U8) => "[]uint8"
+  }
+  j`$capitalizedName $type_`
+}
 
 let assignGo = ({name, varType}) => {
-  switch (varType) {
+  switch varType {
   | Single(String) => j`$name, err := decoder.DecodeString()
 	if err !== nil {
 		return Result{}, err
@@ -303,21 +303,22 @@ let assignGo = ({name, varType}) => {
 		return Result{}, err
 	}`
   | _ => "// TODO: implement later"
-  };
-};
+  }
+}
 
 let resultGo = ({name}) => {
-  let capitalizedName = name -> ChangeCase.pascalCase;
-  j`$capitalizedName: $name`;
-};
+  let capitalizedName = name->ChangeCase.pascalCase
+  j`$capitalizedName: $name`
+}
 
 // TODO: Implement input/params decoding
 let generateDecoderGo = (packageName, schema, dataType) => {
-  switch (dataType) {
+  switch dataType {
   | Params => Some("Code is not available.")
   | Result =>
-    let name = dataType -> dataTypeToSchemaField;
-    let template = (structs, functions, results) => j`package $packageName
+    let name = dataType->dataTypeToSchemaField
+    let template = (structs, functions, results) =>
+      j`package $packageName
 
 import "github.com/bandchain/chain/pkg/obi"
 
@@ -337,32 +338,33 @@ func DecodeResult(data []byte) (Result, error) {
 \treturn Result{
 \t\t$results
 \t}, nil
-}`;
+}`
 
-    let fieldsPair = extractFields(schema, name) -> Belt.Option.getExn;
-    let fields = fieldsPair -> Belt.Array.map(parse) -> optionsAll -> Belt.Option.getExn;
+    let fieldsPair = extractFields(schema, name)->Belt.Option.getExn
+    let fields = fieldsPair->Belt.Array.map(parse)->optionsAll->Belt.Option.getExn
     Some(
       template(
-        fields -> Belt.Array.map(declareGo) -> Js.Array.joinWith("\n\t", _),
-        fields -> Belt.Array.map(assignGo) -> Js.Array.joinWith("\n\t", _),
-        fields -> Belt.Array.map(resultGo) -> Js.Array.joinWith("\n\t\t", _),
+        fields->Belt.Array.map(declareGo)->Js.Array.joinWith("\n\t", _),
+        fields->Belt.Array.map(assignGo)->Js.Array.joinWith("\n\t", _),
+        fields->Belt.Array.map(resultGo)->Js.Array.joinWith("\n\t\t", _),
       ),
-    );
-  };
-};
+    )
+  }
+}
 
 let encodeStructGo = ({name, varType}) => {
-  switch (varType) {
+  switch varType {
   | Single(U8) => j`encoder.EncodeU8(result.$name)`
   | Single(U32) => j`encoder.EncodeU32(result.$name)`
   | Single(U64) => j`encoder.EncodeU64(result.$name)`
   | Single(String) => j`encoder.EncodeString(result.$name)`
   | _ => "//TODO: implement later"
-  };
-};
+  }
+}
 
 let generateEncodeGo = (packageName, schema, name) => {
-  let template = (structs, functions) => j`package $packageName
+  let template = (structs, functions) =>
+    j`package $packageName
 
 import "github.com/bandchain/chain/pkg/obi"
 
@@ -376,14 +378,14 @@ func(result *Result) EncodeResult() []byte {
 \t$functions
 
 \treturn encoder.GetEncodedData()
-}`;
+}`
 
-  let fieldsPair = extractFields(schema, name) -> Belt.Option.getExn;
-  let fields = fieldsPair -> Belt.Array.map(parse) -> optionsAll -> Belt.Option.getExn;
+  let fieldsPair = extractFields(schema, name)->Belt.Option.getExn
+  let fields = fieldsPair->Belt.Array.map(parse)->optionsAll->Belt.Option.getExn
   Some(
     template(
-      fields -> Belt.Array.map(declareGo) -> Js.Array.joinWith("\n\t", _),
-      fields -> Belt.Array.map(encodeStructGo) -> Js.Array.joinWith("\n\t", _),
+      fields->Belt.Array.map(declareGo)->Js.Array.joinWith("\n\t", _),
+      fields->Belt.Array.map(encodeStructGo)->Js.Array.joinWith("\n\t", _),
     ),
-  );
-};
+  )
+}

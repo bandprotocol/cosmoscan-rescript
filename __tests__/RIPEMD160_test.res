@@ -39,7 +39,7 @@ describe("Expect RIPEMD160 to work correctly", () => {
         138,
         186,
       ]->digest,
-    ) |> toEqual([
+    )->toEqual([
       136,
       183,
       105,
@@ -99,6 +99,6 @@ describe("Expect RIPEMD160 to work correctly", () => {
         138,
         186,
       ]->hexDigest,
-    ) |> toBe("88b769b2c05424553e01115e8a8ca297667450f5")
+    )->toBe("88b769b2c05424553e01115e8a8ca297667450f5")
   )
 })

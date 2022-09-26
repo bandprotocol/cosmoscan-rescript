@@ -48,9 +48,12 @@ module RenderBody = {
           {switch txSub {
           | Data({messages, txHash, success, errMsg}) =>
             <div>
-              <TxMessages txHash messages={messages->Belt_List.map(msgTransform)} success errMsg />
+              <TxMessages txHash messages={messages->Belt.List.map(msgTransform)} success errMsg />
             </div>
-          | _ => <> <LoadingCensorBar width=400 height=15 /> </>
+          | _ =>
+            <>
+              <LoadingCensorBar width=400 height=15 />
+            </>
           }}
         </Col>
       </Row>
@@ -69,7 +72,7 @@ module RenderBodyMobile = {
 
     switch txSub {
     | Data({txHash, blockHeight, gasFee, success, messages, errMsg}) =>
-      let msgTransform = messages->Belt_List.map(msgTransform)
+      let msgTransform = messages->Belt.List.map(msgTransform)
       <MobileCard
         values={
           open InfoMobileCard
@@ -80,8 +83,8 @@ module RenderBodyMobile = {
             ("Actions", Messages(txHash, msgTransform, success, errMsg)),
           ]
         }
-        key={txHash |> Hash.toHex}
-        idx={txHash |> Hash.toHex}
+        key={txHash->Hash.toHex}
+        idx={txHash->Hash.toHex}
         status=success
       />
     | _ =>
@@ -95,8 +98,8 @@ module RenderBodyMobile = {
             ("Actions", Loading(isSmallMobile ? 160 : 230)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
   }
@@ -115,12 +118,12 @@ let make = (
     | Data(txs) =>
       txs->Belt.Array.size > 0
         ? txs
-          ->Belt_Array.mapWithIndex((i, e) =>
+          ->Belt.Array.mapWithIndex((i, e) =>
             isMobile
               ? <RenderBodyMobile
-                  key={e.txHash |> Hash.toHex} reserveIndex=i txSub={Sub.resolve(e)} msgTransform
+                  key={e.txHash->Hash.toHex} reserveIndex=i txSub={Sub.resolve(e)} msgTransform
                 />
-              : <RenderBody key={e.txHash |> Hash.toHex} txSub={Sub.resolve(e)} msgTransform />
+              : <RenderBody key={e.txHash->Hash.toHex} txSub={Sub.resolve(e)} msgTransform />
           )
           ->React.array
         : <EmptyContainer>
@@ -136,11 +139,11 @@ let make = (
             />
           </EmptyContainer>
     | _ =>
-      Belt_Array.make(10, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(10, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile key={string_of_int(i)} reserveIndex=i txSub=noData msgTransform />
-          : <RenderBody key={string_of_int(i)} txSub=noData msgTransform />
+          ? <RenderBodyMobile key={Belt.Int.toString(i)} reserveIndex=i txSub=noData msgTransform />
+          : <RenderBody key={Belt.Int.toString(i)} txSub=noData msgTransform />
       )
       ->React.array
     }}

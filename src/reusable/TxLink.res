@@ -18,7 +18,7 @@ let make = (~txHash: Hash.t, ~width: int, ~size=Text.Md, ~weight=Text.Medium) =>
       block=true
       code=true
       spacing={Text.Em(0.02)}
-      value={txHash |> Hash.toHex(~upper=true)}
+      value={txHash->Hash.toHex(~upper=true)}
       weight
       ellipsis=true
       size

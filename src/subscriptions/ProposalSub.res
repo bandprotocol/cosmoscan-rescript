@@ -3,38 +3,36 @@ type proposal_status_t =
   | Voting
   | Passed
   | Rejected
-  | Failed;
+  | Failed
 
 module ProposalStatus = {
   type t = proposal_status_t
   let parse = json => {
-    exception NotFound(string);
-    let status = json -> Js.Json.decodeString -> Belt.Option.getExn;
-    switch (status) {
+    exception NotFound(string)
+    let status = json->Js.Json.decodeString->Belt.Option.getExn
+    switch status {
     | "DepositPeriod" => Deposit
     | "VotingPeriod" => Voting
     | "Passed" => Passed
     | "Rejected" => Rejected
     | "Failed" => Failed
     | _ => raise(NotFound("The proposal status is not existing"))
-    };
-  };
+    }
+  }
   //TODO: implement for status
   let serialize = status => 
   switch (status) {
-  | Deposit => "DepositPeriod" -> Js.Json.string
-  | Voting => "VotingPeriod" -> Js.Json.string
-  | Passed => "Passed" -> Js.Json.string
-  | Rejected => "Rejected" -> Js.Json.string
-  | Failed => "Failed" -> Js.Json.string
+  | Deposit => "DepositPeriod"->Js.Json.string
+  | Voting => "VotingPeriod"->Js.Json.string
+  | Passed => "Passed"->Js.Json.string
+  | Rejected => "Rejected"->Js.Json.string
+  | Failed => "Failed"->Js.Json.string
   };
 }
 
+type account_t = {address: Address.t}
 
-
-type account_t = {address: Address.t};
-
-type deposit_t = {amount: list<Coin.t>};
+type deposit_t = {amount: list<Coin.t>}
 
 type internal_t = {
   id: ID.Proposal.t,
@@ -48,7 +46,7 @@ type internal_t = {
   accountOpt: option<account_t>,
   proposalType: string,
   totalDeposit: list<Coin.t>,
-};
+}
 
 type t = {
   id: ID.Proposal.t,
@@ -62,24 +60,21 @@ type t = {
   proposerAddressOpt: option<Address.t>,
   proposalType: string,
   totalDeposit: list<Coin.t>,
-};
+}
 
-let toExternal =
-    (
-      {
-        id,
-        title,
-        status,
-        description,
-        submitTime,
-        depositEndTime,
-        votingStartTime,
-        votingEndTime,
-        accountOpt,
-        proposalType,
-        totalDeposit,
-      },
-    ) => {
+let toExternal = ({
+  id,
+  title,
+  status,
+  description,
+  submitTime,
+  depositEndTime,
+  votingStartTime,
+  votingEndTime,
+  accountOpt,
+  proposalType,
+  totalDeposit,
+}) => {
   id,
   name: title,
   status,
@@ -91,7 +86,7 @@ let toExternal =
   proposerAddressOpt: accountOpt->Belt.Option.map(({address}) => address),
   proposalType,
   totalDeposit,
-};
+}
 
 module SingleConfig = %graphql(`
   subscription Proposal($id: Int!) {
@@ -133,7 +128,6 @@ module MultiConfig = %graphql(`
   }
 `)
 
-
 module ProposalsCountConfig = %graphql(`
   subscription ProposalsCount {
     proposals_aggregate{
@@ -145,30 +139,29 @@ module ProposalsCountConfig = %graphql(`
 `)
 
 let getList = (~page, ~pageSize, ()) => {
-  let offset = (page - 1) * pageSize;
-  let result = MultiConfig.use({limit: pageSize, offset: offset})
+  let offset = (page - 1) * pageSize
+  let result = MultiConfig.use({limit: pageSize, offset})
 
-  result
-  -> Sub.fromData
-  -> Sub.map(internal => internal.proposals->Belt_Array.map(toExternal));
-};
+  result->Sub.fromData->Sub.map(internal => internal.proposals->Belt.Array.map(toExternal))
+}
 
 let get = id => {
-  let result = SingleConfig.use({id: id -> ID.Proposal.toInt})
-  
-  result -> Sub.fromData
-  -> Sub.flatMap(({proposals_by_pk}) => {
+  let result = SingleConfig.use({id: id->ID.Proposal.toInt})
+
+  result
+  ->Sub.fromData
+  ->Sub.flatMap(({proposals_by_pk}) => {
     switch proposals_by_pk {
-    | Some(data) => Sub.resolve(data -> toExternal)
+    | Some(data) => Sub.resolve(data->toExternal)
     | None => Sub.NoData
     }
   })
-};
+}
 
 let count = () => {
   let result = ProposalsCountConfig.use()
 
   result
-  -> Sub.fromData
-  -> Sub.map(x => x.proposals_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count));
-};
+  ->Sub.fromData
+  ->Sub.map(x => x.proposals_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+}

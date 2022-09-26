@@ -38,8 +38,8 @@ let getAddressAndPubKey = x => {
       Promise.reject(Not_found)
     } else {
       Promise.resolve((
-        response.bech32_address |> Address.fromBech32,
-        response.compressed_pk |> JsBuffer.from |> JsBuffer.toHex |> PubKey.fromHex,
+        response.bech32_address->Address.fromBech32,
+        response.compressed_pk->JsBuffer.from->JsBuffer.toHex->PubKey.fromHex,
       ))
     }
   })
@@ -60,42 +60,46 @@ let create = (ledgerApp, accountIndex) => {
     let app = LedgerJS.createApp(transport)
 
     LedgerJS.publicKey(app, path)->then(pubKeyInfo => {
-      LedgerJS.appInfo(app)->then(appInfo => {
-        LedgerJS.getVersion(app)->then(version => {
-          let {major, minor, patch, test_mode, device_locked} = version
-          let userVersion = j`$major.$minor.$patch`
-          let requiredAppName = getAppName(ledgerApp)
-          let requiredVersion = getRequiredVersion(ledgerApp)
+      LedgerJS.appInfo(app)->then(
+        appInfo => {
+          LedgerJS.getVersion(app)->then(
+            version => {
+              let {major, minor, patch, test_mode, device_locked} = version
+              let userVersion = j`$major.$minor.$patch`
+              let requiredAppName = getAppName(ledgerApp)
+              let requiredVersion = getRequiredVersion(ledgerApp)
 
-          // 36864(0x9000) will return if there is no error.
-          // TODO: improve handle error
-          // Validatate step
-          // 1. Check return code of pubKeyInfo
-          // 2. If pass, then check app version
-          // 3. If pass, then check test_mode
-          if pubKeyInfo.return_code != 36864 {
-            if appInfo.appName != requiredAppName {
-              let appName = appInfo.appName
-              Js.Console.log(j`App name is not $requiredAppName. (Current is $appName)`)
-              reject(Not_found)
-            } else if device_locked {
-              Js.Console.log3("Device is locked", pubKeyInfo, version)
-              reject(Not_found)
-            } else {
-              Js.Console.log(pubKeyInfo.error_message)
-              reject(Not_found)
-            }
-          } else if !Semver.gte(userVersion, requiredVersion) {
-            Js.Console.log(j`Cosmos app version must >= $requiredVersion (Current is $userVersion)`)
-            reject(Not_found)
-          } else if test_mode {
-            Js.Console.log3("test mode is not supported", pubKeyInfo, version)
-            reject(Not_found)
-          } else {
-            resolve({transport: transport, app: app, path: path, prefix: prefix})
-          }
-        })
-      })
+              // 36864(0x9000) will return if there is no error.
+              // TODO: improve handle error
+              // Validatate step
+              // 1. Check return code of pubKeyInfo
+              // 2. If pass, then check app version
+              // 3. If pass, then check test_mode
+              if pubKeyInfo.return_code != 36864 {
+                if appInfo.appName != requiredAppName {
+                  let appName = appInfo.appName
+                  Js.Console.log(j`App name is not $requiredAppName. (Current is $appName)`)
+                  reject(Not_found)
+                } else if device_locked {
+                  Js.Console.log3("Device is locked", pubKeyInfo, version)
+                  reject(Not_found)
+                } else {
+                  Js.Console.log(pubKeyInfo.error_message)
+                  reject(Not_found)
+                }
+              } else if !Semver.gte(userVersion, requiredVersion) {
+                Js.Console.log(j`Cosmos app version must >= $requiredVersion (Current is $userVersion)`)
+                reject(Not_found)
+              } else if test_mode {
+                Js.Console.log3("test mode is not supported", pubKeyInfo, version)
+                reject(Not_found)
+              } else {
+                resolve({transport, app, path, prefix})
+              }
+            },
+          )
+        },
+      )
     })
   })
 }
@@ -103,6 +107,6 @@ let create = (ledgerApp, accountIndex) => {
 let sign = (x, message) => {
   let responsePromise = LedgerJS.sign(x.app, x.path, message)
   responsePromise->Promise.then(response => {
-    response.signature |> Secp256k1.signatureImport |> JsBuffer.from |> Promise.resolve
+    response.signature->Secp256k1.signatureImport->JsBuffer.from->Promise.resolve
   })
 }

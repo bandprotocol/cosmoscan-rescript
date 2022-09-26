@@ -69,26 +69,32 @@ let make = (~info) => {
       <AddressRender address position=AddressRender.Text clickable=true accountType />
     </div>
   | Height(height) =>
-    <div className=Styles.vFlex> <TypeID.Block id=height position=TypeID.Text /> </div>
+    <div className=Styles.vFlex>
+      <TypeID.Block id=height position=TypeID.Text />
+    </div>
   | Coin({value, hasDenom}) =>
     <AmountRender coins=value pos={hasDenom ? AmountRender.TxIndex : Fee} />
-  | Count(value) => <Text value={value |> Format.iPretty} size=Text.Md />
+  | Count(value) => <Text value={value->Format.iPretty} size=Text.Md />
   | DataSource(id, name) =>
     <div className=Styles.vFlex>
-      <TypeID.DataSource id /> <HSpacing size=Spacing.sm /> <Text value=name ellipsis=true />
+      <TypeID.DataSource id />
+      <HSpacing size=Spacing.sm />
+      <Text value=name ellipsis=true />
     </div>
   | OracleScript(id, name) =>
     <div className=Styles.vFlex>
-      <TypeID.OracleScript id /> <HSpacing size=Spacing.sm /> <Text value=name ellipsis=true />
+      <TypeID.OracleScript id />
+      <HSpacing size=Spacing.sm />
+      <Text value=name ellipsis=true />
     </div>
   | RequestID(id) => <TypeID.Request id />
   | RequestResponse({requestCount, responseTime: responseTimeOpt}) =>
     <div className={CssHelper.flexBox()}>
-      <Text value={requestCount |> Format.iPretty} block=true ellipsis=true />
+      <Text value={requestCount->Format.iPretty} block=true ellipsis=true />
       <HSpacing size=Spacing.sm />
       <Text
         value={switch responseTimeOpt {
-        | Some(responseTime') => "(" ++ (responseTime' |> Format.fPretty(~digits=2)) ++ "s)"
+        | Some(responseTime') => "(" ++ responseTime'->Format.fPretty(~digits=2) ++ "s)"
         | None => "(TBD)"
         }}
         block=true
@@ -96,14 +102,14 @@ let make = (~info) => {
     </div>
   | ProgressBar({reportedValidators, minimumValidators, requestValidators}) =>
     <ProgressBar reportedValidators minimumValidators requestValidators />
-  | Float(value, digits) => <Text value={value |> Format.fPretty(~digits?)} />
+  | Float(value, digits) => <Text value={value->Format.fPretty(~digits?)} />
   | KVTableReport(heading, rawReports) =>
     <KVTable
       headers=heading
-      rows={rawReports |> Belt.Array.map(_, rawReport => [
-        KVTable.Value(rawReport.externalDataID |> string_of_int),
-        KVTable.Value(rawReport.exitCode |> string_of_int),
-        KVTable.Value(rawReport.data |> JsBuffer.toUTF8),
+      rows={rawReports->Belt.Array.map(rawReport => [
+        KVTable.Value(rawReport.externalDataID->Belt.Int.toString),
+        KVTable.Value(rawReport.exitCode->Belt.Int.toString),
+        KVTable.Value(rawReport.data->JsBuffer.toUTF8),
       ])}
     />
   | KVTableRequest(calldataKVsOpt) =>
@@ -124,10 +130,10 @@ let make = (~info) => {
         block=true
       />
     }
-  | CopyButton(calldata) => React.null
+  | CopyButton(_) => React.null
   // TODO: do it later
-  // <CopyButton data={calldata |> JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125 />
-  | Percentage(value, digits) => <Text value={value |> Format.fPercent(~digits?)} />
+  // CopyButton(calldata) => <CopyButton data={calldata -> JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125 />
+  | Percentage(value, digits) => <Text value={value->Format.fPercent(~digits?)} />
   | Text(text) => <Text value=text spacing={Text.Em(0.02)} nowrap=true ellipsis=true block=true />
   | Timestamp(time) => <Timestamp time size=Text.Md weight=Text.Regular />
   | Validator(address, moniker, identity) =>
@@ -136,7 +142,7 @@ let make = (~info) => {
   | TxHash(txHash, width) => <TxLink txHash width />
   | BlockHash(hash) =>
     <Text
-      value={hash |> Hash.toHex(~upper=true)}
+      value={hash->Hash.toHex(~upper=true)}
       weight=Text.Medium
       block=true
       code=true
@@ -146,17 +152,15 @@ let make = (~info) => {
   | Messages(txHash, messages, success, errMsg) => <TxMessages txHash messages success errMsg />
   // TODO: do it later
   // <TxMessages txHash messages success errMsg />
-  | Badge({name, category}) => React.null
+  | Badge(_) => React.null
   // TODO: do it later
   // <MsgBadge name />
   | VotingPower(tokens, votingPercent) =>
     <div className=Styles.vFlex>
-      <Text value={tokens |> Coin.getBandAmountFromCoin |> Format.fPretty(~digits=0)} block=true />
+      <Text value={tokens->Coin.getBandAmountFromCoin->Format.fPretty(~digits=0)} block=true />
       <HSpacing size=Spacing.sm />
       <Text
-        value={"(" ++ (votingPercent |> Format.fPercent(~digits=2)) ++ ")"}
-        weight=Text.Thin
-        block=true
+        value={"(" ++ votingPercent->Format.fPercent(~digits=2) ++ ")"} weight=Text.Thin block=true
       />
     </div>
   | Status(status) => <img src={status ? Images.success : Images.fail} className=Styles.logo />
@@ -166,7 +170,7 @@ let make = (~info) => {
     switch uptimeOpt {
     | Some(uptime) =>
       <div className=Styles.vFlex>
-        <Text value={uptime |> Format.fPercent(~digits=2)} spacing={Text.Em(0.02)} nowrap=true />
+        <Text value={uptime->Format.fPercent(~digits=2)} spacing={Text.Em(0.02)} nowrap=true />
         <HSpacing size=Spacing.lg />
         <ProgressBar.Uptime percent=uptime />
       </div>

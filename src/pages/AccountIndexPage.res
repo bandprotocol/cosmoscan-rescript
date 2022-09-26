@@ -59,7 +59,7 @@ module BalanceDetails = {
             value=title
             size=Text.Lg
             weight=Text.Semibold
-            tooltipItem={description |> React.string}
+            tooltipItem={description->React.string}
             tooltipPlacement=Text.AlignBottomStart
             color=theme.textPrimary
           />
@@ -73,7 +73,7 @@ module BalanceDetails = {
                   value=amount size=Text.Lg weight=Text.Regular color=theme.textPrimary
                 />
               : <Text
-                  value={amount |> Format.fPretty}
+                  value={amount->Format.fPretty}
                   size=Text.Lg
                   weight=Text.Regular
                   nowrap=true
@@ -94,7 +94,7 @@ module BalanceDetails = {
                   color=theme.textSecondary
                 />
               : <Text
-                  value={amount *. usdPrice |> Format.fPretty}
+                  value={(amount *. usdPrice)->Format.fPretty}
                   size=Text.Md
                   spacing=Text.Em(0.02)
                   weight=Text.Thin
@@ -114,7 +114,9 @@ module BalanceDetailLoading = {
   @react.component
   let make = () =>
     <Row>
-      <Col col=Col.Six colSm=Col.Five> <LoadingCensorBar width=130 height=18 /> </Col>
+      <Col col=Col.Six colSm=Col.Five>
+        <LoadingCensorBar width=130 height=18 />
+      </Col>
       <Col col=Col.Six colSm=Col.Seven>
         <div className={CssHelper.flexBox(~direction=#column, ~align=#flexEnd, ())}>
           <LoadingCensorBar width=120 height=20 />
@@ -145,7 +147,7 @@ module TotalBalanceRender = {
         />
         <HSpacing size=Spacing.sm />
         <Text
-          value={" USD " ++ ("($" ++ ((usdPrice |> Js.Float.toString) ++ " / BAND)"))}
+          value={" USD " ++ ("($" ++ (usdPrice->Js.Float.toString ++ " / BAND)"))}
           size=Text.Lg
           weight=Text.Thin
         />
@@ -158,7 +160,7 @@ module TotalBalanceRender = {
 let make = (~address, ~hashtag: Route.account_tab_t) => {
   let isMobile = Media.isMobile()
   let currentTime =
-    React.useContext(TimeContext.context) |> MomentRe.Moment.format(Config.timestampUseFormat)
+    React.useContext(TimeContext.context)->MomentRe.Moment.format(Config.timestampUseFormat, _)
   let accountSub = AccountSub.get(address)
   let trackingSub = TrackingSub.use()
   let balanceAtStakeSub = DelegationSub.getTotalStakeByDelegator(address)
@@ -185,7 +187,7 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
       if sender == address {
         {
           open Webapi.Dom
-          window -> Window.confirm("Are you sure you want to send tokens to yourself?")
+          window->Window.confirm("Are you sure you want to send tokens to yourself?")
         }
           ? openSendModal()
           : ()
@@ -200,7 +202,9 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
   <Section>
     <div className=CssHelper.container>
       <Row marginBottom=40 marginBottomSm=16>
-        <Col> <Heading value="Account Details" size=Heading.H2 /> </Col>
+        <Col>
+          <Heading value="Account Details" size=Heading.H2 />
+        </Col>
       </Row>
       <Row marginBottom=24 marginBottomSm=16>
         <Col col=Col.Six>
@@ -226,7 +230,8 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
                 <div className={CssJs.merge(. [CssHelper.flexBox(), Styles.buttonContainer])}>
                   <Button variant=Button.Outline py=5 onClick={_ => qrCode()}>
                     <div className={CssHelper.flexBox()}>
-                      <Icon size=20 name="far fa-qrcode" mr=8 /> {"QR Code" |> React.string}
+                      <Icon size=20 name="far fa-qrcode" mr=8 />
+                      {"QR Code"->React.string}
                     </div>
                   </Button>
                   {isMobile
@@ -234,7 +239,7 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
                     : switch topPartAllSub {
                       | Data((_, _, _, _, {chainID})) =>
                         <Button variant=Button.Outline onClick={_ => send(chainID)}>
-                          {"Send BAND" |> React.string}
+                          {"Send BAND"->React.string}
                         </Button>
                       | _ => <LoadingCensorBar width=90 height=26 />
                       }}
@@ -255,7 +260,8 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
                     usdPrice=financial.usdPrice
                   />
 
-                | _ => <>
+                | _ =>
+                  <>
                     <LoadingCensorBar width=200 height=22 mb=10 />
                     <LoadingCensorBar width=220 height=16 />
                   </>

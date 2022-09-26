@@ -84,35 +84,37 @@ module SearchResults = {
 
   @react.component
   let make = (~searchTerm, ~focusIndex, ~onHover) => {
-    let results =
-      [
-        searchTerm->isValidAddress
-          ? <>
-              <VSpacing size=#px(-2) />
-              <Text value="ADDRESS" size=Text.Xs weight=Text.Semibold />
-              <VSpacing size=Spacing.xs />
-              <Text value={searchTerm ++ "1f2bce"} weight=Text.Bold size=Text.Lg block=true />
-              <VSpacing size=Spacing.sm />
-            </>
-          : React.null,
-        searchTerm->isValidTx
-          ? <>
-              <VSpacing size=#px(-2) />
-              <Text value="TRANSACTION" size=Text.Xs weight=Text.Semibold />
-              <VSpacing size=Spacing.xs />
-              <Text value={searchTerm ++ "dd92b"} weight=Text.Bold size=Text.Lg block=true />
-              <VSpacing size=Spacing.sm />
-            </>
-          : React.null,
-        <> <Text value="Show all results for " /> <Text value=searchTerm weight=Text.Bold /> </>,
-      ]->Belt.Array.keep(r => r != React.null)
+    let results = [
+      searchTerm->isValidAddress
+        ? <>
+            <VSpacing size=#px(-2) />
+            <Text value="ADDRESS" size=Text.Xs weight=Text.Semibold />
+            <VSpacing size=Spacing.xs />
+            <Text value={searchTerm ++ "1f2bce"} weight=Text.Bold size=Text.Lg block=true />
+            <VSpacing size=Spacing.sm />
+          </>
+        : React.null,
+      searchTerm->isValidTx
+        ? <>
+            <VSpacing size=#px(-2) />
+            <Text value="TRANSACTION" size=Text.Xs weight=Text.Semibold />
+            <VSpacing size=Spacing.xs />
+            <Text value={searchTerm ++ "dd92b"} weight=Text.Bold size=Text.Lg block=true />
+            <VSpacing size=Spacing.sm />
+          </>
+        : React.null,
+      <>
+        <Text value="Show all results for " />
+        <Text value=searchTerm weight=Text.Bold />
+      </>,
+    ]->Belt.Array.keep(r => r != React.null)
 
     <div className=Styles.container>
       {results
       ->Belt.Array.mapWithIndex((i, result) =>
         <div
           onMouseOver={_evt => onHover(i)}
-          key={i |> string_of_int}
+          key={i->Belt.Int.toString}
           className={CssJs.merge(. [
             Styles.result,
             i == results->Array.length - 1 ? Styles.lastResult : "",
@@ -192,7 +194,7 @@ let make = () => {
         | "Enter" =>
           dispatch(ChangeSearchTerm(""))
           ReactEvent.Keyboard.preventDefault(event)
-          Route.redirect(searchTerm |> Route.search)
+          Route.redirect(searchTerm->Route.search)
         | _ => ()
         }}
       value=searchTerm
@@ -206,7 +208,7 @@ let make = () => {
     <button
       className=Styles.button
       onClick={_ => {
-        Route.redirect(searchTerm |> Route.search)
+        Route.redirect(searchTerm->Route.search)
         dispatch(ChangeSearchTerm(""))
       }}>
       <Icon name="far fa-search" color=theme.textPrimary size=16 />

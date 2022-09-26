@@ -10,16 +10,16 @@ module Styles = {
 
 let getPrevDay = _ =>
   MomentRe.momentNow()
-  |> MomentRe.Moment.defaultUtc
-  |> MomentRe.Moment.subtract(~duration=MomentRe.duration(1 |> float_of_int, #days))
-  |> MomentRe.Moment.format(Config.timestampUseFormat)
+  ->MomentRe.Moment.defaultUtc
+  ->MomentRe.Moment.subtract(~duration=MomentRe.duration(1->float_of_int, #days))
+  ->MomentRe.Moment.format(Config.timestampUseFormat, _)
 
 @react.component
 let make = () => {
   let isMobile = Media.isMobile()
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let currentTime =
-    React.useContext(TimeContext.context) |> MomentRe.Moment.format(Config.timestampUseFormat)
+    React.useContext(TimeContext.context)->MomentRe.Moment.format(Config.timestampUseFormat, _)
 
   let (prevDayTime, setPrevDayTime) = React.useState(getPrevDay)
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
@@ -57,7 +57,7 @@ let make = () => {
           {switch topPartAllSub {
           | Data((validatorCount, _, _, _, _)) =>
             <Heading
-              value={validatorCount->string_of_int ++ " In total"}
+              value={validatorCount->Belt.Int.toString ++ " In total"}
               size=Heading.H3
               weight=Heading.Thin
               color={theme.textSecondary}
@@ -81,7 +81,7 @@ let make = () => {
                 {switch topPartAllSub {
                 | Data((_, isActiveValidatorCount, _, _, _)) =>
                   <Text
-                    value={isActiveValidatorCount |> string_of_int}
+                    value={isActiveValidatorCount->Belt.Int.toString}
                     size=Text.Xxxl
                     block=true
                     weight=Text.Semibold
@@ -103,7 +103,7 @@ let make = () => {
                 {switch topPartAllSub {
                 | Data((_, _, bondedTokenCount, _, _)) =>
                   <Text
-                    value={bondedTokenCount->Coin.getBandAmountFromCoin |> Format.fCurrency}
+                    value={bondedTokenCount->Coin.getBandAmountFromCoin->Format.fCurrency}
                     size=Text.Xxxl
                     block=true
                     weight=Text.Semibold
@@ -125,7 +125,7 @@ let make = () => {
                 {switch topPartAllSub {
                 | Data((_, _, _, _, {inflation})) =>
                   <Text
-                    value={(inflation *. 100. |> Format.fPretty(~digits=2)) ++ "%"}
+                    value={(inflation *. 100.)->Format.fPretty(~digits=2) ++ "%"}
                     size=Text.Xxxl
                     color={theme.textPrimary}
                     block=true
@@ -148,7 +148,7 @@ let make = () => {
                 {switch topPartAllSub {
                 | Data((_, _, _, avgBlockTime, _)) =>
                   <Text
-                    value={(avgBlockTime |> Format.fPretty(~digits=2)) ++ " secs"}
+                    value={avgBlockTime->Format.fPretty(~digits=2) ++ " secs"}
                     size=Text.Xxxl
                     color={theme.textPrimary}
                     block=true

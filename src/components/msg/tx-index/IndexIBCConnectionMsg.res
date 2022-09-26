@@ -32,7 +32,7 @@ module ConnectionOpenInit = {
             marginBottom=8
             color=theme.textSecondary
           />
-          <Text size=Text.Lg value={(connection.delayPeriod |> string_of_int) ++ "ns"} />
+          <Text size=Text.Lg value={connection.delayPeriod->Belt.Int.toString ++ "ns"} />
         </Col>
       </Row>
       <SeperatedLine mt=24 mb=24 />
@@ -89,7 +89,7 @@ module ConnectionOpenTry = {
             marginBottom=8
             color=theme.textSecondary
           />
-          <Text size=Text.Lg value={(connection.delayPeriod |> string_of_int) ++ "ns"} />
+          <Text size=Text.Lg value={connection.delayPeriod->Belt.Int.toString ++ "ns"} />
         </Col>
         <Col col=Col.Six>
           <Heading

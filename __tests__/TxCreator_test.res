@@ -22,8 +22,8 @@ describe("expect TxCreator to give the correct message", () => {
               from_address: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
               to_address: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
             })
-            |> Belt.Option.getExn
-            |> Js.Json.parseExn,
+            ->Belt.Option.getExn
+            ->Js.Json.parseExn,
           },
         ],
         fee: {
@@ -36,15 +36,15 @@ describe("expect TxCreator to give the correct message", () => {
             pub_key: Js.Json.object_(
               Js.Dict.fromList(list{
                 ("type", Js.Json.string("tendermint/PubKeySecp256k1")),
-                ("value", Js.Json.string(pubKey |> PubKey.toBase64)),
+                ("value", Js.Json.string(pubKey->PubKey.toBase64)),
               }),
             ),
-            public_key: "eb5ae98721" ++ (pubKey |> PubKey.toHex) |> JsBuffer.hexToBase64,
-            signature: signature,
+            public_key: "eb5ae98721" ++ pubKey->PubKey.toHex->JsBuffer.hexToBase64,
+            signature,
           },
         ],
       },
-    }) |> toEqual(
+    })->toEqual(
       createSignedTx(
         ~signature,
         ~pubKey,
@@ -66,8 +66,8 @@ describe("expect TxCreator to give the correct message", () => {
                 from_address: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
                 to_address: "band1m5lq9u533qaya4q3nfyl6ulzqkpkhge9q8tpzs",
               })
-              |> Belt.Option.getExn
-              |> Js.Json.parseExn,
+              ->Belt.Option.getExn
+              ->Js.Json.parseExn,
             },
           ],
         },
@@ -93,8 +93,8 @@ describe("expect TxCreator to give the correct message", () => {
               prepare_gas: "30000",
               execute_gas: "50000",
             })
-            |> Belt.Option.getExn
-            |> Js.Json.parseExn,
+            ->Belt.Option.getExn
+            ->Js.Json.parseExn,
           },
         ],
         fee: {
@@ -107,15 +107,15 @@ describe("expect TxCreator to give the correct message", () => {
             pub_key: Js.Json.object_(
               Js.Dict.fromList(list{
                 ("type", Js.Json.string("tendermint/PubKeySecp256k1")),
-                ("value", Js.Json.string(pubKey |> PubKey.toBase64)),
+                ("value", Js.Json.string(pubKey->PubKey.toBase64)),
               }),
             ),
-            public_key: "eb5ae98721" ++ (pubKey |> PubKey.toHex) |> JsBuffer.hexToBase64,
-            signature: signature,
+            public_key: "eb5ae98721" ++ pubKey->PubKey.toHex->JsBuffer.hexToBase64,
+            signature,
           },
         ],
       },
-    }) |> toEqual(
+    })->toEqual(
       createSignedTx(
         ~signature,
         ~pubKey,
@@ -143,8 +143,8 @@ describe("expect TxCreator to give the correct message", () => {
                 prepare_gas: "30000",
                 execute_gas: "50000",
               })
-              |> Belt.Option.getExn
-              |> Js.Json.parseExn,
+              ->Belt.Option.getExn
+              ->Js.Json.parseExn,
             },
           ],
         },

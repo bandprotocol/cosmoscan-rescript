@@ -12,8 +12,8 @@ module StakeSummary = {
   }
 
   let toExternal = (sum: sum_t) => {
-    amount: sum.amount |> GraphQLParser.coinWithDefault,
-    reward: sum.reward |> GraphQLParser.coinWithDefault,
+    amount: sum.amount->GraphQLParser.coinWithDefault,
+    reward: sum.reward->GraphQLParser.coinWithDefault,
   }
 }
 
@@ -49,13 +49,13 @@ module Stake = {
       identity,
     }: internal_t,
   ) => {
-    amount: amount |> GraphQLParser.coinExn,
-    delegatorAddress: delegatorAddress |> GraphQLParser.addressExn,
-    moniker: moniker |> GraphQLParser.stringExn,
-    operatorAddress: operatorAddress |> GraphQLParser.addressExn,
-    reward: reward |> GraphQLParser.coinExn,
-    sharePercentage: sharePercentage |> GraphQLParser.floatWithDefault,
-    identity: identity |> GraphQLParser.stringExn,
+    amount: amount->GraphQLParser.coinExn,
+    delegatorAddress: delegatorAddress->GraphQLParser.addressExn,
+    moniker: moniker->GraphQLParser.stringExn,
+    operatorAddress: operatorAddress->GraphQLParser.addressExn,
+    reward: reward->GraphQLParser.coinExn,
+    sharePercentage: sharePercentage->GraphQLParser.floatWithDefault,
+    identity: identity->GraphQLParser.stringExn,
   }
 }
 module StakeWithDefault = {
@@ -70,8 +70,8 @@ module StakeWithDefault = {
   }
 
   let toExternal = ({amount, reward}: internal_t) => {
-    amount: amount |> GraphQLParser.coinExn,
-    reward: reward |> GraphQLParser.coinExn,
+    amount: amount->GraphQLParser.coinExn,
+    reward: reward->GraphQLParser.coinExn,
   }
 }
 
@@ -158,41 +158,41 @@ let getStakeList = (delegatorAddress, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
 
   let result = StakeConfig.use({
-    delegator_address: delegatorAddress |> Address.toBech32,
+    delegator_address: delegatorAddress->Address.toBech32,
     limit: pageSize,
     offset,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, ({delegations_view}) => delegations_view->Belt_Array.map(Stake.toExternal))
+  ->Sub.fromData
+  ->Sub.map(({delegations_view}) => delegations_view->Belt.Array.map(Stake.toExternal))
 }
 
 let getDelegatorsByValidator = (validatorAddress, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
 
   let result = DelegatorsByValidatorConfig.use({
-    operator_address: validatorAddress |> Address.toOperatorBech32,
+    operator_address: validatorAddress->Address.toOperatorBech32,
     limit: pageSize,
     offset,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, ({delegations_view}) => delegations_view->Belt_Array.map(Stake.toExternal))
+  ->Sub.fromData
+  ->Sub.map(({delegations_view}) => delegations_view->Belt.Array.map(Stake.toExternal))
 }
 
 let getTotalStakeByDelegator = delegatorAddress => {
   let result = TotalStakeByDelegatorConfig.use({
-    delegator_address: delegatorAddress |> Address.toBech32,
+    delegator_address: delegatorAddress->Address.toBech32,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.flatMap(_, ({delegations_view_aggregate}) => {
-    let agg = delegations_view_aggregate.aggregate |> Belt.Option.getExn
+  ->Sub.fromData
+  ->Sub.flatMap(({delegations_view_aggregate}) => {
+    let agg = delegations_view_aggregate.aggregate->Belt.Option.getExn
     switch agg.sum {
-    | Some(data) => Sub.resolve(data |> StakeSummary.toExternal)
+    | Some(data) => Sub.resolve(data->StakeSummary.toExternal)
     | None => Sub.NoData
     }
   })
@@ -200,15 +200,15 @@ let getTotalStakeByDelegator = delegatorAddress => {
 
 let getStakeByValidator = (delegatorAddress, operatorAddress) => {
   let result = StakeByValidatorConfig.use({
-    operator_address: operatorAddress |> Address.toOperatorBech32,
-    delegator_address: delegatorAddress |> Address.toBech32,
+    operator_address: operatorAddress->Address.toOperatorBech32,
+    delegator_address: delegatorAddress->Address.toBech32,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, ({delegations_view}) =>
+  ->Sub.fromData
+  ->Sub.map(({delegations_view}) =>
     delegations_view
-    ->Belt_Array.get(0)
+    ->Belt.Array.get(0)
     ->Belt.Option.mapWithDefault(
       (
         {
@@ -223,24 +223,24 @@ let getStakeByValidator = (delegatorAddress, operatorAddress) => {
 
 let getStakeCountByDelegator = delegatorAddress => {
   let result = StakeCountByDelegatorConfig.use({
-    delegator_address: delegatorAddress |> Address.toBech32,
+    delegator_address: delegatorAddress->Address.toBech32,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, ({delegations_view_aggregate}) =>
-    delegations_view_aggregate.aggregate |> Belt.Option.getExn |> (y => y |> StakeCount.toExternal)
+  ->Sub.fromData
+  ->Sub.map(({delegations_view_aggregate}) =>
+    delegations_view_aggregate.aggregate->Belt.Option.getExn->(y => y->StakeCount.toExternal)
   )
 }
 
 let getDelegatorCountByValidator = validatorAddress => {
   let result = DelegatorCountConfig.use({
-    operator_address: validatorAddress |> Address.toBech32,
+    operator_address: validatorAddress->Address.toBech32,
   })
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, ({delegations_view_aggregate}) =>
-    delegations_view_aggregate.aggregate |> Belt.Option.getExn |> (y => y |> StakeCount.toExternal)
+  ->Sub.fromData
+  ->Sub.map(({delegations_view_aggregate}) =>
+    delegations_view_aggregate.aggregate->Belt.Option.getExn->(y => y->StakeCount.toExternal)
   )
 }

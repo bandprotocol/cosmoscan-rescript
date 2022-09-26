@@ -64,7 +64,7 @@ module InnerPanel = {
       | _ => false
       }
       <div
-        className={Styles.cardItem(alignItem, isOneColumn)} key={idx ++ (index |> string_of_int)}>
+        className={Styles.cardItem(alignItem, isOneColumn)} key={idx ++ index->Belt.Int.toString}>
         <div className=Styles.cardItemHeading>
           {heading
           ->Js.String2.split("\n")
@@ -82,7 +82,9 @@ module InnerPanel = {
           })
           ->React.array}
         </div>
-        <div className={Styles.infoContainer(isOneColumn)}> <InfoMobileCard info=value /> </div>
+        <div className={Styles.infoContainer(isOneColumn)}>
+          <InfoMobileCard info=value />
+        </div>
       </div>
     })
     ->React.array
@@ -110,7 +112,7 @@ let make = (~values, ~idx, ~status=?, ~requestStatus=?, ~styles="", ~panels=[]) 
           <div className={Styles.infoCardContainerWrapper(show, theme)}>
             {panels
             ->Belt.Array.mapWithIndex((i, e) =>
-              <div key={(i |> string_of_int) ++ idx} className=Styles.infoCardContainer>
+              <div key={i->Belt.Int.toString ++ idx} className=Styles.infoCardContainer>
                 <InnerPanel values=e idx />
               </div>
             )

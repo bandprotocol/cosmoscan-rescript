@@ -8,11 +8,11 @@ let transform = (account, {raw, decoded}: MsgDecoder.t) => {
   let transformDecoded = switch decoded {
   | SendMsgSuccess({toAddress, fromAddress, amount})
   | SendMsgFail({toAddress, fromAddress, amount}) if Address.isEqual(toAddress, account) =>
-    MsgDecoder.ReceiveMsg({toAddress: toAddress, fromAddress: fromAddress, amount: amount})
+    MsgDecoder.ReceiveMsg({toAddress, fromAddress, amount})
   | _ => decoded
   }
   open MsgDecoder
-  {raw: raw, decoded: transformDecoded, isIBC: transformDecoded |> MsgDecoder.isIBC}
+  {raw, decoded: transformDecoded, isIBC: transformDecoded->MsgDecoder.isIBC}
 }
 
 @react.component
@@ -33,7 +33,7 @@ let make = (~accountAddress: Address.t) => {
             | Data(txsCount) =>
               <div className={CssHelper.flexBox()}>
                 <Text
-                  block=true value={txsCount |> string_of_int} weight=Text.Semibold size=Text.Sm
+                  block=true value={txsCount->Belt.Int.toString} weight=Text.Semibold size=Text.Sm
                 />
                 <HSpacing size=Spacing.xs />
                 <Text
@@ -54,7 +54,7 @@ let make = (~accountAddress: Address.t) => {
               {switch txsCountSub {
               | Data(txsCount) =>
                 <div className={CssHelper.flexBox()}>
-                  <Text block=true value={txsCount |> string_of_int} weight=Text.Semibold />
+                  <Text block=true value={txsCount->Belt.Int.toString} weight=Text.Semibold />
                   <HSpacing size=Spacing.xs />
                   <Text
                     block=true

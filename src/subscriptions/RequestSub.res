@@ -1,25 +1,26 @@
-open ValidatorSub.Mini;
-open TxSub.Mini;
+open ValidatorSub.Mini
+open TxSub.Mini
 
 type resolve_status_t =
   | Pending
   | Success
   | Failure
   | Expired
-  | Unknown;
+  | Unknown
 
 module ResolveStatus = {
   let parse = json => {
-    let status = json -> Js.Json.decodeString -> Belt_Option.getExn;
-    switch (status) {
+    let status = json->Js.Json.decodeString->Belt_Option.getExn
+    switch status {
     | "Open" => Pending
     | "Success" => Success
     | "Failure" => Failure
     | "Expired" => Expired
     | _ => Unknown
-    };
-  };
-  let serialize = status => "status" -> Js.Json.string
+    }
+  }
+  // TODO: Impelement serialize
+  let serialize = _ => "status"->Js.Json.string
 }
 
 module Mini = {
@@ -27,15 +28,15 @@ module Mini = {
     scriptID: ID.OracleScript.t,
     name: string,
     schema: string,
-  };
+  }
 
   type aggregate_t = {count: int}
   type block_t = TxSub.Mini.block_t
 
-  type aggregate_wrapper_intenal_t = {aggregate: option<aggregate_t>};
+  type aggregate_wrapper_intenal_t = {aggregate: option<aggregate_t>}
   type transactionOpt_t = TxSub.Mini.t
 
-  type raw_request_t = {fee: Coin.t};
+  type raw_request_t = {fee: Coin.t}
   type request_internal = {
     id: ID.Request.t,
     sender: option<Address.t>,
@@ -51,9 +52,9 @@ module Mini = {
     requestedValidatorsAggregate: aggregate_wrapper_intenal_t,
     result: option<JsBuffer.t>,
     rawDataRequests: array<raw_request_t>,
-  };
+  }
 
-  type raw_request_internal_t = {request: request_internal};
+  type raw_request_internal_t = {request: request_internal}
 
   type t = {
     id: ID.Request.t,
@@ -73,7 +74,7 @@ module Mini = {
     resolveStatus: resolve_status_t,
     result: option<JsBuffer.t>,
     feeEarned: Coin.t,
-  };
+  }
 
   module MultiMiniByDataSourceConfig = %graphql(`
       subscription RequestsMiniByDataSource($id: Int!, $limit: Int!, $offset: Int!) {
@@ -208,25 +209,22 @@ module Mini = {
       }
 `)
 
-  let toExternal =
-    (
-      {
-        id,
-        sender,
-        clientID,
-        requestTime,
-        resolveTime,
-        calldata,
-        oracleScript,
-        transactionOpt,
-        reportsAggregate,
-        minCount,
-        resolveStatus,
-        requestedValidatorsAggregate,
-        result,
-        rawDataRequests,
-      },
-    ) => {
+  let toExternal = ({
+    id,
+    sender,
+    clientID,
+    requestTime,
+    resolveTime,
+    calldata,
+    oracleScript,
+    transactionOpt,
+    reportsAggregate,
+    minCount,
+    resolveStatus,
+    requestedValidatorsAggregate,
+    result,
+    rawDataRequests,
+  }) => {
     id,
     sender,
     clientID,
@@ -238,49 +236,52 @@ module Mini = {
     txHash: transactionOpt->Belt.Option.map(({hash}) => hash),
     txTimestamp: transactionOpt->Belt.Option.map(({block}) => block.timestamp),
     blockHeight: transactionOpt->Belt.Option.map(({blockHeight}) => blockHeight),
-    reportsCount:
-      reportsAggregate.aggregate->Belt.Option.map(({count}) => count)->Belt.Option.getExn,
+    reportsCount: reportsAggregate.aggregate
+    ->Belt.Option.map(({count}) => count)
+    ->Belt.Option.getExn,
     minCount,
-    askCount:
-      requestedValidatorsAggregate.aggregate
-      ->Belt.Option.map(({count}) => count)
-      ->Belt.Option.getExn,
+    askCount: requestedValidatorsAggregate.aggregate
+    ->Belt.Option.map(({count}) => count)
+    ->Belt.Option.getExn,
     resolveStatus,
     result,
-    feeEarned:
-      rawDataRequests->Belt.Array.reduce(0., (a, {fee: {amount}}) => a +. amount)
-      -> Coin.newUBANDFromAmount,
-  };
+    feeEarned: rawDataRequests
+    ->Belt.Array.reduce(0., (a, {fee: {amount}}) => a +. amount)
+    ->Coin.newUBANDFromAmount,
+  }
 
   let getListByDataSource = (id, ~page, ~pageSize) => {
-    let offset = (page - 1) * pageSize;
-    let result = MultiMiniByDataSourceConfig.use({id: id -> ID.DataSource.toInt, limit: pageSize, offset: offset})
+    let offset = (page - 1) * pageSize
+    let result = MultiMiniByDataSourceConfig.use({
+      id: id->ID.DataSource.toInt,
+      limit: pageSize,
+      offset,
+    })
 
     result
-    -> Sub.fromData
-    -> Sub.map(x =>
+    ->Sub.fromData
+    ->Sub.map(x =>
       x.rawDataRequests->Belt.Array.mapWithIndex((_, each) => toExternal(each.request))
-    );
-  };
+    )
+  }
 
   let getListByOracleScript = (id, ~page, ~pageSize, ()) => {
-    let offset = (page - 1) * pageSize;
-    let result = MultiMiniByOracleScriptConfig.use({id: id -> ID.OracleScript.toInt, limit: pageSize, offset: offset})
-    
-    result 
-    -> Sub.fromData
-    -> Sub.map(x => x.requests->Belt.Array.map(toExternal));
-  };
+    let offset = (page - 1) * pageSize
+    let result = MultiMiniByOracleScriptConfig.use({
+      id: id->ID.OracleScript.toInt,
+      limit: pageSize,
+      offset,
+    })
+
+    result->Sub.fromData->Sub.map(x => x.requests->Belt.Array.map(toExternal))
+  }
 
   let getListByTxHash = (txHash: Hash.t) => {
-    let hash = txHash -> Hash.toHex -> (x => "\\x" ++ x) -> Js.Json.string
-    let result = MultiMiniByTxHashConfig.use({tx_hash: hash })
-
-    result 
-    -> Sub.fromData
-    -> Sub.map(x => x.requests->Belt.Array.map(toExternal));
-  };
-};
+    let hash = txHash->Hash.toHex->(x => "\\x" ++ x)->Js.Json.string
+    let result = MultiMiniByTxHashConfig.use({tx_hash: hash})
+    result->Sub.fromData->Sub.map(x => x.requests->Belt.Array.map(toExternal))
+  }
+}
 
 module RequestCountByDataSourceConfig = %graphql(`
   subscription RequestsMiniCountByDataSource($id: Int!) {
@@ -302,36 +303,36 @@ type report_detail_t = {
   externalID: string,
   exitCode: string,
   data: JsBuffer.t,
-};
+}
 
 type report_t = {
   transactionOpt: option<TxSub.Mini.t>,
   reportDetails: array<report_detail_t>,
   reportValidator: ValidatorSub.Mini.t,
-};
+}
 
 type data_source_internal_t = {
   dataSourceID: ID.DataSource.t,
   name: string,
-};
+}
 
 type oracle_script_internal_t = {
   oracleScriptID: ID.OracleScript.t,
   name: string,
   schema: string,
-};
+}
 
 type raw_data_request_t = {
   externalID: string,
   fee: Coin.t,
   dataSource: data_source_internal_t,
   calldata: JsBuffer.t,
-};
+}
 
-type requested_validator_internal_t = {validator: ValidatorSub.Mini.t};
+type requested_validator_internal_t = {validator: ValidatorSub.Mini.t}
 
 type aggregate_t = {count: int}
-type aggregate_wrapper_intenal_t = {aggregate: option<aggregate_t>};
+type aggregate_wrapper_intenal_t = {aggregate: option<aggregate_t>}
 
 type internal_t = {
   id: ID.Request.t,
@@ -355,7 +356,7 @@ type internal_t = {
   rawDataRequests: array<raw_data_request_t>,
   reports: array<report_t>,
   result: option<JsBuffer.t>,
-};
+}
 
 type t = {
   id: ID.Request.t,
@@ -379,34 +380,9 @@ type t = {
   rawDataRequests: array<raw_data_request_t>,
   reports: array<report_t>,
   result: option<JsBuffer.t>,
-};
+}
 
-let toExternal =
-    (
-      {
-        id,
-        clientID,
-        requestTime,
-        resolveTime,
-        oracleScript,
-        calldata,
-        isIBC,
-        reason,
-        prepareGas,
-        executeGas,
-        feeLimit,
-        feeUsed,
-        resolveHeight,
-        requestedValidators,
-        minCount,
-        resolveStatus,
-        sender,
-        transactionOpt,
-        rawDataRequests,
-        reports,
-        result,
-      },
-    ) => {
+let toExternal = ({
   id,
   clientID,
   requestTime,
@@ -419,7 +395,29 @@ let toExternal =
   executeGas,
   feeLimit,
   feeUsed,
-  resolveHeight: resolveHeight -> Belt.Option.map(ID.Block.fromInt),
+  resolveHeight,
+  requestedValidators,
+  minCount,
+  resolveStatus,
+  sender,
+  transactionOpt,
+  rawDataRequests,
+  reports,
+  result,
+}) => {
+  id,
+  clientID,
+  requestTime,
+  resolveTime,
+  oracleScript,
+  calldata,
+  isIBC,
+  reason,
+  prepareGas,
+  executeGas,
+  feeLimit,
+  feeUsed,
+  resolveHeight: resolveHeight->Belt.Option.map(ID.Block.fromInt),
   requestedValidators,
   minCount,
   resolveStatus,
@@ -428,7 +426,7 @@ let toExternal =
   rawDataRequests,
   reports,
   result,
-};
+}
 
 module SingleRequestConfig = %graphql(`
   subscription Request($id: Int!) {
@@ -504,7 +502,6 @@ module SingleRequestConfig = %graphql(`
   }
 `)
 
-
 module MultiRequestConfig = %graphql(`
     subscription Requests($limit: Int!, $offset: Int!) {
       requests(limit: $limit, offset: $offset, order_by: [{id: desc}]) @ppxAs(type: "internal_t") {
@@ -579,7 +576,6 @@ module MultiRequestConfig = %graphql(`
     }
 `)
 
-
 module RequestCountConfig = %graphql(`
   subscription RequestCount {
     requests_aggregate @ppxAs(type: "aggregate_wrapper_intenal_t"){
@@ -590,53 +586,50 @@ module RequestCountConfig = %graphql(`
   }
 `)
 
-
 let get = id => {
-  let result = SingleRequestConfig.use({id: id -> ID.Request.toInt})
+  let result = SingleRequestConfig.use({id: id->ID.Request.toInt})
 
-  result 
-  -> Sub.fromData
-  -> Sub.flatMap(({requests_by_pk}) => {
+  result
+  ->Sub.fromData
+  ->Sub.flatMap(({requests_by_pk}) => {
     switch requests_by_pk {
-    | Some(data) => Sub.resolve(data -> toExternal)
+    | Some(data) => Sub.resolve(data->toExternal)
     | None => Sub.NoData
     }
   })
-};
+}
 
 let getList = (~page, ~pageSize) => {
-  let offset = (page - 1) * pageSize;
-  let result = MultiRequestConfig.use({limit: pageSize, offset: offset})
+  let offset = (page - 1) * pageSize
+  let result = MultiRequestConfig.use({limit: pageSize, offset})
 
-  result
-  -> Sub.fromData
-  -> Sub.map(internal => internal.requests->Belt_Array.map(toExternal));
-};
+  result->Sub.fromData->Sub.map(internal => internal.requests->Belt.Array.map(toExternal))
+}
 
 let count = () => {
   let result = RequestCountConfig.use()
 
   result
-  -> Sub.fromData
-  -> Sub.map(x => x.requests_aggregate.aggregate -> Belt.Option.getExn -> (y => y.count));
-};
+  ->Sub.fromData
+  ->Sub.map(x => x.requests_aggregate.aggregate->Belt.Option.getExn->(y => y.count))
+}
 
 let countByOracleScript = id => {
-  let result = RequestCountByOracleScriptConfig.use({id: id -> ID.OracleScript.toInt})
+  let result = RequestCountByOracleScriptConfig.use({id: id->ID.OracleScript.toInt})
 
   result
-  -> Sub.fromData
-  -> Sub.map(x =>
+  ->Sub.fromData
+  ->Sub.map(x =>
     x.oracle_script_requests->Belt.Array.get(0)->Belt.Option.mapWithDefault(0, y => y.count)
-  );
-};
+  )
+}
 
 let countByDataSource = id => {
-  let result = RequestCountByDataSourceConfig.use({id: id -> ID.DataSource.toInt})
+  let result = RequestCountByDataSourceConfig.use({id: id->ID.DataSource.toInt})
 
   result
-  -> Sub.fromData
-  -> Sub.map(x =>
+  ->Sub.fromData
+  ->Sub.map(x =>
     x.data_source_requests->Belt.Array.get(0)->Belt.Option.mapWithDefault(0, y => y.count)
-  );
-};
+  )
+}

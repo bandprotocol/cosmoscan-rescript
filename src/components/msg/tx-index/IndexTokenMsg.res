@@ -456,15 +456,17 @@ module MultisendMsg = {
               />
             </Col>}
         {tx.inputs
-        ->Belt_List.mapWithIndex((idx, input) =>
-          <React.Fragment key={(idx |> string_of_int) ++ (input.address |> Address.toBech32)}>
-            <Col col=Col.Six mb=16 mbSm=8> <AddressRender address=input.address /> </Col>
+        ->Belt.List.mapWithIndex((idx, input) =>
+          <React.Fragment key={idx->Belt.Int.toString ++ input.address->Address.toBech32}>
+            <Col col=Col.Six mb=16 mbSm=8>
+              <AddressRender address=input.address />
+            </Col>
             <Col col=Col.Six mb=16 mbSm=12>
               <AmountRender coins=input.coins pos=AmountRender.TxIndex />
             </Col>
           </React.Fragment>
         )
-        ->Belt_List.toArray
+        ->Belt.List.toArray
         ->React.array}
       </Row>
       <SeperatedLine mt=8 mb=24 />
@@ -473,15 +475,17 @@ module MultisendMsg = {
       />
       <Row>
         {tx.outputs
-        ->Belt_List.mapWithIndex((idx, output) =>
-          <React.Fragment key={(idx |> string_of_int) ++ (output.address |> Address.toBech32)}>
-            <Col col=Col.Six mb=16 mbSm=8> <AddressRender address=output.address /> </Col>
+        ->Belt.List.mapWithIndex((idx, output) =>
+          <React.Fragment key={idx->Belt.Int.toString ++ output.address->Address.toBech32}>
+            <Col col=Col.Six mb=16 mbSm=8>
+              <AddressRender address=output.address />
+            </Col>
             <Col col=Col.Six mb=16 mbSm=12>
               <AmountRender coins=output.coins pos=AmountRender.TxIndex />
             </Col>
           </React.Fragment>
         )
-        ->Belt_List.toArray
+        ->Belt.List.toArray
         ->React.array}
       </Row>
     </>

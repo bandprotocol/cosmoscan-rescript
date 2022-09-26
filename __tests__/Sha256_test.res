@@ -4,7 +4,7 @@ open Expect
 
 describe("Expect Sha256 to work correctly", () => {
   test("should be able to hash int array in to int array format", () =>
-    expect("F23391B5DBF982E37FB7DADEA64AAE21CAE4C172"->JsBuffer.hexToArray->digest) |> toEqual([
+    expect("F23391B5DBF982E37FB7DADEA64AAE21CAE4C172"->JsBuffer.hexToArray->digest)->toEqual([
       225,
       204,
       133,
@@ -41,7 +41,7 @@ describe("Expect Sha256 to work correctly", () => {
   )
 
   test("should be able to hash int array in to int array format", () =>
-    expect("F23391B5DBF982E37FB7DADEA64AAE21CAE4C172"->JsBuffer.hexToArray->hexDigest) |> toBe(
+    expect("F23391B5DBF982E37FB7DADEA64AAE21CAE4C172"->JsBuffer.hexToArray->hexDigest)->toBe(
       "e1cc85f5948d34c876ceeaa60e004f6d60f344be3b24d681b2bef9129198b60b",
     )
   )

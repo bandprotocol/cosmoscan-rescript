@@ -39,7 +39,7 @@ describe("Expect Bech32 to work correctly", () => {
         24,
         14,
       ]->fromWords,
-    ) |> toEqual([
+    )->toEqual([
       75,
       146,
       150,
@@ -87,7 +87,7 @@ describe("Expect Bech32 to work correctly", () => {
         211,
         14,
       ]->toWords,
-    ) |> toEqual([
+    )->toEqual([
       9,
       14,
       9,
@@ -125,45 +125,48 @@ describe("Expect Bech32 to work correctly", () => {
 
   test("should be able to encode correctly", () =>
     expect(
-      [
-        9,
-        14,
-        9,
-        9,
-        13,
-        6,
-        4,
-        16,
-        24,
-        20,
-        29,
-        15,
-        23,
-        28,
-        15,
-        9,
-        29,
-        31,
-        16,
-        0,
-        21,
-        31,
-        4,
-        19,
-        25,
-        28,
-        24,
-        18,
-        15,
-        20,
-        24,
-        14,
-      ] |> encode("bandvaloper"),
-    ) |> toBe("bandvaloper1fwffdxysc5a0hu0falsq4lyneucj05cwryzfp0")
+      encode(
+        "bandvaloper",
+        [
+          9,
+          14,
+          9,
+          9,
+          13,
+          6,
+          4,
+          16,
+          24,
+          20,
+          29,
+          15,
+          23,
+          28,
+          15,
+          9,
+          29,
+          31,
+          16,
+          0,
+          21,
+          31,
+          4,
+          19,
+          25,
+          28,
+          24,
+          18,
+          15,
+          20,
+          24,
+          14,
+        ],
+      ),
+    )->toEqual("bandvaloper1fwffdxysc5a0hu0falsq4lyneucj05cwryzfp0")
   )
 
   test("should be able to decode correctly", () =>
-    expect("bandvaloper1fwffdxysc5a0hu0falsq4lyneucj05cwryzfp0"->decode) |> toEqual(
+    expect("bandvaloper1fwffdxysc5a0hu0falsq4lyneucj05cwryzfp0"->decode)->toEqual(
       Bech32.decoded_t(
         ~prefix="bandvaloper",
         ~words=[

@@ -41,7 +41,7 @@ let renderField = (field, maxWidth) => {
     <div className={CssHelper.flexBox(~direction=#column, ())}>
       {vals
       ->Belt.Array.mapWithIndex((i, v) =>
-        <div key={i->string_of_int ++ v} className={Styles.valueContainer(maxWidth)}>
+        <div key={i->Belt.Int.toString ++ v} className={Styles.valueContainer(maxWidth)}>
           <Text value=v nowrap=true ellipsis=true block=true align=Text.Right />
         </div>
       )
@@ -78,7 +78,7 @@ let renderField = (field, maxWidth) => {
 
 @react.component
 let make = (~headers=["Key", "Value"], ~rows) => {
-  let columnSize = headers |> Belt.Array.length > 2 ? Col.Four : Col.Six
+  let columnSize = headers->Belt.Array.length > 2 ? Col.Four : Col.Six
   let valueWidth = Media.isMobile() ? 70 : 480
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
@@ -88,7 +88,7 @@ let make = (~headers=["Key", "Value"], ~rows) => {
       <Row>
         {headers
         ->Belt.Array.mapWithIndex((i, header) => {
-          <Col key={header ++ (i |> string_of_int)} col=columnSize colSm=columnSize>
+          <Col key={header ++ i->Belt.Int.toString} col=columnSize colSm=columnSize>
             <Text value=header weight=Text.Semibold height={Text.Px(18)} transform=Text.Uppercase />
           </Col>
         })
@@ -99,11 +99,11 @@ let make = (~headers=["Key", "Value"], ~rows) => {
     {rows
     ->Belt.Array.mapWithIndex((i, row) => {
       <div
-        key={"outerRow" ++ (i |> string_of_int)} className={CssJs.merge(. [Styles.tableSpacing])}>
+        key={"outerRow" ++ i->Belt.Int.toString} className={CssJs.merge(. [Styles.tableSpacing])}>
         <Row>
           {row
           ->Belt.Array.mapWithIndex((j, value) => {
-            <Col key={"innerRow" ++ (j |> string_of_int)} col=columnSize colSm=columnSize>
+            <Col key={"innerRow" ++ j->Belt.Int.toString} col=columnSize colSm=columnSize>
               {renderField(value, valueWidth)}
             </Col>
           })

@@ -44,7 +44,7 @@ module ConnectionOpenAck = {
 module ConnectionOpenConfirm = {
   @react.component
   let make = (~connectionID) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    // let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div
       className={CssJs.merge(. [
         CssHelper.flexBox(~wrap=#nowrap, ()),

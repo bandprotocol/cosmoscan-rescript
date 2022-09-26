@@ -1,28 +1,22 @@
 module Styles = {
-  open CssJs;
-  let titleSpacing = style(. [marginBottom(#px(26))]);
-  let idCointainer = style(. [marginBottom(#px(16))]);
-  let containerSpacingSm = style(. [Media.mobile([marginTop(#px(16))])]);
-  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))]);
+  open CssJs
+  let titleSpacing = style(. [marginBottom(#px(26))])
+  let idCointainer = style(. [marginBottom(#px(16))])
+  let containerSpacingSm = style(. [Media.mobile([marginTop(#px(16))])])
+  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
 
-  let relatedDSContainer =
-    style(. [
-      selector("> div + div", [marginTop(#px(16))]),
-      selector("> div > a", [marginRight(#px(8))]),
-    ]);
-};
+  let relatedDSContainer = style(. [
+    selector("> div + div", [marginTop(#px(16))]),
+    selector("> div > a", [marginRight(#px(8))]),
+  ])
+}
 
 module Content = {
   @react.component
-  let make =
-      (
-        ~oracleScriptSub: Sub.variant<OracleScriptSub.t>,
-        ~oracleScriptID,
-        ~hashtag,
-      ) => {
-    let statSub = OracleScriptSub.getResponseTime(oracleScriptID);
+  let make = (~oracleScriptSub: Sub.variant<OracleScriptSub.t>, ~oracleScriptID, ~hashtag) => {
+    let statSub = OracleScriptSub.getResponseTime(oracleScriptID)
 
-    let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <Section>
       <div className=CssHelper.container>
@@ -31,14 +25,14 @@ module Content = {
           <Col col=Col.Six>
             <div className={Css.merge(list{CssHelper.flexBox(), Styles.idCointainer})}>
               {switch oracleScriptSub {
-               | Data({id, name}) =>
-                 <>
-                   <TypeID.OracleScript id position=TypeID.Title />
-                   <HSpacing size=Spacing.sm />
-                   <Heading size=Heading.H3 value=name weight=Heading.Thin />
-                 </>
-               | _ => <LoadingCensorBar width=270 height=15 />
-               }}
+              | Data({id, name}) =>
+                <>
+                  <TypeID.OracleScript id position=TypeID.Title />
+                  <HSpacing size=Spacing.sm />
+                  <Heading size=Heading.H3 value=name weight=Heading.Thin />
+                </>
+              | _ => <LoadingCensorBar width=270 height=15 />
+              }}
             </div>
           </Col>
           <Col col=Col.Three colSm=Col.Six>
@@ -51,16 +45,16 @@ module Content = {
                 marginBottom=26
               />
               {switch oracleScriptSub {
-               | Data({requestCount}) =>
-                 <Text
-                   value={requestCount -> Format.iPretty}
-                   size=Text.Xxxl
-                   block=true
-                   weight=Text.Bold
-                   color={theme.textPrimary}
-                 />
-               | _ => <LoadingCensorBar width=100 height=15 />
-               }}
+              | Data({requestCount}) =>
+                <Text
+                  value={requestCount->Format.iPretty}
+                  size=Text.Xxxl
+                  block=true
+                  weight=Text.Bold
+                  color={theme.textPrimary}
+                />
+              | _ => <LoadingCensorBar width=100 height=15 />
+              }}
             </InfoContainer>
           </Col>
           <Col col=Col.Three colSm=Col.Six>
@@ -80,21 +74,20 @@ module Content = {
                 </CTooltip>
               </div>
               {switch statSub {
-               | Data(statOpt) =>
-                 <Text
-                   value={
-                     switch statOpt {
-                     | Some({responseTime}) => responseTime  -> Belt.Option.getExn  -> Format.fPretty(~digits=2)
-                     | None => "TBD"
-                     }
-                   }
-                   size=Text.Xxxl
-                   weight=Text.Bold
-                   block=true
-                   color={theme.textPrimary}
-                 />
-               | Error(_) | Loading | NoData => <LoadingCensorBar width=100 height=15 />
-               }}
+              | Data(statOpt) =>
+                <Text
+                  value={switch statOpt {
+                  | Some({responseTime}) =>
+                    responseTime->Belt.Option.getExn->Format.fPretty(~digits=2)
+                  | None => "TBD"
+                  }}
+                  size=Text.Xxxl
+                  weight=Text.Bold
+                  block=true
+                  color={theme.textPrimary}
+                />
+              | Error(_) | Loading | NoData => <LoadingCensorBar width=100 height=15 />
+              }}
             </InfoContainer>
           </Col>
         </Row>
@@ -107,10 +100,7 @@ module Content = {
                 <Col col=Col.Four mbSm=8>
                   <div className={CssHelper.flexBox()}>
                     <Heading
-                      value="Owner"
-                      size=Heading.H4
-                      weight=Heading.Thin
-                      color={theme.textSecondary}
+                      value="Owner" size=Heading.H4 weight=Heading.Thin color={theme.textSecondary}
                     />
                     <HSpacing size=Spacing.xs />
                     <CTooltip tooltipText="The owner of the oracle script">
@@ -119,11 +109,10 @@ module Content = {
                   </div>
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (oracleScriptSub) {
-                   | Data({owner}) =>
-                     <AddressRender address=owner position=AddressRender.Subtitle />
-                   | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
-                   }}
+                  {switch oracleScriptSub {
+                  | Data({owner}) => <AddressRender address=owner position=AddressRender.Subtitle />
+                  | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24>
@@ -144,28 +133,28 @@ module Content = {
                 <Col col=Col.Eight>
                   <div className=Styles.relatedDSContainer>
                     {switch oracleScriptSub {
-                     | Data({relatedDataSources}) =>
-                       relatedDataSources->Belt.List.size > 0
-                         ? relatedDataSources
-                           ->Belt.List.map(({dataSourceName, dataSourceID}) =>
-                               <div
-                                 key={dataSourceID -> ID.DataSource.toString}
-                                 className={CssHelper.flexBox()}>
-                                 <TypeID.DataSource id=dataSourceID position=TypeID.Subtitle />
-                                 <Text
-                                   value=dataSourceName
-                                   size=Text.Lg
-                                   block=true
-                                   color={theme.textPrimary}
-                                 />
-                               </div>
-                             )
-                           ->Belt.List.toArray
-                           ->React.array
-                         : <Text value="TBD" />
+                    | Data({relatedDataSources}) =>
+                      relatedDataSources->Belt.List.size > 0
+                        ? relatedDataSources
+                          ->Belt.List.map(({dataSourceName, dataSourceID}) =>
+                            <div
+                              key={dataSourceID->ID.DataSource.toString}
+                              className={CssHelper.flexBox()}>
+                              <TypeID.DataSource id=dataSourceID position=TypeID.Subtitle />
+                              <Text
+                                value=dataSourceName
+                                size=Text.Lg
+                                block=true
+                                color={theme.textPrimary}
+                              />
+                            </div>
+                          )
+                          ->Belt.List.toArray
+                          ->React.array
+                        : <Text value="TBD" />
 
-                     | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
-                     }}
+                    | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
+                    }}
                   </div>
                 </Col>
               </Row>
@@ -180,9 +169,9 @@ module Content = {
                 </Col>
                 <Col col=Col.Eight>
                   {switch oracleScriptSub {
-                   | Data({description}) => <Text value=description size=Text.Lg block=true />
-                   | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
-                   }}
+                  | Data({description}) => <Text value=description size=Text.Lg block=true />
+                  | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
+                  }}
                 </Col>
               </Row>
             </InfoContainer>
@@ -193,24 +182,21 @@ module Content = {
             tabs=[
               {
                 name: "Requests",
-                route:
-                  oracleScriptID -> ID.OracleScript.getRouteWithTab(Route.OracleScriptRequests),
+                route: oracleScriptID->ID.OracleScript.getRouteWithTab(Route.OracleScriptRequests),
               },
               {
                 name: "OWASM Code",
-                route:
-                  oracleScriptID -> ID.OracleScript.getRouteWithTab(Route.OracleScriptCode),
+                route: oracleScriptID->ID.OracleScript.getRouteWithTab(Route.OracleScriptCode),
               },
               {
                 name: "Bridge Code",
-                route:
-                  oracleScriptID
-                  -> ID.OracleScript.getRouteWithTab(Route.OracleScriptBridgeCode),
+                route: oracleScriptID->ID.OracleScript.getRouteWithTab(
+                  Route.OracleScriptBridgeCode,
+                ),
               },
               {
                 name: "Make New Request",
-                route:
-                  oracleScriptID -> ID.OracleScript.getRouteWithTab(Route.OracleScriptExecute),
+                route: oracleScriptID->ID.OracleScript.getRouteWithTab(Route.OracleScriptExecute),
               },
               // {
               //   name: "Revisions",
@@ -219,55 +205,55 @@ module Content = {
               //     -> ID.OracleScript.getRouteWithTab(Route.OracleScriptRevisions),
               // },
             ]
-            currentRoute={oracleScriptID -> ID.OracleScript.getRouteWithTab(hashtag)}>
+            currentRoute={oracleScriptID->ID.OracleScript.getRouteWithTab(hashtag)}>
             {switch hashtag {
-             | OracleScriptExecute =>
-               switch oracleScriptSub {
-               | Data({schema}) => <OracleScriptExecute id=oracleScriptID schema />
-               | Error(_) | Loading | NoData => <LoadingCensorBar.CircleSpin height=400 />
-               }
-             | OracleScriptCode =>
-               switch oracleScriptSub {
-               | Data({sourceCodeURL}) when sourceCodeURL !== "" =>
-                 <OracleScriptCode url=sourceCodeURL />
-               | Loading => <LoadingCensorBar.CircleSpin height=400 />
-               | Data(_) | Error(_) | NoData =>
-                 <EmptyContainer>
-                   <img
-                     src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
-                     className=Styles.noDataImage
-                     alt="Unable to access OWASM Code"
-                   />
-                   <Heading
-                     size=Heading.H4
-                     value="Unable to access OWASM Code"
-                     align=Heading.Center
-                     weight=Heading.Regular
-                     color={theme.textSecondary}
-                   />
-                 </EmptyContainer>
-               }
-             | OracleScriptBridgeCode =>
-               switch oracleScriptSub {
-               | Data({schema}) => <OracleScriptBridgeCode schema />
-               | Error(_) | Loading | NoData => <LoadingCensorBar.CircleSpin height=400 />
-               }
-             | OracleScriptRequests => <OracleScriptRequestTable oracleScriptID />
-             | OracleScriptRevisions => <OracleScriptRevisionTable id=oracleScriptID />
-             }}
+            | OracleScriptExecute =>
+              switch oracleScriptSub {
+              | Data({schema}) => <OracleScriptExecute id=oracleScriptID schema />
+              | Error(_) | Loading | NoData => <LoadingCensorBar.CircleSpin height=400 />
+              }
+            | OracleScriptCode =>
+              switch oracleScriptSub {
+              | Data({sourceCodeURL}) if sourceCodeURL !== "" =>
+                <OracleScriptCode url=sourceCodeURL />
+              | Loading => <LoadingCensorBar.CircleSpin height=400 />
+              | Data(_) | Error(_) | NoData =>
+                <EmptyContainer>
+                  <img
+                    src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
+                    className=Styles.noDataImage
+                    alt="Unable to access OWASM Code"
+                  />
+                  <Heading
+                    size=Heading.H4
+                    value="Unable to access OWASM Code"
+                    align=Heading.Center
+                    weight=Heading.Regular
+                    color={theme.textSecondary}
+                  />
+                </EmptyContainer>
+              }
+            | OracleScriptBridgeCode =>
+              switch oracleScriptSub {
+              | Data({schema}) => <OracleScriptBridgeCode schema />
+              | Error(_) | Loading | NoData => <LoadingCensorBar.CircleSpin height=400 />
+              }
+            | OracleScriptRequests => <OracleScriptRequestTable oracleScriptID />
+            //  | OracleScriptRevisions => <OracleScriptRevisionTable id=oracleScriptID />
+            }}
           </Tab.Route>
         </Table>
       </div>
-    </Section>;
-  };
-};
+    </Section>
+  }
+}
 
 @react.component
 let make = (~oracleScriptID, ~hashtag) => {
-  let oracleScriptSub = OracleScriptSub.get(oracleScriptID);
+  let oracleScriptSub = OracleScriptSub.get(oracleScriptID)
 
   switch oracleScriptSub {
   | NoData => <NotFound />
   | Data(_) | Error(_) | Loading => <Content oracleScriptSub oracleScriptID hashtag />
-  };
-};
+  }
+}

@@ -8,5 +8,5 @@ type reference_data_t = {
 @module("@bandprotocol/bandchain.js") @new external createClient: string => client_t = "Client"
 
 @send
-external getReferenceData: (client_t, array<string>) => Js.Promise.t<array<reference_data_t>> =
+external getReferenceData: (client_t, array<string>) => Promise.t<array<reference_data_t>> =
   "getReferenceData"

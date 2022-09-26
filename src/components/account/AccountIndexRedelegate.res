@@ -51,8 +51,7 @@ module RenderBody = {
         <Col col=Col.Three>
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch redelegateListSub {
-            | Data({amount}) =>
-              <Text value={amount |> Coin.getBandAmountFromCoin |> Format.fPretty} />
+            | Data({amount}) => <Text value={amount->Coin.getBandAmountFromCoin->Format.fPretty} />
             | _ => <LoadingCensorBar width=145 height=20 />
             }}
           </div>
@@ -83,11 +82,11 @@ module RenderBodyMobile = {
         amount,
       }) =>
       let key_ =
-        (srcAddress |> Address.toBech32) ++
-          ((dstAddress |> Address.toBech32) ++
-          ((completionTime |> MomentRe.Moment.toISOString) ++
-            ((amount |> Coin.getBandAmountFromCoin |> Js.Float.toString) ++
-            (reserveIndex |> string_of_int))))
+        srcAddress->Address.toBech32 ++
+          (dstAddress->Address.toBech32 ++
+          (completionTime->MomentRe.Moment.toISOString ++
+            (amount->Coin.getBandAmountFromCoin->Js.Float.toString ++
+            reserveIndex->Belt.Int.toString)))
       <MobileCard
         values={
           open InfoMobileCard
@@ -112,8 +111,8 @@ module RenderBodyMobile = {
             ("Redelegate\nComplete At", Loading(230)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
 }
@@ -122,7 +121,7 @@ module RenderBodyMobile = {
 let make = (~address) => {
   let isMobile = Media.isMobile()
   let currentTime =
-    React.useContext(TimeContext.context) |> MomentRe.Moment.format(Config.timestampUseFormat)
+    React.useContext(TimeContext.context)->MomentRe.Moment.format(Config.timestampUseFormat, _)
 
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 5
@@ -147,7 +146,7 @@ let make = (~address) => {
               <div className={CssHelper.flexBox()}>
                 <Text
                   block=true
-                  value={redelegateCount |> string_of_int}
+                  value={redelegateCount->Belt.Int.toString}
                   weight=Text.Semibold
                   size=Text.Sm
                   transform=Text.Uppercase
@@ -173,7 +172,7 @@ let make = (~address) => {
                 <div className={CssHelper.flexBox()}>
                   <Text
                     block=true
-                    value={redelegateCount |> string_of_int}
+                    value={redelegateCount->Belt.Int.toString}
                     weight=Text.Semibold
                     size=Text.Sm
                     transform=Text.Uppercase
@@ -225,13 +224,13 @@ let make = (~address) => {
     | Data(redelegateList) =>
       redelegateList->Belt.Array.size > 0
         ? redelegateList
-          ->Belt_Array.mapWithIndex((i, e) => {
+          ->Belt.Array.mapWithIndex((i, e) => {
             let componentKey =
-              (e.srcValidator.operatorAddress |> Address.toBech32) ++
-                ((e.dstValidator.operatorAddress |> Address.toBech32) ++
-                ((e.amount |> Coin.getBandAmountFromCoin |> Js.Float.toString) ++
-                  ((e.completionTime |> MomentRe.Moment.format(Config.timestampDisplayFormat)) ++
-                  (i |> string_of_int))))
+              e.srcValidator.operatorAddress->Address.toBech32 ++
+                (e.dstValidator.operatorAddress->Address.toBech32 ++
+                (e.amount->Coin.getBandAmountFromCoin->Js.Float.toString ++
+                  (e.completionTime->MomentRe.Moment.format(Config.timestampDisplayFormat, _) ++
+                  i->Belt.Int.toString)))
             isMobile
               ? <RenderBodyMobile
                   redelegateListSub={Sub.resolve(e)} reserveIndex=i key=componentKey
@@ -252,11 +251,11 @@ let make = (~address) => {
             />
           </EmptyContainer>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile redelegateListSub=noData reserveIndex=i key={i |> string_of_int} />
-          : <RenderBody redelegateListSub=noData key={i |> string_of_int} />
+          ? <RenderBodyMobile redelegateListSub=noData reserveIndex=i key={i->Belt.Int.toString} />
+          : <RenderBody redelegateListSub=noData key={i->Belt.Int.toString} />
       )
       ->React.array
     }}

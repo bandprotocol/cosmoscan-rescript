@@ -5,7 +5,9 @@ module Packet = {
     <>
       <SeperatedLine mt=24 mb=24 />
       <Row>
-        <Col mb=24> <Heading value="Packet" size=Heading.H4 color=theme.textSecondary /> </Col>
+        <Col mb=24>
+          <Heading value="Packet" size=Heading.H4 color=theme.textSecondary />
+        </Col>
         <Col col=Col.Six mb=24>
           <Heading
             value="Source Port"
@@ -79,7 +81,9 @@ module OracleRequestPacket = {
     <>
       <SeperatedLine mt=24 mb=24 />
       <Row>
-        <Col mb=24> <Heading value="Packet Data" size=Heading.H4 color=theme.textSecondary /> </Col>
+        <Col mb=24>
+          <Heading value="Packet Data" size=Heading.H4 color=theme.textSecondary />
+        </Col>
         <Col mb=24>
           <Heading
             value="Packet Type"
@@ -142,7 +146,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.textSecondary
           />
-          <Text value={request.prepareGas |> string_of_int} size=Text.Lg />
+          <Text value={request.prepareGas->Belt.Int.toString} size=Text.Lg />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -152,7 +156,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.textSecondary
           />
-          <Text value={request.executeGas |> string_of_int} size=Text.Lg />
+          <Text value={request.executeGas->Belt.Int.toString} size=Text.Lg />
         </Col>
         <Col mb=24>
           <div
@@ -164,15 +168,13 @@ module OracleRequestPacket = {
               value="Calldata" size=Heading.H4 weight=Heading.Regular color=theme.textSecondary
             />
             <CopyButton
-              data={request.calldata |> JsBuffer.toHex(~with0x=false)}
-              title="Copy as bytes"
-              width=125
+              data={request.calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
             />
           </div>
           {switch calldataKVsOpt {
           | Some(calldataKVs) =>
             <KVTable
-              rows={calldataKVs->Belt_Array.map(({fieldName, fieldValue}) => [
+              rows={calldataKVs->Belt.Array.map(({fieldName, fieldValue}) => [
                 KVTable.Value(fieldName),
                 KVTable.Value(fieldValue),
               ])}
@@ -197,7 +199,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.textSecondary
           />
-          <Text value={request.askCount |> string_of_int} size=Text.Lg />
+          <Text value={request.askCount->Belt.Int.toString} size=Text.Lg />
         </Col>
         <Col col=Col.Six>
           <Heading
@@ -207,7 +209,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.textSecondary
           />
-          <Text value={request.minCount |> string_of_int} size=Text.Lg />
+          <Text value={request.minCount->Belt.Int.toString} size=Text.Lg />
         </Col>
       </Row>
     </>
@@ -221,7 +223,9 @@ module FungibleTokenPacket = {
     <>
       <SeperatedLine mt=24 mb=24 />
       <Row>
-        <Col mb=24> <Heading value="Packet Data" size=Heading.H4 color=theme.textSecondary /> </Col>
+        <Col mb=24>
+          <Heading value="Packet Data" size=Heading.H4 color=theme.textSecondary />
+        </Col>
         <Col mb=24>
           <Heading
             value="Packet Type"
@@ -261,7 +265,7 @@ module FungibleTokenPacket = {
             color=theme.textSecondary
           />
           <Text
-            value={(token.amount |> string_of_int) ++ (" " ++ token.denom)}
+            value={token.amount->Belt.Int.toString ++ (" " ++ token.denom)}
             code=true
             size=Text.Md
             nowrap=true
@@ -292,13 +296,11 @@ module RecvPacketSuccess = {
       </Row>
       <IndexIBCUtils.ProofHeight proofHeight=packet.proofHeight />
       <Packet packet=packet.packet />
-      {switch packet.packetData {
-      | Some({packetDetail, packetType}) =>
-        switch packetDetail {
-        | OracleRequestPacket(packet) => <OracleRequestPacket request=packet packetType />
-        | FungibleTokenPacket(packet) => <FungibleTokenPacket token=packet packetType />
-        | _ => React.null
-        }
+      {switch packet.packetData.packetDetail {
+      | OracleRequestPacket(request) =>
+        <OracleRequestPacket request packetType=packet.packetData.packetType />
+      | FungibleTokenPacket(token) =>
+        <FungibleTokenPacket token packetType=packet.packetData.packetType />
       | _ => React.null
       }}
     </>

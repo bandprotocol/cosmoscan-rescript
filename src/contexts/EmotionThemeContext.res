@@ -8,10 +8,10 @@ let context = React.createContext(ContextHelper.default)
 
 let getThemeMode = () => {
   LocalStorage.getItem(keyword)
-  -> Belt.Option.flatMap( local => {
+  ->Belt.Option.flatMap(local => {
     local == "dark" ? Some(EmotionTheme.Dark) : Some(Day)
   })
-  |> Belt.Option.getWithDefault(_, Day)
+  ->Belt.Option.getWithDefault(Day)
 }
 
 let setThemeMode = x =>
@@ -37,7 +37,7 @@ let make = (~children) => {
     )
 
   let theme = React.useMemo1(() => EmotionTheme.get(mode), [mode])
-  let data = {isDarkMode: mode == Dark, theme: theme}
+  let data = {isDarkMode: mode == Dark, theme}
 
   React.createElement(
     React.Context.provider(context),

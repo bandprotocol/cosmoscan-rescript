@@ -5,11 +5,12 @@ module Styles = {
   let avatarSm = width_ => style(. [Media.mobile([width(px(width_))])])
 }
 
-let decodeThem = json =>
-  json |> JsonUtils.Decode.at(list{"pictures", "primary", "url"}, JsonUtils.Decode.string)
+let decodeThem = JsonUtils.Decode.at(list{"pictures", "primary", "url"}, JsonUtils.Decode.string)
 
 let decode = json =>
-  json |> JsonUtils.Decode.field("them", JsonUtils.Decode.array(decodeThem)) |> Belt.Array.get(_, 0)
+  json
+  ->JsonUtils.Decode.mustDecode(JsonUtils.Decode.field("them", JsonUtils.Decode.array(decodeThem)))
+  ->Belt.Array.get(0)
 
 module Placeholder = {
   @react.component
@@ -28,7 +29,7 @@ module Keybase = {
     )
     switch resOpt {
     | Some(res) =>
-      switch res |> decode {
+      switch res->decode {
       | Some(url) =>
         Some(
           <img

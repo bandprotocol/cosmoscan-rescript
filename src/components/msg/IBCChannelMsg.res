@@ -44,7 +44,7 @@ module ChannelOpenAck = {
 module ChannelOpenConfirm = {
   @react.component
   let make = (~channelID) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    // let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div
       className={CssJs.merge(. [
         CssHelper.flexBox(~wrap=#nowrap, ()),
@@ -59,7 +59,7 @@ module ChannelOpenConfirm = {
 module ChannelCloseCommon = {
   @react.component
   let make = (~channelID) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    // let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div
       className={CssJs.merge(. [
         CssHelper.flexBox(~wrap=#nowrap, ()),

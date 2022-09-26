@@ -190,7 +190,7 @@ let make = (
       </span>
     : <Tooltip
         title=tooltipItem
-        placement={tooltipPlacement |> toPlacementString}
+        placement={tooltipPlacement->toPlacementString}
         arrow=true
         leaveDelay=tooltipLeaveDelay
         enterTouchDelay=0

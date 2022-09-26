@@ -21,7 +21,7 @@ let make = (~data, ~title, ~width=105, ~py=5, ~px=10, ~pySm=py, ~pxSm=px) => {
     <div className={CssHelper.flexBox(~align=#center, ~justify=#center, ())}>
       {copied ? <Icon name="fal fa-check" size=12 /> : <Icon name="far fa-clone" size=12 />}
       <HSpacing size=Spacing.sm />
-      {title |> React.string}
+      {title->React.string}
     </div>
   </Button>
 }

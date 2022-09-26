@@ -59,7 +59,7 @@ let compareString = (a, b) => {
   // let removeEmojiRegex = %re("/([\u2700-\u27BF]|[\uE000-\uF8FF]|/g")
   let a_ = a->Js.String2.replaceByRe(removeEmojiRegex, "")
   let b_ = b->Js.String2.replaceByRe(removeEmojiRegex, "")
-  Js.String.localeCompare(a_, b_)->int_of_float
+  Js.String2.localeCompare(a_, b_)->int_of_float
 }
 
 let defaultCompare = (a: ValidatorSub.t, b: ValidatorSub.t) =>
@@ -107,7 +107,8 @@ let addUptimeOnValidators = (
         Address.isEqual(validator.consensusAddress, consensusAddress) && voted == true
       )
       ->Belt.Array.get(0)
-      ->Belt.Option.mapWithDefault(0, ({count}) => count) |> float_of_int
+      ->Belt.Option.mapWithDefault(0, ({count}) => count)
+      ->float_of_int
 
     let missedBlock =
       votesBlock
@@ -115,7 +116,8 @@ let addUptimeOnValidators = (
         Address.isEqual(validator.consensusAddress, consensusAddress) && voted == false
       )
       ->Belt.Array.get(0)
-      ->Belt.Option.mapWithDefault(0, ({count}) => count) |> float_of_int
+      ->Belt.Option.mapWithDefault(0, ({count}) => count)
+      ->float_of_int
 
     {
       ...validator,
@@ -147,7 +149,7 @@ module SortableTHead = {
         size=Text.Sm
         weight=Text.Semibold
         transform=Text.Uppercase
-        tooltipItem={tooltipItem->Belt_Option.mapWithDefault(React.null, React.string)}
+        tooltipItem={tooltipItem->Belt.Option.mapWithDefault(React.null, React.string)}
         tooltipPlacement
       />
       <HSpacing size=Spacing.xs />
@@ -175,7 +177,7 @@ module RenderBody = {
       <Row alignItems=Row.Center>
         <Col col=Col.One>
           {switch validatorSub {
-          | Data(_) => <Text value={rank |> string_of_int} block=true />
+          | Data(_) => <Text value={rank->Belt.Int.toString} block=true />
           | _ => <LoadingCensorBar width=20 height=15 />
           }}
         </Col>
@@ -193,10 +195,10 @@ module RenderBody = {
           | Data({tokens}) =>
             <div>
               <Text
-                value={tokens |> Coin.getBandAmountFromCoin |> Format.fPretty(~digits=0)} block=true
+                value={tokens->Coin.getBandAmountFromCoin->Format.fPretty(~digits=0)} block=true
               />
               <VSpacing size=Spacing.sm />
-              <Text value={"(" ++ (votingPower |> Format.fPercent(~digits=2)) ++ ")"} block=true />
+              <Text value={"(" ++ votingPower->Format.fPercent(~digits=2) ++ ")"} block=true />
             </div>
           | _ =>
             <>
@@ -208,8 +210,7 @@ module RenderBody = {
         </Col>
         <Col col=Col.Two>
           {switch validatorSub {
-          | Data({commission}) =>
-            <Text value={commission |> Format.fPercent(~digits=2)} block=true />
+          | Data({commission}) => <Text value={commission->Format.fPercent(~digits=2)} block=true />
           | _ => <LoadingCensorBar width=70 height=15 />
           }}
         </Col>
@@ -219,7 +220,7 @@ module RenderBody = {
             switch uptime {
             | Some(uptime') =>
               <>
-                <Text value={uptime' |> Format.fPercent(~digits=2)} block=true />
+                <Text value={uptime'->Format.fPercent(~digits=2)} block=true />
                 <VSpacing size=Spacing.sm />
                 <ProgressBar.Uptime percent=uptime' />
               </>
@@ -258,13 +259,13 @@ module RenderBody = {
                         commission == 100.
                           ? {
                               open Webapi.Dom
-                              window -> Window.alert(
+                              window->Window.alert(
                                 "Delegation to foundation validator nodes is not advised.",
                               )
                             }
                           : delegate()
                       }}>
-                      {"Delegate" |> React.string}
+                      {"Delegate"->React.string}
                     </Button>
                   | _ => <LoadingCensorBar width=90 height=33 radius=8 />
                   }}
@@ -294,8 +295,8 @@ module RenderBodyMobile = {
             ("Oracle Status", Status(oracleStatus)),
           ]
         }
-        key={rank |> string_of_int}
-        idx={rank |> string_of_int}
+        key={rank->Belt.Int.toString}
+        idx={rank->Belt.Int.toString}
       />
     | _ =>
       <MobileCard
@@ -310,8 +311,8 @@ module RenderBodyMobile = {
             ("Oracle Status", Loading(20)),
           ]
         }
-        key={rank |> string_of_int}
-        idx={rank |> string_of_int}
+        key={rank->Belt.Int.toString}
+        idx={rank->Belt.Int.toString}
       />
     }
   }
@@ -396,26 +397,26 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
     | Sub.Data(((_, _, bondedTokenCount: Coin.t, _, _), rawValidators, votesBlock)) =>
       let validators = addUptimeOnValidators(rawValidators, votesBlock)
       let filteredValidator =
-        searchTerm |> Js.String.length == 0
+        searchTerm->Js.String2.length == 0
           ? validators
-          : validators->Belt_Array.keep(validator => {
-              Js.String.includes(searchTerm, validator.moniker |> Js.String.toLowerCase)
+          : validators->Belt.Array.keep(validator => {
+              Js.String2.includes(searchTerm, validator.moniker->Js.String2.toLowerCase)
             })
       <>
-        {filteredValidator->Belt_Array.size > 0
+        {filteredValidator->Belt.Array.size > 0
           ? filteredValidator
             ->sorting(sortedBy)
-            ->Belt_Array.map(e => {
+            ->Belt.Array.map(e => {
               let votingPower = e.votingPower /. bondedTokenCount.amount *. 100.
               isMobile
                 ? <RenderBodyMobile
-                    key={e.rank |> string_of_int}
+                    key={e.rank->Belt.Int.toString}
                     rank={e.rank}
                     validatorSub={Sub.resolve(e)}
                     votingPower
                   />
                 : <RenderBody
-                    key={e.rank |> string_of_int}
+                    key={e.rank->Belt.Int.toString}
                     rank={e.rank}
                     validatorSub={Sub.resolve(e)}
                     votingPower
@@ -440,12 +441,14 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
             </EmptyContainer>}
       </>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile key={i |> string_of_int} rank=i validatorSub=noData votingPower=1.0 />
+          ? <RenderBodyMobile
+              key={i->Belt.Int.toString} rank=i validatorSub=noData votingPower=1.0
+            />
           : <RenderBody
-              key={i |> string_of_int}
+              key={i->Belt.Int.toString}
               rank=i
               validatorSub=noData
               votingPower=1.0
