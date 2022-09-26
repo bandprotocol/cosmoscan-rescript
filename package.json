@@ -12,7 +12,7 @@
     "test": "yarn jest --coverage"
   },
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.7.0",
+    "@glennsl/rescript-jest": "^0.9.2",
     "@reasonml-community/graphql-ppx": "^1.2.2",
     "@webpack-cli/serve": "^1.5.1",
     "css-loader": "^6.7.1",
@@ -30,7 +30,7 @@
     "@apollo/client": "^3.6.9",
     "@bandprotocol/bandchain.js": "^1.2.1",
     "@cosmostation/cosmosjs": "0.5.5",
-    "@glennsl/bs-json": "^5.0.4",
+    "@glennsl/rescript-json-combinators": "^1.0.0",
     "@ledgerhq/hw-transport-webhid": "^6.4.1",
     "@ledgerhq/hw-transport-webusb": "^6.3.0",
     "@material-ui/core": "^4.12.3",

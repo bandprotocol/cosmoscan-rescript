@@ -6,7 +6,7 @@ type t = {
 let day = 86400
 
 let parse = (~oracleStatusReports, ~startDate, ()) => {
-  let normalizedDateReports = oracleStatusReports->Belt_List.map(({timestamp, status}) =>
+  let normalizedDateReports = oracleStatusReports->Belt.List.map(({timestamp, status}) =>
     if status {
       {
         timestamp: (timestamp / day + 1) * day,
@@ -22,9 +22,9 @@ let parse = (~oracleStatusReports, ~startDate, ()) => {
 
   let addedHeadNormalizedDateReports =
     normalizedDateReports
-    ->Belt_List.add({
+    ->Belt.List.add({
       timestamp: startDate,
-      status: !(normalizedDateReports->Belt_List.headExn).status,
+      status: !(normalizedDateReports->Belt.List.headExn).status,
     })
     ->Belt.List.sort(({timestamp: t1, status: s1}, {timestamp: t2, _}) =>
       switch compare(t1, t2) {
@@ -35,13 +35,13 @@ let parse = (~oracleStatusReports, ~startDate, ()) => {
 
   let addedTailNormalizedReports =
     normalizedDateReports
-    ->Belt_List.concat(list{
+    ->Belt.List.concat(list{
       {
         timestamp: MomentRe.momentNow()
-        |> MomentRe.Moment.defaultUtc
-        |> MomentRe.Moment.startOf(#day)
-        |> MomentRe.Moment.add(~duration=MomentRe.duration(1., #days))
-        |> MomentRe.Moment.toUnix,
+        ->MomentRe.Moment.defaultUtc
+        ->MomentRe.Moment.startOf(#day, _)
+        ->MomentRe.Moment.add(~duration=MomentRe.duration(1., #days))
+        ->MomentRe.Moment.toUnix,
         // Note: this status can be whatever.
         status: false,
       },
@@ -53,15 +53,15 @@ let parse = (~oracleStatusReports, ~startDate, ()) => {
       }
     )
 
-  let optimizedDate = addedHeadNormalizedDateReports->Belt_List.zip(addedTailNormalizedReports)
+  let optimizedDate = addedHeadNormalizedDateReports->Belt.List.zip(addedTailNormalizedReports)
 
   let parsedDate =
     optimizedDate
-    ->Belt_List.map(each => {
+    ->Belt.List.map(each => {
       let ({timestamp: st, status}, {timestamp: en, _}) = each
-      Belt_List.makeBy((en - st) / day, idx => {timestamp: st + day * idx, status: status})
+      Belt.List.makeBy((en - st) / day, idx => {timestamp: st + day * idx, status})
     })
-    ->Belt_List.flatten
+    ->Belt.List.flatten
     ->Belt.List.toArray
     ->Belt.Array.sliceToEnd(1)
 

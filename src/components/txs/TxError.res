@@ -19,39 +19,47 @@ type err_t = {log: option<string>}
 
 let decodeLog = json => {
   open JsonUtils.Decode
-  {message: json |> field("message", string)}
+  json->mustDecode(field("message", string))
 }
 
 let decode = json => {
   open JsonUtils.Decode
-  {log: json |> optional(field("log", string))}
+  json->mustDecode(option(field("log", string)))
 }
 
-let parseErr = msg => {
-  let err =
-    msg
-    -> Json.parse
-    -> Belt.Option.flatMap(json =>
-      json
-      -> Js.Json.decodeArray
-      -> Belt.Option.flatMap(x =>
-        x->Belt.Array.get(0)
-          -> Belt.Option.flatMap(y =>
-            (y -> decode).log -> Belt.Option.flatMap( logStr => {
-              logStr
-              -> Json.parse
-              -> Belt.Option.flatMap( logJson => {
-                let log = logJson -> decodeLog
-                Some(log.message)
-              })
-            })
-          )
-      )
-    )
-    -> Belt.Option.getWithDefault(_, msg)
+// let parseErr = msg => {
+//   let err =
+//     msg
+//     ->Json.parse
+//     ->Belt.Result.flatMap(json =>
+//       json
+//       ->Js.Json.decodeArray
+//       ->Belt.Option.flatMap(x =>
+//         x
+//         ->Belt.Array.get(0)
+//         ->Belt.Option.flatMap(
+//           y =>
+//             y
+//             ->decode
+//             ->Belt.Option.flatMap(
+//               logStr => {
+//                 Some(
+//                   logStr
+//                   ->Json.parse
+//                   ->Belt.Result.flatMap(logJson => Ok(logJson->decodeLog))
+//                   ->Belt.Result.getExn,
+//                 )
+//               },
+//             ),
+//         )
+//       )
+//     )
+//     ->Belt.Result.getWithDefault(msg)
 
-  "Error: " ++ err
-}
+//   "Error: " ++ err
+// }
+
+let parseErr = msg => msg
 
 module Full = {
   @react.component
@@ -65,7 +73,7 @@ module Full = {
       })}>
       <Icon name="fal fa-exclamation-circle" size=14 color=theme.failColor />
       <Text
-        value={msg -> parseErr}
+        value={msg->parseErr}
         size=Text.Lg
         spacing=Text.Em(0.02)
         breakAll=true
@@ -80,6 +88,6 @@ module Mini = {
   let make = (~msg) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    <Text value={msg -> parseErr} code=true size=Text.Sm breakAll=true color=theme.failColor />
+    <Text value={msg->parseErr} code=true size=Text.Sm breakAll=true color=theme.failColor />
   }
 }

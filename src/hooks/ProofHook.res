@@ -2,18 +2,21 @@ module Proof = {
   type t = {
     jsonProof: Js.Json.t,
     evmProofBytes: JsBuffer.t,
-  };
+  }
 
-  let decodeProof = json => {
+  let decodeProof = {
     open JsonUtils.Decode
-    {
-      jsonProof: json |> at(list{"result", "proof"}, json => json),
-      evmProofBytes: json |> at(list{"result", "evm_proof_bytes"}, string) |> JsBuffer.fromHex,
-    }
-  };
-};
+    buildObject(json => {
+      jsonProof: json.at(list{"result", "proof"}, id),
+      evmProofBytes: json.at(
+        list{"result", "evm_proof_bytes"},
+        string->map((. a) => JsBuffer.fromHex(a)),
+      ),
+    })
+  }
+}
 
 let get = (requestId: ID.Request.t) => {
-  let (json, reload) = AxiosHooks.useWithReload({j`oracle/proof/$requestId`});
-  (json -> Belt.Option.map(Proof.decodeProof), reload);
-};
+  let (json, reload) = AxiosHooks.useWithReload({j`oracle/proof/$requestId`})
+  (json->Belt.Option.map(json => JsonUtils.Decode.mustDecode(json, Proof.decodeProof)), reload)
+}

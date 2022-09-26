@@ -127,7 +127,10 @@ module EditDataSourceMsg = {
           <TypeID.DataSource position=TypeID.Subtitle id=dataSource.id />
           {dataSource.name == Config.doNotModify
             ? React.null
-            : <> <HSpacing size=Spacing.sm /> <Text value=dataSource.name size=Text.Lg /> </>}
+            : <>
+                <HSpacing size=Spacing.sm />
+                <Text value=dataSource.name size=Text.Lg />
+              </>}
         </div>
       </Col>
       <Col col=Col.Six mbSm=24>
@@ -243,7 +246,10 @@ module EditOracleScriptMsg = {
           <TypeID.OracleScript position=TypeID.Subtitle id=oracleScript.id />
           {oracleScript.name == Config.doNotModify
             ? React.null
-            : <> <HSpacing size=Spacing.sm /> <Text value=oracleScript.name size=Text.Lg /> </>}
+            : <>
+                <HSpacing size=Spacing.sm />
+                <Text value=oracleScript.name size=Text.Lg />
+              </>}
         </div>
       </Col>
     </Row>
@@ -308,7 +314,7 @@ module RequestMsg = {
           marginBottom=8
           color=theme.textSecondary
         />
-        <Text value={request.prepareGas |> string_of_int} size=Text.Lg />
+        <Text value={request.prepareGas->Belt.Int.toString} size=Text.Lg />
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
@@ -318,7 +324,7 @@ module RequestMsg = {
           marginBottom=8
           color=theme.textSecondary
         />
-        <Text value={request.executeGas |> string_of_int} size=Text.Lg />
+        <Text value={request.executeGas->Belt.Int.toString} size=Text.Lg />
       </Col>
       <Col mb=24>
         <div
@@ -330,13 +336,13 @@ module RequestMsg = {
             value="Calldata" size=Heading.H4 weight=Heading.Regular color=theme.textSecondary
           />
           <CopyButton
-            data={request.calldata |> JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
+            data={request.calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
           />
         </div>
         {switch calldataKVsOpt {
         | Some(calldataKVs) =>
           <KVTable
-            rows={calldataKVs->Belt_Array.map(({fieldName, fieldValue}) => [
+            rows={calldataKVs->Belt.Array.map(({fieldName, fieldValue}) => [
               KVTable.Value(fieldName),
               KVTable.Value(fieldValue),
             ])}
@@ -361,7 +367,7 @@ module RequestMsg = {
           marginBottom=8
           color=theme.textSecondary
         />
-        <Text value={request.askCount |> string_of_int} size=Text.Lg />
+        <Text value={request.askCount->Belt.Int.toString} size=Text.Lg />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -371,7 +377,7 @@ module RequestMsg = {
           marginBottom=8
           color=theme.textSecondary
         />
-        <Text value={request.minCount |> string_of_int} size=Text.Lg />
+        <Text value={request.minCount->Belt.Int.toString} size=Text.Lg />
       </Col>
     </Row>
   }
@@ -422,7 +428,7 @@ module RequestFailMsg = {
           marginBottom=8
           color=theme.textSecondary
         />
-        <Text value={request.prepareGas |> string_of_int} size=Text.Lg />
+        <Text value={request.prepareGas->Belt.Int.toString} size=Text.Lg />
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
@@ -432,7 +438,7 @@ module RequestFailMsg = {
           marginBottom=8
           color=theme.textSecondary
         />
-        <Text value={request.executeGas |> string_of_int} size=Text.Lg />
+        <Text value={request.executeGas->Belt.Int.toString} size=Text.Lg />
       </Col>
       <Col mb=24>
         <Heading
@@ -443,9 +449,9 @@ module RequestFailMsg = {
           color=theme.textSecondary
         />
         <div className={CssHelper.flexBox()}>
-          <Text value={request.calldata |> JsBuffer.toHex} size=Text.Lg />
+          <Text value={request.calldata->JsBuffer.toHex} size=Text.Lg />
           <HSpacing size=Spacing.sm />
-          <CopyRender width=14 message={request.calldata |> JsBuffer.toHex} />
+          <CopyRender width=14 message={request.calldata->JsBuffer.toHex} />
         </div>
       </Col>
       <Col col=Col.Six mbSm=24>
@@ -456,7 +462,7 @@ module RequestFailMsg = {
           marginBottom=8
           color=theme.textSecondary
         />
-        <Text value={request.askCount |> string_of_int} size=Text.Lg />
+        <Text value={request.askCount->Belt.Int.toString} size=Text.Lg />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -466,7 +472,7 @@ module RequestFailMsg = {
           marginBottom=8
           color=theme.textSecondary
         />
-        <Text value={request.minCount |> string_of_int} size=Text.Lg />
+        <Text value={request.minCount->Belt.Int.toString} size=Text.Lg />
       </Col>
     </Row>
   }
@@ -508,12 +514,12 @@ module ReportMsg = {
         <KVTable
           headers=["External Id", "Exit Code", "Value"]
           rows={report.rawReports
-          |> Belt_List.toArray
-          |> Belt_Array.map(_, rawReport => [
-            KVTable.Value(rawReport.externalDataID |> string_of_int),
-            KVTable.Value(rawReport.exitCode |> string_of_int),
-            KVTable.Value(rawReport.data |> JsBuffer.toUTF8),
-          ])}
+          ->Belt.List.map(rawReport => [
+            KVTable.Value(rawReport.externalDataID->Belt.Int.toString),
+            KVTable.Value(rawReport.exitCode->Belt.Int.toString),
+            KVTable.Value(rawReport.data->JsBuffer.toUTF8),
+          ])
+          ->Belt.List.toArray}
         />
       </Col>
     </Row>

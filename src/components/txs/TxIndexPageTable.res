@@ -112,7 +112,7 @@ module MsgDetailCard = {
   @react.component
   let make = (~msg: MsgDecoder.t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    let badgeTheme = msg |> MsgDecoder.getBadgeTheme
+    let badgeTheme = msg->MsgDecoder.getBadgeTheme
     let (showJson, setShowJson) = React.useState(_ => false)
     let toggle = () => setShowJson(prev => !prev)
 
@@ -129,8 +129,13 @@ module MsgDetailCard = {
         </div>
       </div>
       {showJson
-        ? <div className={CssHelper.mt(~size=32, ())}> <JsonViewer src=msg.raw /> </div>
-        : <> <SeperatedLine mt=32 mb=24 /> {renderBody(msg)} </>}
+        ? <div className={CssHelper.mt(~size=32, ())}>
+            <JsonViewer src=msg.raw />
+          </div>
+        : <>
+            <SeperatedLine mt=32 mb=24 />
+            {renderBody(msg)}
+          </>}
     </InfoContainer>
   }
 }
@@ -140,8 +145,8 @@ let make = (~messages: list<MsgDecoder.t>) =>
   <div className=Styles.msgContainer>
     {messages
     ->Belt.List.mapWithIndex((index, msg) => {
-      let badgeTheme = msg |> MsgDecoder.getBadgeTheme
-      <MsgDetailCard key={(index |> string_of_int) ++ badgeTheme.name} msg />
+      let badgeTheme = msg->MsgDecoder.getBadgeTheme
+      <MsgDetailCard key={index->Belt.Int.toString ++ badgeTheme.name} msg />
     })
     ->Array.of_list
     ->React.array}
@@ -159,13 +164,16 @@ module Loading = {
       </div>
       <Row>
         <Col col=Col.Six mb=24>
-          <LoadingCensorBar width=75 height=15 mb=8 /> <LoadingCensorBar width=150 height=15 />
+          <LoadingCensorBar width=75 height=15 mb=8 />
+          <LoadingCensorBar width=150 height=15 />
         </Col>
         <Col col=Col.Six mb=24>
-          <LoadingCensorBar width=75 height=15 mb=8 /> <LoadingCensorBar width=150 height=15 />
+          <LoadingCensorBar width=75 height=15 mb=8 />
+          <LoadingCensorBar width=150 height=15 />
         </Col>
         <Col col=Col.Six>
-          <LoadingCensorBar width=75 height=15 mb=8 /> <LoadingCensorBar width=150 height=15 />
+          <LoadingCensorBar width=75 height=15 mb=8 />
+          <LoadingCensorBar width=150 height=15 />
         </Col>
       </Row>
     </InfoContainer>

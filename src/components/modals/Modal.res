@@ -108,16 +108,14 @@ let make = () => {
           id="closeModal" onClick={_ => canExit ? closeModal() : ()} className=Styles.closeButton>
           <Icon name="fal fa-times" color=theme.textPrimary size=18 />
         </div>
-        {
-          //TODO: Will patch the modal component later
-          switch modal {
-          | Connect(_) => "Connect" |> React.string
-          | SubmitTx(_) => "SubmitTx" |> React.string
-          | QRCode(_) => "QRCode" |> React.string
-          | IBCPacketError(_) => "Connect" |> React.string
-          | Syncing => "Sync" |> React.string
-          }
-        }
+        {switch //TODO: Will patch the modal component later
+        modal {
+        | Connect(_) => "Connect"->React.string
+        | SubmitTx(_) => "SubmitTx"->React.string
+        | QRCode(_) => "QRCode"->React.string
+        | IBCPacketError(_) => "Connect"->React.string
+        | Syncing => "Sync"->React.string
+        }}
       </div>
     </div>
   }

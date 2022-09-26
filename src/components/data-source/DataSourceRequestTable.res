@@ -3,12 +3,18 @@ module Styles = {
 
   let tableWrapper = style(. [Media.mobile([padding2(~v=#px(16), ~h=#zero)])])
   let icon = style(. [width(#px(80)), height(#px(80))])
+  let iconWrapper = style(. [
+    width(#percent(100.)),
+    display(#flex),
+    flexDirection(#column),
+    alignItems(#center),
+  ])
   let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
 }
 
 module RenderBody = {
   @react.component
-  let make = (~requestsSub: Sub.variant<RequestSub.Mini.t>) => {
+  let make = (~requestsSub: Sub.variant<RequestSub.Mini.t>, ~theme: Theme.t) => {
     <TBody>
       <Row alignItems=Row.Center>
         <Col col=Col.Two>
@@ -17,32 +23,40 @@ module RenderBody = {
           | _ => <LoadingCensorBar width=135 height=15 />
           }}
         </Col>
-        <Col col=Col.Four>
+        <Col col=Col.Two>
           {switch requestsSub {
-          | Data({txHash}) =>
-            switch txHash {
-            | Some(txHash') => <TxLink txHash=txHash' width=230 weight=Text.Medium />
-            | None => <Text value="Syncing" size=Text.Md weight=Text.Medium />
-            }
-          | _ => <LoadingCensorBar width=230 height=15 />
+          | Data({feeEarned}) => <AmountRender coins=list{feeEarned} />
+          | _ => <LoadingCensorBar width=100 height=15 />
           }}
         </Col>
         <Col col=Col.Three>
+          {switch requestsSub {
+          | Data({oracleScriptID, oracleScriptName}) =>
+            <div className={CssHelper.flexBox()}>
+              <TypeID.OracleScript id=oracleScriptID />
+              <HSpacing size=Spacing.sm />
+              <Text value=oracleScriptName ellipsis=true color={theme.textPrimary} />
+            </div>
+          | _ => <LoadingCensorBar width=212 height=15 />
+          }}
+        </Col>
+        <Col col=Col.Two>
           {switch requestsSub {
           | Data({minCount, askCount, reportsCount}) =>
             <ProgressBar
               reportedValidators=reportsCount minimumValidators=minCount requestValidators=askCount
             />
-          | _ => <LoadingCensorBar width=212 height=15 />
+          | _ => <LoadingCensorBar width=168 height=15 />
           }}
         </Col>
         <Col col=Col.One>
-          <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-            {switch requestsSub {
-            | Data({resolveStatus}) => <RequestStatus resolveStatus />
-            | _ => <LoadingCensorBar width=100 height=15 />
-            }}
-          </div>
+          {switch requestsSub {
+          | Data({resolveStatus}) =>
+            <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+              <RequestStatus resolveStatus />
+            </div>
+          | _ => <LoadingCensorBar width=60 height=15 />
+          }}
         </Col>
         <Col col=Col.Two>
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
@@ -55,7 +69,8 @@ module RenderBody = {
                 />
               | None => <Text value="Syncing" />
               }
-            | _ => <LoadingCensorBar width=100 height=15 />
+
+            | _ => <LoadingCensorBar width=120 height=15 />
             }}
           </div>
         </Col>
@@ -68,21 +83,24 @@ module RenderBodyMobile = {
   @react.component
   let make = (~reserveIndex, ~requestsSub: Sub.variant<RequestSub.Mini.t>) => {
     switch requestsSub {
-    | Data({id, txTimestamp, txHash, minCount, askCount, reportsCount, resolveStatus}) =>
+    | Data({
+        id,
+        txTimestamp,
+        oracleScriptID,
+        oracleScriptName,
+        minCount,
+        askCount,
+        reportsCount,
+        resolveStatus,
+        feeEarned,
+      }) =>
       <MobileCard
         values={
           open InfoMobileCard
           [
             ("Request ID", RequestID(id)),
-            (
-              "Tx Hash",
-              {
-                switch txHash {
-                | Some(txHash') => TxHash(txHash', 200)
-                | None => Text("Syncing")
-                }
-              },
-            ),
+            ("Fee Earned\n(BAND)", Coin({value: list{feeEarned}, hasDenom: false})),
+            ("Oracle Script", OracleScript(oracleScriptID, oracleScriptName)),
             (
               "Report Status",
               ProgressBar({
@@ -110,7 +128,8 @@ module RenderBodyMobile = {
           open InfoMobileCard
           [
             ("Request ID", Loading(70)),
-            ("Tx Hash", Loading(136)),
+            ("Fee Earned\n(BAND)", Loading(80)),
+            ("Oracle Script", Loading(136)),
             ("Report Status", Loading(20)),
             ("Timestamp", Loading(166)),
           ]
@@ -123,12 +142,12 @@ module RenderBodyMobile = {
 }
 
 @react.component
-let make = (~oracleScriptID: ID.OracleScript.t) => {
+let make = (~dataSourceID: ID.DataSource.t) => {
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 5
 
-  let requestsSub = RequestSub.Mini.getListByOracleScript(oracleScriptID, ~pageSize, ~page, ())
-  let totalRequestCountSub = RequestSub.countByOracleScript(oracleScriptID)
+  let requestsSub = RequestSub.Mini.getListByDataSource(dataSourceID, ~pageSize, ~page)
+  let totalRequestCountSub = RequestSub.countByDataSource(dataSourceID)
 
   let isMobile = Media.isMobile()
 
@@ -160,56 +179,68 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                 </div>
               </Col>
             </Row>
-          : <THead>
-              <Row alignItems=Row.Center>
-                <Col col=Col.Two>
-                  <div className={CssHelper.flexBox()}>
+          : <>
+              <THead>
+                <Row alignItems=Row.Center>
+                  <Col col=Col.Two>
+                    <div className={CssHelper.flexBox()}>
+                      <Text
+                        block=true
+                        value={totalRequestCount->Format.iPretty}
+                        weight=Text.Semibold
+                        transform=Text.Uppercase
+                        size=Text.Sm
+                      />
+                      <HSpacing size=Spacing.xs />
+                      <Text
+                        block=true
+                        value="Requests"
+                        weight=Text.Semibold
+                        transform=Text.Uppercase
+                        size=Text.Sm
+                      />
+                    </div>
+                  </Col>
+                  <Col col=Col.Two>
                     <Text
                       block=true
-                      value={totalRequestCount->Format.iPretty}
+                      value="Fee Earned"
                       weight=Text.Semibold
+                      transform=Text.Uppercase
                       size=Text.Sm
                     />
-                    <HSpacing size=Spacing.xs />
+                  </Col>
+                  <Col col=Col.Three>
                     <Text
                       block=true
-                      value="Requests"
+                      value="Oracle Script"
                       weight=Text.Semibold
+                      transform=Text.Uppercase
                       size=Text.Sm
+                    />
+                  </Col>
+                  <Col col=Col.Three>
+                    <Text
+                      block=true
+                      value="Report Status"
+                      size=Text.Sm
+                      weight=Text.Semibold
                       transform=Text.Uppercase
                     />
-                  </div>
-                </Col>
-                <Col col=Col.Four>
-                  <Text
-                    block=true
-                    value="Tx Hash"
-                    weight=Text.Semibold
-                    size=Text.Sm
-                    transform=Text.Uppercase
-                  />
-                </Col>
-                <Col col=Col.Four>
-                  <Text
-                    block=true
-                    value="Report Status"
-                    weight=Text.Semibold
-                    size=Text.Sm
-                    transform=Text.Uppercase
-                  />
-                </Col>
-                <Col col=Col.Two>
-                  <Text
-                    block=true
-                    value="Timestamp"
-                    weight=Text.Semibold
-                    size=Text.Sm
-                    transform=Text.Uppercase
-                    align=Text.Right
-                  />
-                </Col>
-              </Row>
-            </THead>}
+                  </Col>
+                  <Col col=Col.Two>
+                    <Text
+                      block=true
+                      value="Timestamp"
+                      weight=Text.Semibold
+                      size=Text.Sm
+                      align=Text.Right
+                      transform=Text.Uppercase
+                    />
+                  </Col>
+                </Row>
+              </THead>
+            </>}
         {switch requestsSub {
         | Data(requests) =>
           <>
@@ -217,9 +248,9 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
             ->Belt.Array.mapWithIndex((i, e) =>
               isMobile
                 ? <RenderBodyMobile
-                    reserveIndex=i key={e.id->ID.Request.toString} requestsSub={Sub.resolve(e)}
+                    key={e.id->ID.Request.toString} reserveIndex=i requestsSub={Sub.resolve(e)}
                   />
-                : <RenderBody key={e.id->ID.Request.toString} requestsSub={Sub.resolve(e)} />
+                : <RenderBody key={e.id->ID.Request.toString} theme requestsSub={Sub.resolve(e)} />
             )
             ->React.array}
             {isMobile
@@ -232,8 +263,8 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
           Belt.Array.make(pageSize, Sub.NoData)
           ->Belt.Array.mapWithIndex((i, noData) =>
             isMobile
-              ? <RenderBodyMobile reserveIndex=i key={i->Belt.Int.toString} requestsSub=noData />
-              : <RenderBody key={i->Belt.Int.toString} requestsSub=noData />
+              ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i requestsSub=noData />
+              : <RenderBody key={i->Belt.Int.toString} theme requestsSub=noData />
           )
           ->React.array
         }}

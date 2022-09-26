@@ -1,49 +1,49 @@
-type block_t = {timestamp: MomentRe.Moment.t};
+type block_t = {timestamp: MomentRe.Moment.t}
 type validator_t = {
   moniker: string,
   operatorAddress: Address.t,
   identity: string,
-};
+}
 type account_t = {
   address: Address.t,
   validator: option<validator_t>,
-};
+}
 type transaction_t = {
   hash: Hash.t,
   block: block_t,
-};
+}
 
 type internal_t = {
   account: account_t,
   transactionOpt: option<transaction_t>,
-};
+}
 
 type t = {
   voter: Address.t,
   txHashOpt: option<Hash.t>,
   timestampOpt: option<MomentRe.Moment.t>,
   validator: option<validator_t>,
-};
+}
 
 let toExternal = ({account: {address, validator}, transactionOpt}) => {
   voter: address,
   txHashOpt: transactionOpt->Belt.Option.map(({hash}) => hash),
   timestampOpt: transactionOpt->Belt.Option.map(({block}) => block.timestamp),
   validator,
-};
+}
 
 type vote_t =
   | Yes
   | No
   | NoWithVeto
-  | Abstain;
+  | Abstain
 
-let toString = (~withSpace=false) => x =>
-  switch(x){
-    | Yes => "Yes"
-    | No => "No"
-    | NoWithVeto => withSpace ? "No With Veto" : "NoWithVeto"
-    | Abstain => "Abstain";
+let toString = (~withSpace=false, x) =>
+  switch x {
+  | Yes => "Yes"
+  | No => "No"
+  | NoWithVeto => withSpace ? "No With Veto" : "NoWithVeto"
+  | Abstain => "Abstain"
   }
 
 type answer_vote_t = {
@@ -52,21 +52,21 @@ type answer_vote_t = {
   valVote: option<vote_t>,
   delVotes: vote_t => float,
   proposalID: ID.Proposal.t,
-};
+}
 
 type internal_vote_t = {
   yesVote: option<float>,
   noVote: option<float>,
   noWithVetoVote: option<float>,
   abstainVote: option<float>,
-};
+}
 
 type result_val_t = {
   validatorID: int,
   validatorPower: float,
   validatorAns: option<vote_t>,
   proposalID: ID.Proposal.t,
-};
+}
 
 type vote_stat_t = {
   proposalID: ID.Proposal.t,
@@ -79,7 +79,7 @@ type vote_stat_t = {
   totalAbstain: float,
   totalAbstainPercent: float,
   total: float,
-};
+}
 
 type votePower = {
   totalYes: float,
@@ -89,16 +89,16 @@ type votePower = {
 }
 
 let getAnswer = json => {
-  exception NoChoice(string);
-  let answer = json |> GraphQLParser.jsonToStringExn;
-  switch (answer) {
+  exception NoChoice(string)
+  let answer = json->GraphQLParser.jsonToStringExn
+  switch answer {
   | "Yes" => Yes
   | "No" => No
   | "NoWithVeto" => NoWithVeto
   | "Abstain" => Abstain
   | _ => raise(NoChoice("There is no choice"))
-  };
-};
+  }
+}
 
 module YesVoteConfig = %graphql(`
     subscription Votes($limit: Int!, $offset: Int!, $proposalID: Int! ) {
@@ -269,115 +269,141 @@ module DelegatorVoteByProposalIDConfig = %graphql(`
 // `)
 
 let getList = (proposalID, answer, ~page, ~pageSize, ()) => {
-  let offset = (page - 1) * pageSize;
+  let offset = (page - 1) * pageSize
 
-  switch (answer) {
-    | Yes => {
-      YesVoteConfig.use({
-        proposalID: proposalID |> ID.Proposal.toInt,
-        limit: pageSize,
-        offset
-      })
-      -> Sub.fromData 
-      -> Sub.map(x => x.votes->Belt.Array.map(toExternal))
-    }
-    | No =>{
-      NoVoteConfig.use({
-        proposalID: proposalID |> ID.Proposal.toInt,
-        limit: pageSize,
-        offset
-      })
-      -> Sub.fromData 
-      -> Sub.map(x => x.votes->Belt.Array.map(toExternal))
-    }
-    | NoWithVeto =>{
-      NoWithVetoVoteConfig.use({
-        proposalID: proposalID |> ID.Proposal.toInt,
-        limit: pageSize,
-        offset
-      })
-      -> Sub.fromData 
-      -> Sub.map(x => x.votes->Belt.Array.map(toExternal))
-    }
-    | Abstain =>
-      AbstainVoteConfig.use({
-        proposalID: proposalID |> ID.Proposal.toInt,
-        limit: pageSize,
-        offset
-      })
-      -> Sub.fromData 
-      -> Sub.map(x => x.votes->Belt.Array.map(toExternal))
+  switch answer {
+  | Yes =>
+    YesVoteConfig.use({
+      proposalID: proposalID->ID.Proposal.toInt,
+      limit: pageSize,
+      offset,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes->Belt.Array.map(toExternal))
+
+  | No =>
+    NoVoteConfig.use({
+      proposalID: proposalID->ID.Proposal.toInt,
+      limit: pageSize,
+      offset,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes->Belt.Array.map(toExternal))
+
+  | NoWithVeto =>
+    NoWithVetoVoteConfig.use({
+      proposalID: proposalID->ID.Proposal.toInt,
+      limit: pageSize,
+      offset,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes->Belt.Array.map(toExternal))
+
+  | Abstain =>
+    AbstainVoteConfig.use({
+      proposalID: proposalID->ID.Proposal.toInt,
+      limit: pageSize,
+      offset,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes->Belt.Array.map(toExternal))
   }
-};
+}
 
 let count = (proposalID, answer) => {
-  switch (answer) {
-    | Yes => {
-      YesVoteCountConfig.use({
-        proposalID: proposalID |> ID.Proposal.toInt,
-      })
-      -> Sub.fromData 
-      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count))
-    }
-    | No =>{
-      NoVoteCountConfig.use({
-        proposalID: proposalID |> ID.Proposal.toInt,
-      })
-      -> Sub.fromData 
-      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count))
-    }
-    | NoWithVeto =>{
-      NoWithVetoVoteCountConfig.use({
-        proposalID: proposalID |> ID.Proposal.toInt,
-      })
-      -> Sub.fromData 
-      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count))
-    }
-    | Abstain =>
-      AbstainVoteCountConfig.use({
-        proposalID: proposalID |> ID.Proposal.toInt,
-      })
-      -> Sub.fromData 
-      -> Sub.map(x => x.votes_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count))
+  switch answer {
+  | Yes =>
+    YesVoteCountConfig.use({
+      proposalID: proposalID->ID.Proposal.toInt,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+
+  | No =>
+    NoVoteCountConfig.use({
+      proposalID: proposalID->ID.Proposal.toInt,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+
+  | NoWithVeto =>
+    NoWithVetoVoteCountConfig.use({
+      proposalID: proposalID->ID.Proposal.toInt,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+
+  | Abstain =>
+    AbstainVoteCountConfig.use({
+      proposalID: proposalID->ID.Proposal.toInt,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
   }
-  
-};
+}
 
 // TODO: mess a lot with option need to clean
 let getVoteStatByProposalID = proposalID => {
-  let validatorVotes = ValidatorVoteByProposalIDConfig.use({proposalID: proposalID |> ID.Proposal.toInt})
-  let delegatorVotes = DelegatorVoteByProposalIDConfig.use({proposalID: proposalID |> ID.Proposal.toInt})
-  
-  let val_votes = validatorVotes |> Sub.fromData
-  |> Sub.flatMap(_, ({validator_vote_proposals_view}) => {
-    Sub.resolve({
-      totalYes: validator_vote_proposals_view -> Belt.Array.reduce(0. , (acc, {yesVote}) => acc +. yesVote -> Belt.Option.getExn),
-      totalNo: validator_vote_proposals_view -> Belt.Array.reduce(0. , (acc, {noVote}) => acc +. noVote -> Belt.Option.getExn),
-      totalNoWithVetoVote: validator_vote_proposals_view -> Belt.Array.reduce(0. , (acc, {noWithVetoVote}) => acc +. noWithVetoVote -> Belt.Option.getExn),
-      totalAbstainVote: validator_vote_proposals_view -> Belt.Array.reduce(0. , (acc, {abstainVote}) => acc +. abstainVote -> Belt.Option.getExn)
-    })
+  let validatorVotes = ValidatorVoteByProposalIDConfig.use({
+    proposalID: proposalID->ID.Proposal.toInt,
+  })
+  let delegatorVotes = DelegatorVoteByProposalIDConfig.use({
+    proposalID: proposalID->ID.Proposal.toInt,
   })
 
-  let del_votes = delegatorVotes |> Sub.fromData
-  |> Sub.flatMap(_, ({non_validator_vote_proposals_view}) => {
-    Sub.resolve({
-      totalYes: non_validator_vote_proposals_view -> Belt.Array.reduce(0. , (acc, {yesVote}) => acc +. yesVote -> Belt.Option.getExn),
-      totalNo: non_validator_vote_proposals_view -> Belt.Array.reduce(0. , (acc, {noVote}) => acc +. noVote -> Belt.Option.getExn),
-      totalNoWithVetoVote: non_validator_vote_proposals_view -> Belt.Array.reduce(0. , (acc, {noWithVetoVote}) => acc +. noWithVetoVote -> Belt.Option.getExn),
-      totalAbstainVote: non_validator_vote_proposals_view -> Belt.Array.reduce(0. , (acc, {abstainVote}) => acc +. abstainVote -> Belt.Option.getExn)
+  let val_votes =
+    validatorVotes
+    ->Sub.fromData
+    ->Sub.flatMap(({validator_vote_proposals_view}) => {
+      Sub.resolve({
+        totalYes: validator_vote_proposals_view->Belt.Array.reduce(0., (acc, {yesVote}) =>
+          acc +. yesVote->Belt.Option.getExn
+        ),
+        totalNo: validator_vote_proposals_view->Belt.Array.reduce(0., (acc, {noVote}) =>
+          acc +. noVote->Belt.Option.getExn
+        ),
+        totalNoWithVetoVote: validator_vote_proposals_view->Belt.Array.reduce(0., (
+          acc,
+          {noWithVetoVote},
+        ) => acc +. noWithVetoVote->Belt.Option.getExn),
+        totalAbstainVote: validator_vote_proposals_view->Belt.Array.reduce(0., (
+          acc,
+          {abstainVote},
+        ) => acc +. abstainVote->Belt.Option.getExn),
+      })
     })
-  })
 
-  let allSub = Sub.all2(val_votes, del_votes);
+  let del_votes =
+    delegatorVotes
+    ->Sub.fromData
+    ->Sub.flatMap(({non_validator_vote_proposals_view}) => {
+      Sub.resolve({
+        totalYes: non_validator_vote_proposals_view->Belt.Array.reduce(0., (acc, {yesVote}) =>
+          acc +. yesVote->Belt.Option.getExn
+        ),
+        totalNo: non_validator_vote_proposals_view->Belt.Array.reduce(0., (acc, {noVote}) =>
+          acc +. noVote->Belt.Option.getExn
+        ),
+        totalNoWithVetoVote: non_validator_vote_proposals_view->Belt.Array.reduce(0., (
+          acc,
+          {noWithVetoVote},
+        ) => acc +. noWithVetoVote->Belt.Option.getExn),
+        totalAbstainVote: non_validator_vote_proposals_view->Belt.Array.reduce(0., (
+          acc,
+          {abstainVote},
+        ) => acc +. abstainVote->Belt.Option.getExn),
+      })
+    })
 
-  allSub
-  -> Sub.flatMap(_, ((validatorVoteSub,delegatorVoteSub)) => {
-    let totalYesPower = validatorVoteSub.totalYes +. delegatorVoteSub.totalYes;
-    let totalNoPower = validatorVoteSub.totalNo +. delegatorVoteSub.totalNo;
+  let allSub = Sub.all2(val_votes, del_votes)
+
+  allSub->Sub.flatMap(_, ((validatorVoteSub, delegatorVoteSub)) => {
+    let totalYesPower = validatorVoteSub.totalYes +. delegatorVoteSub.totalYes
+    let totalNoPower = validatorVoteSub.totalNo +. delegatorVoteSub.totalNo
     let totalNoWithVetoPower =
-      validatorVoteSub.totalNoWithVetoVote +. delegatorVoteSub.totalNoWithVetoVote;
-    let totalAbstainPower = validatorVoteSub.totalAbstainVote +. delegatorVoteSub.totalAbstainVote;
-    let totalPower = totalYesPower +. totalNoPower +. totalNoWithVetoPower +. totalAbstainPower;
+      validatorVoteSub.totalNoWithVetoVote +. delegatorVoteSub.totalNoWithVetoVote
+    let totalAbstainPower = validatorVoteSub.totalAbstainVote +. delegatorVoteSub.totalAbstainVote
+    let totalPower = totalYesPower +. totalNoPower +. totalNoWithVetoPower +. totalAbstainPower
 
     Sub.resolve({
       proposalID,
@@ -390,6 +416,6 @@ let getVoteStatByProposalID = proposalID => {
       totalAbstain: totalAbstainPower /. 1e6,
       totalAbstainPercent: totalPower == 0. ? 0. : totalAbstainPower /. totalPower *. 100.,
       total: totalPower /. 1e6,
-    });
+    })
   })
-};
+}

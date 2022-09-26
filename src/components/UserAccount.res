@@ -48,7 +48,7 @@ module ConnectBtn = {
   let make = (~connect) =>
     <div id="connectButton">
       <Button variant=Button.Outline px=24 py=8 onClick={_ => connect()}>
-        {"Connect Wallet" |> React.string}
+        {"Connect Wallet"->React.string}
       </Button>
     </div>
 }
@@ -81,7 +81,7 @@ module FaucetBtn = {
             onClick={_ => {
               setIsRequest(_ => true)
               AxiosFaucet.request({
-                address: address |> Address.toBech32,
+                address: address->Address.toBech32,
                 amount: 10_000_000,
               })
               ->Promise.then(_ => {
@@ -90,7 +90,7 @@ module FaucetBtn = {
               })
               ->ignore
             }}>
-            {"Get 10 Testnet BAND" |> React.string}
+            {"Get 10 Testnet BAND"->React.string}
           </Button>
         </div>
   }
@@ -100,13 +100,14 @@ module SendBtn = {
   @react.component
   let make = (~send) =>
     <div id="sendToken">
-      <Button px=20 py=5 onClick={_ => send()}> {"Send" |> React.string} </Button>
+      <Button px=20 py=5 onClick={_ => send()}> {"Send"->React.string} </Button>
     </div>
 }
 
 module Balance = {
   @react.component
   let make = (~address) => {
+    Js.log(address)
     // Todo will patch later
     // let accountSub = AccountSub.get(address)
 
@@ -119,7 +120,7 @@ module Balance = {
           value="account"
           //   value={switch accountSub {
           //   | Data(account) =>
-          //     account.balance |> Coin.getBandAmountFromCoins |> Format.fPretty(~digits=6)
+          //     account.balance -> Coin.getBandAmountFromCoins -> Format.fPretty(~digits=6)
           //   | _ => "0"
           //   }}
           code=true
@@ -142,7 +143,7 @@ let make = () => {
 
   let clickOutside = ClickOutside.useClickOutside(_ => setShow(_ => false))
 
-  let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
+  // let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
   let disconnect = () => {
     dispatchAccount(Disconnect)
     setShow(_ => false)
@@ -162,7 +163,9 @@ let make = () => {
           id="userInfoButton"
           className={Css.merge(list{CssHelper.flexBox(), CssHelper.clickable})}
           onClick={_ => setShow(prev => !prev)}>
-          <div className={Styles.oval(theme)}> <Icon name="fal fa-user" color=Theme.white /> </div>
+          <div className={Styles.oval(theme)}>
+            <Icon name="fal fa-user" color=Theme.white />
+          </div>
           <HSpacing size=Spacing.sm />
           <Icon name="fas fa-caret-down" color=theme.baseBlue />
         </div>
@@ -175,7 +178,8 @@ let make = () => {
             <Balance address />
             <VSpacing size=#px(16) />
             <div className={CssHelper.flexBox(~direction=#row, ~justify=#spaceBetween, ())}>
-              <FaucetBtn address /> <SendBtn send />
+              <FaucetBtn address />
+              <SendBtn send />
             </div>
           </div>
           <DisconnectBtn disconnect />

@@ -17,7 +17,7 @@ module Styles = {
 
 @react.component
 let make = () => {
-  let currentRoute = RescriptReactRouter.useUrl() |> Route.fromUrl
+  let currentRoute = RescriptReactRouter.useUrl()->Route.fromUrl
   let isMobile = Media.isMobile()
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -25,15 +25,17 @@ let make = () => {
     <Header />
     {isMobile
       ? <Section pt=16 pb=16 ptSm=24 pbSm=24>
-          <div className=CssHelper.container> <SearchBar /> </div>
+          <div className=CssHelper.container>
+            <SearchBar />
+          </div>
         </Section>
       : React.null}
     <div className=Styles.routeContainer>
       {switch currentRoute {
       | HomePage => <HomePage />
-      | DataSourceHomePage => <DataSourceHomePage />
-      | DataSourceIndexPage(dataSourceID, hashtag) =>
-        <DataSourceIndexPage dataSourceID=ID.DataSource.ID(dataSourceID) hashtag />
+      | DataSourcePage => <DataSourcePage />
+      | DataSourceDetailsPage(dataSourceID, hashtag) =>
+        <DataSourceDetailsPage dataSourceID=ID.DataSource.ID(dataSourceID) hashtag />
       | OracleScriptPage => <OracleScriptPage />
       | OracleScriptDetailsPage(oracleScriptID, hashtag) =>
         <OracleScriptDetailsPage oracleScriptID=ID.OracleScript.ID(oracleScriptID) hashtag />
@@ -47,7 +49,8 @@ let make = () => {
       | RequestIndexPage(reqID) => <RequestIndexPage reqID=ID.Request.ID(reqID) />
       | AccountIndexPage(address, hashtag) => <AccountIndexPage address hashtag />
       | ProposalPage => <ProposalPage />
-      | ProposalDetailsPage(proposalID) => <ProposalDetailsPage proposalID=ID.Proposal.ID(proposalID) />
+      | ProposalDetailsPage(proposalID) =>
+        <ProposalDetailsPage proposalID=ID.Proposal.ID(proposalID) />
       | IBCHomePage => <IBCHomePage />
       | NotFound => <NotFound />
       }}

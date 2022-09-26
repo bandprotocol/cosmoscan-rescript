@@ -64,7 +64,7 @@ let getBadgeVariantFromString = badge => {
   | "edit_data_source" => EditDataSourceBadge
   | "create_oracle_script" => CreateOracleScriptBadge
   | "edit_oracle_script" => EditOracleScriptBadge
-  | "request" => RequestBadge
+  | "/oracle.v1.MsgRequestData" => RequestBadge
   | "report" => ReportBadge
   | "add_reporter" => AddReporterBadge
   | "remove_reporter" => RemoveReporterBadge
@@ -106,7 +106,7 @@ let getBadgeVariantFromString = badge => {
 }
 
 // for handling the empty value
-let getDefaultValue = value => value |> Belt.Option.getWithDefault(_, "")
+let getDefaultValue = value => value->Belt.Option.getWithDefault(_, "")
 
 module Send = {
   type t = {
@@ -115,13 +115,13 @@ module Send = {
     amount: list<Coin.t>,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      fromAddress: json |> at(list{"msg", "from_address"}, string) |> Address.fromBech32,
-      toAddress: json |> at(list{"msg", "to_address"}, string) |> Address.fromBech32,
-      amount: json |> at(list{"msg", "amount"}, list(Coin.decodeCoin)),
-    }
+    buildObject(json => {
+      fromAddress: json.at(list{"msg", "from_address"}, address),
+      toAddress: json.at(list{"msg", "to_address"}, address),
+      amount: json.at(list{"msg", "amount"}, list(Coin.decodeCoin)),
+    })
   }
 }
 
@@ -153,29 +153,29 @@ module CreateDataSource = {
     sender: Address.t,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      id: json |> at(list{"msg", "id"}, ID.DataSource.fromJson),
-      owner: json |> at(list{"msg", "owner"}, string) |> Address.fromBech32,
-      name: json |> at(list{"msg", "name"}, string),
-      executable: json |> at(list{"msg", "executable"}, string) |> JsBuffer.fromBase64,
-      treasury: json |> at(list{"msg", "treasury"}, string) |> Address.fromBech32,
-      fee: json |> at(list{"msg", "fee"}, list(Coin.decodeCoin)),
-      sender: json |> at(list{"msg", "sender"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      id: json.at(list{"msg", "id"}, ID.DataSource.decoder),
+      owner: json.at(list{"msg", "owner"}, address),
+      name: json.at(list{"msg", "name"}, string),
+      executable: json.at(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
+      treasury: json.at(list{"msg", "treasury"}, address),
+      fee: json.at(list{"msg", "fee"}, list(Coin.decodeCoin)),
+      sender: json.at(list{"msg", "sender"}, address),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      owner: json |> at(list{"msg", "owner"}, string) |> Address.fromBech32,
-      name: json |> at(list{"msg", "name"}, string),
-      executable: json |> at(list{"msg", "executable"}, string) |> JsBuffer.fromBase64,
-      treasury: json |> at(list{"msg", "treasury"}, string) |> Address.fromBech32,
-      fee: json |> at(list{"msg", "fee"}, list(Coin.decodeCoin)),
-      sender: json |> at(list{"msg", "sender"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      owner: json.at(list{"msg", "owner"}, address),
+      name: json.at(list{"msg", "name"}, string),
+      executable: json.at(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
+      treasury: json.at(list{"msg", "treasury"}, address),
+      fee: json.at(list{"msg", "fee"}, list(Coin.decodeCoin)),
+      sender: json.at(list{"msg", "sender"}, address),
+    })
   }
 }
 
@@ -190,17 +190,17 @@ module EditDataSource = {
     sender: Address.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      id: json |> at(list{"msg", "data_source_id"}, ID.DataSource.fromJson),
-      owner: json |> at(list{"msg", "owner"}, string) |> Address.fromBech32,
-      name: json |> at(list{"msg", "name"}, string),
-      executable: json |> at(list{"msg", "executable"}, string) |> JsBuffer.fromBase64,
-      treasury: json |> at(list{"msg", "treasury"}, string) |> Address.fromBech32,
-      fee: json |> at(list{"msg", "fee"}, list(Coin.decodeCoin)),
-      sender: json |> at(list{"msg", "sender"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      id: json.at(list{"msg", "data_source_id"}, ID.DataSource.decoder),
+      owner: json.at(list{"msg", "owner"}, address),
+      name: json.at(list{"msg", "name"}, string),
+      executable: json.at(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
+      treasury: json.at(list{"msg", "treasury"}, address),
+      fee: json.at(list{"msg", "fee"}, list(Coin.decodeCoin)),
+      sender: json.at(list{"msg", "sender"}, address),
+    })
   }
 }
 
@@ -220,25 +220,25 @@ module CreateOracleScript = {
     sender: Address.t,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      id: json |> at(list{"msg", "id"}, ID.OracleScript.fromJson),
-      owner: json |> at(list{"msg", "owner"}, string) |> Address.fromBech32,
-      name: json |> at(list{"msg", "name"}, string),
-      code: json |> at(list{"msg", "code"}, string) |> JsBuffer.fromBase64,
-      sender: json |> at(list{"msg", "sender"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      id: json.at(list{"msg", "id"}, ID.OracleScript.decoder),
+      owner: json.at(list{"msg", "owner"}, address),
+      name: json.at(list{"msg", "name"}, string),
+      code: json.at(list{"msg", "code"}, string)->JsBuffer.fromBase64,
+      sender: json.at(list{"msg", "sender"}, address),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      owner: json |> at(list{"msg", "owner"}, string) |> Address.fromBech32,
-      name: json |> at(list{"msg", "name"}, string),
-      code: json |> at(list{"msg", "code"}, string) |> JsBuffer.fromBase64,
-      sender: json |> at(list{"msg", "sender"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      owner: json.at(list{"msg", "owner"}, address),
+      name: json.at(list{"msg", "name"}, string),
+      code: json.at(list{"msg", "code"}, string)->JsBuffer.fromBase64,
+      sender: json.at(list{"msg", "sender"}, address),
+    })
   }
 }
 
@@ -251,15 +251,15 @@ module EditOracleScript = {
     sender: Address.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      id: json |> at(list{"msg", "oracle_script_id"}, ID.OracleScript.fromJson),
-      owner: json |> at(list{"msg", "owner"}, string) |> Address.fromBech32,
-      name: json |> at(list{"msg", "name"}, string),
-      code: json |> at(list{"msg", "code"}, string) |> JsBuffer.fromBase64,
-      sender: json |> at(list{"msg", "sender"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      id: json.at(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
+      owner: json.at(list{"msg", "owner"}, address),
+      name: json.at(list{"msg", "name"}, string),
+      code: json.at(list{"msg", "code"}, string)->JsBuffer.fromBase64,
+      sender: json.at(list{"msg", "sender"}, address),
+    })
   }
 }
 
@@ -289,35 +289,35 @@ module Request = {
     sender: Address.t,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      id: json |> at(list{"msg", "id"}, ID.Request.fromJson),
-      oracleScriptID: json |> at(list{"msg", "oracle_script_id"}, ID.OracleScript.fromJson),
-      oracleScriptName: json |> at(list{"msg", "name"}, string),
-      calldata: json |> bufferWithDefault(at(list{"msg", "calldata"})),
-      askCount: json |> at(list{"msg", "ask_count"}, int),
-      minCount: json |> at(list{"msg", "min_count"}, int),
-      prepareGas: json |> at(list{"msg", "prepare_gas"}, int),
-      executeGas: json |> at(list{"msg", "execute_gas"}, int),
-      feeLimit: json |> at(list{"msg", "fee_limit"}, list(Coin.decodeCoin)),
-      schema: json |> at(list{"msg", "schema"}, string),
-      sender: json |> at(list{"msg", "sender"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      id: json.at(list{"msg", "id"}, ID.Request.decoder),
+      oracleScriptID: json.at(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
+      oracleScriptName: json.at(list{"msg", "name"}, string),
+      calldata: json.at(list{"msg", "calldata"}, bufferWithDefault),
+      askCount: json.at(list{"msg", "ask_count"}, int),
+      minCount: json.at(list{"msg", "min_count"}, int),
+      prepareGas: json.at(list{"msg", "prepare_gas"}, int),
+      executeGas: json.at(list{"msg", "execute_gas"}, int),
+      feeLimit: json.at(list{"msg", "fee_limit"}, list(Coin.decodeCoin)),
+      schema: json.at(list{"msg", "schema"}, string),
+      sender: json.at(list{"msg", "sender"}, address),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      oracleScriptID: json |> at(list{"msg", "oracle_script_id"}, ID.OracleScript.fromJson),
-      calldata: json |> bufferWithDefault(at(list{"msg", "calldata"})),
-      askCount: json |> at(list{"msg", "ask_count"}, int),
-      minCount: json |> at(list{"msg", "min_count"}, int),
-      prepareGas: json |> at(list{"msg", "prepare_gas"}, int),
-      executeGas: json |> at(list{"msg", "execute_gas"}, int),
-      feeLimit: json |> at(list{"msg", "fee_limit"}, list(Coin.decodeCoin)),
-      sender: json |> at(list{"msg", "sender"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      oracleScriptID: json.at(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
+      calldata: json.at(list{"msg", "calldata"}, bufferWithDefault),
+      askCount: json.at(list{"msg", "ask_count"}, int),
+      minCount: json.at(list{"msg", "min_count"}, int),
+      prepareGas: json.at(list{"msg", "prepare_gas"}, int),
+      executeGas: json.at(list{"msg", "execute_gas"}, int),
+      feeLimit: json.at(list{"msg", "fee_limit"}, list(Coin.decodeCoin)),
+      sender: json.at(list{"msg", "sender"}, address),
+    })
   }
 }
 
@@ -328,13 +328,13 @@ module RawDataReport = {
     data: JsBuffer.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      externalDataID: json |> intWithDefault(field("external_id")),
-      exitCode: json |> intWithDefault(field("exit_code")),
-      data: json |> bufferWithDefault(field("data")),
-    }
+    object(fields => {
+      externalDataID: fields.required(. "external_id", intWithDefault(0)),
+      exitCode: fields.required(. "exit_code", intWithDefault(0)),
+      data: fields.required(. "data", bufferWithDefault),
+    })
   }
 }
 
@@ -346,14 +346,14 @@ module Report = {
     reporter: Address.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      requestID: json |> at(list{"msg", "request_id"}, ID.Request.fromJson),
-      rawReports: json |> at(list{"msg", "raw_reports"}, list(RawDataReport.decode)),
-      validator: json |> at(list{"msg", "validator"}, string) |> Address.fromBech32,
-      reporter: json |> at(list{"msg", "reporter"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      requestID: json.at(list{"msg", "request_id"}, ID.Request.decoder),
+      rawReports: json.at(list{"msg", "raw_reports"}, list(RawDataReport.decode)),
+      validator: json.at(list{"msg", "validator"}, address),
+      reporter: json.at(list{"msg", "reporter"}, address),
+    })
   }
 }
 
@@ -369,21 +369,21 @@ module AddReporter = {
     reporter: Address.t,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      validator: json |> at(list{"msg", "validator"}, string) |> Address.fromBech32,
-      reporter: json |> at(list{"msg", "reporter"}, string) |> Address.fromBech32,
-      validatorMoniker: json |> at(list{"msg", "validator_moniker"}, string),
-    }
+    buildObject(json => {
+      validator: json.at(list{"msg", "validator"}, address),
+      reporter: json.at(list{"msg", "reporter"}, address),
+      validatorMoniker: json.at(list{"msg", "validator_moniker"}, string),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      validator: json |> at(list{"msg", "validator"}, string) |> Address.fromBech32,
-      reporter: json |> at(list{"msg", "reporter"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      validator: json.at(list{"msg", "validator"}, address),
+      reporter: json.at(list{"msg", "reporter"}, address),
+    })
   }
 }
 
@@ -399,21 +399,21 @@ module RemoveReporter = {
     reporter: Address.t,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      validator: json |> at(list{"msg", "validator"}, string) |> Address.fromBech32,
-      reporter: json |> at(list{"msg", "reporter"}, string) |> Address.fromBech32,
-      validatorMoniker: json |> at(list{"msg", "validator_moniker"}, string),
-    }
+    buildObject(json => {
+      validator: json.at(list{"msg", "validator"}, address),
+      reporter: json.at(list{"msg", "reporter"}, address),
+      validatorMoniker: json.at(list{"msg", "validator_moniker"}, string),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      validator: json |> at(list{"msg", "validator"}, string) |> Address.fromBech32,
-      reporter: json |> at(list{"msg", "reporter"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      validator: json.at(list{"msg", "validator"}, address),
+      reporter: json.at(list{"msg", "reporter"}, address),
+    })
   }
 }
 
@@ -432,24 +432,25 @@ module CreateValidator = {
     minSelfDelegation: Coin.t,
     selfDelegation: Coin.t,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      moniker: json |> at(list{"msg", "description", "moniker"}, string),
-      identity: json |> at(list{"msg", "description", "identity"}, string),
-      website: json |> at(list{"msg", "description", "website"}, string),
-      details: json |> at(list{"msg", "description", "details"}, string),
-      commissionRate: json |> at(list{"msg", "commission", "rate"}, floatstr),
-      commissionMaxRate: json |> at(list{"msg", "commission", "max_rate"}, floatstr),
-      commissionMaxChange: json |> at(list{"msg", "commission", "max_change_rate"}, floatstr),
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-      validatorAddress: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-      publicKey: json |> at(list{"msg", "pubkey"}, string) |> PubKey.fromBech32,
-      minSelfDelegation: json
-      |> at(list{"msg", "min_self_delegation"}, floatstr)
-      |> Coin.newUBANDFromAmount,
-      selfDelegation: json |> at(list{"msg", "value"}, Coin.decodeCoin),
-    }
+    buildObject(json => {
+      moniker: json.at(list{"msg", "description", "moniker"}, string),
+      identity: json.at(list{"msg", "description", "identity"}, string),
+      website: json.at(list{"msg", "description", "website"}, string),
+      details: json.at(list{"msg", "description", "details"}, string),
+      commissionRate: json.at(list{"msg", "commission", "rate"}, floatstr),
+      commissionMaxRate: json.at(list{"msg", "commission", "max_rate"}, floatstr),
+      commissionMaxChange: json.at(list{"msg", "commission", "max_change_rate"}, floatstr),
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+      publicKey: json.at(list{"msg", "pubkey"}, string)->PubKey.fromBech32,
+      minSelfDelegation: json.at(
+        list{"msg", "min_self_delegation"},
+        floatstr,
+      )->Coin.newUBANDFromAmount,
+      selfDelegation: json.at(list{"msg", "value"}, Coin.decodeCoin),
+    })
   }
 }
 
@@ -464,19 +465,20 @@ module EditValidator = {
     minSelfDelegation: option<Coin.t>,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      moniker: json |> at(list{"msg", "description", "moniker"}, string),
-      identity: json |> at(list{"msg", "description", "identity"}, string),
-      website: json |> at(list{"msg", "description", "website"}, string),
-      details: json |> at(list{"msg", "description", "details"}, string),
-      commissionRate: json |> optional(at(list{"msg", "commission_rate"}, floatstr)),
-      sender: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-      minSelfDelegation: json
-      |> optional(at(list{"msg", "min_self_delegation"}, floatstr))
-      |> Belt.Option.map(_, Coin.newUBANDFromAmount),
-    }
+    buildObject(json => {
+      moniker: json.at(list{"msg", "description", "moniker"}, string),
+      identity: json.at(list{"msg", "description", "identity"}, string),
+      website: json.at(list{"msg", "description", "website"}, string),
+      details: json.at(list{"msg", "description", "details"}, string),
+      commissionRate: json.at(list{"msg", "commission_rate"}, option(floatstr)),
+      sender: json.at(list{"msg", "validator_address"}, address),
+      minSelfDelegation: json.at(
+        list{"msg", "min_self_delegation"},
+        option(floatstr)->map((. a) => a->(Coin.newUBANDFromAmount->Belt.Option.map)),
+      ),
+    })
   }
 }
 
@@ -494,24 +496,24 @@ module Delegate = {
     amount: Coin.t,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-      validatorAddress: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-      amount: json |> at(list{"msg", "amount"}, Coin.decodeCoin),
-      moniker: json |> at(list{"msg", "moniker"}, string),
-      identity: json |> at(list{"msg", "identity"}, string),
-    }
+    buildObject(json => {
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
+      moniker: json.at(list{"msg", "moniker"}, string),
+      identity: json.at(list{"msg", "identity"}, string),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-      validatorAddress: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-      amount: json |> at(list{"msg", "amount"}, Coin.decodeCoin),
-    }
+    buildObject(json => {
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
+    })
   }
 }
 
@@ -529,24 +531,24 @@ module Undelegate = {
     amount: Coin.t,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-      validatorAddress: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-      amount: json |> at(list{"msg", "amount"}, Coin.decodeCoin),
-      moniker: json |> at(list{"msg", "moniker"}, string),
-      identity: json |> at(list{"msg", "identity"}, string),
-    }
+    buildObject(json => {
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
+      moniker: json.at(list{"msg", "moniker"}, string),
+      identity: json.at(list{"msg", "identity"}, string),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-      validatorAddress: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-      amount: json |> at(list{"msg", "amount"}, Coin.decodeCoin),
-    }
+    buildObject(json => {
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
+    })
   }
 }
 
@@ -568,36 +570,40 @@ module Redelegate = {
     delegatorAddress: Address.t,
     amount: Coin.t,
   }
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      validatorSourceAddress: json
-      |> at(list{"msg", "validator_src_address"}, string)
-      |> Address.fromBech32,
-      validatorDestinationAddress: json
-      |> at(list{"msg", "validator_dst_address"}, string)
-      |> Address.fromBech32,
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-      amount: json |> at(list{"msg", "amount"}, Coin.decodeCoin),
-      monikerSource: json |> at(list{"msg", "val_src_moniker"}, string),
-      monikerDestination: json |> at(list{"msg", "val_dst_moniker"}, string),
-      identitySource: json |> at(list{"msg", "val_src_identity"}, string),
-      identityDestination: json |> at(list{"msg", "val_dst_identity"}, string),
-    }
+    buildObject(json => {
+      validatorSourceAddress: json.at(
+        list{"msg", "validator_src_address"},
+        string,
+      )->Address.fromBech32,
+      validatorDestinationAddress: json.at(
+        list{"msg", "validator_dst_address"},
+        string,
+      )->Address.fromBech32,
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
+      monikerSource: json.at(list{"msg", "val_src_moniker"}, string),
+      monikerDestination: json.at(list{"msg", "val_dst_moniker"}, string),
+      identitySource: json.at(list{"msg", "val_src_identity"}, string),
+      identityDestination: json.at(list{"msg", "val_dst_identity"}, string),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      validatorSourceAddress: json
-      |> at(list{"msg", "validator_src_address"}, string)
-      |> Address.fromBech32,
-      validatorDestinationAddress: json
-      |> at(list{"msg", "validator_dst_address"}, string)
-      |> Address.fromBech32,
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-      amount: json |> at(list{"msg", "amount"}, Coin.decodeCoin),
-    }
+    buildObject(json => {
+      validatorSourceAddress: json.at(
+        list{"msg", "validator_src_address"},
+        string,
+      )->Address.fromBech32,
+      validatorDestinationAddress: json.at(
+        list{"msg", "validator_dst_address"},
+        string,
+      )->Address.fromBech32,
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
+    })
   }
 }
 
@@ -614,34 +620,34 @@ module WithdrawReward = {
     delegatorAddress: Address.t,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      validatorAddress: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-      amount: json |> at(list{"msg", "reward_amount"}, string) |> GraphQLParser.coins,
-      moniker: json |> at(list{"msg", "moniker"}, string),
-      identity: json |> at(list{"msg", "identity"}, string),
-    }
+    buildObject(json => {
+      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      amount: json.at(list{"msg", "reward_amount"}, string)->GraphQLParser.coins,
+      moniker: json.at(list{"msg", "moniker"}, string),
+      identity: json.at(list{"msg", "identity"}, string),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      validatorAddress: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+    })
   }
 }
 
 module Unjail = {
   type t = {address: Address.t}
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      address: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      address: json.at(list{"msg", "validator_address"}, address),
+    })
   }
 }
 
@@ -650,12 +656,12 @@ module SetWithdrawAddress = {
     delegatorAddress: Address.t,
     withdrawAddress: Address.t,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      delegatorAddress: json |> at(list{"msg", "delegator_address"}, string) |> Address.fromBech32,
-      withdrawAddress: json |> at(list{"msg", "withdraw_address"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      withdrawAddress: json.at(list{"msg", "withdraw_address"}, address),
+    })
   }
 }
 
@@ -675,25 +681,25 @@ module SubmitProposal = {
     initialDeposit: list<Coin.t>,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      proposer: json |> at(list{"msg", "proposer"}, string) |> Address.fromBech32,
-      title: json |> at(list{"msg", "content", "title"}, string),
-      description: json |> at(list{"msg", "content", "description"}, string),
-      initialDeposit: json |> at(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
-      proposalID: json |> at(list{"msg", "proposal_id"}, ID.Proposal.fromJson),
-    }
+    buildObject(json => {
+      proposer: json.at(list{"msg", "proposer"}, address),
+      title: json.at(list{"msg", "content", "title"}, string),
+      description: json.at(list{"msg", "content", "description"}, string),
+      initialDeposit: json.at(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
+      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      proposer: json |> at(list{"msg", "proposer"}, string) |> Address.fromBech32,
-      title: json |> at(list{"msg", "content", "title"}, string),
-      description: json |> at(list{"msg", "content", "description"}, string),
-      initialDeposit: json |> at(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
-    }
+    buildObject(json => {
+      proposer: json.at(list{"msg", "proposer"}, address),
+      title: json.at(list{"msg", "content", "title"}, string),
+      description: json.at(list{"msg", "content", "description"}, string),
+      initialDeposit: json.at(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
+    })
   }
 }
 
@@ -711,23 +717,23 @@ module Deposit = {
     amount: list<Coin.t>,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      depositor: json |> at(list{"msg", "depositor"}, string) |> Address.fromBech32,
-      proposalID: json |> at(list{"msg", "proposal_id"}, ID.Proposal.fromJson),
-      amount: json |> at(list{"msg", "amount"}, list(Coin.decodeCoin)),
-      title: json |> at(list{"msg", "title"}, string),
-    }
+    buildObject(json => {
+      depositor: json.at(list{"msg", "depositor"}, address),
+      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      amount: json.at(list{"msg", "amount"}, list(Coin.decodeCoin)),
+      title: json.at(list{"msg", "title"}, string),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      depositor: json |> at(list{"msg", "depositor"}, string) |> Address.fromBech32,
-      proposalID: json |> at(list{"msg", "proposal_id"}, ID.Proposal.fromJson),
-      amount: json |> at(list{"msg", "amount"}, list(Coin.decodeCoin)),
-    }
+    buildObject(json => {
+      depositor: json.at(list{"msg", "depositor"}, address),
+      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      amount: json.at(list{"msg", "amount"}, list(Coin.decodeCoin)),
+    })
   }
 }
 
@@ -756,23 +762,23 @@ module Vote = {
     option: string,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      voterAddress: json |> at(list{"msg", "voter"}, string) |> Address.fromBech32,
-      proposalID: json |> at(list{"msg", "proposal_id"}, ID.Proposal.fromJson),
-      option: json |> at(list{"msg", "option"}, int) |> parse,
-      title: json |> at(list{"msg", "title"}, string),
-    }
+    buildObject(json => {
+      voterAddress: json.at(list{"msg", "voter"}, address),
+      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      option: json.at(list{"msg", "option"}, int)->parse,
+      title: json.at(list{"msg", "title"}, string),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      voterAddress: json |> at(list{"msg", "voter"}, string) |> Address.fromBech32,
-      proposalID: json |> at(list{"msg", "proposal_id"}, ID.Proposal.fromJson),
-      option: json |> at(list{"msg", "option"}, string),
-    }
+    buildObject(json => {
+      voterAddress: json.at(list{"msg", "voter"}, address),
+      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      option: json.at(list{"msg", "option"}, string),
+    })
   }
 }
 
@@ -785,21 +791,21 @@ module WithdrawCommission = {
   }
   type fail_t = {validatorAddress: Address.t}
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      validatorAddress: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-      amount: json |> at(list{"msg", "commission_amount"}, string) |> GraphQLParser.coins,
-      moniker: json |> at(list{"msg", "moniker"}, string),
-      identity: json |> at(list{"msg", "identity"}, string),
-    }
+    buildObject(json => {
+      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+      amount: json.at(list{"msg", "commission_amount"}, string)->GraphQLParser.coins,
+      moniker: json.at(list{"msg", "moniker"}, string),
+      identity: json.at(list{"msg", "identity"}, string),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      validatorAddress: json |> at(list{"msg", "validator_address"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+    })
   }
 }
 
@@ -812,39 +818,39 @@ module MultiSend = {
     inputs: list<send_tx_t>,
     outputs: list<send_tx_t>,
   }
-  let decodeSendTx = json => {
+  let decodeSendTx = {
     open JsonUtils.Decode
-    {
-      address: json |> field("address", string) |> Address.fromBech32,
-      coins: json |> field("coins", list(Coin.decodeCoin)),
-    }
+    object(fields => {
+      address: fields.required(. "address", address),
+      coins: fields.required(. "coins", list(Coin.decodeCoin)),
+    })
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      inputs: json |> at(list{"msg", "inputs"}, list(decodeSendTx)),
-      outputs: json |> at(list{"msg", "outputs"}, list(decodeSendTx)),
-    }
+    buildObject(json => {
+      inputs: json.at(list{"msg", "inputs"}, list(decodeSendTx)),
+      outputs: json.at(list{"msg", "outputs"}, list(decodeSendTx)),
+    })
   }
 }
 
 module Activate = {
   type t = {validatorAddress: Address.t}
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      validatorAddress: json |> at(list{"msg", "validator"}, string) |> Address.fromBech32,
-    }
+    buildObject(json => {
+      validatorAddress: json.at(list{"msg", "validator"}, address),
+    })
   }
 }
 
 module CreateClient = {
   type t = {signer: Address.t}
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32}
+    buildObject(json => {signer: json.at(list{"msg", "signer"}, address)})
   }
 }
 
@@ -853,12 +859,12 @@ module UpdateClient = {
     signer: Address.t,
     clientID: string,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      clientID: json |> at(list{"msg", "client_id"}, string),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      clientID: json.at(list{"msg", "client_id"}, string),
+    })
   }
 }
 
@@ -867,12 +873,12 @@ module UpgradeClient = {
     signer: Address.t,
     clientID: string,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      clientID: json |> at(list{"msg", "client_id"}, string),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      clientID: json.at(list{"msg", "client_id"}, string),
+    })
   }
 }
 
@@ -881,12 +887,12 @@ module SubmitClientMisbehaviour = {
     signer: Address.t,
     clientID: string,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      clientID: json |> at(list{"msg", "client_id"}, string),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      clientID: json.at(list{"msg", "client_id"}, string),
+    })
   }
 }
 
@@ -896,12 +902,12 @@ module Height = {
     revisionNumber: int,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      revisionHeight: json |> field("revision_height", int),
-      revisionNumber: json |> field("revision_number", int),
-    }
+    object(fields => {
+      revisionHeight: fields.required(. "revision_height", int),
+      revisionNumber: fields.required(. "revision_number", int),
+    })
   }
 }
 
@@ -911,12 +917,12 @@ module ConnectionCounterParty = {
     connectionID: string,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      clientID: json |> field("client_id", string),
-      connectionID: json |> optional(field("connection_id", string)) |> getDefaultValue,
-    }
+    object(fields => {
+      clientID: fields.required(. "client_id", string),
+      connectionID: fields.optional(. "connection_id", string)->getDefaultValue,
+    })
   }
 }
 
@@ -928,14 +934,14 @@ module ConnectionOpenInit = {
     counterparty: ConnectionCounterParty.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      clientID: json |> at(list{"msg", "client_id"}, string),
-      delayPeriod: json |> at(list{"msg", "delay_period"}, int),
-      counterparty: json |> at(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      clientID: json.at(list{"msg", "client_id"}, string),
+      delayPeriod: json.at(list{"msg", "delay_period"}, int),
+      counterparty: json.at(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
+    })
   }
 }
 
@@ -949,17 +955,17 @@ module ConnectionOpenTry = {
     consensusHeight: Height.t,
     proofHeight: Height.t,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      clientID: json |> at(list{"msg", "client_id"}, string),
-      previousConnectionID: json |> at(list{"msg", "previous_connection_id"}, string),
-      delayPeriod: json |> at(list{"msg", "delay_period"}, int),
-      counterparty: json |> at(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
-      consensusHeight: json |> at(list{"msg", "consensus_height"}, Height.decode),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      clientID: json.at(list{"msg", "client_id"}, string),
+      previousConnectionID: json.at(list{"msg", "previous_connection_id"}, string),
+      delayPeriod: json.at(list{"msg", "delay_period"}, int),
+      counterparty: json.at(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
+      consensusHeight: json.at(list{"msg", "consensus_height"}, Height.decode),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -971,15 +977,15 @@ module ConnectionOpenAck = {
     consensusHeight: Height.t,
     proofHeight: Height.t,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      connectionID: json |> at(list{"msg", "connection_id"}, string),
-      counterpartyConnectionID: json |> at(list{"msg", "counterparty_connection_id"}, string),
-      consensusHeight: json |> at(list{"msg", "consensus_height"}, Height.decode),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      connectionID: json.at(list{"msg", "connection_id"}, string),
+      counterpartyConnectionID: json.at(list{"msg", "counterparty_connection_id"}, string),
+      consensusHeight: json.at(list{"msg", "consensus_height"}, Height.decode),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -989,13 +995,13 @@ module ConnectionOpenConfirm = {
     connectionID: string,
     proofHeight: Height.t,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      connectionID: json |> at(list{"msg", "connection_id"}, string),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      connectionID: json.at(list{"msg", "connection_id"}, string),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -1005,12 +1011,12 @@ module ChannelCounterParty = {
     channelID: string,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      portID: json |> field("port_id", string),
-      channelID: json |> optional(field("channel_id", string)) |> getDefaultValue,
-    }
+    object(fields => {
+      portID: fields.required(. "port_id", string),
+      channelID: fields.optional(. "channel_id", string)->getDefaultValue,
+    })
   }
 }
 
@@ -1039,13 +1045,13 @@ module Channel = {
     counterparty: ChannelCounterParty.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      state: json |> field("state", int) |> getStateText,
-      ordering: json |> field("ordering", int) |> getOrderText,
-      counterparty: json |> field("counterparty", ChannelCounterParty.decode),
-    }
+    object(fields => {
+      state: fields.required(. "state", int)->getStateText,
+      ordering: fields.required(. "ordering", int)->getOrderText,
+      counterparty: fields.required(. "counterparty", ChannelCounterParty.decode),
+    })
   }
 }
 
@@ -1056,13 +1062,13 @@ module ChannelOpenInit = {
     channel: Channel.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      portID: json |> at(list{"msg", "port_id"}, string),
-      channel: json |> at(list{"msg", "channel"}, Channel.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      portID: json.at(list{"msg", "port_id"}, string),
+      channel: json.at(list{"msg", "channel"}, Channel.decode),
+    })
   }
 }
 
@@ -1074,14 +1080,14 @@ module ChannelOpenTry = {
     proofHeight: Height.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      portID: json |> at(list{"msg", "port_id"}, string),
-      channel: json |> at(list{"msg", "channel"}, Channel.decode),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      portID: json.at(list{"msg", "port_id"}, string),
+      channel: json.at(list{"msg", "channel"}, Channel.decode),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -1093,15 +1099,15 @@ module ChannelOpenAck = {
     counterpartyChannelID: string,
     proofHeight: Height.t,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      portID: json |> at(list{"msg", "port_id"}, string),
-      channelID: json |> at(list{"msg", "channel_id"}, string),
-      counterpartyChannelID: json |> at(list{"msg", "counterparty_channel_id"}, string),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      portID: json.at(list{"msg", "port_id"}, string),
+      channelID: json.at(list{"msg", "channel_id"}, string),
+      counterpartyChannelID: json.at(list{"msg", "counterparty_channel_id"}, string),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -1112,14 +1118,14 @@ module ChannelOpenConfirm = {
     channelID: string,
     proofHeight: Height.t,
   }
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      portID: json |> at(list{"msg", "port_id"}, string),
-      channelID: json |> at(list{"msg", "channel_id"}, string),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      portID: json.at(list{"msg", "port_id"}, string),
+      channelID: json.at(list{"msg", "channel_id"}, string),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -1130,13 +1136,13 @@ module ChannelCloseInit = {
     channelID: string,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      portID: json |> at(list{"msg", "port_id"}, string),
-      channelID: json |> at(list{"msg", "channel_id"}, string),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      portID: json.at(list{"msg", "port_id"}, string),
+      channelID: json.at(list{"msg", "channel_id"}, string),
+    })
   }
 }
 
@@ -1148,14 +1154,14 @@ module ChannelCloseConfirm = {
     proofHeight: Height.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      portID: json |> at(list{"msg", "port_id"}, string),
-      channelID: json |> at(list{"msg", "channel_id"}, string),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      portID: json.at(list{"msg", "port_id"}, string),
+      channelID: json.at(list{"msg", "channel_id"}, string),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -1171,18 +1177,18 @@ module Packet = {
     data: string,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      sequence: json |> field("sequence", int),
-      sourcePort: json |> field("source_port", string),
-      sourceChannel: json |> field("source_channel", string),
-      destinationPort: json |> field("destination_port", string),
-      destinationChannel: json |> field("destination_channel", string),
-      timeoutHeight: json |> at(list{"timeout_height", "revision_height"}, int),
-      timeoutTimestamp: json |> at(list{"timeout_timestamp"}, GraphQLParser.timeNS),
-      data: json |> field("data", string),
-    }
+    buildObject(json => {
+      sequence: json.at(list{"sequence"}, int),
+      sourcePort: json.at(list{"source_port"}, string),
+      sourceChannel: json.at(list{"source_channel"}, string),
+      destinationPort: json.at(list{"destination_port"}, string),
+      destinationChannel: json.at(list{"destination_channel"}, string),
+      timeoutHeight: json.at(list{"timeout_height", "revision_height"}, int),
+      timeoutTimestamp: json.at(list{"timeout_timestamp"}, GraphQLParser.timeNS),
+      data: json.at(list{"data"}, string),
+    })
   }
 }
 
@@ -1191,7 +1197,7 @@ module RecvPacket = {
     signer: Address.t,
     packet: Packet.t,
     proofHeight: Height.t,
-    packetData: option<PacketDecoder.t>,
+    packetData: PacketDecoder.t,
   }
 
   type fail_t = {
@@ -1200,23 +1206,23 @@ module RecvPacket = {
     proofHeight: Height.t,
   }
 
-  let decodeSuccess = json => {
+  let decodeSuccess = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      packet: json |> at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-      packetData: json |> optional(PacketDecoder.decodeAction),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      packet: json.at(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      packetData: json.at(list{}, PacketDecoder.decodeAction),
+    })
   }
 
-  let decodeFail = json => {
+  let decodeFail = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      packet: json |> at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      packet: json.at(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -1227,13 +1233,13 @@ module AcknowledgePacket = {
     proofHeight: Height.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      packet: json |> at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      packet: json.at(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -1244,13 +1250,13 @@ module Timeout = {
     proofHeight: Height.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      packet: json |> at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      packet: json.at(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -1261,13 +1267,13 @@ module TimeoutOnClose = {
     proofHeight: Height.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      signer: json |> at(list{"msg", "signer"}, string) |> Address.fromBech32,
-      packet: json |> at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json |> at(list{"msg", "proof_height"}, Height.decode),
-    }
+    buildObject(json => {
+      signer: json.at(list{"msg", "signer"}, address),
+      packet: json.at(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+    })
   }
 }
 
@@ -1282,17 +1288,17 @@ module Transfer = {
     timeoutTimestamp: MomentRe.Moment.t,
   }
 
-  let decode = json => {
+  let decode = {
     open JsonUtils.Decode
-    {
-      sender: json |> at(list{"msg", "sender"}, string) |> Address.fromBech32,
-      receiver: json |> at(list{"msg", "receiver"}, string),
-      sourcePort: json |> at(list{"msg", "source_port"}, string),
-      sourceChannel: json |> at(list{"msg", "source_channel"}, string),
-      token: json |> at(list{"msg", "token"}, Coin.decodeCoin),
-      timeoutHeight: json |> at(list{"msg", "timeout_height"}, Height.decode),
-      timeoutTimestamp: json |> at(list{"msg", "timeout_timestamp"}, GraphQLParser.timeNS),
-    }
+    buildObject(json => {
+      sender: json.at(list{"msg", "sender"}, address),
+      receiver: json.at(list{"msg", "receiver"}, string),
+      sourcePort: json.at(list{"msg", "source_port"}, string),
+      sourceChannel: json.at(list{"msg", "source_channel"}, string),
+      token: json.at(list{"msg", "token"}, Coin.decodeCoin),
+      timeoutHeight: json.at(list{"msg", "timeout_height"}, Height.decode),
+      timeoutTimestamp: json.at(list{"msg", "timeout_timestamp"}, GraphQLParser.timeNS),
+    })
   }
 }
 
@@ -1498,7 +1504,7 @@ let getCreator = msg => {
   | WithdrawCommissionMsgFail(withdrawal) => withdrawal.validatorAddress
   | MultiSendMsgSuccess(tx)
   | MultiSendMsgFail(tx) =>
-    let firstInput = tx.inputs |> Belt_List.getExn(_, 0)
+    let firstInput = tx.inputs->Belt.List.getExn(_, 0)
     firstInput.address
   | ActivateMsgSuccess(activator)
   | ActivateMsgFail(activator) =>
@@ -1524,7 +1530,7 @@ let getCreator = msg => {
   | TimeoutMsg(timeout) => timeout.signer
   | TimeoutOnCloseMsg(timeout) => timeout.signer
   | TransferMsg(message) => message.sender
-  | _ => "" |> Address.fromHex
+  | _ => ""->Address.fromHex
   }
 }
 
@@ -1682,111 +1688,124 @@ let getBadgeTheme = msg => {
 let decodeAction = json => {
   let decoded = {
     open JsonUtils.Decode
-    switch json |> field("type", string) |> getBadgeVariantFromString {
-    | SendBadge => SendMsgSuccess(json |> Send.decode)
+    switch json->mustGet("type", string)->getBadgeVariantFromString {
+    | SendBadge => SendMsgSuccess(json->mustDecode(Send.decode))
     | ReceiveBadge => raise(Not_found)
-    | CreateDataSourceBadge => CreateDataSourceMsgSuccess(json |> CreateDataSource.decodeSuccess)
-    | EditDataSourceBadge => EditDataSourceMsgSuccess(json |> EditDataSource.decode)
+    | CreateDataSourceBadge =>
+      CreateDataSourceMsgSuccess(json->mustDecode(CreateDataSource.decodeSuccess))
+    | EditDataSourceBadge => EditDataSourceMsgSuccess(json->mustDecode(EditDataSource.decode))
     | CreateOracleScriptBadge =>
-      CreateOracleScriptMsgSuccess(json |> CreateOracleScript.decodeSuccess)
-    | EditOracleScriptBadge => EditOracleScriptMsgSuccess(json |> EditOracleScript.decode)
-    | RequestBadge => RequestMsgSuccess(json |> Request.decodeSuccess)
-    | ReportBadge => ReportMsgSuccess(json |> Report.decode)
-    | AddReporterBadge => AddReporterMsgSuccess(json |> AddReporter.decodeSuccess)
-    | RemoveReporterBadge => RemoveReporterMsgSuccess(json |> RemoveReporter.decodeSuccess)
-    | CreateValidatorBadge => CreateValidatorMsgSuccess(json |> CreateValidator.decode)
-    | EditValidatorBadge => EditValidatorMsgSuccess(json |> EditValidator.decode)
-    | DelegateBadge => DelegateMsgSuccess(json |> Delegate.decodeSuccess)
-    | UndelegateBadge => UndelegateMsgSuccess(json |> Undelegate.decodeSuccess)
-    | RedelegateBadge => RedelegateMsgSuccess(json |> Redelegate.decodeSuccess)
-    | WithdrawRewardBadge => WithdrawRewardMsgSuccess(json |> WithdrawReward.decodeSuccess)
-    | UnjailBadge => UnjailMsgSuccess(json |> Unjail.decode)
-    | SetWithdrawAddressBadge => SetWithdrawAddressMsgSuccess(json |> SetWithdrawAddress.decode)
-    | SubmitProposalBadge => SubmitProposalMsgSuccess(json |> SubmitProposal.decodeSuccess)
-    | DepositBadge => DepositMsgSuccess(json |> Deposit.decodeSuccess)
-    | VoteBadge => VoteMsgSuccess(json |> Vote.decodeSuccess)
+      CreateOracleScriptMsgSuccess(json->mustDecode(CreateOracleScript.decodeSuccess))
+    | EditOracleScriptBadge => EditOracleScriptMsgSuccess(json->mustDecode(EditOracleScript.decode))
+    | RequestBadge => RequestMsgSuccess(json->mustDecode(Request.decodeSuccess))
+    | ReportBadge => ReportMsgSuccess(json->mustDecode(Report.decode))
+    | AddReporterBadge => AddReporterMsgSuccess(json->mustDecode(AddReporter.decodeSuccess))
+    | RemoveReporterBadge =>
+      RemoveReporterMsgSuccess(json->mustDecode(RemoveReporter.decodeSuccess))
+    | CreateValidatorBadge => CreateValidatorMsgSuccess(json->mustDecode(CreateValidator.decode))
+    | EditValidatorBadge => EditValidatorMsgSuccess(json->mustDecode(EditValidator.decode))
+    | DelegateBadge => DelegateMsgSuccess(json->mustDecode(Delegate.decodeSuccess))
+    | UndelegateBadge => UndelegateMsgSuccess(json->mustDecode(Undelegate.decodeSuccess))
+    | RedelegateBadge => RedelegateMsgSuccess(json->mustDecode(Redelegate.decodeSuccess))
+    | WithdrawRewardBadge =>
+      WithdrawRewardMsgSuccess(json->mustDecode(WithdrawReward.decodeSuccess))
+    | UnjailBadge => UnjailMsgSuccess(json->mustDecode(Unjail.decode))
+    | SetWithdrawAddressBadge =>
+      SetWithdrawAddressMsgSuccess(json->mustDecode(SetWithdrawAddress.decode))
+    | SubmitProposalBadge =>
+      SubmitProposalMsgSuccess(json->mustDecode(SubmitProposal.decodeSuccess))
+    | DepositBadge => DepositMsgSuccess(json->mustDecode(Deposit.decodeSuccess))
+    | VoteBadge => VoteMsgSuccess(json->mustDecode(Vote.decodeSuccess))
     | WithdrawCommissionBadge =>
-      WithdrawCommissionMsgSuccess(json |> WithdrawCommission.decodeSuccess)
-    | MultiSendBadge => MultiSendMsgSuccess(json |> MultiSend.decode)
-    | ActivateBadge => ActivateMsgSuccess(json |> Activate.decode)
+      WithdrawCommissionMsgSuccess(json->mustDecode(WithdrawCommission.decodeSuccess))
+    | MultiSendBadge => MultiSendMsgSuccess(json->mustDecode(MultiSend.decode))
+    | ActivateBadge => ActivateMsgSuccess(json->mustDecode(Activate.decode))
     | UnknownBadge => UnknownMsg
     //IBC
-    | CreateClientBadge => CreateClientMsg(json |> CreateClient.decode)
-    | UpdateClientBadge => UpdateClientMsg(json |> UpdateClient.decode)
-    | UpgradeClientBadge => UpgradeClientMsg(json |> UpgradeClient.decode)
+    | CreateClientBadge => CreateClientMsg(json->mustDecode(CreateClient.decode))
+    | UpdateClientBadge => UpdateClientMsg(json->mustDecode(UpdateClient.decode))
+    | UpgradeClientBadge => UpgradeClientMsg(json->mustDecode(UpgradeClient.decode))
     | SubmitClientMisbehaviourBadge =>
-      SubmitClientMisbehaviourMsg(json |> SubmitClientMisbehaviour.decode)
-    | ConnectionOpenInitBadge => ConnectionOpenInitMsg(json |> ConnectionOpenInit.decode)
-    | ConnectionOpenTryBadge => ConnectionOpenTryMsg(json |> ConnectionOpenTry.decode)
-    | ConnectionOpenAckBadge => ConnectionOpenAckMsg(json |> ConnectionOpenAck.decode)
-    | ConnectionOpenConfirmBadge => ConnectionOpenConfirmMsg(json |> ConnectionOpenConfirm.decode)
-    | ChannelOpenInitBadge => ChannelOpenInitMsg(json |> ChannelOpenInit.decode)
-    | ChannelOpenTryBadge => ChannelOpenTryMsg(json |> ChannelOpenTry.decode)
-    | ChannelOpenAckBadge => ChannelOpenAckMsg(json |> ChannelOpenAck.decode)
-    | ChannelOpenConfirmBadge => ChannelOpenConfirmMsg(json |> ChannelOpenConfirm.decode)
-    | ChannelCloseInitBadge => ChannelCloseInitMsg(json |> ChannelCloseInit.decode)
-    | ChannelCloseConfirmBadge => ChannelCloseConfirmMsg(json |> ChannelCloseConfirm.decode)
-    | RecvPacketBadge => RecvPacketMsgSuccess(json |> RecvPacket.decodeSuccess)
-    | AcknowledgePacketBadge => AcknowledgePacketMsg(json |> AcknowledgePacket.decode)
-    | TimeoutBadge => TimeoutMsg(json |> Timeout.decode)
-    | TimeoutOnCloseBadge => TimeoutOnCloseMsg(json |> TimeoutOnClose.decode)
-    | TransferBadge => TransferMsg(json |> Transfer.decode)
+      SubmitClientMisbehaviourMsg(json->mustDecode(SubmitClientMisbehaviour.decode))
+    | ConnectionOpenInitBadge => ConnectionOpenInitMsg(json->mustDecode(ConnectionOpenInit.decode))
+    | ConnectionOpenTryBadge => ConnectionOpenTryMsg(json->mustDecode(ConnectionOpenTry.decode))
+    | ConnectionOpenAckBadge => ConnectionOpenAckMsg(json->mustDecode(ConnectionOpenAck.decode))
+    | ConnectionOpenConfirmBadge =>
+      ConnectionOpenConfirmMsg(json->mustDecode(ConnectionOpenConfirm.decode))
+    | ChannelOpenInitBadge => ChannelOpenInitMsg(json->mustDecode(ChannelOpenInit.decode))
+    | ChannelOpenTryBadge => ChannelOpenTryMsg(json->mustDecode(ChannelOpenTry.decode))
+    | ChannelOpenAckBadge => ChannelOpenAckMsg(json->mustDecode(ChannelOpenAck.decode))
+    | ChannelOpenConfirmBadge => ChannelOpenConfirmMsg(json->mustDecode(ChannelOpenConfirm.decode))
+    | ChannelCloseInitBadge => ChannelCloseInitMsg(json->mustDecode(ChannelCloseInit.decode))
+    | ChannelCloseConfirmBadge =>
+      ChannelCloseConfirmMsg(json->mustDecode(ChannelCloseConfirm.decode))
+    | RecvPacketBadge => RecvPacketMsgSuccess(json->mustDecode(RecvPacket.decodeSuccess))
+    | AcknowledgePacketBadge => AcknowledgePacketMsg(json->mustDecode(AcknowledgePacket.decode))
+    | TimeoutBadge => TimeoutMsg(json->mustDecode(Timeout.decode))
+    | TimeoutOnCloseBadge => TimeoutOnCloseMsg(json->mustDecode(TimeoutOnClose.decode))
+    | TransferBadge => TransferMsg(json->mustDecode(Transfer.decode))
     }
   }
-  {raw: json, decoded: decoded, isIBC: decoded |> isIBC}
+  {raw: json, decoded, isIBC: decoded->isIBC}
 }
 
 let decodeFailAction = json => {
   let decoded = {
     open JsonUtils.Decode
-    switch json |> field("type", string) |> getBadgeVariantFromString {
-    | SendBadge => SendMsgFail(json |> Send.decode)
+    switch json->mustGet("type", string)->getBadgeVariantFromString {
+    | SendBadge => SendMsgFail(json->mustDecode(Send.decode))
     | ReceiveBadge => raise(Not_found)
-    | CreateDataSourceBadge => CreateDataSourceMsgFail(json |> CreateDataSource.decodeFail)
-    | EditDataSourceBadge => EditDataSourceMsgFail(json |> EditDataSource.decode)
-    | CreateOracleScriptBadge => CreateOracleScriptMsgFail(json |> CreateOracleScript.decodeFail)
-    | EditOracleScriptBadge => EditOracleScriptMsgFail(json |> EditOracleScript.decode)
-    | RequestBadge => RequestMsgFail(json |> Request.decodeFail)
-    | ReportBadge => ReportMsgFail(json |> Report.decode)
-    | AddReporterBadge => AddReporterMsgFail(json |> AddReporter.decodeFail)
-    | RemoveReporterBadge => RemoveReporterMsgFail(json |> RemoveReporter.decodeFail)
-    | CreateValidatorBadge => CreateValidatorMsgFail(json |> CreateValidator.decode)
-    | EditValidatorBadge => EditValidatorMsgFail(json |> EditValidator.decode)
-    | DelegateBadge => DelegateMsgFail(json |> Delegate.decodeFail)
-    | UndelegateBadge => UndelegateMsgFail(json |> Undelegate.decodeFail)
-    | RedelegateBadge => RedelegateMsgFail(json |> Redelegate.decodeFail)
-    | WithdrawRewardBadge => WithdrawRewardMsgFail(json |> WithdrawReward.decodeFail)
-    | UnjailBadge => UnjailMsgFail(json |> Unjail.decode)
-    | SetWithdrawAddressBadge => SetWithdrawAddressMsgFail(json |> SetWithdrawAddress.decode)
-    | SubmitProposalBadge => SubmitProposalMsgFail(json |> SubmitProposal.decodeFail)
-    | DepositBadge => DepositMsgFail(json |> Deposit.decodeFail)
-    | VoteBadge => VoteMsgFail(json |> Vote.decodeFail)
-    | WithdrawCommissionBadge => WithdrawCommissionMsgFail(json |> WithdrawCommission.decodeFail)
-    | MultiSendBadge => MultiSendMsgFail(json |> MultiSend.decode)
-    | ActivateBadge => ActivateMsgFail(json |> Activate.decode)
+    | CreateDataSourceBadge =>
+      CreateDataSourceMsgFail(json->mustDecode(CreateDataSource.decodeFail))
+    | EditDataSourceBadge => EditDataSourceMsgFail(json->mustDecode(EditDataSource.decode))
+    | CreateOracleScriptBadge =>
+      CreateOracleScriptMsgFail(json->mustDecode(CreateOracleScript.decodeFail))
+    | EditOracleScriptBadge => EditOracleScriptMsgFail(json->mustDecode(EditOracleScript.decode))
+    | RequestBadge => RequestMsgFail(json->mustDecode(Request.decodeFail))
+    | ReportBadge => ReportMsgFail(json->mustDecode(Report.decode))
+    | AddReporterBadge => AddReporterMsgFail(json->mustDecode(AddReporter.decodeFail))
+    | RemoveReporterBadge => RemoveReporterMsgFail(json->mustDecode(RemoveReporter.decodeFail))
+    | CreateValidatorBadge => CreateValidatorMsgFail(json->mustDecode(CreateValidator.decode))
+    | EditValidatorBadge => EditValidatorMsgFail(json->mustDecode(EditValidator.decode))
+    | DelegateBadge => DelegateMsgFail(json->mustDecode(Delegate.decodeFail))
+    | UndelegateBadge => UndelegateMsgFail(json->mustDecode(Undelegate.decodeFail))
+    | RedelegateBadge => RedelegateMsgFail(json->mustDecode(Redelegate.decodeFail))
+    | WithdrawRewardBadge => WithdrawRewardMsgFail(json->mustDecode(WithdrawReward.decodeFail))
+    | UnjailBadge => UnjailMsgFail(json->mustDecode(Unjail.decode))
+    | SetWithdrawAddressBadge =>
+      SetWithdrawAddressMsgFail(json->mustDecode(SetWithdrawAddress.decode))
+    | SubmitProposalBadge => SubmitProposalMsgFail(json->mustDecode(SubmitProposal.decodeFail))
+    | DepositBadge => DepositMsgFail(json->mustDecode(Deposit.decodeFail))
+    | VoteBadge => VoteMsgFail(json->mustDecode(Vote.decodeFail))
+    | WithdrawCommissionBadge =>
+      WithdrawCommissionMsgFail(json->mustDecode(WithdrawCommission.decodeFail))
+    | MultiSendBadge => MultiSendMsgFail(json->mustDecode(MultiSend.decode))
+    | ActivateBadge => ActivateMsgFail(json->mustDecode(Activate.decode))
     | UnknownBadge => UnknownMsg
     //IBC
-    | CreateClientBadge => CreateClientMsg(json |> CreateClient.decode)
-    | UpdateClientBadge => UpdateClientMsg(json |> UpdateClient.decode)
-    | UpgradeClientBadge => UpgradeClientMsg(json |> UpgradeClient.decode)
+    | CreateClientBadge => CreateClientMsg(json->mustDecode(CreateClient.decode))
+    | UpdateClientBadge => UpdateClientMsg(json->mustDecode(UpdateClient.decode))
+    | UpgradeClientBadge => UpgradeClientMsg(json->mustDecode(UpgradeClient.decode))
     | SubmitClientMisbehaviourBadge =>
-      SubmitClientMisbehaviourMsg(json |> SubmitClientMisbehaviour.decode)
-    | ConnectionOpenInitBadge => ConnectionOpenInitMsg(json |> ConnectionOpenInit.decode)
-    | ConnectionOpenTryBadge => ConnectionOpenTryMsg(json |> ConnectionOpenTry.decode)
-    | ConnectionOpenAckBadge => ConnectionOpenAckMsg(json |> ConnectionOpenAck.decode)
-    | ConnectionOpenConfirmBadge => ConnectionOpenConfirmMsg(json |> ConnectionOpenConfirm.decode)
-    | ChannelOpenInitBadge => ChannelOpenInitMsg(json |> ChannelOpenInit.decode)
-    | ChannelOpenTryBadge => ChannelOpenTryMsg(json |> ChannelOpenTry.decode)
-    | ChannelOpenAckBadge => ChannelOpenAckMsg(json |> ChannelOpenAck.decode)
-    | ChannelOpenConfirmBadge => ChannelOpenConfirmMsg(json |> ChannelOpenConfirm.decode)
-    | ChannelCloseInitBadge => ChannelCloseInitMsg(json |> ChannelCloseInit.decode)
-    | ChannelCloseConfirmBadge => ChannelCloseConfirmMsg(json |> ChannelCloseConfirm.decode)
-    | RecvPacketBadge => RecvPacketMsgFail(json |> RecvPacket.decodeFail)
-    | AcknowledgePacketBadge => AcknowledgePacketMsg(json |> AcknowledgePacket.decode)
-    | TimeoutBadge => TimeoutMsg(json |> Timeout.decode)
-    | TimeoutOnCloseBadge => TimeoutOnCloseMsg(json |> TimeoutOnClose.decode)
-    | TransferBadge => TransferMsg(json |> Transfer.decode)
+      SubmitClientMisbehaviourMsg(json->mustDecode(SubmitClientMisbehaviour.decode))
+    | ConnectionOpenInitBadge => ConnectionOpenInitMsg(json->mustDecode(ConnectionOpenInit.decode))
+    | ConnectionOpenTryBadge => ConnectionOpenTryMsg(json->mustDecode(ConnectionOpenTry.decode))
+    | ConnectionOpenAckBadge => ConnectionOpenAckMsg(json->mustDecode(ConnectionOpenAck.decode))
+    | ConnectionOpenConfirmBadge =>
+      ConnectionOpenConfirmMsg(json->mustDecode(ConnectionOpenConfirm.decode))
+    | ChannelOpenInitBadge => ChannelOpenInitMsg(json->mustDecode(ChannelOpenInit.decode))
+    | ChannelOpenTryBadge => ChannelOpenTryMsg(json->mustDecode(ChannelOpenTry.decode))
+    | ChannelOpenAckBadge => ChannelOpenAckMsg(json->mustDecode(ChannelOpenAck.decode))
+    | ChannelOpenConfirmBadge => ChannelOpenConfirmMsg(json->mustDecode(ChannelOpenConfirm.decode))
+    | ChannelCloseInitBadge => ChannelCloseInitMsg(json->mustDecode(ChannelCloseInit.decode))
+    | ChannelCloseConfirmBadge =>
+      ChannelCloseConfirmMsg(json->mustDecode(ChannelCloseConfirm.decode))
+    | RecvPacketBadge => RecvPacketMsgFail(json->mustDecode(RecvPacket.decodeFail))
+    | AcknowledgePacketBadge => AcknowledgePacketMsg(json->mustDecode(AcknowledgePacket.decode))
+    | TimeoutBadge => TimeoutMsg(json->mustDecode(Timeout.decode))
+    | TimeoutOnCloseBadge => TimeoutOnCloseMsg(json->mustDecode(TimeoutOnClose.decode))
+    | TransferBadge => TransferMsg(json->mustDecode(Transfer.decode))
     }
   }
-  {raw: json, decoded: decoded, isIBC: decoded |> isIBC}
+  {raw: json, decoded, isIBC: decoded->isIBC}
 }

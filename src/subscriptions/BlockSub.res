@@ -96,14 +96,14 @@ module PastDayBlockCountConfig = %graphql(`
 `)
 
 module BlockSum = {
-  let toExternal = (count: int) => (24 * 60 * 60 |> float_of_int) /. count->float_of_int
+  let toExternal = (count: int) => (24 * 60 * 60)->float_of_int /. count->float_of_int
 }
 
 let getList = (~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({limit: pageSize, offset})
 
-  result |> Sub.fromData |> Sub.map(_, ({blocks}) => blocks->Belt_Array.map(toExternal))
+  result->Sub.fromData->Sub.map(({blocks}) => blocks->Belt.Array.map(toExternal))
 }
 
 let get = (~height, ()) => {
@@ -118,8 +118,8 @@ let getAvgBlockTime = (greater, less) => {
   })
 
   result
-  |> Sub.fromData
-  |> Sub.map(_, ({blocks_aggregate}) =>
+  ->Sub.fromData
+  ->Sub.map(({blocks_aggregate}) =>
     blocks_aggregate.aggregate->Belt_Option.getExn->(y => y.count)->BlockSum.toExternal
   )
 }
@@ -127,9 +127,9 @@ let getAvgBlockTime = (greater, less) => {
 let getLatest = () => {
   let result = getList(~pageSize=1, ~page=1, ())
 
-  result |> Sub.flatMap(_, blocks => {
-    switch blocks->Belt_Array.get(0) {
-    | Some(latestBlock) => latestBlock |> Sub.resolve
+  result->Sub.flatMap(_, blocks => {
+    switch blocks->Belt.Array.get(0) {
+    | Some(latestBlock) => latestBlock->Sub.resolve
     | None => NoData
     }
   })

@@ -10,7 +10,7 @@ module Hash = {
   let parse = json => json->GraphQLParser.hash
 
   //Note: just mock
-  let serialize = x => "empty"->Js.Json.string
+  let serialize = _ => "empty"->Js.Json.string
 }
 
 module String = {
@@ -32,7 +32,7 @@ module FromUnixSecond = {
 module FloatExn = {
   type t = float
 
-  let parse = json => json -> Js.Json.decodeNumber
+  let parse = json => json->Js.Json.decodeNumber
   //Note: just mock
   let serialize = float => float->Js.Float.toString->Js.Json.parseExn
 }
@@ -40,7 +40,7 @@ module FloatExn = {
 module Test = {
   type t = int
 
-  let parse = json => json -> Belt.Option.getExn -> Js.Json.decodeNumber -> Belt.Option.getExn
+  let parse = json => json->Belt.Option.getExn->Js.Json.decodeNumber->Belt.Option.getExn
   //Note: just mock
   let serialize = float => float->Js.Float.toString->Js.Json.parseExn
 }
@@ -84,26 +84,26 @@ module Coins = {
   type t = list<Coin.t>
   let parse = json => json->GraphQLParser.coins
   //TODO: implement for coins
-  let serialize = coins => "coins"
+  let serialize = _ => "coins"
 }
 
 module Coin = {
   type t = Coin.t
   let parse = json => json->GraphQLParser.coin
   //TODO: implement for coins
-  let serialize = coin => "coin" |> Js.Json.string
+  let serialize = _ => "coin"->Js.Json.string
 }
 
 module CoinWithDefault = {
   type t = Coin.t
   let parse = jsonOpt => jsonOpt->GraphQLParser.coinWithDefault
-  let serialize = coin => "coin" |> Js.Json.string
+  let serialize = _ => "coin"->Js.Json.string
 }
 
 module Buffer = {
   type t = JsBuffer.t
   let parse = json => json->GraphQLParser.buffer
-  let serialize = coin => "buffer" |> Js.Json.string
+  let serialize = _ => "buffer"->Js.Json.string
 }
 
 module OptionBuffer = {

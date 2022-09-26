@@ -12,10 +12,10 @@ let getBreakpoint = size =>
 
 let query = (size, styles) => {
   let breakpoint = getBreakpoint(size)
-  CssJs.media("(max-width:" ++ string_of_int(breakpoint) ++ "px)", styles)
+  CssJs.media("(max-width:" ++ Belt.Int.toString(breakpoint) ++ "px)", styles)
 }
 
-let getWindowWidth = () => window |> Window.innerWidth
+let getWindowWidth = () => window->Window.innerWidth
 
 let useQuery = (~size, ()) => {
   let breakpoint = getBreakpoint(size)
@@ -26,8 +26,8 @@ let useQuery = (~size, ()) => {
   }
 
   React.useEffect0(() => {
-    window -> Window.addEventListener("resize", handleWindowResize)
-    Some(() => window -> Window.removeEventListener("resize", handleWindowResize))
+    window->Window.addEventListener("resize", handleWindowResize)
+    Some(() => window->Window.removeEventListener("resize", handleWindowResize))
   })
 
   width <= breakpoint

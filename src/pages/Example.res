@@ -20,7 +20,7 @@
 //   let (_, dispatchModal) = React.useContext(ModalContext.context)
 
 //   let currentTime =
-//     React.useContext(TimeContext.context) |> MomentRe.Moment.format(Config.timestampUseFormat)
+//     React.useContext(TimeContext.context) -> MomentRe.Moment.format(Config.timestampUseFormat)
 
 //   Js.log(currentTime)
 
@@ -60,7 +60,7 @@
 
 //   // let update = () => setValue(prev => prev +. 20.)
 
-//   // let capitalizedName = "hello world" |> ChangeCase.pascalCase
+//   // let capitalizedName = "hello world" -> ChangeCase.pascalCase
 
 //   // let keyword = "testing"
 
@@ -104,9 +104,9 @@
 //   // bandChain->CosmosJS.setBech32MainPrefix("band")
 //   // Js.log2(
 //   //   "private",
-//   //   bandChain |> CosmosJS.getECPairPriv(_, mnemonic) |> JsBuffer.toHex(~with0x=false),
+//   //   bandChain -> CosmosJS.getECPairPriv(_, mnemonic) -> JsBuffer.toHex(~with0x=false),
 //   // )
-//   // Js.log2("address", bandChain |> CosmosJS.getAddress(_, mnemonic))
+//   // Js.log2("address", bandChain -> CosmosJS.getAddress(_, mnemonic))
 
 //   // let countUp = CountUp.context(
 //   //   CountUp.props(
@@ -184,7 +184,7 @@
 
 //   <>
 //     <Tooltip
-//       title={"hello world" |> React.string}
+//       title={"hello world" -> React.string}
 //       placement="bottom"
 //       arrow=true
 //       leaveDelay=0
@@ -197,7 +197,7 @@
 //       onClick={_ => {
 //         Copy.copy("Hello World")
 //       }}>
-//       {"Copy" |> React.string}
+//       {"Copy" -> React.string}
 //     </div>
 //     <div className=Styles.root>
 //       {switch blockSub {
@@ -207,7 +207,7 @@
 //         }
 //       | _ => {
 //           Js.log("Loading...")
-//           "Loading...." |> React.string
+//           "Loading...." -> React.string
 //         }
 //       }}
 //     </div>
@@ -216,19 +216,19 @@
 //         toggle()
 //         Js.log(isDarkMode)
 //       }}>
-//       {"Change Theme" |> React.string}
+//       {"Change Theme" -> React.string}
 //     </button>
-//     <button onClick={_ => send()}> {"Send modal" |> React.string} </button>
-//     <button onClick={_ => connectMnemonic()}> {"Connect Wallets Mnemonic" |> React.string} </button>
-//     <button onClick={_ => connectLedger()}> {"Connect Wallets Ledger" |> React.string} </button>
-//     <button onClick={_ => disconnect()}> {"Disconnected" |> React.string} </button>
+//     <button onClick={_ => send()}> {"Send modal" -> React.string} </button>
+//     <button onClick={_ => connectMnemonic()}> {"Connect Wallets Mnemonic" -> React.string} </button>
+//     <button onClick={_ => connectLedger()}> {"Connect Wallets Ledger" -> React.string} </button>
+//     <button onClick={_ => disconnect()}> {"Disconnected" -> React.string} </button>
 //     {switch accountOpt {
-//     | Some({address}) => address |> Address.toBech32 |> React.string
-//     | None => "not connected" |> React.string
+//     | Some({address}) => address -> Address.toBech32 -> React.string
+//     | None => "not connected" -> React.string
 //     }}
 //     <QRCode value={"Wow QR Code"} size=200 />
 //     <ReactHighlight className=Styles.padding>
-//       {"let x = hello world; console.log(x);" |> React.string}
+//       {"let x = hello world; console.log(x);" -> React.string}
 //     </ReactHighlight>
 //     {
 //       let dict = Js.Dict.empty()
@@ -244,13 +244,13 @@
 //       }
 //     | _ => React.null
 //     }}
-//     <button onClick={_ => run()}> {"Send request " |> React.string} </button>
+//     <button onClick={_ => run()}> {"Send request " -> React.string} </button>
 //     <MobileCard
 //       values=[
 //         (
 //           "TX Hash",
 //           InfoMobileCard.Address(
-//             "band1q72cy88h8je89lqhqhcskmzak25uyavdg79y95" |> Address.fromBech32,
+//             "band1q72cy88h8je89lqhqhcskmzak25uyavdg79y95" -> Address.fromBech32,
 //             149,
 //             #account,
 //           ),
@@ -269,7 +269,7 @@
 
 //   // let update = () => setValue(prev => prev +. 20.)
 
-//   // let capitalizedName = "hello world" |> ChangeCase.pascalCase
+//   // let capitalizedName = "hello world" -> ChangeCase.pascalCase
 
 //   // let keyword = "testing"
 
@@ -313,9 +313,9 @@
 //   // bandChain->CosmosJS.setBech32MainPrefix("band")
 //   // Js.log2(
 //   //   "private",
-//   //   bandChain |> CosmosJS.getECPairPriv(_, mnemonic) |> JsBuffer.toHex(~with0x=false),
+//   //   bandChain -> CosmosJS.getECPairPriv(_, mnemonic) -> JsBuffer.toHex(~with0x=false),
 //   // )
-//   // Js.log2("address", bandChain |> CosmosJS.getAddress(_, mnemonic))
+//   // Js.log2("address", bandChain -> CosmosJS.getAddress(_, mnemonic))
 
 //   // let countUp = CountUp.context(
 //   //   CountUp.props(
@@ -340,7 +340,7 @@
 
 //   // <>
 //   //   <Tooltip
-//   //     title={"hello world" |> React.string}
+//   //     title={"hello world" -> React.string}
 //   //     placement="bottom"
 //   //     arrow=true
 //   //     leaveDelay=0
@@ -354,13 +354,13 @@
 //   //     onClick={_ => {
 //   //       Copy.copy("Hello World")
 //   //     }}>
-//   //     {"Copy" |> React.string}
+//   //     {"Copy" -> React.string}
 //   //   </div>
 //   //   <QRCode value={"Wow QR Code"} size=200 />
 //   //   <span id="counter" />
-//   //   <button onClick={_ => update()}> {"update" |> React.string} </button>
+//   //   <button onClick={_ => update()}> {"update" -> React.string} </button>
 //   //   <ReactHighlight className=Styles.padding>
-//   //     {"let x = hello world; console.log(x);" |> React.string}
+//   //     {"let x = hello world; console.log(x);" -> React.string}
 //   //   </ReactHighlight>
 //   //   <div className=Styles.root>
 //   //     {switch blockSub {
@@ -370,11 +370,11 @@
 //   //       }
 //   //     | {loading: true, data: Some(x)} => {
 //   //         Js.log2("Loading with Some", x)
-//   //         <div> {"Loading with Some" |> React.string} </div>
+//   //         <div> {"Loading with Some" -> React.string} </div>
 //   //       }
 //   //     | {loading: true, data: None} => {
 //   //         Js.log("Loading with None")
-//   //         <div> {"Loading with None" |> React.string} </div>
+//   //         <div> {"Loading with None" -> React.string} </div>
 //   //       }
 //   //     | {error: Some(error)} => {
 //   //         Js.log(error)
@@ -382,7 +382,7 @@
 //   //       }
 //   //     | {loading: false, data: None, error: None} => {
 //   //         Js.log("No data")
-//   //         <div> {"No data" |> React.string} </div>
+//   //         <div> {"No data" -> React.string} </div>
 //   //       }
 //   //     }}
 //   //   </div>
@@ -395,3 +395,4 @@
 //   //   }
 //   // </>
 // }
+

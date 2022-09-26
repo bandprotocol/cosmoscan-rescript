@@ -11,7 +11,7 @@ type internal_t = {
 }
 
 let toExternal = ({balance, validator}) => {
-  balance: balance,
+  balance,
   commission: switch validator {
   | Some(validator') => validator'.commission
   | None => list{}
@@ -30,13 +30,13 @@ module SingleConfig = %graphql(`
   `)
 
 let get = address => {
-  let result = SingleConfig.use({address: address |> Address.toBech32})
+  let result = SingleConfig.use({address: address->Address.toBech32})
 
   result
-  |> Sub.fromData
-  |> Sub.flatMap(_, ({accounts_by_pk}) => {
+  ->Sub.fromData
+  ->Sub.flatMap(({accounts_by_pk}) => {
     switch accounts_by_pk {
-    | Some(data) => Sub.resolve(data |> toExternal)
+    | Some(data) => Sub.resolve(data->toExternal)
     | None => Sub.resolve({balance: list{}, commission: list{}})
     }
   })

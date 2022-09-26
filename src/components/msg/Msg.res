@@ -49,7 +49,7 @@ let makeBadge = (name, length, color1, color2) =>
 
 @react.component
 let make = (~msg: MsgDecoder.t) => {
-  let theme = msg |> MsgDecoder.getBadgeTheme
+  let theme = msg->MsgDecoder.getBadgeTheme
   <div
     className={CssJs.merge(. [
       CssHelper.flexBox(~wrap=#nowrap, ()),
@@ -57,7 +57,7 @@ let make = (~msg: MsgDecoder.t) => {
       CssHelper.overflowHidden,
       Styles.msgContainer,
     ])}>
-    <MsgFront msgType=theme.category name=theme.name fromAddress={msg |> MsgDecoder.getCreator} />
+    <MsgFront name=theme.name fromAddress={msg->MsgDecoder.getCreator} />
     {switch msg.decoded {
     | SendMsgSuccess({toAddress, amount}) => <TokenMsg.SendMsg toAddress amount />
     | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
@@ -110,11 +110,7 @@ let make = (~msg: MsgDecoder.t) => {
       <IBCChannelMsg.ChannelCloseCommon channelID />
     | TransferMsg({token, receiver}) =>
       <IBCTransferMsg.Transfer toAddress=receiver amount=token.amount denom=token.denom />
-    | RecvPacketMsgSuccess({packetData}) =>
-      switch packetData {
-      | Some({packetType}) => <IBCPacketMsg.Packet packetType />
-      | None => React.null
-      }
+    | RecvPacketMsgSuccess({packetData}) => <IBCPacketMsg.Packet packetType=packetData.packetType />
     | RecvPacketMsgFail(_)
     | AcknowledgePacketMsg(_)
     | TimeoutMsg(_)

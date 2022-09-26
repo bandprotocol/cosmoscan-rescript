@@ -41,9 +41,9 @@ let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string) => {
   <>
     <div ref={ReactDOM.Ref.domRef(msgEl)} className={Styles.msgContainer(overflowed)}>
       {messages
-      ->Belt_List.toArray
-      ->Belt_Array.mapWithIndex((i, msg) =>
-        <React.Fragment key={(txHash -> Hash.toHex) ++ (i -> string_of_int)}>
+      ->Belt.List.toArray
+      ->Belt.Array.mapWithIndex((i, msg) =>
+        <React.Fragment key={txHash->Hash.toHex ++ i->Belt.Int.toString}>
           {<Msg msg />}
         </React.Fragment>
       )
@@ -59,12 +59,12 @@ let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string) => {
               setExpanded(_ => !expanded)
             }}>
             {expanded
-              ? <div className=Styles.showButton> {"show less" -> React.string} </div>
+              ? <div className=Styles.showButton> {"show less"->React.string} </div>
               : isMobile
               ? <Link className=Styles.showButton route=Route.TxIndexPage(txHash)>
-                {"show more" -> React.string}
+                {"show more"->React.string}
               </Link>
-              : <div className=Styles.showButton> {"show more" -> React.string} </div>}
+              : <div className=Styles.showButton> {"show more"->React.string} </div>}
           </div>
         </div>
       : React.null}

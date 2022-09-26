@@ -3,7 +3,7 @@ type state_t =
   | Init
   | TryOpen
   | Open
-  | Closed;
+  | Closed
 
 type channel_t = {
   port: string,
@@ -12,7 +12,7 @@ type channel_t = {
   counterpartyChannelID: string,
   state: state_t,
   order: string,
-};
+}
 
 type internal_t = {
   clientID: string,
@@ -21,7 +21,7 @@ type internal_t = {
   counterpartyClientID: string,
   counterpartyConnectionID: string,
   channels: array<channel_t>,
-};
+}
 
 type t = {
   clientID: string,
@@ -30,9 +30,9 @@ type t = {
   counterpartyClientID: string,
   counterpartyConnectionID: string,
   channels: array<channel_t>,
-};
+}
 
-exception NotMatch(string);
+exception NotMatch(string)
 module State = {
   type t = state_t
   let parse = x =>
@@ -42,15 +42,15 @@ module State = {
     | 2 => TryOpen
     | 3 => Open
     | 4 => Closed
-    | x => raise(NotMatch(j`This $x doesn't match any state.`));
+    | x => raise(NotMatch(j`This $x doesn't match any state.`))
     }
   let serialize = state =>
-    switch state { 
-      | Uninitialized => 0 
-      | Init => 1
-      | TryOpen => 2
-      | Open => 3
-      | Closed => 4
+    switch state {
+    | Uninitialized => 0
+    | Init => 1
+    | TryOpen => 2
+    | Open => 3
+    | Closed => 4
     }
 }
 
@@ -61,11 +61,10 @@ module Order = {
     | "0" => "None"
     | "1" => "Unordered"
     | "2" => "Ordered"
-    | x => raise(NotMatch(j`This $x doesn't match any state.`));
+    | x => raise(NotMatch(j`This $x doesn't match any state.`))
     }
-  let serialize = order => "order"
+  let serialize = _ => "order"
 }
-
 
 module MultiConfig = %graphql(`
   subscription Connections($limit: Int!, $offset: Int!, $chainID: String!, $connectionID: String!) {
@@ -98,18 +97,16 @@ module ConnectionCountConfig = %graphql(`
 `)
 
 let getList = (~counterpartyChainID, ~connectionID, ~page, ~pageSize, ()) => {
-  let offset = (page - 1) * pageSize;
+  let offset = (page - 1) * pageSize
   let result = MultiConfig.use({
     chainID: counterpartyChainID !== "" ? counterpartyChainID : "%%",
     connectionID: j`%$connectionID%`,
     limit: pageSize,
-    offset: offset
+    offset,
   })
 
-  result
-  -> Sub.fromData
-  -> Sub.map(internal => internal.connections);
-};
+  result->Sub.fromData->Sub.map(internal => internal.connections)
+}
 
 let getCount = (~counterpartyChainID, ~connectionID) => {
   let result = ConnectionCountConfig.use({
@@ -118,6 +115,6 @@ let getCount = (~counterpartyChainID, ~connectionID) => {
   })
 
   result
-  -> Sub.fromData
-  -> Sub.map(x => x.connections_aggregate.aggregate |> Belt.Option.getExn |> (y => y.count));
-};
+  ->Sub.fromData
+  ->Sub.map(x => x.connections_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+}

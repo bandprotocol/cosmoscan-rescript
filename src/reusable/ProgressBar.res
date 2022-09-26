@@ -64,7 +64,7 @@ module Styles = {
 @react.component
 let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
   let progressPercentage =
-    (reportedValidators * 100 |> float_of_int) /. (requestValidators |> float_of_int)
+    (reportedValidators * 100)->Belt.Int.toFloat /. requestValidators->Belt.Int.toFloat
   let success = reportedValidators >= minimumValidators
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
@@ -72,7 +72,7 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
   <div className=Styles.barContainer>
     <div className=Styles.leftText>
       <Text
-        value={"Min " ++ (minimumValidators |> Format.iPretty)}
+        value={"Min " ++ minimumValidators->Format.iPretty}
         transform=Text.Uppercase
         weight=Text.Semibold
         size=Text.Sm
@@ -84,9 +84,7 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
     </div>
     <div className=Styles.rightText>
       <Text
-        value={(reportedValidators |> Format.iPretty) ++
-        " of " ++
-        (requestValidators |> Format.iPretty)}
+        value={reportedValidators->Format.iPretty ++ " of " ++ requestValidators->Format.iPretty}
         size=Text.Sm
         transform=Text.Uppercase
         weight=Text.Semibold
@@ -119,10 +117,10 @@ module Deposit = {
   let make = (~totalDeposit) => {
     // TODO: remove hard-coded later.
     let minDeposit = 1000.
-    let totalDeposit_ = totalDeposit |> Coin.getBandAmountFromCoins
+    let totalDeposit_ = totalDeposit->Coin.getBandAmountFromCoins
     let percent = totalDeposit_ /. minDeposit *. 100.
-    let formatedMinDeposit = minDeposit |> Format.fPretty(~digits=0)
-    let formatedTotalDeposit = totalDeposit_ |> Format.fPretty(~digits=0)
+    let formatedMinDeposit = minDeposit->Format.fPretty(~digits=0)
+    let formatedTotalDeposit = totalDeposit_->Format.fPretty(~digits=0)
 
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -147,6 +145,8 @@ module Deposit = {
 module Voting = {
   @react.component
   let make = (~percent, ~label, ~amount) => {
+    // TODO: Remove after using param
+    Js.log(label)
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div>
@@ -160,7 +160,7 @@ module Voting = {
         //   value={VoteSub.toString(label, ~withSpace=true)} size=Heading.H4 weight=Heading.Thin
         // />
         <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-          <Text value={percent |> Format.fPercent(~digits=2)} size=Text.Lg block=true />
+          <Text value={percent->Format.fPercent(~digits=2)} size=Text.Lg block=true />
           {isMobile
             ? React.null
             : <>
@@ -168,7 +168,7 @@ module Voting = {
                 <Text value="/" size=Text.Lg block=true />
                 <HSpacing size=Spacing.sm />
                 <Text
-                  value={(amount |> Format.fPretty(~digits=2)) ++ " BAND"}
+                  value={amount->Format.fPretty(~digits=2) ++ " BAND"}
                   size=Text.Lg
                   block=true
                   color={theme.textPrimary}

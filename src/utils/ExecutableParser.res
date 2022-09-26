@@ -1,29 +1,31 @@
 let pythonMatch = str => {
-  let reg = "def main\(\s*([^)]+?)\s*\)" |> Js.Re.fromString
-  let rawResult = reg |> Js.Re.exec_(_, str) |> Belt.Option.mapWithDefault(_, [], Js.Re.captures)
+  let reg = %re("/def main\(([^\)]*)\)/ig")
+  let args =
+    reg
+    ->Js.Re.exec_(str)
+    ->Belt.Option.mapWithDefault([], Js.Re.captures)
+    ->Belt.Array.get(1)
+    ->Belt.Option.flatMap(Js.Nullable.toOption)
 
-  switch rawResult->Belt.Array.get(1) {
-  | Some(resultNullable) =>
-    switch resultNullable->Js.Nullable.toOption {
-    | Some(result) => Some(result |> String.split_on_char(',') |> Belt.List.map(_, String.trim))
-    | None => None
-    }
-  | None => None
-  }
+  args->Belt.Option.map(result =>
+    result
+    ->Js.String2.split(",")
+    ->Belt.Array.map(String.trim)
+    ->Belt.Array.keep(s => s->Js.String2.length > 0)
+  )
 }
 
 let getVariables = str => {
-  let splitedStr = String.split_on_char('\n', str)
-  switch splitedStr->Belt.List.get(0) {
-  | Some(program) =>
+  Js.String2.split("\n", str)
+  ->Belt.Array.get(0)
+  ->Belt.Option.flatMap(program =>
     switch program {
-    | "#!/usr/bin/env python3" => str |> pythonMatch
+    | "#!/usr/bin/env python3" => str->pythonMatch
     | _ => None
     }
-  | None => None
-  }
+  )
 }
 
 let parseExecutableScript = (buff: JsBuffer.t) => {
-  buff |> JsBuffer.toUTF8 |> getVariables
+  buff->JsBuffer.toUTF8->getVariables
 }
