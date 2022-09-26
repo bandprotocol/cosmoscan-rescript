@@ -1,16 +1,16 @@
 module Styles = {
-  open CssJs;
+  open CssJs
 
-  let container = style(. [paddingTop(#px(24)), paddingBottom(#px(10)), minHeight(#px(100))]);
+  let container = style(. [paddingTop(#px(24)), paddingBottom(#px(10)), minHeight(#px(100))])
   let emptyContainer =
     style(. [
       display(#flex),
       minHeight(#px(100)),
       alignItems(#center),
       justifyContent(#center),
-    ]);
-  let request = style(. [marginTop(#px(26)), marginRight(#px(12))]);
-};
+    ])
+  let request = style(. [marginTop(#px(26)), marginRight(#px(12))])
+}
 
 module RequestsList = {
   @react.component
@@ -23,31 +23,31 @@ module RequestsList = {
            </div>
          )
        ->React.array}
-    </div>;
-  };
-};
+    </div>
+  }
+}
 
 @react.component
 let make = (~blockSub: Sub.variant<BlockSub.t>) => {
-  let (tabIndex, setTabIndex) = React.useState(_ => 0);
-  let setTab = index => setTabIndex(_ => index);
+  let (tabIndex, setTabIndex) = React.useState(_ => 0)
+  let setTab = index => setTabIndex(_ => index)
 
   switch (blockSub) {
   | Data({requests}) when requests->Belt.Array.length !== 0 =>
     let onChainRequests =
-      requests->Belt.Array.keepMap(({id, isIBC}) => !isIBC ? Some(id) : None);
-    let ibcRequests = requests->Belt.Array.keepMap(({id, isIBC}) => isIBC ? Some(id) : None);
-    let onChain = onChainRequests->Belt.Array.length;
-    let ibc = ibcRequests->Belt.Array.length;
+      requests->Belt.Array.keepMap(({id, isIBC}) => !isIBC ? Some(id) : None)
+    let ibcRequests = requests->Belt.Array.keepMap(({id, isIBC}) => isIBC ? Some(id) : None)
+    let onChain = onChainRequests->Belt.Array.length
+    let ibc = ibcRequests->Belt.Array.length
     let showRequests = {
       switch (tabIndex) {
       | 0 => onChainRequests
       | 1 => ibcRequests
       | _ =>
-        Js.log("Please handle every case on Resolve Requests.");
-        [];
-      };
-    };
+        Js.log("Please handle every case on Resolve Requests.")
+        []
+      }
+    }
 
     <Row marginBottom=24>
       <Col>
@@ -70,7 +70,7 @@ let make = (~blockSub: Sub.variant<BlockSub.t>) => {
           </Tab.State>
         </InfoContainer>
       </Col>
-    </Row>;
+    </Row>
   | Data(_) | Error(_) | Loading | NoData => React.null
-  };
-};
+  }
+}

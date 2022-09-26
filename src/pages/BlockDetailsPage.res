@@ -1,7 +1,7 @@
 module Styles = {
-  open CssJs;
+  open CssJs
 
-  let proposerContainer = style(. [width(#fitContent)]);
+  let proposerContainer = style(. [width(#fitContent)])
 
   let pageContainer = (theme: Theme.t) =>
     style(. [
@@ -10,27 +10,27 @@ module Styles = {
       backgroundColor(theme.secondaryBg),
       borderRadius(#px(4)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(0, 0, 0, #num(0.1)))),
-    ]);
+    ])
 
-  let logo = style(. [width(#px(180)), marginRight(#px(10))]);
-  let linkToHome = style(. [display(#flex), alignItems(#center), cursor(#pointer)]);
-  let rightArrow = style(. [width(#px(20)), filter([#saturate(50.0), #brightness(70.0)])]);
-};
+  let logo = style(. [width(#px(180)), marginRight(#px(10))])
+  let linkToHome = style(. [display(#flex), alignItems(#center), cursor(#pointer)])
+  let rightArrow = style(. [width(#px(20)), filter([#saturate(50.0), #brightness(70.0)])])
+}
 
 let isIBCTx = (tx: TxSub.t) => {
-  tx.messages->Belt.List.reduce(false, (acc, message) => acc || message.isIBC);
-};
+  tx.messages->Belt.List.reduce(false, (acc, message) => acc || message.isIBC)
+}
 
 @react.component
 let make = (~height) => {
-  let isMobile = Media.isMobile();
-  let blockSub = BlockSub.get(height);
-  let latestBlockSub = BlockSub.getLatest();
-  let txsSub = TxSub.getListByBlockHeight(height);
+  let isMobile = Media.isMobile()
+  let blockSub = BlockSub.get(height)
+  let latestBlockSub = BlockSub.getLatest()
+  let txsSub = TxSub.getListByBlockHeight(height)
   let ibcTxsSub = txsSub -> Sub.map(txs => txs->Belt.Array.keepMap(tx => isIBCTx(tx) ? Some(tx) : None))
   let commonTxsSub = txsSub -> Sub.map(txs => txs->Belt.Array.keepMap(tx => !isIBCTx(tx) ? Some(tx) : None))
 
-  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
+  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
 
   switch (blockSub, latestBlockSub) {
   | (NoData, Data(latestBlock)) =>
@@ -112,7 +112,7 @@ let make = (~height) => {
                   {switch (blockSub) {
                    | Data({hash}) =>
                      <Text
-                       value={hash |> Hash.toHex(~upper=true)}
+                       value={hash->Hash.toHex(~upper=true)}
                        code=true
                        block=true
                        size=Text.Lg
@@ -133,7 +133,7 @@ let make = (~height) => {
                 </Col>
                 <Col col=Col.Eight>
                   {switch (blockSub) {
-                   | Data({txn}) => <Text value={txn |> string_of_int} size=Text.Lg />
+                   | Data({txn}) => <Text value={txn->Belt.Int.toString} size=Text.Lg />
                    | Error(_) | Loading | NoData => <LoadingCensorBar width=40 height=15 />
                    }}
                 </Col>
@@ -154,8 +154,8 @@ let make = (~height) => {
                        <Text
                          value={
                            timestamp
-                           |> MomentRe.Moment.format(Config.timestampDisplayFormat)
-                           |> String.uppercase_ascii
+                           ->MomentRe.Moment.format(Config.timestampDisplayFormat, _)
+                           ->String.uppercase_ascii
                          }
                          size=Text.Lg
                        />
@@ -222,5 +222,5 @@ let make = (~height) => {
         </Table>
       </div>
     </Section>
-  };
-};
+  }
+}

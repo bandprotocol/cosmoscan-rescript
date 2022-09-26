@@ -118,7 +118,7 @@ module PastDayBlockCountConfig = %graphql(`
 `)
 
 module BlockSum = {
-  let toExternal = (count: int) => (24 * 60 * 60 |> float_of_int) /. count->float_of_int
+  let toExternal = (count: int) => (24 * 60 * 60)->Belt.Int.toFloat /. (count->Belt.Int.toFloat)
 }
 
 let getList = (~page, ~pageSize) => {
@@ -135,7 +135,12 @@ let get = (height: ID.Block.t) => {
 
   result
   -> Sub.fromData 
-  -> Sub.map(({blocks_by_pk}) => blocks_by_pk->Belt.Option.getExn->toExternal)
+  -> Sub.flatMap(({blocks_by_pk}) => 
+    switch blocks_by_pk {
+    | Some(data) => data->toExternal->Sub.resolve
+    | None => NoData
+    }
+  )
 }
 
 let getAvgBlockTime = (greater, less) => {

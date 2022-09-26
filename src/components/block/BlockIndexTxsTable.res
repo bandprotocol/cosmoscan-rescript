@@ -1,8 +1,8 @@
 module Styles = {
-  open CssJs;
+  open CssJs
 
-  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))]);
-};
+  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
+}
 
 module RenderBody = {
   @react.component
@@ -38,9 +38,9 @@ module RenderBody = {
            }}
         </Col>
       </Row>
-    </TBody>;
-  };
-};
+    </TBody>
+  }
+}
 
 module RenderBodyMobile = {
   @react.component
@@ -71,14 +71,14 @@ module RenderBodyMobile = {
         }
         idx={reserveIndex -> Belt.Int.toString}
       />
-    };
-  };
-};
+    }
+  }
+}
 
 @react.component
 let make = (~txsSub: Sub.variant<array<TxSub.t>>) => {
-  let isMobile = Media.isMobile();
-  let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+  let isMobile = Media.isMobile()
+  let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <>
     {isMobile
@@ -153,5 +153,5 @@ let make = (~txsSub: Sub.variant<array<TxSub.t>>) => {
          )
        ->React.array
      }}
-  </>;
-};
+  </>
+}

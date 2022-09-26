@@ -1,7 +1,7 @@
 module BodyDesktop = {
   @react.component
   let make = (~reserveIndex, ~blockSub: Sub.variant<BlockSub.t>) => {
-    let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
+    let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
     <TBody
       key={
         switch blockSub {
@@ -65,8 +65,8 @@ module BodyDesktop = {
           </div>
         </Col>
       </Row>
-    </TBody>;
-  };
+    </TBody>
+  }
 }
 
 module BodyMobile = {
@@ -106,16 +106,16 @@ module BodyMobile = {
         key={reserveIndex -> string_of_int}
         idx={reserveIndex -> string_of_int}
       />
-    };
-  };
+    }
+  }
 }
 
 @react.component
 let make = () => {
-  let blocksSub = BlockSub.getList(~pageSize=10, ~page=1);
-  let isMobile = Media.isMobile();
+  let blocksSub = BlockSub.getList(~pageSize=10, ~page=1)
+  let isMobile = Media.isMobile()
 
-  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
+  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
 
   <Section ptSm=32 pbSm=32>
     <div className=CssHelper.container id="blocksSection">
@@ -215,6 +215,6 @@ let make = () => {
         </Table>
       </div>
     </div>
-  </Section>;
-};
+  </Section>
+}
 
