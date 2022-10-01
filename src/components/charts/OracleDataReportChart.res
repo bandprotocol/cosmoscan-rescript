@@ -38,6 +38,12 @@ let getDayAgo = days => {
   |> MomentRe.Moment.subtract(~duration=MomentRe.duration(days |> float_of_int, #days))
 }
 
+let getDayAgo = days => {
+  MomentRe.momentNow()
+  |> MomentRe.Moment.defaultUtc
+  |> MomentRe.Moment.subtract(~duration=MomentRe.duration(days |> float_of_int, #days))
+}
+
 module Item = {
   @react.component
   let make = (~status, ~timestamp) => {
@@ -68,16 +74,17 @@ let make = (~oracleStatus, ~operatorAddress) => {
     prevDate,
     oracleStatus,
   )
+
   <>
     <Row marginBottom=24>
       <Col>
-        <div className={Css.merge([CssHelper.flexBox(), Styles.chartWrapper])}>
-          <div className={Css.merge([CssHelper.flexBox(), Styles.chartContainer])}>
+        <div className={Css.merge(list{CssHelper.flexBox(), Styles.chartWrapper})}>
+          <div className={Css.merge(list{CssHelper.flexBox(), Styles.chartContainer})}>
             {switch historicalOracleStatusSub {
             | Data({oracleStatusReports}) =>
               oracleStatusReports
               ->Belt.Array.mapWithIndex((i, {timestamp, status}) =>
-                <Item key={(i |> string_of_int) ++ (timestamp |> string_of_int)} status timestamp />
+                <Item key={i->Belt.Int.toString ++ timestamp->Belt.Int.toString} status timestamp />
               )
               ->React.array
             | _ => <LoadingCensorBar.CircleSpin height=90 />
@@ -88,26 +95,26 @@ let make = (~oracleStatus, ~operatorAddress) => {
     </Row>
     <Row>
       <Col>
-        <div className={Css.merge([CssHelper.flexBox(), Styles.labelBox])}>
+        <div className={Css.merge(list{CssHelper.flexBox(), Styles.labelBox})}>
           <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Css.merge([Styles.status(true), Styles.statusLabel])} />
+              <div className={Css.merge(list{Styles.status(true), Styles.statusLabel})} />
               <HSpacing size=Spacing.sm />
               <Text block=true value="Uptime" weight=Text.Semibold />
             </div>
             {switch historicalOracleStatusSub {
-            | Data({uptimeCount}) => <Text block=true value={uptimeCount |> string_of_int} />
+            | Data({uptimeCount}) => <Text block=true value={uptimeCount->Belt.Int.toString} />
             | _ => <LoadingCensorBar width=20 height=14 />
             }}
           </div>
           <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Css.merge([Styles.status(false), Styles.statusLabel])} />
+              <div className={Css.merge(list{Styles.status(false), Styles.statusLabel})} />
               <HSpacing size=Spacing.sm />
               <Text block=true value="Downtime" weight=Text.Semibold />
             </div>
             {switch historicalOracleStatusSub {
-            | Data({downtimeCount}) => <Text block=true value={downtimeCount |> string_of_int} />
+            | Data({downtimeCount}) => <Text block=true value={downtimeCount->Belt.Int.toString} />
             | _ => <LoadingCensorBar width=20 height=14 />
             }}
           </div>

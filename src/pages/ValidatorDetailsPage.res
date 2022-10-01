@@ -66,8 +66,8 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
 
   let validatorSub = ValidatorSub.get(address)
   let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
-  // TODO: Implement later
-  // let oracleReportsCountSub = ReportSub.ValidatorReport.count(address)
+
+  let oracleReportsCountSub = ReportSub.ValidatorReport.count(address)
 
   // for finding validator rank
   let validatorsSub = ValidatorSub.getList(~isActive=true, ())

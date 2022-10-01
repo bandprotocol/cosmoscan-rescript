@@ -441,57 +441,73 @@ let getBlockUptimeByValidator = consensusAddress => {
   })
 }
 
+// let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
+//   let result = HistoricalOracleStatusesConfig.use({
+//     operatorAddress: operatorAddress->Address.toOperatorBech32,
+//     greater: greater->MomentRe.Moment.format(Config.timestampUseFormat, _)->Js.Json.string,
+//   })
+
+//   let startDate = greater->MomentRe.Moment.startOf(#day, _)->MomentRe.Moment.toUnix
+
+//   let oracleStatusReports =
+//     result
+//     ->Sub.fromData
+//     ->Sub.flatMap(({historical_oracle_statuses}) => {
+//       historical_oracle_statuses->Belt.Array.length > 0
+//         ? historical_oracle_statuses
+//           ->Belt.Array.map(each => {
+//             HistoryOracleParser.status: each.status,
+//             timestamp: each.timestamp->GraphQLParser.timestamp->MomentRe.Moment.toUnix,
+//           })
+//           ->Belt.List.fromArray
+//           ->Sub.resolve
+//         : [{HistoryOracleParser.timestamp: startDate, HistoryOracleParser.status: oracleStatus}]
+//           ->Belt.List.fromArray
+//           ->Sub.resolve
+//     })
+
+// }
+
 let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
   let result = HistoricalOracleStatusesConfig.use({
     operatorAddress: operatorAddress->Address.toOperatorBech32,
-    greater: greater |> MomentRe.Moment.format(Config.timestampUseFormat) |> Js.Json.string,
+    greater: greater->MomentRe.Moment.format(Config.timestampUseFormat, _)->Js.Json.string,
   })
 
-  let startDate = greater |> MomentRe.Moment.startOf(#day) |> MomentRe.Moment.toUnix
+  let startDate = greater->MomentRe.Moment.startOf(#day, _)->MomentRe.Moment.toUnix
 
-  let oracleStatusReports =
-    result
-    ->Sub.fromData
-    ->Sub.flatMap(({historical_oracle_statuses}) => {
-      historical_oracle_statuses->Belt.Array.length > 0
+  result
+  ->Sub.fromData
+  ->Sub.flatMap(({historical_oracle_statuses}) => {
+    let oracleStatusReports =
+      historical_oracle_statuses->Belt.Array.size > 0
         ? historical_oracle_statuses
           ->Belt.Array.map(each => {
             HistoryOracleParser.status: each.status,
-            timestamp: each.timestamp |> GraphQLParser.timestamp |> MomentRe.Moment.toUnix,
+            timestamp: each.timestamp->GraphQLParser.timestamp->MomentRe.Moment.toUnix,
           })
           ->Belt.List.fromArray
-          ->Sub.resolve
-        : 
+        : list{
+            {
+              timestamp: startDate,
+              status: oracleStatus,
+            },
+          }
+    let rawParsedReports = HistoryOracleParser.parse(~oracleStatusReports, ~startDate, ())
+
+    let parsedReports = if !oracleStatus && historical_oracle_statuses->Belt.Array.size == 0 {
+      rawParsedReports->Belt.Array.map(({timestamp}) => {
+        HistoryOracleParser.timestamp,
+        status: false,
+      })
+    } else {
+      rawParsedReports
+    }
+
+    Sub.resolve({
+      oracleStatusReports: parsedReports,
+      uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.size,
+      downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.size,
     })
-
-  let rawParsedReports = HistoryOracleParser.parse(~oracleStatusReports, ~startDate)
-
-  // let oracleStatusReports =
-  //   x##historical_oracle_statuses->Belt.Array.size > 0
-  //     ? x##historical_oracle_statuses
-  //       ->Belt.Array.map(each =>
-  //           {
-  //             HistoryOracleParser.status: each##status,
-  //             timestamp: each##timestamp |> GraphQLParser.timestamp |> MomentRe.Moment.toUnix,
-  //           }
-  //         )
-  //       ->Belt.List.fromArray
-  //     : [{timestamp: startDate, status: oracleStatus}];
-
-  // let rawParsedReports = HistoryOracleParser.parse(~oracleStatusReports, ~startDate, ());
-
-  // let parsedReports =
-  //   if (!oracleStatus && x##historical_oracle_statuses->Belt.Array.size == 0) {
-  //     rawParsedReports->Belt.Array.map(({timestamp}) =>
-  //       {HistoryOracleParser.timestamp, status: false}
-  //     );
-  //   } else {
-  //     rawParsedReports;
-  //   };
-
-  // Sub.resolve({
-  //   oracleStatusReports: parsedReports,
-  //   uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.size,
-  //   downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.size,
-  // });
+  })
 }
