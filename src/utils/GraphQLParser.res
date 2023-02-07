@@ -20,8 +20,6 @@ let fromUnixSecondOpt = timeOpt =>
 
 let fromUnixSecond = timeInt => timeInt->MomentRe.momentWithUnix->MomentRe.Moment.defaultUtc
 
-let fromUnixSecond = timeInt => timeInt->MomentRe.momentWithUnix->MomentRe.Moment.defaultUtc
-
 let timeMS = json =>
   json
   ->Js.Json.decodeNumber

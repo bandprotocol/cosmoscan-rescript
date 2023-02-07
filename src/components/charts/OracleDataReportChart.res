@@ -34,14 +34,8 @@ module Styles = {
 
 let getDayAgo = days => {
   MomentRe.momentNow()
-  |> MomentRe.Moment.defaultUtc
-  |> MomentRe.Moment.subtract(~duration=MomentRe.duration(days |> float_of_int, #days))
-}
-
-let getDayAgo = days => {
-  MomentRe.momentNow()
-  |> MomentRe.Moment.defaultUtc
-  |> MomentRe.Moment.subtract(~duration=MomentRe.duration(days |> float_of_int, #days))
+  ->MomentRe.Moment.defaultUtc
+  ->MomentRe.Moment.subtract(~duration=MomentRe.duration(days->Belt.Int.toFloat, #days))
 }
 
 module Item = {
@@ -54,7 +48,7 @@ module Item = {
       mobile=false
       align=#center
       pd=10
-      tooltipText={timestamp |> MomentRe.momentWithUnix |> MomentRe.Moment.format("YYYY-MM-DD")}
+      tooltipText={MomentRe.Moment.format("YYYY-MM-DD", MomentRe.momentWithUnix(timestamp))}
       styles=Styles.blockContainer>
       <div className={Css.merge(list{Styles.blockBase, Styles.status(status)})} />
     </CTooltip>

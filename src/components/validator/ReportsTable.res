@@ -32,14 +32,14 @@ module DataSourceItem = {
         <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
           <TypeID.DataSource
             id={
-              let rawRequest = dataSource.rawRequest |> Belt_Option.getExn
+              let rawRequest = dataSource.rawRequest->Belt.Option.getExn
               rawRequest.dataSource.dataSourceID
             }
           />
           <HSpacing size=Spacing.sm />
           <Text
             value={
-              let rawRequest = dataSource.rawRequest |> Belt_Option.getExn
+              let rawRequest = dataSource.rawRequest->Belt.Option.getExn
               rawRequest.dataSource.dataSourceName
             }
             ellipsis=true
@@ -50,8 +50,8 @@ module DataSourceItem = {
         <Text
           block=true
           value={
-            let rawRequest = dataSource.rawRequest |> Belt_Option.getExn
-            rawRequest.calldata |> JsBuffer.toUTF8
+            let rawRequest = dataSource.rawRequest->Belt.Option.getExn
+            rawRequest.calldata->JsBuffer.toUTF8
           }
           color={theme.textPrimary}
         />
@@ -62,7 +62,7 @@ module DataSourceItem = {
       <Col col=Col.Three>
         <Text
           block=true
-          value={dataSource.data |> JsBuffer.toUTF8}
+          value={dataSource.data->JsBuffer.toUTF8}
           align=Text.Right
           color={theme.textPrimary}
           ellipsis=true
@@ -178,9 +178,9 @@ module RenderBody = {
         {switch reportsSub {
         | Data({reportDetails}) =>
           reportDetails
-          ->Belt_Array.mapWithIndex((i, reportDetail) =>
+          ->Belt.Array.mapWithIndex((i, reportDetail) =>
             <DataSourceItem
-              key={(i |> string_of_int) ++ reportDetail.externalID} dataSource=reportDetail
+              key={i->Belt.Int.toString ++ reportDetail.externalID} dataSource=reportDetail
             />
           )
           ->React.array
@@ -212,9 +212,9 @@ module RenderBodyMobile = {
             ),
           ]
         }
-        key={id |> ID.Request.toString}
-        idx={id |> ID.Request.toString}
-        panels={reportDetails->Belt_Array.map(({
+        key={id->ID.Request.toString}
+        idx={id->ID.Request.toString}
+        panels={reportDetails->Belt.Array.map(({
           externalID,
           exitCode,
           data,
@@ -226,9 +226,9 @@ module RenderBodyMobile = {
           [
             ("External ID", Text(externalID)),
             ("Data Source", DataSource(dataSourceID, dataSourceName)),
-            ("Param", Text(calldata |> JsBuffer.toUTF8)),
+            ("Param", Text(calldata->JsBuffer.toUTF8)),
             ("Exit Code", Text(exitCode)),
-            ("Value", Text(data |> JsBuffer.toUTF8)),
+            ("Value", Text(data->JsBuffer.toUTF8)),
           ]
         })}
       />
@@ -242,8 +242,8 @@ module RenderBodyMobile = {
             ("TX Hash", Loading(isSmallMobile ? 170 : 200)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
   }
@@ -258,7 +258,7 @@ let make = (~address) => {
     ~page,
     ~pageSize,
     ~validator={
-      address |> Address.toOperatorBech32
+      address->Address.toOperatorBech32
     },
   )
   let reportsCountSub = ReportSub.ValidatorReport.count(address)
@@ -271,12 +271,12 @@ let make = (~address) => {
     {isMobile
       ? <Row marginBottom=16>
           <Col>
-            {switch allSub {
-            | Data((_, reportsCount)) =>
+            {switch reportsCountSub {
+            | Data(reportsCount) =>
               <div className={CssHelper.flexBox()}>
                 <Text
                   block=true
-                  value={reportsCount |> Format.iPretty}
+                  value={reportsCount->Format.iPretty}
                   weight=Text.Semibold
                   transform=Text.Uppercase
                   size=Text.Sm
@@ -297,12 +297,12 @@ let make = (~address) => {
       : <THead>
           <Row alignItems=Row.Center>
             <Col col=Col.Three>
-              {switch allSub {
-              | Data((_, reportsCount)) =>
+              {switch reportsCountSub {
+              | Data(reportsCount) =>
                 <div className={CssHelper.flexBox()}>
                   <Text
                     block=true
-                    value={reportsCount |> Format.iPretty}
+                    value={reportsCount->Format.iPretty}
                     weight=Text.Semibold
                     transform=Text.Uppercase
                     size=Text.Sm
@@ -345,15 +345,15 @@ let make = (~address) => {
       <>
         {reportsCount > 0
           ? reports
-            ->Belt_Array.mapWithIndex((i, e) =>
+            ->Belt.Array.mapWithIndex((i, e) =>
               isMobile
                 ? <RenderBodyMobile
-                    key={(i |> string_of_int) ++ (e.request.id |> ID.Request.toString)}
+                    key={i->Belt.Int.toString ++ e.request.id->ID.Request.toString}
                     reserveIndex=i
                     reportsSub={Sub.resolve(e)}
                   />
                 : <RenderBody
-                    key={(i |> string_of_int) ++ (e.request.id |> ID.Request.toString)}
+                    key={i->Belt.Int.toString ++ e.request.id->ID.Request.toString}
                     reportsSub={Sub.resolve(e)}
                   />
             )
@@ -379,11 +379,11 @@ let make = (~address) => {
             />}
       </>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile key={i |> string_of_int} reserveIndex=i reportsSub=noData />
-          : <RenderBody key={i |> string_of_int} reportsSub=noData />
+          ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i reportsSub=noData />
+          : <RenderBody key={i->Belt.Int.toString} reportsSub=noData />
       )
       ->React.array
     }}

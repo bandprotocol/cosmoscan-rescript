@@ -27,16 +27,11 @@ let get = operatorAddress => {
   let x =
     result
     ->Sub.fromData
-    ->Sub.flatMap(({historical_bonded_token_on_validators}) => {
-      Sub.resolve(
-        historical_bonded_token_on_validators->Belt_Array.map(each => {
-          t: each.timestamp->GraphQLParser.timestamp->MomentRe.Moment.toUnix,
-          y: each.bonded_tokens->Js.Json.decodeString->Belt.Option.getExn->float_of_string /. 1e6,
-        }),
-      )
+    ->Sub.map(({historical_bonded_token_on_validators}) => {
+      historical_bonded_token_on_validators->Belt_Array.map(each => {
+        t: each.timestamp->GraphQLParser.timestamp->MomentRe.Moment.toUnix,
+        y: each.bonded_tokens->Js.Json.decodeString->Belt.Option.getExn->float_of_string /. 1e6,
+      })
     })
   x
-
-  // Js.log(result)
-  // x
 }

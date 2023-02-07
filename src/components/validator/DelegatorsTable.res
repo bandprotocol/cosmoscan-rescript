@@ -8,7 +8,7 @@ module Styles = {
 module RenderBody = {
   @react.component
   let make = (~delegatorSub: Sub.variant<DelegationSub.Stake.t>) => {
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <TBody>
       <Row alignItems=Row.Center minHeight={#px(30)}>
         <Col col=Col.Six>
@@ -20,7 +20,7 @@ module RenderBody = {
         <Col col=Col.Four>
           {switch delegatorSub {
           | Data({sharePercentage}) =>
-            <Text block=true value={sharePercentage |> Format.fPretty} color={theme.textPrimary} />
+            <Text block=true value={sharePercentage->Format.fPretty} color={theme.textPrimary} />
           | _ => <LoadingCensorBar width=100 height=15 />
           }}
         </Col>
@@ -30,7 +30,7 @@ module RenderBody = {
             | Data({amount}) =>
               <Text
                 block=true
-                value={amount |> Coin.getBandAmountFromCoin |> Format.fPretty}
+                value={amount->Coin.getBandAmountFromCoin->Format.fPretty}
                 color={theme.textPrimary}
               />
             | _ => <LoadingCensorBar width=100 height=15 />
@@ -56,8 +56,8 @@ module RenderBodyMobile = {
             ("Amount\n(BAND)", Coin({value: list{amount}, hasDenom: false})),
           ]
         }
-        key={delegatorAddress |> Address.toBech32}
-        idx={delegatorAddress |> Address.toBech32}
+        key={delegatorAddress->Address.toBech32}
+        idx={delegatorAddress->Address.toBech32}
       />
     | _ =>
       <MobileCard
@@ -69,8 +69,8 @@ module RenderBodyMobile = {
             ("Amount\n(BAND)", Loading(80)),
           ]
         }
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
   }
@@ -99,7 +99,7 @@ let make = (~address) => {
               <div className={CssHelper.flexBox()}>
                 <Text
                   block=true
-                  value={delegatorCount |> Format.iPretty}
+                  value={delegatorCount->Format.iPretty}
                   weight=Text.Semibold
                   size=Text.Sm
                 />
@@ -204,8 +204,8 @@ let make = (~address) => {
       Belt_Array.make(pageSize, Sub.NoData)
       ->Belt_Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile key={string_of_int(i)} reserveIndex=i delegatorSub=noData />
-          : <RenderBody key={string_of_int(i)} delegatorSub=noData />
+          ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i delegatorSub=noData />
+          : <RenderBody key={i->Belt.Int.toString} delegatorSub=noData />
       )
       ->React.array
     }}
