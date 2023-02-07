@@ -20,7 +20,14 @@ module ProposalStatus = {
     }
   }
   //TODO: implement for status
-  let serialize = _ => "status"->Js.Json.string
+  let serialize = status => 
+  switch (status) {
+  | Deposit => "DepositPeriod"->Js.Json.string
+  | Voting => "VotingPeriod"->Js.Json.string
+  | Passed => "Passed"->Js.Json.string
+  | Rejected => "Rejected"->Js.Json.string
+  | Failed => "Failed"->Js.Json.string
+  };
 }
 
 type account_t = {address: Address.t}

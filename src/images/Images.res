@@ -49,3 +49,7 @@
 @module("./cosmosibc.svg") external cosmosIBCIcon: string = "default"
 @module("./solidity.svg") external solidityIcon: string = "default"
 @module("./golang.svg") external golangIcon: string = "default"
+@module("./right-arrow.svg") external rightArrow: string = "default"
+
+// BG
+@module("./not-found-bg.svg") external notFoundBg: string = "default"

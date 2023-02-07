@@ -196,7 +196,7 @@ let getList = (~page, ~pageSize, ()) => {
   result->Sub.fromData->Sub.map(({transactions}) => transactions->Belt.Array.map(toExternal))
 }
 
-let getListBySender = (sender, ~page, ~pageSize, ()) => {
+let getListBySender = (sender, ~page, ~pageSize) => {
   let offset = (page - 1) * pageSize
   let result = MultiBySenderConfig.use({
     limit: pageSize,
@@ -217,7 +217,7 @@ let getListBySender = (sender, ~page, ~pageSize, ()) => {
   })
 }
 
-let getListByBlockHeight = (height, ()) => {
+let getListByBlockHeight = (height) => {
   let result = MultiByHeightConfig.use({height: height->ID.Block.toInt})
 
   result->Sub.fromData->Sub.map(({transactions}) => transactions->Belt.Array.map(toExternal))

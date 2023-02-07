@@ -3,7 +3,7 @@ open Route
 open Expect
 
 describe("Expect Search Functionality to work correctly", () => {
-  test("test block route", () => expect("123"->search)->toEqual(BlockIndexPage(123)))
+  test("test block route", () => expect("123"->search)->toEqual(BlockDetailsPage(123)))
   test("test transaction route", () =>
     expect("22638794cb5f306ef929b90c58b27d26cb35a77ca5c5c624cf2025a98528c323"->search)->toEqual(
       TxIndexPage("22638794cb5f306ef929b90c58b27d26cb35a77ca5c5c624cf2025a98528c323"->Hash.fromHex),
@@ -16,8 +16,8 @@ describe("Expect Search Functionality to work correctly", () => {
       ),
     )
   )
-  test("test block prefix is B", () => expect("B123"->search)->toEqual(BlockIndexPage(123)))
-  test("test block prefix is b", () => expect("b123"->search)->toEqual(BlockIndexPage(123)))
+  test("test block prefix is B", () => expect("B123"->search)->toEqual(BlockDetailsPage(123)))
+  test("test block prefix is b", () => expect("b123"->search)->toEqual(BlockDetailsPage(123)))
   test("test data soure route prefix is D", () =>
     expect("D123"->search)->toEqual(DataSourceDetailsPage(123, DataSourceRequests))
   )
