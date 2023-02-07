@@ -20,9 +20,8 @@ let fromUnixSecondOpt = timeOpt =>
 
 let fromUnixSecond = timeInt => timeInt->MomentRe.momentWithUnix->MomentRe.Moment.defaultUtc
 
-let fromUnixSecond = timeInt =>
-  timeInt -> MomentRe.momentWithUnix -> MomentRe.Moment.defaultUtc
-  
+let fromUnixSecond = timeInt => timeInt->MomentRe.momentWithUnix->MomentRe.Moment.defaultUtc
+
 let timeMS = json =>
   json
   ->Js.Json.decodeNumber
@@ -80,11 +79,12 @@ let coinExn = jsonOpt =>
   ->float_of_string
   ->Coin.newUBANDFromAmount
 
-let coinWithDefault = jsonOpt =>
+let coinWithDefault = jsonOpt => {
   jsonOpt
-  ->Belt.Option.flatMap(Js.Json.decodeNumber)
-  ->Belt.Option.getWithDefault(_, 0.0)
+  ->Belt_Option.flatMap(_, Js.Json.decodeString)
+  ->Belt.Option.mapWithDefault(_, 0., float_of_string)
   ->Coin.newUBANDFromAmount
+}
 
 let coins = str =>
   str
