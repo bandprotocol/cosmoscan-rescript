@@ -80,6 +80,25 @@ let toExternal = (
   votingPower: tokens.amount,
 }
 
+module SingleConfig = %graphql(`
+      subscription Validator($operator_address: String!) {
+        validators_by_pk(operator_address: $operator_address) @ppxAs(type: "internal_t") {
+          operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
+          consensusAddress: consensus_address
+          moniker
+          identity
+          website
+          tokens @ppxCustom(module: "GraphQLParserModule.Coin")
+          commissionRate: commission_rate @ppxCustom(module: "GraphQLParserModule.FloatStringExn")
+          commissionMaxChange: commission_max_change@ppxCustom(module: "GraphQLParserModule.FloatStringExn")
+          commissionMaxRate: commission_max_rate @ppxCustom(module: "GraphQLParserModule.FloatStringExn")
+          jailed
+          details
+          oracleStatus: status
+        }
+      }
+`)
+
 module MultiConfig = %graphql(`
   subscription Validators($jailed: Boolean!) {
     validators(where: {jailed: {_eq: $jailed}}, order_by: [{tokens: desc, moniker: asc}]) @ppxAs(type: "internal_t") {
@@ -158,13 +177,26 @@ module MultiLast100VotedConfig = %graphql(`
   }
 `)
 
+let get = operator_address => {
+  let result = SingleConfig.use({operator_address: operator_address->Address.toOperatorBech32})
+
+  result
+  ->Sub.fromData
+  ->Sub.flatMap(({validators_by_pk}) => {
+    switch validators_by_pk {
+    | Some(data) => Sub.resolve(data->toExternal)
+    | None => Sub.NoData
+    }
+  })
+}
+
 let getList = (~isActive, ()) => {
   let result = MultiConfig.use({jailed: !isActive})
 
   result
   ->Sub.fromData
   ->Sub.map(({validators}) =>
-    validators->Belt.Array.mapWithIndex((idx, each) => toExternal(each, idx + 1))
+    validators->Belt_Array.mapWithIndex((idx, each) => toExternal(each, idx + 1))
   )
 }
 
