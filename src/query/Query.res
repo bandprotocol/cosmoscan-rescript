@@ -1,4 +1,4 @@
-open ApolloClient__React_Hooks_UseSubscription
+open ApolloClient__React_Hooks_UseQuery
 
 type variant<'a> =
   | Data('a)
@@ -14,13 +14,15 @@ let default = (result, value) =>
   | _ => value
   }
 
-let fromData = result =>
-  switch result {
-  | {data: Some(data)} => Data(data)
-  | {error: Some(error)} => Error(error)
-  | {loading: true} => Loading
-  | {data: None, error: None, loading: false} => NoData
-  }
+// let fromData = result => {
+//   switch result {
+//   | {loading: true} => Loading
+//   | {data: Some(data)} => Data(data)
+//   | {error: Some(_error)} => Error(_error)
+//   | {data: None, error: None, loading: false} => NoData
+//   | _ => NoData
+//   }
+// }
 
 let flatMap = (result, f) =>
   switch result {
@@ -30,13 +32,9 @@ let flatMap = (result, f) =>
   | NoData => NoData
   }
 
-// 1. loading: true, data: None
-// 2. loading: false, data: Some
-// 3. loading: true, data: Some
-
 let map = (result, f) =>
   switch result {
-  | Data(data) => Data(data->f)
+  | Data(data) => Data(data |> f)
   | Loading => Loading
   | Error(e) => Error(e)
   | NoData => NoData

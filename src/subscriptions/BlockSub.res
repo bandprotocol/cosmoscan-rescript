@@ -13,7 +13,7 @@ type internal_validator_t = {
 
 type request_t = {
   id: ID.Request.t,
-  isIBC: bool
+  isIBC: bool,
 }
 
 type internal_t = {
@@ -26,7 +26,6 @@ type internal_t = {
   requests: array<request_t>,
 }
 
-
 type t = {
   height: ID.Block.t,
   timestamp: MomentRe.Moment.t,
@@ -37,7 +36,15 @@ type t = {
   requests: array<request_t>,
 }
 
-let toExternal = ({height, hash, inflation, timestamp, validator, transactions_aggregate, requests}) => {
+let toExternal = ({
+  height,
+  hash,
+  inflation,
+  timestamp,
+  validator,
+  transactions_aggregate,
+  requests,
+}) => {
   height,
   hash,
   inflation,
@@ -52,7 +59,7 @@ let toExternal = ({height, hash, inflation, timestamp, validator, transactions_a
   | Some(aggregate) => aggregate.count
   | _ => 0
   },
-  requests
+  requests,
 }
 
 module MultiConfig = %graphql(`
@@ -118,24 +125,48 @@ module PastDayBlockCountConfig = %graphql(`
 `)
 
 module BlockSum = {
-  let toExternal = (count: int) => (24 * 60 * 60)->Belt.Int.toFloat /. (count->Belt.Int.toFloat)
+  let toExternal = (count: int) => (24 * 60 * 60)->Belt.Int.toFloat /. count->Belt.Int.toFloat
 }
+
+module MultiConsensusAddressConfig = %graphql(`
+  subscription BlocksByConsensusAddress($limit: Int!, $offset: Int!, $address: String!) {
+    blocks(limit: $limit, offset: $offset, order_by: [{height: desc}], where: {proposer: {_eq: $address}}) @ppxAs(type: "internal_t") {
+      height @ppxCustom(module: "GraphQLParserModule.BlockID")
+      hash @ppxCustom(module: "GraphQLParserModule.Hash")
+      inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
+      timestamp @ppxCustom(module: "GraphQLParserModule.Date")
+      validator @ppxAs(type: "internal_validator_t") {
+        consensusAddress: consensus_address
+        operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
+        moniker
+        identity
+      }
+      transactions_aggregate @ppxAs(type: "transactions_aggregate_t") {
+        aggregate @ppxAs(type: "aggregate_t"){
+          count
+        }
+      }
+      requests(where: {resolve_status: {_neq: "Open"}}) @ppxAs(type: "request_t"){
+        id @ppxCustom(module: "GraphQLParserModule.RequestID")
+        isIBC: is_ibc
+      }
+    }
+  }
+`)
 
 let getList = (~page, ~pageSize) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({limit: pageSize, offset})
 
-  result 
-  -> Sub.fromData 
-  -> Sub.map(({blocks}) => blocks->Belt_Array.map(toExternal))
+  result->Sub.fromData->Sub.map(({blocks}) => blocks->Belt_Array.map(toExternal))
 }
 
 let get = (height: ID.Block.t) => {
-  let result = SingleConfig.use({height: height -> ID.Block.toInt})
+  let result = SingleConfig.use({height: height->ID.Block.toInt})
 
   result
-  -> Sub.fromData 
-  -> Sub.flatMap(({blocks_by_pk}) => 
+  ->Sub.fromData
+  ->Sub.flatMap(({blocks_by_pk}) =>
     switch blocks_by_pk {
     | Some(data) => data->toExternal->Sub.resolve
     | None => NoData
@@ -165,4 +196,23 @@ let getLatest = () => {
     | None => NoData
     }
   })
+}
+
+let getListByConsensusAddress = (~address, ~page, ~pageSize, ()) => {
+  let offset = (page - 1) * pageSize
+
+  let result = MultiConsensusAddressConfig.use({
+    address: address->Address.toHex,
+    limit: pageSize,
+    offset,
+  })
+
+  // result->Sub.fromData->Sub.map(({blocks}) => Sub.resolve(blocks->Belt.Array.map(toExternal)))
+  result->Sub.fromData->Sub.flatMap(({blocks}) => blocks->Belt.Array.map(toExternal)->Sub.resolve)
+
+  //   result
+  // ->Sub.fromData
+  // ->Sub.map(({blocks_aggregate}) =>
+  //   blocks_aggregate.aggregate->Belt_Option.getExn->(y => y.count)->BlockSum.toExternal
+  // )
 }

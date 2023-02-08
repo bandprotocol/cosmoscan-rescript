@@ -208,12 +208,13 @@ let assignSolidity = ({name, varType}) => {
 }
 
 // TODO: abstract it out
-let optionsAll = options => {
-  switch options->Belt.Array.every(Belt.Option.isSome) {
-  | true => Some(options->Belt.Array.map(Belt.Option.getExn))
-  | false => None
-  }
-}
+let optionsAll = options =>
+  options->Belt.Array.reduce(_, Some([]), (acc, obj) => {
+    switch (acc, obj) {
+    | (Some(acc'), Some(obj')) => Some(acc'->Js.Array.concat([obj']))
+    | (_, _) => None
+    }
+  })
 
 let generateDecodeLibSolidity = (schema, dataType) => {
   let dataTypeString = dataType->dataTypeToString

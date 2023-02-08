@@ -53,3 +53,7 @@
 
 // BG
 @module("./not-found-bg.svg") external notFoundBg: string = "default"
+
+// Validator
+@module("./inactive-validator-logo.svg") external inactiveValidatorLogo: string = "default"
+@module("./active-validator-logo.svg") external activeValidatorLogo: string = "default"
