@@ -198,12 +198,6 @@ module Content = {
                 name: "Make New Request",
                 route: oracleScriptID->ID.OracleScript.getRouteWithTab(Route.OracleScriptExecute),
               },
-              // {
-              //   name: "Revisions",
-              //   route:
-              //     oracleScriptID
-              //     -> ID.OracleScript.getRouteWithTab(Route.OracleScriptRevisions),
-              // },
             ]
             currentRoute={oracleScriptID->ID.OracleScript.getRouteWithTab(hashtag)}>
             {switch hashtag {
@@ -239,7 +233,6 @@ module Content = {
               | Error(_) | Loading | NoData => <LoadingCensorBar.CircleSpin height=400 />
               }
             | OracleScriptRequests => <OracleScriptRequestTable oracleScriptID />
-            //  | OracleScriptRevisions => <OracleScriptRevisionTable id=oracleScriptID />
             }}
           </Tab.Route>
         </Table>
