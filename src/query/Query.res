@@ -14,13 +14,15 @@ let default = (result, value) =>
   | _ => value
   }
 
-// let fromData = result =>
+// let fromData = result => {
 //   switch result {
-//   | {data: Some(data)} => Data(data)
-//   | {error: Some(error)} => Error(error)
 //   | {loading: true} => Loading
+//   | {data: Some(data)} => Data(data)
+//   | {error: Some(_error)} => Error(_error)
 //   | {data: None, error: None, loading: false} => NoData
+//   | _ => NoData
 //   }
+// }
 
 let flatMap = (result, f) =>
   switch result {

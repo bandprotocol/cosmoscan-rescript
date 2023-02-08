@@ -454,7 +454,10 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
             </div>
             <SeperatedLine mt=32 mb=24 />
             <div
-              className={Css.merge([CssHelper.flexBox(~justify=#center, ()), Styles.chartWrapper])}>
+              className={Css.merge(list{
+                CssHelper.flexBox(~justify=#center, ()),
+                Styles.chartWrapper,
+              })}>
               {switch allSub {
               | Data(({consensusAddress}, _, _)) => <BlockUptimeChart consensusAddress />
               | _ => <LoadingCensorBar.CircleSpin height=90 />
@@ -473,7 +476,10 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
             </div>
             <SeperatedLine mt=32 mb=24 />
             <div
-              className={Css.merge([CssHelper.flexBox(~justify=#center, ()), Styles.chartWrapper])}>
+              className={Css.merge(list{
+                CssHelper.flexBox(~justify=#center, ()),
+                Styles.chartWrapper,
+              })}>
               {switch allSub {
               | Data(({oracleStatus}, _, _)) =>
                 <OracleDataReportChart oracleStatus operatorAddress=address />

@@ -1,17 +1,15 @@
 module Styles = {
   open CssJs
 
-  let container = style([width(#percent(100.)), height(#px(250)), margin2(~v=#zero, ~h=#auto)])
+  let container = style(. [width(#percent(100.)), height(#px(250)), margin2(~v=#zero, ~h=#auto)])
 
-  let chart = show => style([important(display(show ? #block : #none))])
+  let chart = show => style(. [important(display(show ? #block : #none))])
 }
 
-let renderGraph: (
-  array<HistoricalBondedQuery.t>,
-  bool,
-) => unit = %raw(`// TODO: let's binding chart.js later
+let renderGraph: (array<HistoricalBondedQuery.t>, bool) => unit = %raw(`
 function(data, isDarkMode) {
-  var Chart = require('chart.js');
+
+  const { Chart } = require('chart.js');
   var ctx = document.getElementById('historicalBonded').getContext('2d');
 
   // change seconds to milliseconds

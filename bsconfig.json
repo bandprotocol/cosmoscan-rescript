@@ -48,7 +48,8 @@
     "rescript-webapi",
     "@glennsl/rescript-json-combinators"
   ],
-  "bs-dev-dependencies": [
-    "@glennsl/rescript-jest"
-  ]
+  "bs-dev-dependencies": ["@glennsl/bs-jest"],
+  "warnings" : { 
+    "number": "-20-26-27-20-32-33-34-35-36-37-38-39-48"
+  }
 }
