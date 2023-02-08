@@ -1,35 +1,33 @@
 module Styles = {
-  open CssJs;
+  open CssJs
 
-  let tableLowerContainer = style(. [position(#relative)]);
-  let tableWrapper =
-    style(. [padding(#px(24)), Media.mobile([padding2(~v=#px(20), ~h=#zero)])]);
-  let codeImage = style(. [width(#px(20)), marginRight(#px(10))]);
-  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))]);
+  let tableLowerContainer = style(. [position(#relative)])
+  let tableWrapper = style(. [padding(#px(24)), Media.mobile([padding2(~v=#px(20), ~h=#zero)])])
+  let codeImage = style(. [width(#px(20)), marginRight(#px(10))])
+  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
 
-  let scriptContainer =
-    style(. [
-      fontSize(#px(12)),
-      lineHeight(#px(20)),
-      fontFamilies([#custom("Roboto Mono"), #monospace]),
-    ]);
+  let scriptContainer = style(. [
+    fontSize(#px(12)),
+    lineHeight(#px(20)),
+    fontFamilies([#custom("Roboto Mono"), #monospace]),
+  ])
 
-  let padding = style(. [padding(#px(20))]);
-  let titleSpacing = style(. [marginBottom(#px(8))]);
-};
+  let padding = style(. [padding(#px(20))])
+  let titleSpacing = style(. [marginBottom(#px(8))])
+}
 
 let renderCode = content => {
   <div className=Styles.scriptContainer>
-    <ReactHighlight className=Styles.padding> {content -> React.string} </ReactHighlight>
-  </div>;
-};
+    <ReactHighlight className=Styles.padding> {content->React.string} </ReactHighlight>
+  </div>
+}
 
 @react.component
 let make = (~url: string) => {
-  let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  let (dataOpt, loading) = AxiosHooks.useLoadable(url);
-  let codeOpt = dataOpt -> Belt.Option.flatMap(Js.Json.decodeString);
+  let (dataOpt, loading) = AxiosHooks.useLoadable(url)
+  let codeOpt = dataOpt->Belt.Option.flatMap(Js.Json.decodeString)
 
   switch (codeOpt, loading) {
   | (_, true) => <LoadingCensorBar.CircleSpin height=400 />
@@ -71,7 +69,7 @@ let make = (~url: string) => {
           </div>
         </Col>
       </Row>
-      <div className=Styles.tableLowerContainer> {code -> renderCode} </div>
+      <div className=Styles.tableLowerContainer> {code->renderCode} </div>
     </div>
   | (None, false) =>
     <EmptyContainer>
@@ -88,5 +86,5 @@ let make = (~url: string) => {
         color={theme.textSecondary}
       />
     </EmptyContainer>
-  };
-};
+  }
+}

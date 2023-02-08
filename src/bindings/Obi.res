@@ -208,12 +208,13 @@ let assignSolidity = ({name, varType}) => {
 }
 
 // TODO: abstract it out
-let optionsAll = options => {
-  switch options->Belt.Array.every(Belt.Option.isSome) {
-  | true => Some(options->Belt.Array.map(Belt.Option.getExn))
-  | false => None
-  }
-}
+let optionsAll = options =>
+  options->Belt_Array.reduce(_, Some([]), (acc, obj) => {
+    switch (acc, obj) {
+    | (Some(acc'), Some(obj')) => Some(acc'->Js.Array.concat([obj']))
+    | (_, _) => None
+    }
+  })
 
 let generateDecodeLibSolidity = (schema, dataType) => {
   let dataTypeString = dataType->dataTypeToString
@@ -341,51 +342,13 @@ func DecodeResult(data []byte) (Result, error) {
 }`
 
     let fieldsPair = extractFields(schema, name)->Belt.Option.getExn
-    let fields = fieldsPair->Belt.Array.map(parse)->optionsAll->Belt.Option.getExn
+    let fields = fieldsPair->Belt_Array.map(parse)->optionsAll->Belt.Option.getExn
     Some(
       template(
-        fields->Belt.Array.map(declareGo)->Js.Array.joinWith("\n\t", _),
-        fields->Belt.Array.map(assignGo)->Js.Array.joinWith("\n\t", _),
-        fields->Belt.Array.map(resultGo)->Js.Array.joinWith("\n\t\t", _),
+        fields->Belt_Array.map(declareGo)->Js.Array.joinWith("\n\t", _),
+        fields->Belt_Array.map(assignGo)->Js.Array.joinWith("\n\t", _),
+        fields->Belt_Array.map(resultGo)->Js.Array.joinWith("\n\t\t", _),
       ),
     )
   }
-}
-
-let encodeStructGo = ({name, varType}) => {
-  switch varType {
-  | Single(U8) => j`encoder.EncodeU8(result.$name)`
-  | Single(U32) => j`encoder.EncodeU32(result.$name)`
-  | Single(U64) => j`encoder.EncodeU64(result.$name)`
-  | Single(String) => j`encoder.EncodeString(result.$name)`
-  | _ => "//TODO: implement later"
-  }
-}
-
-let generateEncodeGo = (packageName, schema, name) => {
-  let template = (structs, functions) =>
-    j`package $packageName
-
-import "github.com/bandchain/chain/pkg/obi"
-
-type Result struct {
-\t$structs
-}
-
-func(result *Result) EncodeResult() []byte {
-\tencoder := obi.NewObiEncoder()
-
-\t$functions
-
-\treturn encoder.GetEncodedData()
-}`
-
-  let fieldsPair = extractFields(schema, name)->Belt.Option.getExn
-  let fields = fieldsPair->Belt.Array.map(parse)->optionsAll->Belt.Option.getExn
-  Some(
-    template(
-      fields->Belt.Array.map(declareGo)->Js.Array.joinWith("\n\t", _),
-      fields->Belt.Array.map(encodeStructGo)->Js.Array.joinWith("\n\t", _),
-    ),
-  )
 }
