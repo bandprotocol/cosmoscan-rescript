@@ -29,22 +29,6 @@ module FromUnixSecond = {
   let serialize = momentT => momentT->MomentRe.Moment.toUnix
 }
 
-module String = {
-  type t = string
-  let parse = json => json->GraphQLParser.string
-
-  //Note: just mock
-  let serialize = str => str->Js.Json.string
-}
-
-module FromUnixSecond = {
-  type t = option<MomentRe.Moment.t>
-  let parse = timeInt => timeInt->GraphQLParser.fromUnixSecond
-
-  //Note: just mock
-  let serialize = momentT => momentT->MomentRe.Moment.toUnix
-}
-
 module FloatExn = {
   type t = float
 
@@ -120,17 +104,6 @@ module Buffer = {
   type t = JsBuffer.t
   let parse = json => json->GraphQLParser.buffer
   let serialize = _ => "buffer"->Js.Json.string
-}
-
-module OptionBuffer = {
-  type t = option<JsBuffer.t>
-  let parse = jsonOpt => jsonOpt->GraphQLParser.optionBuffer
-}
-
-module Buffer = {
-  type t = JsBuffer.t
-  let parse = json => json->GraphQLParser.buffer
-  let serialize = coin => "buffer" |> Js.Json.string
 }
 
 module OptionBuffer = {

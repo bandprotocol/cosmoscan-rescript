@@ -1,5 +1,3 @@
-open ValidatorSub.Mini
-
 type aggregate_t = {count: int}
 
 type transactions_aggregate_t = {aggregate: option<aggregate_t>}
@@ -23,7 +21,6 @@ type internal_t = {
   timestamp: MomentRe.Moment.t,
   hash: Hash.t,
   inflation: float,
-  timestamp: MomentRe.Moment.t,
   validator: internal_validator_t,
   transactions_aggregate: transactions_aggregate_t,
   requests: array<request_t>,
@@ -72,14 +69,13 @@ module MultiConfig = %graphql(`
       timestamp @ppxCustom(module: "GraphQLParserModule.Date")
       hash @ppxCustom(module: "GraphQLParserModule.Hash")
       inflation @ppxCustom(module: "GraphQLParserModule.FloatString")
-      timestamp @ppxCustom(module: "GraphQLParserModule.Date")
       validator @ppxAs(type: "internal_validator_t"){
         consensusAddress: consensus_address
         operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
         moniker
         identity
       }
-      transactions_aggregate @ppxAs(type: "transactions_aggregate_t") {
+      transactions_aggregate @ppxAs(type: "transactions_aggregate_t"){
         aggregate @ppxAs(type: "aggregate_t"){
           count
         }
@@ -107,7 +103,7 @@ module SingleConfig = %graphql(`
       }
       transactions_aggregate @ppxAs(type: "transactions_aggregate_t") {
         aggregate @ppxAs(type: "aggregate_t"){
-          count
+          count 
         }
       }
       requests(where: {resolve_status: {_neq: "Open"}}) @ppxAs(type: "request_t"){
@@ -128,6 +124,10 @@ module PastDayBlockCountConfig = %graphql(`
   }
 `)
 
+module BlockSum = {
+  let toExternal = (count: int) => (24 * 60 * 60)->Belt.Int.toFloat /. count->Belt.Int.toFloat
+}
+
 module MultiConsensusAddressConfig = %graphql(`
   subscription BlocksByConsensusAddress($limit: Int!, $offset: Int!, $address: String!) {
     blocks(limit: $limit, offset: $offset, order_by: [{height: desc}], where: {proposer: {_eq: $address}}) @ppxAs(type: "internal_t") {
@@ -146,19 +146,19 @@ module MultiConsensusAddressConfig = %graphql(`
           count
         }
       }
+      requests(where: {resolve_status: {_neq: "Open"}}) @ppxAs(type: "request_t"){
+        id @ppxCustom(module: "GraphQLParserModule.RequestID")
+        isIBC: is_ibc
+      }
     }
   }
 `)
-
-module BlockSum = {
-  let toExternal = (count: int) => (24 * 60 * 60)->Belt.Int.toFloat /. count->Belt.Int.toFloat
-}
 
 let getList = (~page, ~pageSize) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({limit: pageSize, offset})
 
-  result->Sub.fromData->Sub.map(({blocks}) => blocks->Belt.Array.map(toExternal))
+  result->Sub.fromData->Sub.map(({blocks}) => blocks->Belt_Array.map(toExternal))
 }
 
 let get = (height: ID.Block.t) => {

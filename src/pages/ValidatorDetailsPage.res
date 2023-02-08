@@ -45,11 +45,7 @@ module UptimePercentage = {
         switch uptime {
         | Some(uptime) =>
           <Text
-<<<<<<< HEAD
-            value={uptime->Format.fPercent(~digits=2)}
-=======
             value={Format.fPercent(~digits=2, uptime)}
->>>>>>> efd80e8 (fix comment and change pipe operator)
             size=Text.Xxxl
             block=true
             color={theme.textPrimary}
@@ -180,11 +176,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               {switch allSub {
               | Data(({votingPower}, _, {amount})) =>
                 <Text
-<<<<<<< HEAD
-                  value={votingPower *. 100. /. amount->Format.fPercent(~digits=2)}
-=======
                   value={Format.fPercent(~digits=2, votingPower *. 100. /. amount)}
->>>>>>> efd80e8 (fix comment and change pipe operator)
                   size=Text.Xxxl
                   align=Text.Left
                   block=true
@@ -199,11 +191,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
             | Data(({votingPower}, _, _)) =>
               <>
                 <Text
-<<<<<<< HEAD
-                  value={votingPower /. 1e6->Format.fPretty(~digits=0) ++ " Band"}
-=======
                   value={Format.fPretty(~digits=0, votingPower /. 1e6) ++ " Band"}
->>>>>>> efd80e8 (fix comment and change pipe operator)
                   size=Text.Lg
                   block=true
                 />
@@ -224,11 +212,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
             {switch allSub {
             | Data(({commission}, _, _)) =>
               <Text
-<<<<<<< HEAD
-                value={commission->Format.fPercent(~digits=2)}
-=======
                 value={Format.fPercent(~digits=2, commission)}
->>>>>>> efd80e8 (fix comment and change pipe operator)
                 size=Text.Xxxl
                 align=Text.Left
                 block=true
@@ -368,11 +352,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               <Col col=Col.Eight>
                 {switch allSub {
                 | Data(({commissionMaxChange}, _, _)) =>
-<<<<<<< HEAD
-                  <Text value={commissionMaxChange->Format.fPercent(~digits=2)} size=Text.Lg />
-=======
                   <Text value={Format.fPercent(~digits=2, commissionMaxChange)} size=Text.Lg />
->>>>>>> efd80e8 (fix comment and change pipe operator)
                 | _ => <LoadingCensorBar width=260 height=15 />
                 }}
               </Col>
@@ -396,11 +376,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               <Col col=Col.Eight>
                 {switch allSub {
                 | Data(({commissionMaxRate}, _, _)) =>
-<<<<<<< HEAD
-                  <Text value={commissionMaxRate->Format.fPercent(~digits=2)} size=Text.Lg />
-=======
                   <Text value={Format.fPercent(~digits=2, commissionMaxRate)} size=Text.Lg />
->>>>>>> efd80e8 (fix comment and change pipe operator)
                 | _ => <LoadingCensorBar width=260 height=15 />
                 }}
               </Col>
