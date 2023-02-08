@@ -75,9 +75,13 @@ let parseChainID = x =>
   | "band-guanyu-poa" => GuanYuPOA
   | "band-guanyu-mainnet" => GuanYuMainnet
   | "band-laozi-testnet1"
-  | "band-laozi-testnet2" =>
+  | "band-laozi-testnet2"
+  | "band-laozi-testnet3"
+  | "band-laozi-testnet4"
+  | "band-laozi-testnet5"
+  | "band-laozi-testnet6" =>
     LaoziTestnet
-  | "band-laozi-mainnet" => LaoziMainnet
+  | "laozi-mainnet" => LaoziMainnet
   | "band-laozi-poa" => LaoziPOA
   | _ => Unknown
   }
@@ -90,7 +94,7 @@ let getLink = x =>
   | GuanYuDevnet => "https://guanyu-devnet.cosmoscan.io/"
   | GuanYuTestnet => "https://guanyu-testnet4.cosmoscan.io/"
   | GuanYuPOA => "https://guanyu-poa.cosmoscan.io/"
-  | LaoziTestnet => "https://laozi-testnet2.cosmoscan.io/"
+  | LaoziTestnet => "https://laozi-testnet6.cosmoscan.io/"
   | LaoziMainnet => "https://cosmoscan.io/"
   | LaoziPOA => "https://laozi-poa.cosmoscan.io/"
   | Unknown => ""
@@ -110,8 +114,42 @@ let getName = x =>
   | Unknown => "unknown"
   }
 
-// TODO will patch later
 @react.component
 let make = () => {
-  <> <Text value="Chain ID Badge" /> </>
+  let (show, setShow) = React.useState(_ => false)
+  let trackingSub = TrackingSub.use()
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+  switch trackingSub {
+  | Data({chainID}) => {
+      let currentChainID = chainID->parseChainID
+      <div
+        className={Styles.version(theme, isDarkMode)}
+        onClick={event => {
+          setShow(oldVal => !oldVal)
+          ReactEvent.Mouse.stopPropagation(event)
+        }}>
+        <Text
+          value={currentChainID->getName} color={theme.textPrimary} nowrap=true weight=Text.Semibold
+        />
+        <HSpacing size=Spacing.sm />
+        {show
+          ? <Icon name="far fa-angle-up" color={theme.textSecondary} />
+          : <Icon name="far fa-angle-down" color={theme.textSecondary} />}
+        <div className={Styles.dropdown(show, theme, isDarkMode)}>
+          {[LaoziMainnet, LaoziTestnet]
+          ->Belt.Array.keep(chainID => chainID != currentChainID)
+          ->Belt.Array.map(chainID => {
+            let name = chainID->getName
+            <AbsoluteLink href={getLink(chainID)} key=name className={Styles.link(theme)}>
+              <Text value=name color={theme.textSecondary} nowrap=true weight=Text.Semibold />
+            </AbsoluteLink>
+          })
+          ->React.array}
+        </div>
+      </div>
+    }
+
+  | _ => <LoadingCensorBar width=153 height=30 />
+  }
 }
