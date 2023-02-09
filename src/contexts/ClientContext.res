@@ -1,10 +1,10 @@
-type t = {client: BandChainJS.client_t};
+type t = {client: BandChainJS.Client.t}
 
-let context = React.createContext(ContextHelper.default);
+let context = React.createContext(ContextHelper.default)
 
 @react.component
 let make = (~children) => {
-  let client = BandChainJS.createClient(Env.grpc);
+  let client = BandChainJS.Client.create(Env.grpc)
 
-  React.createElement(React.Context.provider(context), {"value": client, "children": children});
-};
+  React.createElement(React.Context.provider(context), {"value": client, "children": children})
+}

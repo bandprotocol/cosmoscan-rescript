@@ -28,7 +28,7 @@ let getBandUsd24Change = () => {
 let getCirculatingSupply = () => {
   open! JsonUtils.Decode
 
-  Axios.get("https://supply.bandchain.org/circulating")
+  Axios.get("https://api.bandchain.org/supply/circulating")
   ->Promise.then(result => Promise.resolve(result->mustGet("data", float)))
   ->Promise.catch(_ => {
     Js.Console.log("swapped to use coingekco api")
