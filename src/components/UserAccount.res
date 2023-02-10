@@ -136,14 +136,14 @@ module Balance = {
 @react.component
 let make = () => {
   // TODO: Will patch later
-  //   let trackingSub = TrackingSub.use()
+  let trackingSub = TrackingSub.use()
   let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
   let (_, dispatchModal) = React.useContext(ModalContext.context)
   let (show, setShow) = React.useState(_ => false)
 
   let clickOutside = ClickOutside.useClickOutside(_ => setShow(_ => false))
 
-  // let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
+  let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
   let disconnect = () => {
     dispatchAccount(Disconnect)
     setShow(_ => false)
@@ -186,16 +186,16 @@ let make = () => {
         </div>
       </div>
     </div>
-  | None => React.null
-  // <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-  //   {switch trackingSub {
-  //   | Data({chainID}) => <ConnectBtn connect={_ => connect(chainID)} />
-  //   | Error(err) =>
-  //     // log for err details
-  //     Js.Console.log(err)
-  //     <Text value="chain id not found" />
-  //   | _ => <LoadingCensorBar width=80 height=18 />
-  //   }}
-  // </div>
+  | None =>
+    <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+      {switch trackingSub {
+      | Data({chainID}) => <ConnectBtn connect={_ => connect(chainID)} />
+      | Error(err) =>
+        // log for err details
+        Js.Console.log(err)
+        <Text value="Invalid Chain ID" />
+      | _ => <LoadingCensorBar width=80 height=18 />
+      }}
+    </div>
   }
 }
