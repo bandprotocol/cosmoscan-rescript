@@ -406,6 +406,27 @@ module ExecutionPart = {
                     style={Styles.button(result == Loading)}
                     onClick={_ =>
                       if result !== Loading {
+                        // TODO: For testing OBI type-safe version, will be removed later
+                        // Js.log(
+                        //   Obi2.encode(
+                        //     schema,
+                        //     Obi2.Input,
+                        //     Belt.List.map(paramsInput, input => input.fieldName)
+                        //     ->Belt.List.zip(callDataArr->Belt.List.fromArray)
+                        //     ->Belt.List.map(([fieldName, fieldValue]) => {fieldName, fieldValue}),
+                        //   ),
+                        // )
+
+                        // Js.log(
+                        //   Obi.encode(
+                        //     schema,
+                        //     "input",
+                        //     Belt.List.map(paramsInput, input => input.fieldName)
+                        //     ->Belt.List.zip(callDataArr)
+                        //     ->Belt.List.map(([fieldName, fieldValue]) => {fieldName, fieldValue}),
+                        //   ),
+                        // )
+
                         switch Obi.encode(
                           schema,
                           "input",

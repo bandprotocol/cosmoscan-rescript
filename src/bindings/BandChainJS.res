@@ -1,12 +1,22 @@
-type client_t
+module Client = {
+  type t
+  type reference_data_t = {
+    pair: string,
+    rate: float,
+  }
 
-type reference_data_t = {
-  pair: string,
-  rate: float,
+  @module("@bandprotocol/bandchain.js") @new external create: string => t = "Client"
+  @send
+  external getReferenceData: (t, array<string>) => Promise.t<array<reference_data_t>> =
+    "getReferenceData"
 }
 
-@module("@bandprotocol/bandchain.js") @new external createClient: string => client_t = "Client"
+module Obi = {
+  type t
 
-@send
-external getReferenceData: (client_t, array<string>) => Promise.t<array<reference_data_t>> =
-  "getReferenceData"
+  @module("@bandprotocol/bandchain.js") @new external create: string => t = "Obi"
+  @send external encodeInput: (t, 'a) => JsBuffer.t = "encodeInput"
+  @send external encodeOutput: (t, 'a) => JsBuffer.t = "encodeOutput"
+  @send external decodeInput: (t, JsBuffer.t) => 'a = "decodeInput"
+  @send external decodeOutput: (t, JsBuffer.t) => 'a = "decodeOutput"
+}
