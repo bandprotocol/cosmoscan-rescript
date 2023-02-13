@@ -147,7 +147,7 @@ let make = (~info) => {
       block=true
       code=true
       ellipsis=true
-      color={theme.textPrimary}
+      color={theme.neutral_900}
     />
   | Messages(txHash, messages, success, errMsg) => <TxMessages txHash messages success errMsg />
   // TODO: do it later

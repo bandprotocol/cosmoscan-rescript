@@ -250,7 +250,7 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
           value="No Request Found"
           align=Heading.Center
           weight=Heading.Regular
-          color={theme.textSecondary}
+          color={theme.neutral_600}
         />
       </EmptyContainer>
     | _ => React.null

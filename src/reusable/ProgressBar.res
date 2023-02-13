@@ -12,7 +12,7 @@ module Styles = {
       width(#percent(100.)),
       height(px(12)),
       borderRadius(px(7)),
-      border(px(1), solid, theme.tableRowBorderColor),
+      border(px(1), solid, theme.neutral_100),
       padding(px(1)),
       overflow(hidden),
     ])
@@ -22,7 +22,7 @@ module Styles = {
       height(#percent(100.)),
       borderRadius(px(7)),
       transition(~duration=200, "all"),
-      background(success ? theme.baseBlue : theme.failColor),
+      background(success ? theme.primary_600 : theme.error_600),
     ])
   let leftText = style(. [
     position(absolute),
@@ -76,7 +76,7 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
         transform=Text.Uppercase
         weight=Text.Semibold
         size=Text.Sm
-        color={theme.textPrimary}
+        color={theme.neutral_900}
       />
     </div>
     <div className={Styles.progressOuter(theme)}>
@@ -88,7 +88,7 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
         size=Text.Sm
         transform=Text.Uppercase
         weight=Text.Semibold
-        color={theme.textPrimary}
+        color={theme.neutral_900}
       />
     </div>
   </div>
@@ -97,15 +97,15 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
 module Uptime = {
   @react.component
   let make = (~percent) => {
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     let color = if percent == 100. {
-      Theme.baseBlue
+      theme.primary_600
     } else if percent < 100. && percent >= 79. {
-      Theme.lightBlue
+      theme.primary_200
     } else {
-      Theme.failColor
+      theme.error_600
     }
 
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div className={Styles.progressOuter(theme)}>
       <div className={Styles.progressUptimeInner(percent, color)} />
     </div>
@@ -130,13 +130,13 @@ module Deposit = {
           CssHelper.mb(~size=8, ()),
           CssHelper.flexBox(~justify=#spaceBetween, ()),
         ])}>
-        <Text value={`Min Deposit ${formatedMinDeposit} BAND`} color=Theme.gray size=Text.Lg />
+        <Text value={`Min Deposit ${formatedMinDeposit} BAND`} color=theme.neutral_200 size=Text.Lg />
         <Text
-          value={`${formatedTotalDeposit} / ${formatedMinDeposit}`} color=Theme.gray size=Text.Lg
+          value={`${formatedTotalDeposit} / ${formatedMinDeposit}`} color=theme.neutral_200 size=Text.Lg
         />
       </div>
       <div className={Styles.progressOuter(theme)}>
-        <div className={Styles.progressUptimeInner(percent, Theme.baseBlue)} />
+        <div className={Styles.progressUptimeInner(percent, theme.primary_600)} />
       </div>
     </div>
   }
@@ -171,7 +171,7 @@ module Voting = {
                   value={amount->Format.fPretty(~digits=2) ++ " BAND"}
                   size=Text.Lg
                   block=true
-                  color={theme.textPrimary}
+                  color={theme.neutral_900}
                 />
               </>}
         </div>

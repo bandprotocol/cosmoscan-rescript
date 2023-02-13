@@ -10,7 +10,7 @@ module Styles = {
 
   let listContainer = style(. [marginBottom(#px(25))])
 
-  let input = (theme: Theme.t) =>
+  let input = (theme: Theme.t, isDarkMode) =>
     style(. [
       width(#percent(100.)),
       height(#px(37)),
@@ -19,16 +19,16 @@ module Styles = {
       borderRadius(#px(4)),
       fontSize(#px(14)),
       fontWeight(#light),
-      border(#px(1), #solid, theme.tableRowBorderColor),
-      backgroundColor(theme.inputContrastColor),
+      border(#px(1), #solid, theme.neutral_100),
+      backgroundColor(isDarkMode ? theme.neutral_300 : theme.neutral_100),
       outlineStyle(#none),
-      color(theme.textPrimary),
+      color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
     ])
 
-  let button = isLoading =>
+  let button = (theme: Theme.t, isLoading) =>
     style(. [
-      backgroundColor(isLoading ? Theme.lightenBlue : Theme.baseBlue),
+      backgroundColor(isLoading ? theme.primary_200 : theme.primary_600),
       fontWeight(#num(600)),
       opacity(isLoading ? 0.8 : 1.),
       cursor(isLoading ? #auto : #pointer),
@@ -41,7 +41,7 @@ module Styles = {
   let resultContainer = (theme: Theme.t) =>
     style(. [
       margin2(~v=#px(20), ~h=#zero),
-      selector("> div + div", [borderTop(#px(1), #solid, theme.tableRowBorderColor)]),
+      selector("> div + div", [borderTop(#px(1), #solid, theme.neutral_100)]),
     ])
   let resultBox = style(. [padding(#px(20))])
   let labelWrapper = style(. [
@@ -62,13 +62,13 @@ module ParameterInput = {
   @react.component
   let make = (~name, ~index, ~setCalldataList) => {
     let name = name->Js.String2.replaceByRe(%re(`/[_]/g`), " ")
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.listContainer>
       <Text value=name size=Text.Md weight=Text.Semibold transform=Text.Capitalize />
       <VSpacing size=Spacing.sm />
       <input
-        className={Styles.input(theme)}
+        className={Styles.input(theme, isDarkMode)}
         type_="text"
         // TODO: Think about placeholder later
         // placeholder="Value"
@@ -155,7 +155,8 @@ module ResultRender = {
 let make = (~executable: JsBuffer.t) => {
   let params = ExecutableParser.parseExecutableScript(executable)->Belt_Option.getWithDefault([])
   let numParams = params->Belt.Array.length
-
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  
   let (callDataList, setCalldataList) = React.useState(_ => Belt.List.make(numParams, ""))
 
   let (result, setResult) = React.useState(_ => Nothing)
@@ -196,7 +197,7 @@ let make = (~executable: JsBuffer.t) => {
           </div>
           <Button
             fsize=14
-            style={Styles.button(result == Loading)}
+            style={Styles.button(theme, result == Loading)}
             px=25
             py=13
             onClick={_ =>

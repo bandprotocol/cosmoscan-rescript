@@ -6,7 +6,7 @@ module Packet = {
       <SeperatedLine mt=24 mb=24 />
       <Row>
         <Col mb=24>
-          <Heading value="Packet" size=Heading.H4 color=theme.textSecondary />
+          <Heading value="Packet" size=Heading.H4 color=theme.neutral_600 />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -14,7 +14,7 @@ module Packet = {
             size=Heading.H4
             marginBottom=8
             weight=Heading.Regular
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text size=Text.Lg value=packet.sourcePort />
         </Col>
@@ -24,7 +24,7 @@ module Packet = {
             size=Heading.H4
             marginBottom=8
             weight=Heading.Regular
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text size=Text.Lg value=packet.destinationPort />
         </Col>
@@ -34,7 +34,7 @@ module Packet = {
             size=Heading.H4
             marginBottom=8
             weight=Heading.Regular
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text size=Text.Lg value=packet.sourceChannel />
         </Col>
@@ -44,7 +44,7 @@ module Packet = {
             size=Heading.H4
             marginBottom=8
             weight=Heading.Regular
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text size=Text.Lg value=packet.destinationChannel />
         </Col>
@@ -54,7 +54,7 @@ module Packet = {
             size=Heading.H4
             marginBottom=8
             weight=Heading.Regular
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text size=Text.Lg value=packet.data breakAll=true />
         </Col>
@@ -64,7 +64,7 @@ module Packet = {
             size=Heading.H4
             marginBottom=8
             weight=Heading.Regular
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Timestamp time=packet.timeoutTimestamp size=Text.Lg />
         </Col>
@@ -82,7 +82,7 @@ module OracleRequestPacket = {
       <SeperatedLine mt=24 mb=24 />
       <Row>
         <Col mb=24>
-          <Heading value="Packet Data" size=Heading.H4 color=theme.textSecondary />
+          <Heading value="Packet Data" size=Heading.H4 color=theme.neutral_600 />
         </Col>
         <Col mb=24>
           <Heading
@@ -90,7 +90,7 @@ module OracleRequestPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text size=Text.Lg value=packetType />
         </Col>
@@ -100,7 +100,7 @@ module OracleRequestPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <TypeID.Request position=TypeID.Subtitle id=request.requestID />
         </Col>
@@ -110,7 +110,7 @@ module OracleRequestPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <div className={CssHelper.flexBox()}>
             <TypeID.OracleScript position=TypeID.Subtitle id=request.oracleScriptID />
@@ -124,7 +124,7 @@ module OracleRequestPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <AddressRender address=request.payer />
         </Col>
@@ -134,7 +134,7 @@ module OracleRequestPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text value=request.requestKey size=Text.Lg />
         </Col>
@@ -144,7 +144,7 @@ module OracleRequestPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text value={request.prepareGas->Belt.Int.toString} size=Text.Lg />
         </Col>
@@ -154,7 +154,7 @@ module OracleRequestPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text value={request.executeGas->Belt.Int.toString} size=Text.Lg />
         </Col>
@@ -165,7 +165,7 @@ module OracleRequestPacket = {
               CssHelper.mb(),
             })}>
             <Heading
-              value="Calldata" size=Heading.H4 weight=Heading.Regular color=theme.textSecondary
+              value="Calldata" size=Heading.H4 weight=Heading.Regular color=theme.neutral_600
             />
             <CopyButton
               data={request.calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
@@ -197,7 +197,7 @@ module OracleRequestPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text value={request.askCount->Belt.Int.toString} size=Text.Lg />
         </Col>
@@ -207,7 +207,7 @@ module OracleRequestPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text value={request.minCount->Belt.Int.toString} size=Text.Lg />
         </Col>
@@ -224,7 +224,7 @@ module FungibleTokenPacket = {
       <SeperatedLine mt=24 mb=24 />
       <Row>
         <Col mb=24>
-          <Heading value="Packet Data" size=Heading.H4 color=theme.textSecondary />
+          <Heading value="Packet Data" size=Heading.H4 color=theme.neutral_600 />
         </Col>
         <Col mb=24>
           <Heading
@@ -232,7 +232,7 @@ module FungibleTokenPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text size=Text.Lg value=packetType />
         </Col>
@@ -242,7 +242,7 @@ module FungibleTokenPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text size=Text.Lg value=token.sender />
         </Col>
@@ -252,7 +252,7 @@ module FungibleTokenPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text size=Text.Lg value=token.receiver />
         </Col>
@@ -262,7 +262,7 @@ module FungibleTokenPacket = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <Text
             value={token.amount->Belt.Int.toString ++ (" " ++ token.denom)}
@@ -289,7 +289,7 @@ module RecvPacketSuccess = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <AddressRender address=packet.signer />
         </Col>
@@ -319,7 +319,7 @@ module RecvPacketFail = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <AddressRender address=packet.signer />
         </Col>
@@ -342,7 +342,7 @@ module AcknowledgePacket = {
             size=Heading.H4
             marginBottom=8
             weight=Heading.Regular
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <AddressRender address=packet.signer />
         </Col>
@@ -365,7 +365,7 @@ module Timeout = {
             size=Heading.H4
             marginBottom=8
             weight=Heading.Regular
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <AddressRender address=packet.signer />
         </Col>
@@ -388,7 +388,7 @@ module TimeoutOnClose = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
           <AddressRender address=packet.signer />
         </Col>

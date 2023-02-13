@@ -4,7 +4,7 @@ module Styles = {
   let container = style(. [Media.mobile([margin2(~h=px(-12), ~v=zero)])])
   let header = (theme: Theme.t) =>
     style(. [
-      borderBottom(px(1), solid, theme.tableRowBorderColor),
+      borderBottom(px(1), solid, theme.neutral_100),
       selector("> * + *", [marginLeft(px(32))]),
       Media.mobile([
         overflow(auto),
@@ -13,14 +13,14 @@ module Styles = {
       ]),
     ])
 
-  let buttonContainer = active =>
+  let buttonContainer = (theme: Theme.t, active) =>
     style(. [
       display(inlineFlex),
       justifyContent(center),
       alignItems(center),
       cursor(pointer),
       padding2(~v=#px(32), ~h=zero),
-      borderBottom(#px(4), solid, active ? Theme.baseBlue : transparent),
+      borderBottom(#px(4), solid, active ? theme.primary_600 : transparent),
       Media.mobile([whiteSpace(nowrap), padding2(~v=#px(24), ~h=zero)]),
     ])
 
@@ -34,7 +34,9 @@ module Route = {
   }
 
   let button = (~name, ~route, ~active) => {
-    <Link key=name isTab=true className={Styles.buttonContainer(active)} route>
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
+    <Link key=name isTab=true className={Styles.buttonContainer(theme, active)} route>
       <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Lg />
     </Link>
   }
@@ -56,7 +58,9 @@ module Route = {
 
 module State = {
   let button = (~name, ~active, ~setTab) => {
-    <div key=name className={Styles.buttonContainer(active)} onClick={_ => setTab()}>
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
+    <div key=name className={Styles.buttonContainer(theme, active)} onClick={_ => setTab()}>
       <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Lg />
     </div>
   }

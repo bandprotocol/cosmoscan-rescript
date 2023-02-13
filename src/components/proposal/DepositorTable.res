@@ -190,7 +190,7 @@ let make = (~proposalID) => {
                 value="No Depositors"
                 align=Heading.Center
                 weight=Heading.Regular
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             </EmptyContainer>}
         {isMobile

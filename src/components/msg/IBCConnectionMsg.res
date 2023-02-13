@@ -18,7 +18,7 @@ module ConnectionCommon = {
         Styles.msgContainer,
       ])}>
       <Text value=clientID nowrap=true block=true />
-      <Icon name="far fa-arrow-right" color=theme.textSecondary />
+      <Icon name="far fa-arrow-right" color=theme.neutral_600 />
       <Text value=counterpartyClientID nowrap=true block=true />
     </div>
   }
@@ -35,7 +35,7 @@ module ConnectionOpenAck = {
         Styles.msgContainer,
       ])}>
       <Text value=connectionID nowrap=true block=true />
-      <Icon name="far fa-arrow-right" color=theme.textSecondary />
+      <Icon name="far fa-arrow-right" color=theme.neutral_600 />
       <Text value=counterpartyConnectionID nowrap=true block=true />
     </div>
   }

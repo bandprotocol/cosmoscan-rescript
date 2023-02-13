@@ -20,13 +20,13 @@ module Styles = {
       flexDirection(#column),
       alignItems(#center),
       paddingTop(#px(30)),
-      borderBottom(#px(1), #solid, theme.tableRowBorderColor),
+      borderBottom(#px(1), #solid, theme.neutral_100),
     ])
 
   let row = style(. [height(#percent(100.))])
   let rowContainer = style(. [margin2(~v=#zero, ~h=#px(12)), height(#percent(100.))])
 
-  let header = (active, theme: Theme.t) =>
+  let header = (theme: Theme.t, active) =>
     style(. [
       display(#flex),
       flexDirection(#row),
@@ -35,21 +35,21 @@ module Styles = {
       padding2(~v=#zero, ~h=#px(20)),
       fontSize(#px(14)),
       fontWeight(active ? #bold : #normal),
-      color(active ? theme.textPrimary : theme.textSecondary),
+      color(active ? theme.neutral_900 : theme.neutral_600),
     ])
 
-  let loginList = active =>
+  let loginList = (theme: Theme.t, active) =>
     style(. [
       display(#flex),
       width(#percent(100.)),
       height(#px(50)),
       borderRadius(#px(8)),
-      border(#px(2), #solid, active ? Theme.baseBlue : #transparent),
+      border(#px(2), #solid, active ? theme.primary_600 : #transparent),
       cursor(#pointer),
       overflow(#hidden),
     ])
 
-  let loginSelectionBackground = (theme: Theme.t) => style(. [background(theme.contrastBg)])
+  let loginSelectionBackground = (theme: Theme.t) => style(. [background(theme.neutral_100)])
 
   let ledgerIcon = style(. [height(#px(28)), width(#px(28)), transform(translateY(#px(3)))])
   let ledgerImageContainer = active => style(. [opacity(active ? 1.0 : 0.5), marginRight(#px(15))])

@@ -6,7 +6,7 @@ module Styles = {
 
   let textContainer = (theme: Theme.t) =>
     style(. [
-      background(theme.secondaryBg),
+      background(theme.neutral_100),
       position(#absolute),
       top(#px(8)),
       left(#px(8)),
@@ -15,15 +15,15 @@ module Styles = {
       borderRadius(#percent(50.)),
     ])
 
-  let emoCircle = (percent, theme: EmotionTheme.t) =>
+  let emoCircle = (percent, theme: Theme.t) =>
     css({
       "width": "100%",
       "height": "100%",
       "borderRadius": "50%",
       "& > circle": {
-        "fill": theme.tableRowBorderColor,
+        "fill": theme.neutral_100,
         "strokeWidth": "16px",
-        "stroke": theme.baseBlue,
+        "stroke": theme.primary_600,
         "strokeDasharray": j`calc($percent * 653.45 / 100) 653.45`,
         "transform": "rotate(-90deg) translateX(-100%)",
       },
@@ -37,9 +37,9 @@ module Styles = {
   //     selector(
   //       "> circle",
   //       [
-  //         SVG.fill(theme.tableRowBorderColor),
+  //         SVG.fill(theme.neutral_100),
   //         SVG.strokeWidth(#px(16)),
-  //         SVG.stroke(theme.baseBlue),
+  //         SVG.stroke(theme.primary_600),
   //         //TODO: it will be remove when the bs-css upgrade to have this proporty
   //         // 653.45 is from 2 * pi(3.141) * r(104)
   //         strokeDasharray: j`calc($percent * 653.45 / 100) 653.45`,
@@ -54,11 +54,10 @@ module Styles = {
 @react.component
 let make = (~percent) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-  let (emotionTheme, _) = React.useContext(EmotionThemeContext.context)
 
   <div className=Styles.chartContainer>
     <svg
-      className={Styles.emoCircle(percent->int_of_float->Belt.Int.toString, emotionTheme.theme)}
+      className={Styles.emoCircle(percent->int_of_float->Belt.Int.toString, theme)}
       viewBox="0 0 208 208">
       <circle r="104" cx="104" cy="104" />
     </svg>
@@ -72,13 +71,13 @@ let make = (~percent) => {
         value="Turnout"
         align=Heading.Center
         marginBottom=8
-        color={theme.textSecondary}
+        color={theme.neutral_600}
       />
       <Text
         size=Text.Xxxl
         value={percent->Format.fPercent(~digits=2)}
         block=true
-        color={theme.textPrimary}
+        color={theme.neutral_900}
       />
     </div>
   </div>

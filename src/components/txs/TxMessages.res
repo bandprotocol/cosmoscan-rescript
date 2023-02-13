@@ -7,9 +7,10 @@ module Styles = {
       overflow(overflowed ? #hidden : #visible),
       selector("> div + div", [marginTop(#px(10))]),
     ])
-  let showButton = style(. [
+  let showButton = (theme: Theme.t) => 
+  style(. [
     display(#flex),
-    backgroundColor(Theme.gray),
+    backgroundColor(theme.neutral_200),
     borderRadius(#px(30)),
     width(#px(65)),
     alignItems(#center),
@@ -24,6 +25,7 @@ module Styles = {
 
 @react.component
 let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string) => {
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let (overflowed, setOverflowed) = React.useState(_ => false)
   let (expanded, setExpanded) = React.useState(_ => false)
 
@@ -59,12 +61,12 @@ let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string) => {
               setExpanded(_ => !expanded)
             }}>
             {expanded
-              ? <div className=Styles.showButton> {"show less"->React.string} </div>
+              ? <div className=Styles.showButton(theme)> {"show less"->React.string} </div>
               : isMobile
-              ? <Link className=Styles.showButton route=Route.TxIndexPage(txHash)>
+              ? <Link className=Styles.showButton(theme) route=Route.TxIndexPage(txHash)>
                 {"show more"->React.string}
               </Link>
-              : <div className=Styles.showButton> {"show more"->React.string} </div>}
+              : <div className=Styles.showButton(theme)> {"show more"->React.string} </div>}
           </div>
         </div>
       : React.null}

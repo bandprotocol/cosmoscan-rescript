@@ -4,9 +4,9 @@ module Styles = {
   let errorContainer = (theme: Theme.t) =>
     style(. [
       padding(#px(10)),
-      color(theme.failColor),
-      backgroundColor(theme.mainBg),
-      border(#px(1), #solid, theme.failColor),
+      color(theme.error_600),
+      backgroundColor(theme.neutral_000),
+      border(#px(1), #solid, theme.error_600),
       borderRadius(#px(4)),
       marginBottom(#px(24)),
       selector("> i", [marginRight(#px(8))]),
@@ -71,13 +71,13 @@ module Full = {
         Styles.errorContainer(theme),
         CssHelper.flexBox(~wrap=#nowrap, ()),
       })}>
-      <Icon name="fal fa-exclamation-circle" size=14 color=theme.failColor />
+      <Icon name="fal fa-exclamation-circle" size=14 color=theme.error_600 />
       <Text
         value={msg->parseErr}
         size=Text.Lg
         spacing=Text.Em(0.02)
         breakAll=true
-        color=theme.textPrimary
+        color=theme.neutral_900
       />
     </div>
   }
@@ -88,6 +88,6 @@ module Mini = {
   let make = (~msg) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    <Text value={msg->parseErr} code=true size=Text.Sm breakAll=true color=theme.failColor />
+    <Text value={msg->parseErr} code=true size=Text.Sm breakAll=true color=theme.error_600 />
   }
 }

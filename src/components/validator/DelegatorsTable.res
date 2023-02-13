@@ -20,7 +20,7 @@ module RenderBody = {
         <Col col=Col.Four>
           {switch delegatorSub {
           | Data({sharePercentage}) =>
-            <Text block=true value={sharePercentage->Format.fPretty} color={theme.textPrimary} />
+            <Text block=true value={sharePercentage->Format.fPretty} color={theme.neutral_900} />
           | _ => <LoadingCensorBar width=100 height=15 />
           }}
         </Col>
@@ -31,7 +31,7 @@ module RenderBody = {
               <Text
                 block=true
                 value={amount->Coin.getBandAmountFromCoin->Format.fPretty}
-                color={theme.textPrimary}
+                color={theme.neutral_900}
               />
             | _ => <LoadingCensorBar width=100 height=15 />
             }}
@@ -191,7 +191,7 @@ let make = (~address) => {
                 value="No Delegators"
                 align=Heading.Center
                 weight=Heading.Regular
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             </EmptyContainer>}
         {isMobile

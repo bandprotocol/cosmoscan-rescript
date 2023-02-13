@@ -8,7 +8,7 @@ module CreateValidatorMsg = {
           value="Moniker"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <ValidatorMonikerLink
@@ -25,7 +25,7 @@ module CreateValidatorMsg = {
           value="Identity"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text size=Text.Lg value=validator.identity />
@@ -35,7 +35,7 @@ module CreateValidatorMsg = {
           value="Commission Rate"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text
@@ -49,7 +49,7 @@ module CreateValidatorMsg = {
           value="Commission Max Rate"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text
@@ -63,7 +63,7 @@ module CreateValidatorMsg = {
           value="Commission Max Change"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text
@@ -77,7 +77,7 @@ module CreateValidatorMsg = {
           value="Delegator Address"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender position=AddressRender.Subtitle address=validator.delegatorAddress />
@@ -87,7 +87,7 @@ module CreateValidatorMsg = {
           value="Validator Address"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender
@@ -99,7 +99,7 @@ module CreateValidatorMsg = {
           value="Public Key"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <PubKeyRender pubKey=validator.publicKey alignLeft=true position=PubKeyRender.Subtitle />
@@ -109,7 +109,7 @@ module CreateValidatorMsg = {
           value="Min Self Delegation"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AmountRender coins=list{validator.minSelfDelegation} pos=AmountRender.TxIndex />
@@ -119,7 +119,7 @@ module CreateValidatorMsg = {
           value="Self Delegation"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AmountRender coins=list{validator.selfDelegation} pos=AmountRender.TxIndex />
@@ -129,7 +129,7 @@ module CreateValidatorMsg = {
           value="Details"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text size=Text.Lg value=validator.details />
@@ -139,7 +139,7 @@ module CreateValidatorMsg = {
           value="Website"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text size=Text.Lg value=validator.website />
@@ -158,7 +158,7 @@ module EditValidatorMsg = {
           value="Moniker"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text
@@ -171,7 +171,7 @@ module EditValidatorMsg = {
           value="Identity"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text
@@ -184,7 +184,7 @@ module EditValidatorMsg = {
           value="Commission Rate"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text
@@ -200,7 +200,7 @@ module EditValidatorMsg = {
           value="Validator Address"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender
@@ -212,7 +212,7 @@ module EditValidatorMsg = {
           value="Min Self Delegation"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         {switch validator.minSelfDelegation {
@@ -226,7 +226,7 @@ module EditValidatorMsg = {
           value="Details"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <Text
@@ -248,7 +248,7 @@ module UnjailMsg = {
           value="Validator"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender
@@ -269,7 +269,7 @@ module AddReporterMsg = {
           value="Validator"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender
@@ -281,7 +281,7 @@ module AddReporterMsg = {
           value="Reporter Address"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender position=AddressRender.Subtitle address=address.reporter />
@@ -300,7 +300,7 @@ module AddReporterFailMsg = {
           value="Validator"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender
@@ -312,7 +312,7 @@ module AddReporterFailMsg = {
           value="Reporter Address"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender position=AddressRender.Subtitle address=address.reporter />
@@ -331,7 +331,7 @@ module RemoveReporterMsg = {
           value="Validator"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender
@@ -343,7 +343,7 @@ module RemoveReporterMsg = {
           value="Reporter Address"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender position=AddressRender.Subtitle address=address.reporter />
@@ -362,7 +362,7 @@ module RemoveReporterFailMsg = {
           value="Validator"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender
@@ -374,7 +374,7 @@ module RemoveReporterFailMsg = {
           value="Reporter Address"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender position=AddressRender.Subtitle address=address.reporter />
@@ -393,7 +393,7 @@ module ActivateMsg = {
           value="Validator"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender
@@ -414,7 +414,7 @@ module SetWithdrawAddressMsg = {
           value="Delegator Address"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender
@@ -426,7 +426,7 @@ module SetWithdrawAddressMsg = {
           value="Withdraw Address"
           size=Heading.H4
           weight=Heading.Regular
-          color=theme.textSecondary
+          color=theme.neutral_600
           marginBottom=8
         />
         <AddressRender position=AddressRender.Subtitle address=set.withdrawAddress />

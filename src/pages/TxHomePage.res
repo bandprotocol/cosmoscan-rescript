@@ -24,7 +24,7 @@ let make = () => {
               ->Format.iPretty ++ " In total"}
               size=Heading.H3
               weight=Heading.Thin
-              color=theme.textSecondary
+              color=theme.neutral_600
             />
           | _ => <LoadingCensorBar width=65 height=21 />
           }}

@@ -1,7 +1,6 @@
 module type RawIDSig = {
   type tab_t
   let prefix: string
-  let color: Css.Types.Color.t
   let route: (int, tab_t) => Route.t
   let defaultTab: tab_t
 }
@@ -9,7 +8,6 @@ module type RawIDSig = {
 module RawDataSourceID = {
   type tab_t = Route.data_source_tab_t
   let prefix = "#D"
-  let color = Theme.baseBlue
   let route = (id, tab) => Route.DataSourceDetailsPage(id, tab)
   let defaultTab = Route.DataSourceRequests
 }
@@ -17,7 +15,6 @@ module RawDataSourceID = {
 module RawOracleScriptID = {
   type tab_t = Route.oracle_script_tab_t
   let prefix = "#O"
-  let color = Theme.baseBlue
   let route = (id, tab) => Route.OracleScriptDetailsPage(id, tab)
   let defaultTab = Route.OracleScriptRequests
 }
@@ -25,7 +22,6 @@ module RawOracleScriptID = {
 module RawRequestID = {
   type tab_t = unit
   let prefix = "#R"
-  let color = Theme.baseBlue
   let route = (id, _) => Route.RequestIndexPage(id)
   let defaultTab = ()
 }
@@ -33,7 +29,6 @@ module RawRequestID = {
 module RawProposalID = {
   type tab_t = unit
   let prefix = "#P"
-  let color = Theme.baseBlue
   let route = (id, _) => Route.ProposalDetailsPage(id)
   let defaultTab = ()
 }
@@ -41,7 +36,6 @@ module RawProposalID = {
 module RawBlock = {
   type tab_t = unit
   let prefix = "#B"
-  let color = Theme.baseBlue
   let route = (height, _) => Route.BlockDetailsPage(height)
   let defaultTab = ()
 }

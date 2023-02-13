@@ -25,7 +25,7 @@ module BodyDesktop = {
               block=true
               code=true
               ellipsis=true
-              color={theme.textSecondary}
+              color={theme.neutral_600}
             />
           | Error(_) | Loading | NoData => <LoadingCensorBar fullWidth=true height=15 />
           }}
@@ -49,7 +49,7 @@ module BodyDesktop = {
                 value={txn -> Format.iPretty}
                 code=true
                 weight=Text.Medium
-                color={theme.textPrimary}
+                color={theme.neutral_900}
               />
             | Error(_) | Loading | NoData => <LoadingCensorBar width=40 height=15 />
             }}
@@ -135,7 +135,7 @@ let make = () => {
                 }
                 size=Heading.H3
                 weight=Heading.Thin
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             | Error(_) | Loading | NoData => <LoadingCensorBar width=65 height=21 />
             }}

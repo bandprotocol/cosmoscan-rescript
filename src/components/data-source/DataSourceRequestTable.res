@@ -35,7 +35,7 @@ module RenderBody = {
             <div className={CssHelper.flexBox()}>
               <TypeID.OracleScript id=oracleScriptID />
               <HSpacing size=Spacing.sm />
-              <Text value=oracleScriptName ellipsis=true color={theme.textPrimary} />
+              <Text value=oracleScriptName ellipsis=true color={theme.neutral_900} />
             </div>
           | _ => <LoadingCensorBar width=212 height=15 />
           }}
@@ -281,7 +281,7 @@ let make = (~dataSourceID: ID.DataSource.t) => {
           value="No Request Found"
           align=Heading.Center
           weight=Heading.Regular
-          color={theme.textSecondary}
+          color={theme.neutral_600}
         />
       </EmptyContainer>
     | _ => React.null

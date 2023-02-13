@@ -57,7 +57,7 @@ module RenderBody = {
             <div className={CssHelper.flexBox()}>
               <TypeID.DataSource id />
               <HSpacing size=Spacing.sm />
-              <Text value=name ellipsis=true color={theme.textPrimary} />
+              <Text value=name ellipsis=true color={theme.neutral_900} />
             </div>
           | _ => <LoadingCensorBar width=220 height=15 />
           }}
@@ -184,7 +184,7 @@ let make = () => {
                 value={dataSourcesCount->Format.iPretty ++ " In total"}
                 size=Heading.H3
                 weight=Heading.Thin
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             | _ => <LoadingCensorBar width=65 height=21 />
             }}
@@ -273,7 +273,7 @@ let make = () => {
                 value="No Data Source"
                 align=Heading.Center
                 weight=Heading.Regular
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             </EmptyContainer>
           | Data((dataSources, dataSourcesCount)) =>

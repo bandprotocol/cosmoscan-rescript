@@ -247,7 +247,7 @@ let make = (~address) => {
               value="No redelegation"
               align=Heading.Center
               weight=Heading.Regular
-              color=theme.textSecondary
+              color=theme.neutral_600
             />
           </EmptyContainer>
     | _ =>
