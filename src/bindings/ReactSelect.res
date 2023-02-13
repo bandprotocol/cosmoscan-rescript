@@ -14,19 +14,10 @@ type style_t<'a, 'b, 'c, 'd, 'e, 'f, 'g> = {
   menuList: 'g => 'g,
 }
 
-// @obj
-// external makeProps: (
-//   ~value: react_select_option_t,
-//   ~onChange: 'a => unit,
-//   ~options: array<'a>,
-//   ~styles: style_t<'b, 'c, 'd, 'e, 'f, 'g, 'h>,
-//   unit,
-// ) => _ = ""
-
 @react.component @module("react-select")
 external make: (
   ~value: react_select_option_t,
   ~onChange: 'a => unit,
   ~options: array<'a>,
   ~styles: style_t<'b, 'c, 'd, 'e, 'f, 'g, 'h>,
-) => React.element = "ReactSelect"
+) => React.element = "default"
