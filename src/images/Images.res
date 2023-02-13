@@ -34,12 +34,14 @@
 @module("./no-delegator-dark.png") external noDelegatorDark: string = "default"
 @module("./no-oracle-dark.png") external noOracleDark: string = "default"
 @module("./no-data-dark.png") external noDataDark: string = "default"
+@module("./no-request-dark.png") external noRequestDark: string = "default"
 
 @module("./no-block-light.png") external noBlockLight: string = "default"
 @module("./no-tx-light.png") external noTxLight: string = "default"
 @module("./no-delegator-light.png") external noDelegatorLight: string = "default"
 @module("./no-oracle-light.png") external noOracleLight: string = "default"
 @module("./no-data-light.png") external noDataLight: string = "default"
+@module("./no-request-light.png") external noRequestLight: string = "default"
 
 // IBC
 @module("./tx-ibc-icon.svg") external ibcIcon: string = "default"
