@@ -178,7 +178,9 @@ let make = (~chainID, ~ledgerApp) => {
               isConfirm
                 ? Copy.copy("chrome://flags/#enable-experimental-web-platform-features")
                 : ()
-            | (_, _) => createLedger(accountIndex)
+            | (_, _) => {
+                let _ = createLedger(accountIndex)
+              }
             }
           }}>
           {"Connect to Ledger" |> React.string}
