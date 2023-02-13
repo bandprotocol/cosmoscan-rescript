@@ -39,18 +39,18 @@ type sign_response_t = {
 }
 
 @module("@ledgerhq/hw-transport-webhid") @scope("default") @val
-external createTransportWebHID: int => Promise.t<transport_t> = "create"
+external createTransportWebHID: int => promise<transport_t> = "create"
 
 @module("@ledgerhq/hw-transport-webusb") @scope("default") @val
-external createTransportWebUSB: int => Promise.t<transport_t> = "create"
+external createTransportWebUSB: int => promise<transport_t> = "create"
 
 @module("ledger-cosmos-js") @new external createApp: transport_t => t = "default"
 @send
-external getAddressAndPubKey: (t, array<int>, string) => Promise.t<addr_pukey_response_t> =
+external getAddressAndPubKey: (t, array<int>, string) => promise<addr_pukey_response_t> =
   "getAddressAndPubKey"
-@send external publicKey: (t, array<int>) => Promise.t<pubkey_response_t> = "publicKey"
-@send external sign: (t, array<int>, string) => Promise.t<sign_response_t> = "sign"
-@send external getVersion: t => Promise.t<version_t> = "getVersion"
-@send external appInfo: t => Promise.t<app_info_t> = "appInfo"
+@send external publicKey: (t, array<int>) => promise<pubkey_response_t> = "publicKey"
+@send external sign: (t, array<int>, string) => promise<sign_response_t> = "sign"
+@send external getVersion: t => promise<version_t> = "getVersion"
+@send external appInfo: t => promise<app_info_t> = "appInfo"
 // TODO: It should return promise
 @send external close: transport_t => unit = "close"
