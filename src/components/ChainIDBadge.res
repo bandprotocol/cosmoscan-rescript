@@ -6,7 +6,7 @@ module Styles = {
       display(#flex),
       borderRadius(#px(8)),
       border(#px(1), #solid, isDarkMode ? theme.neutral_100 : theme.neutral_600),
-      backgroundColor(theme.neutral_100),
+      backgroundColor(theme.neutral_000),
       padding2(~v=#px(8), ~h=#px(10)),
       minWidth(#px(153)),
       justifyContent(#spaceBetween),
@@ -23,7 +23,7 @@ module Styles = {
       position(#absolute),
       width(#percent(100.)),
       border(#px(1), #solid, isDarkMode ? theme.neutral_100 : theme.neutral_600),
-      backgroundColor(theme.neutral_100),
+      backgroundColor(theme.neutral_000),
       borderRadius(#px(8)),
       transition(~duration=200, "all"),
       top(#percent(110.)),
@@ -38,7 +38,7 @@ module Styles = {
   let link = (theme: Theme.t) =>
     style(. [
       textDecoration(#none),
-      backgroundColor(theme.neutral_100),
+      backgroundColor(theme.neutral_000),
       display(#block),
       padding2(~v=#px(5), ~h=#px(10)),
       hover([backgroundColor(theme.neutral_100)]),

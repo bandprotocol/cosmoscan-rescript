@@ -72,7 +72,7 @@ module RenderMostRequestedCard = {
     ~statsSub: Sub.variant<array<OracleScriptSub.response_last_1_day_external>>,
   ) => {
     let allSub = Sub.all2(oracleScriptSub, statsSub)
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <Col
       key={switch oracleScriptSub {
@@ -83,6 +83,7 @@ module RenderMostRequestedCard = {
       <div
         className={Css.merge(list{
           Styles.mostRequestCard(theme),
+          CommonStyles.card(theme, isDarkMode),
           CssHelper.flexBox(~direction=#column, ~justify=#spaceBetween, ~align=#stretch, ()),
         })}>
         <div

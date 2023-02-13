@@ -6,7 +6,7 @@ module Styles = {
 
   let textContainer = (theme: Theme.t) =>
     style(. [
-      background(theme.neutral_100),
+      background(theme.neutral_000),
       position(#absolute),
       top(#px(8)),
       left(#px(8)),
@@ -15,40 +15,20 @@ module Styles = {
       borderRadius(#percent(50.)),
     ])
 
-  let emoCircle = (percent, theme: Theme.t) =>
+  let emoCircle = (percent, theme: Theme.t) => {
     css({
       "width": "100%",
       "height": "100%",
       "borderRadius": "50%",
       "& > circle": {
-        "fill": theme.neutral_100,
+        "fill": theme.neutral_100 -> Css_AtomicTypes.Color.toString,
         "strokeWidth": "16px",
-        "stroke": theme.primary_600,
+        "stroke": theme.primary_600 -> Css_AtomicTypes.Color.toString,
         "strokeDasharray": j`calc($percent * 653.45 / 100) 653.45`,
         "transform": "rotate(-90deg) translateX(-100%)",
       },
     })
-
-  // let circle = (percent, theme: Theme.t) => {
-  //   style(. [
-  //     width(#percent(100.)),
-  //     height(#percent(100.)),
-  //     borderRadius(#percent(50.)),
-  //     selector(
-  //       "> circle",
-  //       [
-  //         SVG.fill(theme.neutral_100),
-  //         SVG.strokeWidth(#px(16)),
-  //         SVG.stroke(theme.primary_600),
-  //         //TODO: it will be remove when the bs-css upgrade to have this proporty
-  //         // 653.45 is from 2 * pi(3.141) * r(104)
-  //         strokeDasharray: j`calc($percent * 653.45 / 100) 653.45`,
-  //       //   unsafe("stroke-dasharray", {j|calc($percent * 653.45 / 100) 653.45|j}),
-  //         transforms([#rotate(#deg(-90.)), #translateX(#percent(-100.))]),
-  //       ],
-  //     ),
-  //   ]);
-  // };
+  }
 }
 
 @react.component

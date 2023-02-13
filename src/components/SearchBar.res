@@ -16,11 +16,12 @@ module Styles = {
     width(#px(15)),
     height(#px(15)),
   ])
-  let search = (theme: Theme.t) =>
+  let search = (theme: Theme.t, isDarkMode) =>
     style(. [
       width(#percent(100.)),
       color(theme.neutral_900),
-      background(theme.neutral_100),
+      background(theme.neutral_000),
+      border(#px(1), #solid, isDarkMode ? theme.neutral_400 : theme.neutral_300),
       borderRadius(#px(8)),
       padding4(~left=#px(15), ~right=Spacing.md, ~top=#px(10), ~bottom=#px(10)),
       boxShadows([
@@ -30,7 +31,7 @@ module Styles = {
       fontSize(#px(12)),
       outline(#px(1), #none, theme.neutral_100),
       border(#px(1), #solid, theme.neutral_100),
-      placeholder([color(theme.neutral_600)]),
+      placeholder([color(theme.neutral_500)]),
       Media.mobile([fontSize(#px(10))]),
     ])
 
@@ -176,7 +177,7 @@ let make = () => {
     {searchTerm: "", resultState: Hidden},
   )
 
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <div className=Styles.container>
     <input
@@ -198,7 +199,7 @@ let make = () => {
         | _ => ()
         }}
       value=searchTerm
-      className={Styles.search(theme)}
+      className={Styles.search(theme, isDarkMode)}
       placeholder="Search Address / TXN Hash / Block"
     />
     {switch resultState {

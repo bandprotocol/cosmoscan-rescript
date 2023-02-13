@@ -19,7 +19,7 @@ module Styles = {
       borderRadius(#px(4)),
       fontSize(#px(14)),
       fontWeight(#light),
-      border(#px(1), #solid, theme.neutral_100),
+      border(#px(1), #solid, isDarkMode ? theme.neutral_200 : theme.neutral_100),
       backgroundColor(isDarkMode ? theme.neutral_300 : theme.neutral_100),
       outlineStyle(#none),
       color(theme.neutral_900),
