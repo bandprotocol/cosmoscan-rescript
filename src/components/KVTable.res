@@ -52,7 +52,7 @@ let renderField = (field, maxWidth) => {
       <TypeID.DataSource id position=TypeID.Mini />
       <HSpacing size=Spacing.sm />
       <Text
-        value=name weight=Text.Regular spacing={Text.Em(0.02)} size=Text.Sm height={Text.Px(16)}
+        value=name weight=Text.Regular spacing={Text.Em(0.02)} size=Text.Caption height={Text.Px(16)}
       />
     </div>
   | Block(id) =>
@@ -61,12 +61,12 @@ let renderField = (field, maxWidth) => {
     </div>
   | TxHash(txHash) =>
     <div className={Styles.valueContainer(maxWidth)}>
-      <TxLink txHash width=maxWidth size=Text.Sm />
+      <TxLink txHash width=maxWidth size=Text.Caption />
     </div>
   | Validator(validator) =>
     <div className={Styles.valueContainer(maxWidth)}>
       <ValidatorMonikerLink
-        size=Text.Sm
+        size=Text.Caption
         validatorAddress={validator.operatorAddress}
         width={#px(maxWidth)}
         moniker={validator.moniker}

@@ -43,7 +43,7 @@ module RenderBody = {
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch blockSub {
             | Data({timestamp}) =>
-              <Timestamp time=timestamp size=Text.Md weight=Text.Regular textAlign=Text.Right />
+              <Timestamp time=timestamp size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
             | _ => <LoadingCensorBar width=80 height=15 />
             }}
           </div>
@@ -112,7 +112,7 @@ let make = (~consensusAddress) => {
           <Row alignItems=Row.Center>
             <Col col=Col.Two>
               <Text
-                block=true value="Block" weight=Text.Semibold transform=Text.Uppercase size=Text.Sm
+                block=true value="Block" weight=Text.Semibold transform=Text.Uppercase size=Text.Caption
               />
             </Col>
             <Col col=Col.Seven>
@@ -121,7 +121,7 @@ let make = (~consensusAddress) => {
                 value="Block Hash"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
               />
             </Col>
             <Col col=Col.One>
@@ -130,7 +130,7 @@ let make = (~consensusAddress) => {
                 value="Txn"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
                 align=Text.Center
               />
             </Col>
@@ -140,7 +140,7 @@ let make = (~consensusAddress) => {
                 value="Timestamp"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
                 align=Text.Right
               />
             </Col>

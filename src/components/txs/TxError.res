@@ -74,7 +74,7 @@ module Full = {
       <Icon name="fal fa-exclamation-circle" size=14 color=theme.error_600 />
       <Text
         value={msg->parseErr}
-        size=Text.Lg
+        size=Text.Body1
         spacing=Text.Em(0.02)
         breakAll=true
         color=theme.neutral_900
@@ -88,6 +88,6 @@ module Mini = {
   let make = (~msg) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    <Text value={msg->parseErr} code=true size=Text.Sm breakAll=true color=theme.error_600 />
+    <Text value={msg->parseErr} code=true size=Text.Caption breakAll=true color=theme.error_600 />
   }
 }

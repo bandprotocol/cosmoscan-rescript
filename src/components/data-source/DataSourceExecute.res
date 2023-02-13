@@ -65,7 +65,7 @@ module ParameterInput = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.listContainer>
-      <Text value=name size=Text.Md weight=Text.Semibold transform=Text.Capitalize />
+      <Text value=name size=Text.Body2 weight=Text.Semibold transform=Text.Capitalize />
       <VSpacing size=Spacing.sm />
       <input
         className={Styles.input(theme, isDarkMode)}
@@ -169,13 +169,13 @@ let make = (~executable: JsBuffer.t) => {
             value={"Test data source execution" ++ (
               numParams == 0 ? "" : " with" ++ (numParams == 1 ? " a " : " ") ++ "following"
             )}
-            size=Text.Lg
+            size=Text.Body1
           />
           <HSpacing size=Spacing.sm />
           {numParams == 0
             ? React.null
             : <Text
-                value={numParams > 1 ? "parameters" : "parameter"} weight=Text.Bold size=Text.Lg
+                value={numParams > 1 ? "parameters" : "parameter"} weight=Text.Bold size=Text.Body1
               />}
         </div>
         {numParams > 0

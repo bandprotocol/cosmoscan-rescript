@@ -59,7 +59,7 @@ module BodyDesktop = {
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch blockSub {
             | Data({timestamp}) =>
-              <Timestamp time=timestamp size=Text.Md weight=Text.Regular textAlign=Text.Right />
+              <Timestamp time=timestamp size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
             | Error(_) | Loading | NoData => <LoadingCensorBar width=130 height=15 />
             }}
           </div>
@@ -150,7 +150,7 @@ let make = () => {
                     <Text
                       block=true
                       value="Block"
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                       transform=Text.Uppercase
                     />
@@ -159,7 +159,7 @@ let make = () => {
                     <Text
                       block=true
                       value="Block Hash"
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                       transform=Text.Uppercase
                     />
@@ -168,7 +168,7 @@ let make = () => {
                     <Text
                       block=true
                       value="Proposer"
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                       transform=Text.Uppercase
                     />
@@ -177,7 +177,7 @@ let make = () => {
                     <Text
                       block=true
                       value="Txn"
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                       align=Text.Center
                       transform=Text.Uppercase
@@ -187,7 +187,7 @@ let make = () => {
                     <Text
                       block=true
                       value="Timestamp"
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                       align=Text.Right
                       transform=Text.Uppercase

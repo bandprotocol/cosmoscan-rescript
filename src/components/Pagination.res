@@ -79,15 +79,15 @@ let make = (~currentPage, ~pageCount, ~onPageChange: int => unit) => {
           })}>
           <Text
             value={currentPage->Format.iPretty}
-            size=Text.Lg
+            size=Text.Body1
             weight=Text.Semibold
             color=theme.neutral_900
           />
-          <Text value="of" size=Text.Lg />
+          <Text value="of" size=Text.Body1 />
           <Text
             value={pageCount->Format.iPretty}
             weight=Text.Semibold
-            size=Text.Lg
+            size=Text.Body1
             color=theme.neutral_900
           />
         </div>

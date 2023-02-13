@@ -193,7 +193,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               <>
                 <Text
                   value={Format.fPretty(~digits=0, votingPower /. 1e6) ++ " Band"}
-                  size=Text.Lg
+                  size=Text.Body1
                   block=true
                 />
               </>
@@ -353,7 +353,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               <Col col=Col.Eight>
                 {switch allSub {
                 | Data(({commissionMaxChange}, _, _)) =>
-                  <Text value={Format.fPercent(~digits=2, commissionMaxChange)} size=Text.Lg />
+                  <Text value={Format.fPercent(~digits=2, commissionMaxChange)} size=Text.Body1 />
                 | _ => <LoadingCensorBar width=260 height=15 />
                 }}
               </Col>
@@ -377,7 +377,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               <Col col=Col.Eight>
                 {switch allSub {
                 | Data(({commissionMaxRate}, _, _)) =>
-                  <Text value={Format.fPercent(~digits=2, commissionMaxRate)} size=Text.Lg />
+                  <Text value={Format.fPercent(~digits=2, commissionMaxRate)} size=Text.Body1 />
                 | _ => <LoadingCensorBar width=260 height=15 />
                 }}
               </Col>
@@ -411,7 +411,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
                 {switch allSub {
                 | Data(({details}, _, _)) =>
                   <p>
-                    <Text value=details size=Text.Lg />
+                    <Text value=details size=Text.Body1 />
                   </p>
                 | _ => <LoadingCensorBar width=260 height=15 />
                 }}

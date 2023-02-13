@@ -72,11 +72,11 @@ module InnerPanel = {
             switch value {
             | InfoMobileCard.Nothing =>
               <div className=Styles.cardItemHeadingLg>
-                <Text key=each value=each size=Text.Sm transform=Text.Uppercase />
+                <Text key=each value=each size=Text.Caption transform=Text.Uppercase />
               </div>
             | _ =>
               <Text
-                key=each value=each size=Text.Sm weight=Text.Semibold transform=Text.Uppercase
+                key=each value=each size=Text.Caption weight=Text.Semibold transform=Text.Uppercase
               />
             }
           })

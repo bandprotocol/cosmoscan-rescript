@@ -22,7 +22,7 @@ module ConnectionOpenInit = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=connection.clientID />
+          <Text size=Text.Body1 value=connection.clientID />
         </Col>
         <Col col=Col.Six>
           <Heading
@@ -32,7 +32,7 @@ module ConnectionOpenInit = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value={connection.delayPeriod->Belt.Int.toString ++ "ns"} />
+          <Text size=Text.Body1 value={connection.delayPeriod->Belt.Int.toString ++ "ns"} />
         </Col>
       </Row>
       <SeperatedLine mt=24 mb=24 />
@@ -48,7 +48,7 @@ module ConnectionOpenInit = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=connection.counterparty.clientID />
+          <Text size=Text.Body1 value=connection.counterparty.clientID />
         </Col>
       </Row>
     </>
@@ -79,7 +79,7 @@ module ConnectionOpenTry = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=connection.clientID />
+          <Text size=Text.Body1 value=connection.clientID />
         </Col>
         <Col col=Col.Six mbSm=24>
           <Heading
@@ -89,7 +89,7 @@ module ConnectionOpenTry = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value={connection.delayPeriod->Belt.Int.toString ++ "ns"} />
+          <Text size=Text.Body1 value={connection.delayPeriod->Belt.Int.toString ++ "ns"} />
         </Col>
         <Col col=Col.Six>
           <Heading
@@ -99,7 +99,7 @@ module ConnectionOpenTry = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=connection.clientID />
+          <Text size=Text.Body1 value=connection.clientID />
         </Col>
       </Row>
       <SeperatedLine mt=24 mb=24 />
@@ -115,7 +115,7 @@ module ConnectionOpenTry = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=connection.counterparty.clientID />
+          <Text size=Text.Body1 value=connection.counterparty.clientID />
         </Col>
         <Col col=Col.Six>
           <Heading
@@ -125,7 +125,7 @@ module ConnectionOpenTry = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=connection.counterparty.connectionID />
+          <Text size=Text.Body1 value=connection.counterparty.connectionID />
         </Col>
       </Row>
       <IndexIBCUtils.ProofHeight proofHeight=connection.proofHeight />
@@ -158,7 +158,7 @@ module ConnectionOpenAck = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=connection.connectionID />
+          <Text size=Text.Body1 value=connection.connectionID />
         </Col>
       </Row>
       <SeperatedLine mt=24 mb=24 />
@@ -174,7 +174,7 @@ module ConnectionOpenAck = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=connection.counterpartyConnectionID />
+          <Text size=Text.Body1 value=connection.counterpartyConnectionID />
         </Col>
       </Row>
       <IndexIBCUtils.ProofHeight proofHeight=connection.proofHeight />
@@ -207,7 +207,7 @@ module ConnectionOpenConfirm = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=connection.connectionID />
+          <Text size=Text.Body1 value=connection.connectionID />
         </Col>
       </Row>
       <IndexIBCUtils.ProofHeight proofHeight=connection.proofHeight />

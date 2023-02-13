@@ -143,7 +143,7 @@ module Content = {
                               <TypeID.DataSource id=dataSourceID position=TypeID.Subtitle />
                               <Text
                                 value=dataSourceName
-                                size=Text.Lg
+                                size=Text.Body1
                                 block=true
                                 color={theme.neutral_900}
                               />
@@ -169,7 +169,7 @@ module Content = {
                 </Col>
                 <Col col=Col.Eight>
                   {switch oracleScriptSub {
-                  | Data({description}) => <Text value=description size=Text.Lg block=true />
+                  | Data({description}) => <Text value=description size=Text.Body1 block=true />
                   | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
                   }}
                 </Col>

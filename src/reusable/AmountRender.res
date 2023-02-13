@@ -19,7 +19,7 @@ let make = (~coins, ~pos=Msg) => {
         code=true
         block=true
         nowrap=true
-        size=Text.Lg
+        size=Text.Body1
       />
     | _ =>
       <Text

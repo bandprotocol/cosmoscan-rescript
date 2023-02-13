@@ -17,7 +17,7 @@ module Styles = {
 let renderUnknownMessage = () =>
   <Col col=Col.Six>
     <div className=Styles.topicContainer>
-      <Text value="Unknown Message" size=Text.Sm transform=Text.Uppercase />
+      <Text value="Unknown Message" size=Text.Caption transform=Text.Uppercase />
       <img src=Images.fail className=Styles.failIcon />
     </div>
   </Col>

@@ -103,7 +103,7 @@ let make = (~proposalID) => {
                   block=true
                   value={depositCount->Belt.Int.toString}
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
                 <HSpacing size=Spacing.xs />
@@ -111,7 +111,7 @@ let make = (~proposalID) => {
                   block=true
                   value={depositCount > 1 ? "Depositors" : "Depositor"}
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
               </div>
@@ -129,7 +129,7 @@ let make = (~proposalID) => {
                     block=true
                     value={depositCount->Belt.Int.toString}
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                   <HSpacing size=Spacing.xs />
@@ -137,7 +137,7 @@ let make = (~proposalID) => {
                     block=true
                     value="Depositors"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </div>
@@ -149,7 +149,7 @@ let make = (~proposalID) => {
                 block=true
                 value="TX Hash"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
               />
             </Col>
@@ -158,7 +158,7 @@ let make = (~proposalID) => {
                 block=true
                 value="Amount"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
                 align=Text.Right
               />

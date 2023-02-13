@@ -44,7 +44,7 @@ let make = (~url: string) => {
               <Icon name="fal fa-info-circle" size=10 color={theme.neutral_900} />
             </CTooltip>
           </div>
-          <Text value="OWASM v0.1" weight=Text.Regular size=Text.Lg block=true />
+          <Text value="OWASM v0.1" weight=Text.Regular size=Text.Body1 block=true />
         </Col>
         <Col col=Col.Six colSm=Col.Six>
           <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
@@ -54,7 +54,7 @@ let make = (~url: string) => {
               <Icon name="fal fa-info-circle" size=10 color={theme.neutral_900} />
             </CTooltip>
           </div>
-          <Text value="Rust 1.40.0" weight=Text.Regular size=Text.Lg block=true />
+          <Text value="Rust 1.40.0" weight=Text.Regular size=Text.Body1 block=true />
         </Col>
       </Row>
       <Row marginBottom=24 marginBottomSm=12>
@@ -63,7 +63,7 @@ let make = (~url: string) => {
             <div className={CssHelper.flexBox()}>
               <Icon name="fal fa-file" size=16 color={theme.neutral_600} />
               <HSpacing size=Spacing.sm />
-              <Text value="src/logic.rs" weight=Text.Semibold size=Text.Lg block=true />
+              <Text value="src/logic.rs" weight=Text.Semibold size=Text.Body1 block=true />
             </div>
             <CopyButton data=code title="Copy Code" />
           </div>

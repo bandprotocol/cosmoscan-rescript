@@ -154,7 +154,7 @@ let make = (~chainID, ~ledgerApp) => {
     <div className=Styles.resultContainer>
       {switch result {
       | Loading => <Text value="Please accept with ledger" weight=Text.Medium />
-      | Error(err) => <Text value=err color=theme.error_600 weight=Text.Medium size=Text.Lg />
+      | Error(err) => <Text value=err color=theme.error_600 weight=Text.Medium size=Text.Body1 />
       | Nothing => React.null
       }}
     </div>
@@ -162,7 +162,7 @@ let make = (~chainID, ~ledgerApp) => {
       ? <div className={Styles.connectBtn(~isLoading=true, ())}>
           <div className=Styles.connectingBtnContainer>
             <Icon name="fad fa-spinner-third fa-spin" size=16 />
-            <Text value="Connecting..." weight=Text.Bold size=Text.Md />
+            <Text value="Connecting..." weight=Text.Bold size=Text.Body2 />
           </div>
         </div>
       : <Button

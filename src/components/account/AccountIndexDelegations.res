@@ -25,7 +25,7 @@ module RenderBody = {
                 identity
                 width=#px(300)
                 avatarWidth=30
-                size=Text.Lg
+                size=Text.Body1
               />
             </div>
           | _ => <LoadingCensorBar width=200 height=20 />
@@ -160,7 +160,7 @@ let make = (~address) => {
                   block=true
                   value={delegationsCount->Belt.Int.toString}
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
                 <HSpacing size=Spacing.xs />
@@ -168,7 +168,7 @@ let make = (~address) => {
                   block=true
                   value="Validators Delegated"
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
               </div>
@@ -186,7 +186,7 @@ let make = (~address) => {
                     block=true
                     value={delegationsCount->Belt.Int.toString}
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                   <HSpacing size=Spacing.xs />
@@ -194,7 +194,7 @@ let make = (~address) => {
                     block=true
                     value="Validators Delegated"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </div>
@@ -206,7 +206,7 @@ let make = (~address) => {
                 block=true
                 value="Amount (BAND)"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
               />
             </Col>
@@ -215,7 +215,7 @@ let make = (~address) => {
                 block=true
                 value="Reward (BAND)"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
               />
             </Col>

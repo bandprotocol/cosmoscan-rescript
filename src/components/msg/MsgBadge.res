@@ -19,6 +19,6 @@ let make = (~name) => {
       CssHelper.flexBox(~wrap=#nowrap, ~justify=#center, ()),
       Styles.msgBadge(theme),
     ])}>
-    <Text value=name size=Text.Sm color=Theme.white transform=Text.Uppercase align=Text.Center />
+    <Text value=name size=Text.Caption color=Theme.white transform=Text.Uppercase align=Text.Center />
   </div>
 }

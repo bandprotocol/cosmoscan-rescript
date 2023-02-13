@@ -11,7 +11,7 @@ module Styles = {
 }
 
 @react.component
-let make = (~txHash: Hash.t, ~width: int, ~size=Text.Md, ~weight=Text.Medium) => {
+let make = (~txHash: Hash.t, ~width: int, ~size=Text.Body2, ~weight=Text.Medium) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   <Link className={Styles.withWidth(width, theme)} route={Route.TxIndexPage(txHash)}>
     <Text

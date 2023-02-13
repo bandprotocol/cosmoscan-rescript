@@ -65,7 +65,7 @@ module RenderBody = {
             | Data({timestampOpt}) =>
               switch timestampOpt {
               | Some(timestamp) =>
-                <Timestamp time=timestamp size=Text.Md weight=Text.Regular textAlign=Text.Right />
+                <Timestamp time=timestamp size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
               | None => <Text value="Created on Wenchang" />
               }
             | _ => <LoadingCensorBar width=80 height=15 />
@@ -137,7 +137,7 @@ module TabButton = {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className={Styles.buttonContainer(theme, active)} onClick={_ => setTab(_ => tab)}>
-      <Text value=tabString weight={active ? Text.Semibold : Text.Regular} size=Text.Lg />
+      <Text value=tabString weight={active ? Text.Semibold : Text.Regular} size=Text.Body1 />
     </div>
   }
 }
@@ -174,7 +174,7 @@ let make = (~proposalID) => {
                         block=true
                         value={voteCount->Belt.Int.toString}
                         weight=Text.Semibold
-                        size=Text.Sm
+                        size=Text.Caption
                         transform=Text.Uppercase
                       />
                       <HSpacing size=Spacing.xs />
@@ -182,7 +182,7 @@ let make = (~proposalID) => {
                         block=true
                         value="Voters"
                         weight=Text.Semibold
-                        size=Text.Sm
+                        size=Text.Caption
                         transform=Text.Uppercase
                       />
                     </div>
@@ -200,7 +200,7 @@ let make = (~proposalID) => {
                           block=true
                           value={voteCount->Belt.Int.toString}
                           weight=Text.Semibold
-                          size=Text.Sm
+                          size=Text.Caption
                           transform=Text.Uppercase
                         />
                         <HSpacing size=Spacing.xs />
@@ -208,7 +208,7 @@ let make = (~proposalID) => {
                           block=true
                           value="Voters"
                           weight=Text.Semibold
-                          size=Text.Sm
+                          size=Text.Caption
                           transform=Text.Uppercase
                         />
                       </div>
@@ -220,7 +220,7 @@ let make = (~proposalID) => {
                       block=true
                       value="TX Hash"
                       weight=Text.Semibold
-                      size=Text.Sm
+                      size=Text.Caption
                       transform=Text.Uppercase
                     />
                   </Col>
@@ -229,7 +229,7 @@ let make = (~proposalID) => {
                       block=true
                       value="Timestamp"
                       weight=Text.Semibold
-                      size=Text.Sm
+                      size=Text.Caption
                       transform=Text.Uppercase
                       align=Text.Right
                     />

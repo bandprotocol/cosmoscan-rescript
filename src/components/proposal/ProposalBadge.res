@@ -32,6 +32,6 @@ let make = (~status) => {
       Styles.badge(getBadgeColor(theme, status)),
       CssHelper.flexBox(~justify=#center, ()),
     })}>
-    <Text value={getBadgeText(status)} size=Text.Sm transform=Text.Uppercase color=theme.white />
+    <Text value={getBadgeText(status)} size=Text.Caption transform=Text.Uppercase color=theme.white />
   </div>;
 };

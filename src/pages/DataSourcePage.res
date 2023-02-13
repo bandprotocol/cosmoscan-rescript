@@ -94,7 +94,7 @@ module RenderBody = {
             | Data({timestamp: timestampOpt}) =>
               switch timestampOpt {
               | Some(timestamp') =>
-                <Timestamp time=timestamp' size=Text.Md weight=Text.Regular textAlign=Text.Right />
+                <Timestamp time=timestamp' size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
               | None => <Text value="Genesis" />
               }
             | _ => <LoadingCensorBar width=80 height=15 />
@@ -217,7 +217,7 @@ let make = () => {
                       block=true
                       value="Data Source"
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                     />
                   </Col>
@@ -226,7 +226,7 @@ let make = () => {
                       block=true
                       value="Fee"
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                     />
                   </Col>
@@ -235,7 +235,7 @@ let make = () => {
                       block=true
                       value="Description"
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                     />
                   </Col>
@@ -244,7 +244,7 @@ let make = () => {
                       block=true
                       value="Requests"
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                     />
                   </Col>
@@ -253,7 +253,7 @@ let make = () => {
                       block=true
                       value="Timestamp"
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                       align=Text.Right
                     />

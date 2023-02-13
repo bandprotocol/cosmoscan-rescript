@@ -37,10 +37,10 @@ let make = () => {
           />
         </div>
         <VSpacing size=Spacing.xxl />
-        <Text value="Oops! We cannot find the page you're looking for." size=Text.Lg />
+        <Text value="Oops! We cannot find the page you're looking for." size=Text.Body1 />
         <VSpacing size=Spacing.lg />
         <Link className=Styles.linkToHome route=Route.HomePage>
-          <Text value="Back to Homepage" weight=Text.Bold size=Text.Lg color=theme.neutral_900 />
+          <Text value="Back to Homepage" weight=Text.Bold size=Text.Body1 color=theme.neutral_900 />
           <HSpacing size=Spacing.md />
           <Icon name="far fa-arrow-right" color=theme.neutral_900 />
         </Link>

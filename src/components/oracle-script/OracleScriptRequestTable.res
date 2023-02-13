@@ -22,7 +22,7 @@ module RenderBody = {
           | Data({txHash}) =>
             switch txHash {
             | Some(txHash') => <TxLink txHash=txHash' width=230 weight=Text.Medium />
-            | None => <Text value="Syncing" size=Text.Md weight=Text.Medium />
+            | None => <Text value="Syncing" size=Text.Body2 weight=Text.Medium />
             }
           | _ => <LoadingCensorBar width=230 height=15 />
           }}
@@ -51,7 +51,7 @@ module RenderBody = {
               switch txTimestamp {
               | Some(txTimestamp') =>
                 <Timestamp
-                  time=txTimestamp' size=Text.Md weight=Text.Regular textAlign=Text.Right
+                  time=txTimestamp' size=Text.Body2 weight=Text.Regular textAlign=Text.Right
                 />
               | None => <Text value="Syncing" />
               }
@@ -147,14 +147,14 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                     block=true
                     value={totalRequestCount->Format.iPretty}
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                   <HSpacing size=Spacing.xs />
                   <Text
                     block=true
                     value="Requests"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </div>
@@ -168,14 +168,14 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                       block=true
                       value={totalRequestCount->Format.iPretty}
                       weight=Text.Semibold
-                      size=Text.Sm
+                      size=Text.Caption
                     />
                     <HSpacing size=Spacing.xs />
                     <Text
                       block=true
                       value="Requests"
                       weight=Text.Semibold
-                      size=Text.Sm
+                      size=Text.Caption
                       transform=Text.Uppercase
                     />
                   </div>
@@ -185,7 +185,7 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                     block=true
                     value="Tx Hash"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </Col>
@@ -194,7 +194,7 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                     block=true
                     value="Report Status"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </Col>
@@ -203,7 +203,7 @@ let make = (~oracleScriptID: ID.OracleScript.t) => {
                     block=true
                     value="Timestamp"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                     align=Text.Right
                   />

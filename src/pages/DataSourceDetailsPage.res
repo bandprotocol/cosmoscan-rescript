@@ -104,7 +104,7 @@ module Content = {
                 </Col>
                 <Col col=Col.Eight>
                   {switch dataSourceSub {
-                  | Data({description}) => <Text size=Text.Lg value=description />
+                  | Data({description}) => <Text size=Text.Body1 value=description />
                   | _ => <LoadingCensorBar width=284 height=15 />
                   }}
                 </Col>

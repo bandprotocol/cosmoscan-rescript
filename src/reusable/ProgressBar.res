@@ -75,7 +75,7 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
         value={"Min " ++ minimumValidators->Format.iPretty}
         transform=Text.Uppercase
         weight=Text.Semibold
-        size=Text.Sm
+        size=Text.Caption
         color={theme.neutral_900}
       />
     </div>
@@ -85,7 +85,7 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
     <div className=Styles.rightText>
       <Text
         value={reportedValidators->Format.iPretty ++ " of " ++ requestValidators->Format.iPretty}
-        size=Text.Sm
+        size=Text.Caption
         transform=Text.Uppercase
         weight=Text.Semibold
         color={theme.neutral_900}
@@ -130,9 +130,9 @@ module Deposit = {
           CssHelper.mb(~size=8, ()),
           CssHelper.flexBox(~justify=#spaceBetween, ()),
         ])}>
-        <Text value={`Min Deposit ${formatedMinDeposit} BAND`} color=theme.neutral_200 size=Text.Lg />
+        <Text value={`Min Deposit ${formatedMinDeposit} BAND`} color=theme.neutral_200 size=Text.Body1 />
         <Text
-          value={`${formatedTotalDeposit} / ${formatedMinDeposit}`} color=theme.neutral_200 size=Text.Lg
+          value={`${formatedTotalDeposit} / ${formatedMinDeposit}`} color=theme.neutral_200 size=Text.Body1
         />
       </div>
       <div className={Styles.progressOuter(theme)}>
@@ -160,16 +160,16 @@ module Voting = {
         //   value={VoteSub.toString(label, ~withSpace=true)} size=Heading.H4 weight=Heading.Thin
         // />
         <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-          <Text value={percent->Format.fPercent(~digits=2)} size=Text.Lg block=true />
+          <Text value={percent->Format.fPercent(~digits=2)} size=Text.Body1 block=true />
           {isMobile
             ? React.null
             : <>
                 <HSpacing size=Spacing.sm />
-                <Text value="/" size=Text.Lg block=true />
+                <Text value="/" size=Text.Body1 block=true />
                 <HSpacing size=Spacing.sm />
                 <Text
                   value={amount->Format.fPretty(~digits=2) ++ " BAND"}
-                  size=Text.Lg
+                  size=Text.Body1
                   block=true
                   color={theme.neutral_900}
                 />

@@ -85,7 +85,7 @@ module ConnectPanel = {
           CssHelper.flexBox(~justify=#spaceBetween, ()),
         })}>
         <Icon name="fal fa-link" size=32 color={theme.neutral_900} />
-        <Text value="Please connect to make request" size=Text.Lg nowrap=true block=true />
+        <Text value="Please connect to make request" size=Text.Body1 nowrap=true block=true />
         <Button px=20 py=5 onClick={_ => {connect()}}> {"Connect"->React.string} </Button>
       </div>
     </div>
@@ -351,8 +351,8 @@ module ExecutionPart = {
     isMobile
       ? <MobileBlock>
           <Icon name="fal fa-exclamation-circle" size=32 color={theme.neutral_900} />
-          <Text value="Oracle request" size=Text.Lg align=Text.Center block=true />
-          <Text value="not available on mobile" size=Text.Lg align=Text.Center block=true />
+          <Text value="Oracle request" size=Text.Body1 align=Text.Center block=true />
+          <Text value="not available on mobile" size=Text.Body1 align=Text.Center block=true />
         </MobileBlock>
       : <Row>
           <Col>
@@ -361,14 +361,14 @@ module ExecutionPart = {
                 ? React.null
                 : <div>
                     <div className={Css.merge(list{CssHelper.flexBox(), Styles.upperTextCotainer})}>
-                      <Text value="This oracle script requires the following" size=Text.Lg />
+                      <Text value="This oracle script requires the following" size=Text.Body1 />
                       <HSpacing size=Spacing.sm />
                       {numParams == 0
                         ? React.null
                         : <Text
                             value={numParams > 1 ? "parameters" : "parameter"}
                             weight=Text.Bold
-                            size=Text.Lg
+                            size=Text.Body1
                           />}
                     </div>
                     <VSpacing size=Spacing.lg />

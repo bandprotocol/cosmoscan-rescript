@@ -22,7 +22,7 @@ let make = (
   ~time,
   ~prefix="",
   ~suffix="",
-  ~size=Text.Sm,
+  ~size=Text.Caption,
   ~weight=Text.Regular,
   ~spacing=Text.Unset,
   ~color=?,

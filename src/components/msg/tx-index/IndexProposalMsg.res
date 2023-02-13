@@ -31,7 +31,7 @@ module SubmitProposalMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text size=Text.Lg value=proposal.title />
+        <Text size=Text.Body1 value=proposal.title />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -70,7 +70,7 @@ module SubmitProposalFailMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text size=Text.Lg value=proposal.title />
+        <Text size=Text.Body1 value=proposal.title />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -119,7 +119,7 @@ module DepositMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text size=Text.Lg value=deposit.title />
+        <Text size=Text.Body1 value=deposit.title />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -207,7 +207,7 @@ module VoteMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text size=Text.Lg value=vote.title />
+        <Text size=Text.Body1 value=vote.title />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -217,7 +217,7 @@ module VoteMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text size=Text.Lg value=vote.option />
+        <Text size=Text.Body1 value=vote.option />
       </Col>
     </Row>
   }
@@ -256,7 +256,7 @@ module VoteFailMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text size=Text.Lg value=vote.option />
+        <Text size=Text.Body1 value=vote.option />
       </Col>
     </Row>
   }

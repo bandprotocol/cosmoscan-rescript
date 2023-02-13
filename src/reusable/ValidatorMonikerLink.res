@@ -18,7 +18,7 @@ let make = (
   ~moniker: string,
   ~identity=?,
   ~weight=Text.Semibold,
-  ~size=Text.Md,
+  ~size=Text.Body2,
   ~underline=false,
   ~width=#auto,
   ~avatarWidth=20,

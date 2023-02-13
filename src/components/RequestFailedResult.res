@@ -32,7 +32,7 @@ let make = (~id) => {
              <Text value="Resolve Status" color={theme.neutral_600} weight=Text.Regular />
            </div>
            <div className={CssHelper.flexBox()}>
-             <RequestStatus resolveStatus display=RequestStatus.Full size=Text.Md />
+             <RequestStatus resolveStatus display=RequestStatus.Full size=Text.Body2 />
              {switch (resolveHeight) {
               | Some(height) =>
                 <>

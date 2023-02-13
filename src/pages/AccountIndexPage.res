@@ -58,7 +58,7 @@ module BalanceDetails = {
           <div className={Styles.squareIcon(color)} />
           <Text
             value=title
-            size=Text.Lg
+            size=Text.Body1
             weight=Text.Semibold
             tooltipItem={description->React.string}
             tooltipPlacement=Text.AlignBottomStart
@@ -71,39 +71,39 @@ module BalanceDetails = {
           <div className={CssHelper.flexBox()}>
             {isCountup
               ? <NumberCountUp
-                  value=amount size=Text.Lg weight=Text.Regular color=theme.neutral_900
+                  value=amount size=Text.Body1 weight=Text.Regular color=theme.neutral_900
                 />
               : <Text
                   value={amount->Format.fPretty}
-                  size=Text.Lg
+                  size=Text.Body1
                   weight=Text.Regular
                   nowrap=true
                   code=true
                   color=theme.neutral_900
                 />}
             <HSpacing size=Spacing.sm />
-            <Text value="BAND" size=Text.Lg weight=Text.Thin nowrap=true color=theme.neutral_900 />
+            <Text value="BAND" size=Text.Body1 weight=Text.Thin nowrap=true color=theme.neutral_900 />
           </div>
           <VSpacing size=Spacing.xs />
           <div className={CssJs.merge(. [CssHelper.flexBox(), Styles.balance])}>
             {isCountup
               ? <NumberCountUp
                   value={amount *. usdPrice}
-                  size=Text.Md
+                  size=Text.Body2
                   weight=Text.Thin
                   spacing=Text.Em(0.02)
                   color=theme.neutral_600
                 />
               : <Text
                   value={(amount *. usdPrice)->Format.fPretty}
-                  size=Text.Md
+                  size=Text.Body2
                   spacing=Text.Em(0.02)
                   weight=Text.Thin
                   nowrap=true
                   code=true
                 />}
             <HSpacing size=Spacing.sm />
-            <Text value="USD" size=Text.Md weight=Text.Thin nowrap=true color=theme.neutral_600 />
+            <Text value="USD" size=Text.Body2 weight=Text.Thin nowrap=true color=theme.neutral_600 />
           </div>
         </div>
       </Col>
@@ -140,16 +140,16 @@ module TotalBalanceRender = {
         ])}>
         <NumberCountUp value=amountBAND size=Text.Xxxl weight=Text.Regular smallNumber=true />
         <HSpacing size=Spacing.sm />
-        <Text value="BAND" size=Text.Lg code=false weight=Text.Thin color=theme.neutral_900 />
+        <Text value="BAND" size=Text.Body1 code=false weight=Text.Thin color=theme.neutral_900 />
       </div>
       <div className={CssHelper.flexBox()}>
         <NumberCountUp
-          value={amountBAND *. usdPrice} size=Text.Lg weight=Text.Regular color=theme.neutral_600
+          value={amountBAND *. usdPrice} size=Text.Body1 weight=Text.Regular color=theme.neutral_600
         />
         <HSpacing size=Spacing.sm />
         <Text
           value={" USD " ++ ("($" ++ (usdPrice->Js.Float.toString ++ " / BAND)"))}
-          size=Text.Lg
+          size=Text.Body1
           weight=Text.Thin
         />
       </div>

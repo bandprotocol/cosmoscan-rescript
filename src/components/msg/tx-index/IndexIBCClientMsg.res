@@ -42,7 +42,7 @@ module UpdateClient = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text size=Text.Lg value=client.clientID />
+        <Text size=Text.Body1 value=client.clientID />
       </Col>
     </Row>
   }
@@ -72,7 +72,7 @@ module UpgradeClient = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text size=Text.Lg value=client.clientID />
+        <Text size=Text.Body1 value=client.clientID />
       </Col>
     </Row>
   }
@@ -102,7 +102,7 @@ module SubmitClientMisbehaviour = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text size=Text.Lg value=client.clientID />
+        <Text size=Text.Body1 value=client.clientID />
       </Col>
     </Row>
   }

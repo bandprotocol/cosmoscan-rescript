@@ -101,14 +101,14 @@ let make = (~address) => {
                   block=true
                   value={delegatorCount->Format.iPretty}
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                 />
                 <HSpacing size=Spacing.xs />
                 <Text
                   block=true
                   value="Delegators"
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
               </div>
@@ -127,7 +127,7 @@ let make = (~address) => {
                     value={delegatorCount |> Format.iPretty}
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                   <HSpacing size=Spacing.xs />
                   <Text
@@ -135,7 +135,7 @@ let make = (~address) => {
                     value="Delegators"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                 </div>
               | _ => <LoadingCensorBar width=100 height=15 />
@@ -147,7 +147,7 @@ let make = (~address) => {
                 value="Share(%)"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
               />
             </Col>
             <Col col=Col.Two>
@@ -156,7 +156,7 @@ let make = (~address) => {
                 value="Amount"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
                 align=Text.Right
               />
             </Col>

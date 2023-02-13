@@ -16,7 +16,7 @@ module ProofHeight = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value={proofHeight.revisionHeight->Belt.Int.toString} />
+          <Text size=Text.Body1 value={proofHeight.revisionHeight->Belt.Int.toString} />
         </Col>
         <Col col=Col.Six>
           <Heading
@@ -26,7 +26,7 @@ module ProofHeight = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value={proofHeight.revisionNumber->Belt.Int.toString} />
+          <Text size=Text.Body1 value={proofHeight.revisionNumber->Belt.Int.toString} />
         </Col>
       </Row>
     </>
@@ -51,7 +51,7 @@ module ConsensusHeight = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value={proofHeight.revisionHeight->Belt.Int.toString} />
+          <Text size=Text.Body1 value={proofHeight.revisionHeight->Belt.Int.toString} />
         </Col>
         <Col col=Col.Six>
           <Heading
@@ -61,7 +61,7 @@ module ConsensusHeight = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value={proofHeight.revisionNumber->Belt.Int.toString} />
+          <Text size=Text.Body1 value={proofHeight.revisionNumber->Belt.Int.toString} />
         </Col>
       </Row>
     </>

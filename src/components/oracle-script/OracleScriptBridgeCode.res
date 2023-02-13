@@ -173,7 +173,7 @@ module GenerateDecodeCode = {
               <Text
                 value={getFileNameFromLanguage(~language, ~dataType)}
                 weight=Text.Semibold
-                size=Text.Lg
+                size=Text.Body1
                 block=true
               />
             </div>
@@ -263,7 +263,7 @@ let make = (~schema) => {
           <div className={CssHelper.flexBox()}>
             <Icon name="fal fa-file" size=16 color={theme.neutral_600} />
             <HSpacing size=Spacing.sm />
-            <Text value="Oracle Script Schema" weight=Text.Semibold size=Text.Lg block=true />
+            <Text value="Oracle Script Schema" weight=Text.Semibold size=Text.Body1 block=true />
           </div>
           <CopyButton data=schema title="Copy Code" />
         </div>

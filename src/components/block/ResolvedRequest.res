@@ -64,7 +64,7 @@ let make = (~blockSub: Sub.variant<BlockSub.t>) => {
                    <Text value="There is no resolved request." />
                  </div>
                : <div className=Styles.container>
-                   <Text value="Request ID" size=Text.Sm transform=Text.Uppercase />
+                   <Text value="Request ID" size=Text.Caption transform=Text.Uppercase />
                    <RequestsList requests=showRequests />
                  </div>}
           </Tab.State>

@@ -90,7 +90,7 @@ module SearchResults = {
             <VSpacing size=#px(-2) />
             <Text value="ADDRESS" size=Text.Xs weight=Text.Semibold />
             <VSpacing size=Spacing.xs />
-            <Text value={searchTerm ++ "1f2bce"} weight=Text.Bold size=Text.Lg block=true />
+            <Text value={searchTerm ++ "1f2bce"} weight=Text.Bold size=Text.Body1 block=true />
             <VSpacing size=Spacing.sm />
           </>
         : React.null,
@@ -99,7 +99,7 @@ module SearchResults = {
             <VSpacing size=#px(-2) />
             <Text value="TRANSACTION" size=Text.Xs weight=Text.Semibold />
             <VSpacing size=Spacing.xs />
-            <Text value={searchTerm ++ "dd92b"} weight=Text.Bold size=Text.Lg block=true />
+            <Text value={searchTerm ++ "dd92b"} weight=Text.Bold size=Text.Body1 block=true />
             <VSpacing size=Spacing.sm />
           </>
         : React.null,

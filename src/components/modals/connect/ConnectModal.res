@@ -103,11 +103,11 @@ let make = (~chainID) => {
           ? <>
               <VSpacing size=Spacing.md />
               <div className={CssHelper.flexBox()}>
-                <Text value="Please check that you are visiting" size=Text.Lg />
+                <Text value="Please check that you are visiting" size=Text.Body1 />
                 <HSpacing size=Spacing.sm />
                 <Text
                   value="https://www.cosmoscan.io"
-                  size=Text.Lg
+                  size=Text.Body1
                   weight=Text.Medium
                   color={theme.neutral_900}
                 />

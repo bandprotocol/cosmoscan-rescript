@@ -20,7 +20,7 @@ module RenderBody = {
                 identity
                 width=#px(300)
                 avatarWidth=30
-                size=Text.Lg
+                size=Text.Body1
               />
             </div>
           | _ => <LoadingCensorBar width=200 height=20 />
@@ -39,7 +39,7 @@ module RenderBody = {
             {switch unbondingListSub {
             | Data({completionTime}) =>
               <Timestamp
-                time=completionTime size=Text.Md weight=Text.Regular textAlign=Text.Right
+                time=completionTime size=Text.Body2 weight=Text.Regular textAlign=Text.Right
               />
             | _ => <LoadingCensorBar width=200 height=20 />
             }}
@@ -117,7 +117,7 @@ let make = (~address) => {
                   block=true
                   value={unbondingCount->Belt.Int.toString}
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
                 <HSpacing size=Spacing.xs />
@@ -125,7 +125,7 @@ let make = (~address) => {
                   block=true
                   value="Unbonding Entries"
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
               </div>
@@ -143,7 +143,7 @@ let make = (~address) => {
                     block=true
                     value={unbondingCount->Belt.Int.toString}
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                   <HSpacing size=Spacing.xs />
@@ -151,7 +151,7 @@ let make = (~address) => {
                     block=true
                     value="Unbonding Entries"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </div>
@@ -163,7 +163,7 @@ let make = (~address) => {
                 block=true
                 value="Amount (BAND)"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
                 align=Text.Right
               />
@@ -173,7 +173,7 @@ let make = (~address) => {
                 block=true
                 value="Unbonded At"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
                 align=Text.Right
               />

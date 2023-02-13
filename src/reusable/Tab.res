@@ -37,7 +37,7 @@ module Route = {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <Link key=name isTab=true className={Styles.buttonContainer(theme, active)} route>
-      <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Lg />
+      <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Body1 />
     </Link>
   }
 
@@ -61,7 +61,7 @@ module State = {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div key=name className={Styles.buttonContainer(theme, active)} onClick={_ => setTab()}>
-      <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Lg />
+      <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Body1 />
     </div>
   }
 

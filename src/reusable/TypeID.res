@@ -9,9 +9,9 @@ let fontSize = pos =>
   switch pos {
   | Landing => Text.Xxxl
   | Title => Text.Xxl
-  | Subtitle => Text.Lg
-  | Text => Text.Md
-  | Mini => Text.Sm
+  | Subtitle => Text.Body1
+  | Text => Text.Body2
+  | Mini => Text.Caption
   }
 
 let lineHeight = pos =>

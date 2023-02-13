@@ -16,7 +16,7 @@ module Packet = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=packet.sourcePort />
+          <Text size=Text.Body1 value=packet.sourcePort />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -26,7 +26,7 @@ module Packet = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=packet.destinationPort />
+          <Text size=Text.Body1 value=packet.destinationPort />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -36,7 +36,7 @@ module Packet = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=packet.sourceChannel />
+          <Text size=Text.Body1 value=packet.sourceChannel />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -46,7 +46,7 @@ module Packet = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=packet.destinationChannel />
+          <Text size=Text.Body1 value=packet.destinationChannel />
         </Col>
         <Col col=Col.Six mbSm=24>
           <Heading
@@ -56,7 +56,7 @@ module Packet = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=packet.data breakAll=true />
+          <Text size=Text.Body1 value=packet.data breakAll=true />
         </Col>
         <Col col=Col.Six mbSm=24>
           <Heading
@@ -66,7 +66,7 @@ module Packet = {
             weight=Heading.Regular
             color=theme.neutral_600
           />
-          <Timestamp time=packet.timeoutTimestamp size=Text.Lg />
+          <Timestamp time=packet.timeoutTimestamp size=Text.Body1 />
         </Col>
       </Row>
     </>
@@ -92,7 +92,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=packetType />
+          <Text size=Text.Body1 value=packetType />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -115,7 +115,7 @@ module OracleRequestPacket = {
           <div className={CssHelper.flexBox()}>
             <TypeID.OracleScript position=TypeID.Subtitle id=request.oracleScriptID />
             <HSpacing size=Spacing.sm />
-            <Text value=request.oracleScriptName size=Text.Lg />
+            <Text value=request.oracleScriptName size=Text.Body1 />
           </div>
         </Col>
         <Col col=Col.Six mb=24>
@@ -136,7 +136,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text value=request.requestKey size=Text.Lg />
+          <Text value=request.requestKey size=Text.Body1 />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -146,7 +146,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text value={request.prepareGas->Belt.Int.toString} size=Text.Lg />
+          <Text value={request.prepareGas->Belt.Int.toString} size=Text.Body1 />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -156,7 +156,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text value={request.executeGas->Belt.Int.toString} size=Text.Lg />
+          <Text value={request.executeGas->Belt.Int.toString} size=Text.Body1 />
         </Col>
         <Col mb=24>
           <div
@@ -187,7 +187,7 @@ module OracleRequestPacket = {
               ellipsis=true
               code=true
               block=true
-              size=Text.Lg
+              size=Text.Body1
             />
           }}
         </Col>
@@ -199,7 +199,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text value={request.askCount->Belt.Int.toString} size=Text.Lg />
+          <Text value={request.askCount->Belt.Int.toString} size=Text.Body1 />
         </Col>
         <Col col=Col.Six>
           <Heading
@@ -209,7 +209,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text value={request.minCount->Belt.Int.toString} size=Text.Lg />
+          <Text value={request.minCount->Belt.Int.toString} size=Text.Body1 />
         </Col>
       </Row>
     </>
@@ -234,7 +234,7 @@ module FungibleTokenPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=packetType />
+          <Text size=Text.Body1 value=packetType />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -244,7 +244,7 @@ module FungibleTokenPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=token.sender />
+          <Text size=Text.Body1 value=token.sender />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -254,7 +254,7 @@ module FungibleTokenPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text size=Text.Lg value=token.receiver />
+          <Text size=Text.Body1 value=token.receiver />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -267,7 +267,7 @@ module FungibleTokenPacket = {
           <Text
             value={token.amount->Belt.Int.toString ++ (" " ++ token.denom)}
             code=true
-            size=Text.Md
+            size=Text.Body2
             nowrap=true
             block=true
           />

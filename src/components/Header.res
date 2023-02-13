@@ -51,7 +51,7 @@ module DesktopRender = {
                   <div>
                     <Text
                       value="BANDCHAIN"
-                      size=Text.Md
+                      size=Text.Body2
                       weight=Text.Semibold
                       nowrap=true
                       color=theme.neutral_900
@@ -61,7 +61,7 @@ module DesktopRender = {
                     <Text
                       value="Cosmoscan"
                       nowrap=true
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                       color=theme.neutral_900
                       special=true
@@ -114,7 +114,7 @@ module MobileRender = {
               <div className={CssHelper.flexBox(~direction=#column, ~align=#flexStart, ())}>
                 <Text
                   value="BANDCHAIN"
-                  size=Text.Md
+                  size=Text.Body2
                   weight=Text.Bold
                   nowrap=true
                   color=theme.neutral_900
@@ -124,7 +124,7 @@ module MobileRender = {
                 <Text
                   value="CosmoScan"
                   nowrap=true
-                  size=Text.Sm
+                  size=Text.Caption
                   color=theme.neutral_600
                   spacing=Text.Em(0.03)
                 />

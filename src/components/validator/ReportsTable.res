@@ -138,7 +138,7 @@ module RenderBody = {
               value="External ID"
               weight=Text.Semibold
               transform=Text.Uppercase
-              size=Text.Sm
+              size=Text.Caption
             />
           </Col>
           <Col col=Col.Three>
@@ -147,12 +147,12 @@ module RenderBody = {
               value="Data Source"
               weight=Text.Semibold
               transform=Text.Uppercase
-              size=Text.Sm
+              size=Text.Caption
             />
           </Col>
           <Col col=Col.Two>
             <Text
-              block=true value="Param" weight=Text.Semibold transform=Text.Uppercase size=Text.Sm
+              block=true value="Param" weight=Text.Semibold transform=Text.Uppercase size=Text.Caption
             />
           </Col>
           <Col col=Col.Two>
@@ -161,7 +161,7 @@ module RenderBody = {
               value="Exit Code"
               weight=Text.Semibold
               transform=Text.Uppercase
-              size=Text.Sm
+              size=Text.Caption
             />
           </Col>
           <Col col=Col.Three>
@@ -171,7 +171,7 @@ module RenderBody = {
               weight=Text.Semibold
               align=Text.Right
               transform=Text.Uppercase
-              size=Text.Sm
+              size=Text.Caption
             />
           </Col>
         </Row>
@@ -279,7 +279,7 @@ let make = (~address) => {
                   value={reportsCount->Format.iPretty}
                   weight=Text.Semibold
                   transform=Text.Uppercase
-                  size=Text.Sm
+                  size=Text.Caption
                 />
                 <HSpacing size=Spacing.xs />
                 <Text
@@ -287,7 +287,7 @@ let make = (~address) => {
                   value="Requests"
                   weight=Text.Semibold
                   transform=Text.Uppercase
-                  size=Text.Sm
+                  size=Text.Caption
                 />
               </div>
             | _ => <LoadingCensorBar width=100 height=15 />
@@ -305,7 +305,7 @@ let make = (~address) => {
                     value={reportsCount->Format.iPretty}
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                   <HSpacing size=Spacing.xs />
                   <Text
@@ -313,7 +313,7 @@ let make = (~address) => {
                     value="Oracle Reports"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                 </div>
               | _ => <LoadingCensorBar width=100 height=15 />
@@ -325,7 +325,7 @@ let make = (~address) => {
                 value="Oracle Script"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
               />
             </Col>
             <Col col=Col.Five>
@@ -334,7 +334,7 @@ let make = (~address) => {
                 value="TX Hash"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
               />
             </Col>
           </Row>

@@ -146,7 +146,7 @@ module SortableTHead = {
       <Text
         block=true
         value=title
-        size=Text.Sm
+        size=Text.Caption
         weight=Text.Semibold
         transform=Text.Uppercase
         tooltipItem={tooltipItem->Belt.Option.mapWithDefault(React.null, React.string)}
@@ -341,7 +341,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
           <Row alignItems=Row.Center>
             <Col col=Col.One>
               <Text
-                block=true value="Rank" weight=Text.Semibold transform=Text.Uppercase size=Text.Sm
+                block=true value="Rank" weight=Text.Semibold transform=Text.Uppercase size=Text.Caption
               />
             </Col>
             <Col col=Col.Two>
@@ -384,7 +384,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
               <Text
                 block=true
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
                 weight=Text.Semibold
                 align={isLogin ? Text.Left : Center}
                 value="Oracle Status"

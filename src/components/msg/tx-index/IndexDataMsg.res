@@ -24,7 +24,7 @@ module CreateDataSourceMsg = {
         <div className={CssHelper.flexBox()}>
           <TypeID.DataSource position=TypeID.Subtitle id=dataSource.id />
           <HSpacing size=Spacing.sm />
-          <Text value=dataSource.name size=Text.Lg />
+          <Text value=dataSource.name size=Text.Body1 />
         </div>
       </Col>
       <Col col=Col.Six mbSm=24>
@@ -74,7 +74,7 @@ module CreateDataSourceFailMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value=dataSource.name size=Text.Lg />
+        <Text value=dataSource.name size=Text.Body1 />
       </Col>
       <Col col=Col.Six mbSm=24>
         <Heading
@@ -129,7 +129,7 @@ module EditDataSourceMsg = {
             ? React.null
             : <>
                 <HSpacing size=Spacing.sm />
-                <Text value=dataSource.name size=Text.Lg />
+                <Text value=dataSource.name size=Text.Body1 />
               </>}
         </div>
       </Col>
@@ -213,7 +213,7 @@ module CreateOracleScriptFailMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value=oracleScript.name size=Text.Lg />
+        <Text value=oracleScript.name size=Text.Body1 />
       </Col>
     </Row>
   }
@@ -248,7 +248,7 @@ module EditOracleScriptMsg = {
             ? React.null
             : <>
                 <HSpacing size=Spacing.sm />
-                <Text value=oracleScript.name size=Text.Lg />
+                <Text value=oracleScript.name size=Text.Body1 />
               </>}
         </div>
       </Col>
@@ -293,7 +293,7 @@ module RequestMsg = {
         <div className={CssHelper.flexBox()}>
           <TypeID.OracleScript position=TypeID.Subtitle id=request.oracleScriptID />
           <HSpacing size=Spacing.sm />
-          <Text value=request.oracleScriptName size=Text.Lg />
+          <Text value=request.oracleScriptName size=Text.Body1 />
         </div>
       </Col>
       <Col col=Col.Six mb=24>
@@ -314,7 +314,7 @@ module RequestMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value={request.prepareGas->Belt.Int.toString} size=Text.Lg />
+        <Text value={request.prepareGas->Belt.Int.toString} size=Text.Body1 />
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
@@ -324,7 +324,7 @@ module RequestMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value={request.executeGas->Belt.Int.toString} size=Text.Lg />
+        <Text value={request.executeGas->Belt.Int.toString} size=Text.Body1 />
       </Col>
       <Col mb=24>
         <div
@@ -355,7 +355,7 @@ module RequestMsg = {
             ellipsis=true
             code=true
             block=true
-            size=Text.Lg
+            size=Text.Body1
           />
         }}
       </Col>
@@ -367,7 +367,7 @@ module RequestMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value={request.askCount->Belt.Int.toString} size=Text.Lg />
+        <Text value={request.askCount->Belt.Int.toString} size=Text.Body1 />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -377,7 +377,7 @@ module RequestMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value={request.minCount->Belt.Int.toString} size=Text.Lg />
+        <Text value={request.minCount->Belt.Int.toString} size=Text.Body1 />
       </Col>
     </Row>
   }
@@ -428,7 +428,7 @@ module RequestFailMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value={request.prepareGas->Belt.Int.toString} size=Text.Lg />
+        <Text value={request.prepareGas->Belt.Int.toString} size=Text.Body1 />
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
@@ -438,7 +438,7 @@ module RequestFailMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value={request.executeGas->Belt.Int.toString} size=Text.Lg />
+        <Text value={request.executeGas->Belt.Int.toString} size=Text.Body1 />
       </Col>
       <Col mb=24>
         <Heading
@@ -449,7 +449,7 @@ module RequestFailMsg = {
           color=theme.neutral_600
         />
         <div className={CssHelper.flexBox()}>
-          <Text value={request.calldata->JsBuffer.toHex} size=Text.Lg />
+          <Text value={request.calldata->JsBuffer.toHex} size=Text.Body1 />
           <HSpacing size=Spacing.sm />
           <CopyRender width=14 message={request.calldata->JsBuffer.toHex} />
         </div>
@@ -462,7 +462,7 @@ module RequestFailMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value={request.askCount->Belt.Int.toString} size=Text.Lg />
+        <Text value={request.askCount->Belt.Int.toString} size=Text.Body1 />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -472,7 +472,7 @@ module RequestFailMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <Text value={request.minCount->Belt.Int.toString} size=Text.Lg />
+        <Text value={request.minCount->Belt.Int.toString} size=Text.Body1 />
       </Col>
     </Row>
   }

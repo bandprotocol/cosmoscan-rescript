@@ -46,7 +46,7 @@ module Turnout = {
             weight=Heading.Thin
           />
           <Text
-            value={turnoutRate->Format.fPercent(~digits=2)} size=Text.Lg color={theme.neutral_900}
+            value={turnoutRate->Format.fPercent(~digits=2)} size=Text.Body1 color={theme.neutral_900}
           />
         </Col>
       | _ => React.null
@@ -166,7 +166,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
           {switch proposalSub {
           | Data({depositEndTime, votingEndTime, status}) =>
             <Timestamp
-              size=Text.Lg
+              size=Text.Body1
               time={switch status {
               | Deposit => depositEndTime
               | Voting

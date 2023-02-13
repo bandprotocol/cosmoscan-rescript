@@ -241,7 +241,7 @@ module RenderBody = {
             | Data({timestamp: timestampOpt}) =>
               switch timestampOpt {
               | Some(timestamp') =>
-                <Timestamp time=timestamp' size=Text.Md weight=Text.Regular textAlign=Text.Right />
+                <Timestamp time=timestamp' size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
               | None => <Text value="Genesis" />
               }
             | _ => <LoadingCensorBar width=80 height=15 />
@@ -415,7 +415,7 @@ let make = () => {
                       value="Oracle Script"
                       weight=Text.Semibold
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                     />
                   </Col>
                   <Col col=Col.Four>
@@ -424,7 +424,7 @@ let make = () => {
                       value="Description"
                       weight=Text.Semibold
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                     />
                   </Col>
                   <Col col=Col.Two>
@@ -433,7 +433,7 @@ let make = () => {
                       value="Request & Response time"
                       weight=Text.Semibold
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                     />
                   </Col>
                   <Col col=Col.Two>
@@ -442,7 +442,7 @@ let make = () => {
                       value="Timestamp"
                       weight=Text.Semibold
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                       align=Text.Right
                     />
                   </Col>
