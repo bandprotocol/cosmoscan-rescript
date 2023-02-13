@@ -71,8 +71,8 @@ module LoginMethod = {
   let make = (~name, ~active, ~onClick) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-    <div className={Styles.loginList(active)} onClick>
-      <div className={Styles.header(active, theme)}>
+    <div className={Styles.loginList(theme, active)} onClick>
+      <div className={Styles.header(theme, active)}>
         {switch name {
         | LedgerWithCosmos =>
           <div className={Styles.ledgerImageContainer(active)}>
@@ -109,7 +109,7 @@ let make = (~chainID) => {
                   value="https://www.cosmoscan.io"
                   size=Text.Lg
                   weight=Text.Medium
-                  color={theme.textPrimary}
+                  color={theme.neutral_900}
                 />
               </div>
             </>

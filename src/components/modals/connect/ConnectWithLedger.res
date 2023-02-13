@@ -37,7 +37,7 @@ module Styles = {
       alignSelf(#flexEnd),
     ])
 
-  let selectWrapper = (theme: Theme.t) =>
+  let selectWrapper = (theme: Theme.t, isDarkMode) =>
     style(. [
       display(#flex),
       padding2(~v=#px(3), ~h=#px(8)),
@@ -47,8 +47,8 @@ module Styles = {
       height(#px(37)),
       left(#zero),
       top(#px(32)),
-      background(theme.inputContrastColor),
-      border(#px(1), #solid, theme.tableRowBorderColor),
+      background(isDarkMode ? theme.neutral_300 : theme.neutral_000),
+      border(#px(1), #solid, isDarkMode ? theme.neutral_400 : theme.neutral_200),
       borderRadius(#px(6)),
     ])
 
@@ -56,7 +56,7 @@ module Styles = {
     style(. [
       backgroundColor(#transparent),
       borderColor(#transparent),
-      color(theme.textPrimary),
+      color(theme.neutral_900),
       width(#px(100)),
       lineHeight(#em(1.41)),
       outlineStyle(#none),
@@ -74,7 +74,7 @@ module InstructionCard = {
   let make = (~title, ~url) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div className=Styles.instructionCard>
-      <Text value=title color={theme.textPrimary} weight=Text.Semibold />
+      <Text value=title color={theme.neutral_900} weight=Text.Semibold />
       <img alt="Ledger Device" src=url className=Styles.ledgerGuide />
     </div>
   }
@@ -92,7 +92,7 @@ let make = (~chainID, ~ledgerApp) => {
   let (result, setResult) = React.useState(_ => Nothing)
   let (accountIndex, setAccountIndex) = React.useState(_ => 0)
 
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   let createLedger = async (accountIndex: int): unit => {
     dispatchModal(DisableExit)
@@ -113,15 +113,15 @@ let make = (~chainID, ~ledgerApp) => {
 
   <div className=Styles.container>
     <VSpacing size=Spacing.xl />
-    <Text value="1. Select HD Derivation Path" weight=Text.Semibold color={theme.textPrimary} />
+    <Text value="1. Select HD Derivation Path" weight=Text.Semibold color={theme.neutral_900} />
     <VSpacing size=Spacing.md />
-    <div className={Styles.selectWrapper(theme)}>
+    <div className={Styles.selectWrapper(theme, isDarkMode)}>
       <div
         className={CssHelper.selectWrapper(
           ~pRight=8,
           ~mW=100,
           ~size=10,
-          ~fontColor=theme.textPrimary,
+          ~fontColor=theme.neutral_900,
           (),
         )}>
         <select
@@ -144,7 +144,7 @@ let make = (~chainID, ~ledgerApp) => {
       </div>
     </div>
     <VSpacing size=Spacing.xl />
-    <Text value="2. On Your Ledger" weight=Text.Semibold color={theme.textPrimary} />
+    <Text value="2. On Your Ledger" weight=Text.Semibold color={theme.neutral_900} />
     <VSpacing size=Spacing.xl />
     <InstructionCard title="1. Enter Pin Code" url=Images.ledgerStep1 />
     <VSpacing size=Spacing.lg />
@@ -154,7 +154,7 @@ let make = (~chainID, ~ledgerApp) => {
     <div className=Styles.resultContainer>
       {switch result {
       | Loading => <Text value="Please accept with ledger" weight=Text.Medium />
-      | Error(err) => <Text value=err color=Theme.failColor weight=Text.Medium size=Text.Lg />
+      | Error(err) => <Text value=err color=theme.error_600 weight=Text.Medium size=Text.Lg />
       | Nothing => React.null
       }}
     </div>
