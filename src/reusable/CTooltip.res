@@ -219,7 +219,7 @@ let make = (
   ~align=#left,
   ~tooltipText="",
   ~tooltipPlacement=Bottom,
-  ~tooltipPlacementSm=tooltipPlacement,
+  ~tooltipPlacementSm=Bottom,
   ~mobile=true,
   ~styles="",
   ~children,

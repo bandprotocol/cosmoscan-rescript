@@ -81,7 +81,7 @@ module Styles = {
     style(. [marginBottom(#px(mb)), Media.mobile([marginBottom(#px(mbSm))])])
 }
 @react.component
-let make = (~col=Twelve, ~colSm=Twelve, ~offset=Twelve, ~mb=0, ~mbSm=mb, ~style="", ~children) =>
+let make = (~col=Twelve, ~colSm=Twelve, ~offset=Twelve, ~mb=0, ~mbSm=0, ~style="", ~children) =>
   <div
     className={CssJs.merge(. [
       Styles.colGridBase,

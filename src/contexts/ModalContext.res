@@ -23,37 +23,36 @@ let reducer = (state, x) =>
   | OpenModal(m) => Some({canExit: true, closing: false, modal: m})
   | CloseModal =>
     switch state {
-    | Some({modal}) => Some({canExit: true, closing: true, modal: modal})
+    | Some({modal}) => Some({canExit: true, closing: true, modal})
     | None => None
     }
   | KillModal => None
   | EnableExit =>
     switch state {
-    | Some({modal}) => Some({canExit: true, closing: false, modal: modal})
+    | Some({modal}) => Some({canExit: true, closing: false, modal})
     | None => None
     }
   | DisableExit =>
     switch state {
-    | Some({modal}) => Some({canExit: false, closing: false, modal: modal})
+    | Some({modal}) => Some({canExit: false, closing: false, modal})
     | None => None
     }
   }
 
-let context = React.createContext((ContextHelper.default: (option<t>, a => unit)))
+type props = {value: (option<t>, a => unit), children: React.element}
+let context = React.createContext((None, _ => ()))
 
-@react.component
-let make = (~children) => {
-  let (state, dispatch) = React.useReducer(reducer, None)
-  let isClosing = state->Belt.Option.mapWithDefault(false, ({closing}) => closing)
-  React.useEffect1(() => {
-    if isClosing {
-      Js.Global.setTimeout(() => dispatch(KillModal), Config.modalFadingDutation)->ignore
-    }
-    None
-  }, [isClosing])
-
-  React.createElement(
-    React.Context.provider(context),
-    {"value": (state, dispatch), "children": children},
-  )
+module Provider = {
+  @react.component
+  let make = (~children) => {
+    let (state, dispatch) = React.useReducer(reducer, None)
+    let isClosing = state->Belt.Option.mapWithDefault(false, ({closing}) => closing)
+    React.useEffect1(() => {
+      if isClosing {
+        Js.Global.setTimeout(() => dispatch(KillModal), Config.modalFadingDutation)->ignore
+      }
+      None
+    }, [isClosing])
+    React.createElement(React.Context.provider(context), {value: (state, dispatch), children})
+  }
 }

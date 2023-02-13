@@ -4,7 +4,6 @@ type t = {
 }
 
 let keyword = "theme"
-let context = React.createContext(ContextHelper.default)
 
 let getThemeMode = () => {
   LocalStorage.getItem(keyword)
@@ -20,27 +19,26 @@ let setThemeMode = x =>
   | Dark => LocalStorage.setItem(keyword, "dark")
   }
 
-@react.component
-let make = (~children) => {
-  let (mode, setMode) = React.useState(_ => getThemeMode())
+type props = {value: (t, unit => unit), children: React.element}
+let context = React.createContext(({isDarkMode: false, theme: Theme.get(Day)}, () => ()))
 
-  let toggle = () =>
-    setMode(prevMode =>
-      switch prevMode {
-      | Day =>
-        setThemeMode(Dark)
-        Dark
-      | Dark =>
-        setThemeMode(Day)
-        Day
-      }
-    )
-
-  let theme = React.useMemo1(() => Theme.get(mode), [mode])
-  let data = {isDarkMode: mode == Dark, theme}
-
-  React.createElement(
-    React.Context.provider(context),
-    {"value": (data, toggle), "children": children},
-  )
+module Provider = {
+  @react.component
+  let make = (~children) => {
+    let (mode, setMode) = React.useState(getThemeMode)
+    let theme = React.useMemo1(() => Theme.get(mode), [mode])
+    let toggle = () =>
+      setMode(prevMode =>
+        switch prevMode {
+        | Day =>
+          setThemeMode(Dark)
+          Dark
+        | Dark =>
+          setThemeMode(Day)
+          Day
+        }
+      )
+    let data = {isDarkMode: mode == Dark, theme}
+    React.createElement(React.Context.provider(context), {value: (data, toggle), children})
+  }
 }

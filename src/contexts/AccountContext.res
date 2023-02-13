@@ -86,14 +86,13 @@ let reducer = (state, action) =>
     }
   }
 
-let context = React.createContext(ContextHelper.default)
+type props = {value: (option<t>, a => unit), children: React.element}
+let context = React.createContext((None, _ => ()))
 
-@react.component
-let make = (~children) => {
-  let (state, dispatch) = React.useReducer(reducer, None)
-
-  React.createElement(
-    React.Context.provider(context),
-    {"value": (state, dispatch), "children": children},
-  )
+module Provider = {
+  @react.component
+  let make = (~children) => {
+    let (state, dispatch) = React.useReducer(reducer, None)
+    React.createElement(React.Context.provider(context), {value: (state, dispatch), children})
+  }
 }
