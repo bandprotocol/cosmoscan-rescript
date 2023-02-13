@@ -34,7 +34,7 @@ let flatMap = (result, f) =>
 
 let map = (result, f) =>
   switch result {
-  | Data(data) => Data(data |> f)
+  | Data(data) => Data(data->f)
   | Loading => Loading
   | Error(e) => Error(e)
   | NoData => NoData
