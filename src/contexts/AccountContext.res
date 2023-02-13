@@ -8,7 +8,7 @@ type t = {
 type send_request_t = {
   oracleScriptID: ID.OracleScript.t,
   calldata: JsBuffer.t,
-  callback: Promise.t<TxCreator.response_t> => unit,
+  callback: promise<TxCreator.response_t> => unit,
   askCount: string,
   minCount: string,
   clientID: string,

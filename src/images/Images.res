@@ -57,3 +57,9 @@
 // Validator
 @module("./inactive-validator-logo.svg") external inactiveValidatorLogo: string = "default"
 @module("./active-validator-logo.svg") external activeValidatorLogo: string = "default"
+
+// Ledger
+@module("./ledger-cosmos-light.svg") external ledgerCosmosLightIcon: string = "default"
+@module("./ledger-cosmos-dark.svg") external ledgerCosmosDarkIcon: string = "default"
+@module("./ledger-step1.svg") external ledgerStep1: string = "default"
+@module("./ledger-step2-cosmos.svg") external ledgerStep2Cosmos: string = "default"

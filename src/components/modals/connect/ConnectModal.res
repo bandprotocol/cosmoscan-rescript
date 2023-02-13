@@ -55,24 +55,96 @@ module Styles = {
   let ledgerImageContainer = active => style(. [opacity(active ? 1.0 : 0.5), marginRight(#px(15))])
 }
 
-//Re-consider to remove ledgerWithBandChain
 type login_method_t =
   | Mnemonic
   | LedgerWithCosmos
-  | LedgerWithBandChain
+
+let toLoginMethodString = method => {
+  switch method {
+  | Mnemonic => "Mnemonic Phrase"
+  | LedgerWithCosmos => "Ledger - Cosmos"
+  }
+}
+
+module LoginMethod = {
+  @react.component
+  let make = (~name, ~active, ~onClick) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    <div className={Styles.loginList(active)} onClick>
+      <div className={Styles.header(active, theme)}>
+        {switch name {
+        | LedgerWithCosmos =>
+          <div className={Styles.ledgerImageContainer(active)}>
+            <img
+              alt="Cosmos Ledger Icon"
+              src={isDarkMode ? Images.ledgerCosmosDarkIcon : Images.ledgerCosmosLightIcon}
+              className=Styles.ledgerIcon
+            />
+          </div>
+        | _ => <div />
+        }}
+        {name->toLoginMethodString->React.string}
+      </div>
+    </div>
+  }
+}
 
 @react.component
 let make = (~chainID) => {
-  Js.log(chainID)
-  let (loginMethod, _) = React.useState(_ => Mnemonic)
-  // let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let (loginMethod, setLoginMethod) = React.useState(_ => Mnemonic)
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  //TODO: will patch to modal component later
-  <div>
-    {switch loginMethod {
-    | Mnemonic => "Connect Mnemonic Modal"->React.string
-    | LedgerWithCosmos => "Connect LedgerWithCosmos"->React.string
-    | LedgerWithBandChain => "Connect LedgerWithBandChain"->React.string
-    }}
+  <div className=Styles.container>
+    <div className=Styles.innerContainer>
+      <div className={Styles.modalTitle(theme)}>
+        <Heading value="Connect with your wallet" size=Heading.H4 />
+        {chainID == "band-guanyu-mainnet"
+          ? <>
+              <VSpacing size=Spacing.md />
+              <div className={CssHelper.flexBox()}>
+                <Text value="Please check that you are visiting" size=Text.Lg />
+                <HSpacing size=Spacing.sm />
+                <Text
+                  value="https://www.cosmoscan.io"
+                  size=Text.Lg
+                  weight=Text.Medium
+                  color={theme.textPrimary}
+                />
+              </div>
+            </>
+          : <VSpacing size=Spacing.sm />}
+        <VSpacing size=Spacing.xl />
+      </div>
+      <div className=Styles.rowContainer>
+        <Row style=Styles.row>
+          <Col col=Col.Five style={Styles.loginSelectionBackground(theme)}>
+            <div className=Styles.loginSelectionContainer>
+              <VSpacing size=Spacing.xl />
+              <Heading size=Heading.H5 value="Select your connection method" />
+              <VSpacing size=Spacing.md />
+              {[Mnemonic, LedgerWithCosmos]
+              ->Belt.Array.map(method =>
+                <React.Fragment key={method |> toLoginMethodString}>
+                  <VSpacing size=Spacing.lg />
+                  <LoginMethod
+                    name=method
+                    active={loginMethod == method}
+                    onClick={_ => setLoginMethod(_ => method)}
+                  />
+                </React.Fragment>
+              )
+              ->React.array}
+            </div>
+          </Col>
+          <Col col=Col.Seven>
+            {switch loginMethod {
+            | Mnemonic => <ConnectWithMnemonic chainID />
+            | LedgerWithCosmos => <ConnectWithLedger chainID ledgerApp=Ledger.Cosmos />
+            }}
+          </Col>
+        </Row>
+      </div>
+    </div>
   </div>
 }

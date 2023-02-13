@@ -110,7 +110,7 @@ let make = () => {
         </div>
         {switch //TODO: Will patch the modal component later
         modal {
-        | Connect(_) => "Connect"->React.string
+        | Connect(chainID) => <ConnectModal chainID />
         | SubmitTx(_) => "SubmitTx"->React.string
         | QRCode(_) => "QRCode"->React.string
         | IBCPacketError(_) => "Connect"->React.string
