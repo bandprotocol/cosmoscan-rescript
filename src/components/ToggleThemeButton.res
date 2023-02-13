@@ -30,12 +30,8 @@ let make = () => {
   let ({ThemeContext.isDarkMode: isDarkMode, theme}, toggle) = React.useContext(
     ThemeContext.context,
   )
-  // Will migrate to this later
-  let (_, emotionToggle) = React.useContext(
-    EmotionThemeContext.context,
-  )
 
-  <button className={Styles.button(isDarkMode, theme)} onClick={_ => {toggle(); emotionToggle();}}>
+  <button className={Styles.button(isDarkMode, theme)} onClick={_ => toggle()}>
     {isDarkMode
       ? <img src=Images.sunIcon className=Styles.icon />
       : <Icon name="fal fa-moon" size=14 color=theme.white />}

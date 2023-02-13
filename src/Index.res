@@ -7,14 +7,12 @@ let make = () =>
       <ClientContext>
         <TimeContext>
           <ThemeContext>
-            <EmotionThemeContext>
               <ModalContext>
                 <AccountContext>
                   <App />
                   <Modal />
                 </AccountContext> 
               </ModalContext>
-            </EmotionThemeContext>
           </ThemeContext>
         </TimeContext>
       </ClientContext>
