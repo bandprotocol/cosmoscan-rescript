@@ -24,6 +24,18 @@ let default = (result, value) =>
 //   }
 // }
 
+let fromData = result => {
+  // switch result {
+  // | Data(data) => data
+  // | Loading => Loading
+  // | _ => raise(Invalid_argument("fromData"))
+  // }
+  switch result {
+  | Some(data) => Data(data)
+  | None => NoData
+  }
+}
+
 let flatMap = (result, f) =>
   switch result {
   | Data(data) => f(data)

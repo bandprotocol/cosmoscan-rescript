@@ -188,8 +188,8 @@ let toExternal = ({
 }
 
 module IncomingPacketsConfig = %graphql(`
-    query IncomingPackets($limit: Int!, $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $sequence: Int_comparison_exp, $chainID: String!) {
-    incoming_packets(limit: $limit, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType}, sequence: $sequence, dst_port: {_ilike: $port}, dst_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) {
+    query IncomingPackets($limit: Int!) {
+    incoming_packets(limit: $limit, order_by: [{block_height: desc}]) {
         packetType: type @ppxCustom(module: "Packet")
         srcPort: src_port
         srcChannel: src_channel
@@ -223,13 +223,13 @@ module OutgoingPacketsConfig = %graphql(`
             dataOpt: data
             acknowledgement
             transaction {
-            hash @ppxCustom(module: "GraphQLParserModule.Hash")
+              hash @ppxCustom(module: "GraphQLParserModule.Hash")
             }
             blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
             channel {
-            connection {
-                counterPartyChainID: counterparty_chain_id
-            }
+              connection {
+                  counterPartyChainID: counterparty_chain_id
+              }
             }
         }
     }
@@ -292,82 +292,53 @@ let getList = (
 
   let result = switch direction {
   | Incoming =>
-    let result = IncomingPacketsConfig.use({
+    let data = IncomingPacketsConfig.use({
       limit: pageSize,
-      packetType: {
-        switch packetTypeKeyword {
-        | Some("oracle_request") => "oracle_request"
-        | Some("oracle response") => "oracle response"
-        | Some("fungible_token") => "fungible_token"
-        | Some("interchain_account") => "interchain_account"
-        | _ => "%%"
-        }
-      },
-      packetTypeIsNull: {
-        switch packetTypeIsNull {
-        | Some(true) => true
-        | _ => false
-        }
-      },
-      port: {
-        port !== "" ? port : "%%"
-      },
-      channel: {
-        channel !== "" ? channel : "%%"
-      },
-      chainID: {
-        chainID !== "" ? chainID : "%%"
-      },
-      sequence: None,
-    })
-    // let (result, _) = ApolloHooks.useQuery(
-    //   IncomingPacketsConfig.definition,
-    //   ~variables=IncomingPacketsConfig.makeVariables(
-    //     ~limit=pageSize,
-    //     ~packetType={
-    //       switch packetTypeKeyword {
-    //       | Some("oracle_request") => "oracle_request"
-    //       | Some("oracle response") => "oracle response"
-    //       | Some("fungible_token") => "fungible_token"
-    //       | Some("interchain_account") => "interchain_account"
-    //       | _ => "%%"
-    //       }
-    //     },
-    //     ~packetTypeIsNull={
-    //       switch packetTypeIsNull {
-    //       | Some(true) => true
-    //       | _ => false
-    //       }
-    //     },
-    //     ~port={
-    //       port !== "" ? port : "%%"
-    //     },
-    //     ~channel={
-    //       channel !== "" ? channel : "%%"
-    //     },
-    //     ~chainID={
-    //       chainID !== "" ? chainID : "%%"
-    //     },
-    //     ~sequence={
-    //       sequenceFilter
-    //     },
-    //     (),
-    //   ),
-    //   ~pollInterval=?Some(5000),
-    // )
-    // result->Query.map(_, x => x.incoming_packets->Belt_Array.map(toExternal))
+      // packetType: {
+      //   switch packetTypeKeyword {
+      //   | Some("oracle_request") => "oracle_request"
+      //   | Some("oracle response") => "oracle response"
+      //   | Some("fungible_token") => "fungible_token"
+      //   | Some("interchain_account") => "interchain_account"
+      //   | _ => "%%"
+      //   }
+      // },
+      // packetTypeIsNull: {
+      //   switch packetTypeIsNull {
+      //   | Some(true) => true
+      //   | _ => false
+      //   }
+      // },
+      // port: {
+      //   port !== "" ? port : "%%"
+      // },
+      // channel: {
+      //   channel !== "" ? channel : "%%"
+      // },
+      // chainID: {
+      //   chainID !== "" ? chainID : "%%"
+      // },
+    })->Query.resolve
 
-    // result
-    // ->Query.map(x => {
-    //   switch x {
-    //   | Some(x') => x'.incoming_packets->Belt_Array.map(toExternal)
-    //   }
-    // })
-    // ->Query.resolve
-    []
+    // data->Query.fromData->Query.map(internal => internal.data_sources->Belt.Array.map(toExternal))
+    Js.log(data)
+
+    switch data {
+    | Data(x) =>
+      switch x {
+      | {data: Some({incoming_packets: _, _}), error: None, loading: true, _} => Query.NoData
+      | {loading: false, error: None, data: Some({incoming_packets})} =>
+        Query.Data(incoming_packets->Belt.Array.map(packet => toExternal))
+      | {error: Some(_error)} => Error(_error)
+      | _ => Query.NoData
+      }->Query.resolve
+    | Error(_error) => Error(_error)
+    | NoData => Query.NoData
+    | Loading => Query.Loading
+    }
 
   | Outgoing =>
-    let result = OutgoingPacketsConfig.use({
+    let data = OutgoingPacketsConfig.use({
       limit: pageSize,
       packetType: {
         switch packetTypeKeyword {
@@ -394,44 +365,20 @@ let getList = (
         chainID !== "" ? chainID : "%%"
       },
       sequence: None,
-    })
-    // let (result, _) = ApolloHooks.useQuery(
-    //   OutgoingPacketsConfig.definition,
-    //   ~variables=OutgoingPacketsConfig.makeVariables(
-    //     ~limit=pageSize,
-    //     ~packetType={
-    //       switch packetTypeKeyword {
-    //       | Some("oracle_request") => "oracle_request"
-    //       | Some("oracle response") => "oracle response"
-    //       | Some("fungible_token") => "fungible_token"
-    //       | Some("interchain_account") => "interchain_account"
-    //       | _ => "%%"
-    //       }
-    //     },
-    //     ~packetTypeIsNull={
-    //       switch packetTypeIsNull {
-    //       | Some(true) => true
-    //       | _ => false
-    //       }
-    //     },
-    //     ~port={
-    //       port !== "" ? port : "%%"
-    //     },
-    //     ~channel={
-    //       channel !== "" ? channel : "%%"
-    //     },
-    //     ~chainID={
-    //       chainID !== "" ? chainID : "%%"
-    //     },
-    //     ~sequence={
-    //       sequenceFilter
-    //     },
-    //     (),
-    //   ),
-    //   ~pollInterval=?Some(5000),
-    // )
-    // result->Query.map(_, x => x.outgoing_packets->Belt_Array.map(toExternal))
-    []
+    })->Query.resolve
+
+    switch data {
+    | Data(x) =>
+      switch x {
+      | {data: Some({outgoing_packets: _, _}), error: None, loading: true, _} => Query.NoData
+      | {loading: false, error: None, data: Some({outgoing_packets})} =>
+        Query.Data(outgoing_packets->Belt.Array.map(packet => toExternal))->Query.resolve
+      | {error: Some(_error)} => Error(_error)
+      | _ => Query.NoData
+      }
+    | Error(_error) => Error(_error)
+    | NoData => Query.NoData
+    | Loading => Query.Loading
+    }
   }
-  result
 }

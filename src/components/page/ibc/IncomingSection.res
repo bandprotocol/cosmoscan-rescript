@@ -21,6 +21,18 @@ let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let isMobile = Media.isMobile()
 
+  let packetsQuery = IBCQuery.getList(
+    ~pageSize=100,
+    ~direction=Incoming,
+    ~packetType="Oracle Request",
+    ~port="",
+    ~channel="",
+    ~sequence=None,
+    ~chainID="",
+    (),
+  )
+  Js.log(packetsQuery)
+
   <div>
     <Row>
       <Col col=Col.Twelve>
