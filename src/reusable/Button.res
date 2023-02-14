@@ -79,7 +79,7 @@ let make = (
   ~fsize=12,
   ~pySm=py,
   ~pxSm=px,
-  ~onClick,
+  ~onClick=_=>(),
   ~style="",
   ~disabled=false,
 ) => {
