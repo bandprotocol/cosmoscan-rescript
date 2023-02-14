@@ -71,19 +71,19 @@ type acknowledgement_t = {
   status: packet_status_t,
 }
 
-module Packet = {
+module PacketType = {
   type t = packet_type_t
-  let parse = packetTypeOpt => {
-    switch packetTypeOpt {
-    | "oracle_request" => OracleRequest
-    | "oracle response" => OracleResponse
-    | "fungible_token" => FungibleToken
-    | "interchain_account" => InterchainAccount
+  let parse = packetT => {
+    switch packetT {
+    | Some("oracle_request") => OracleRequest
+    | Some("oracle_response") => OracleResponse
+    | Some("fungible_token") => FungibleToken
+    | Some("interchain_account") => InterchainAccount
     | _ => Unknown
     }
   }
-  //   let serialize = _ => "type")
-  let serialize = _ => "packetType"
+  // TODO: Impelement serialize
+  let serialize = packetType => packetType->Js.Json.serializeExn
 }
 
 let getPacketTypeText = packetTypeText => {
@@ -110,12 +110,14 @@ type tx_t = {hash: Hash.t}
 type connection_t = {counterPartyChainID: string}
 type channel_t = {connection: connection_t}
 
+type sequence_t = {_eq: int}
+
 type t = {
   srcChannel: string,
   srcPort: string,
-  sequence: int,
   dstChannel: string,
   dstPort: string,
+  sequence: int,
   packetType: packet_type_t,
   acknowledgement: option<acknowledgement_t>,
   blockHeight: ID.Block.t,
@@ -128,9 +130,9 @@ type internal_t = {
   srcChannel: string,
   srcPort: string,
   dstChannel: string,
-  sequence: int,
   dstPort: string,
-  packetType: packet_type_t,
+  sequence: int,
+  packetType: option<string>,
   acknowledgement: option<Js.Json.t>,
   dataOpt: option<Js.Json.t>,
   transaction: option<tx_t>,
@@ -139,24 +141,26 @@ type internal_t = {
 }
 
 let toExternal = ({
+  packetType,
   srcChannel,
   srcPort,
   dstChannel,
   sequence,
   dstPort,
-  packetType,
   acknowledgement,
   dataOpt,
   transaction,
   blockHeight,
   channel,
 }) => {
+  dstPort,
+  packetType: {
+    packetType->PacketType.parse
+  },
   srcChannel,
   srcPort,
   sequence,
   dstChannel,
-  dstPort,
-  packetType,
   blockHeight,
   counterPartyChainID: {
     (channel->Belt.Option.getExn).connection.counterPartyChainID
@@ -164,23 +168,31 @@ let toExternal = ({
   acknowledgement: {
     let ackOpt = acknowledgement->Belt.Option.getExn
     open JsonUtils.Decode
-    Some({
-      data: switch packetType {
-      | InterchainAccount
-      | OracleRequest =>
-        Request(ackOpt->OracleRequestAcknowledge.decode)
-      | _ => Empty
-      },
-      reason: ackOpt->mustDecode(at(list{"reason"}, option(string))),
-      status: ackOpt->mustDecode(at(list{"status"}, string))->getPacketStatus,
-    })
+    Some(
+      ackOpt->mustDecode({
+        object(json => {
+          data: switch packetType->PacketType.parse {
+          | InterchainAccount
+          | OracleRequest =>
+            Request(ackOpt->OracleRequestAcknowledge.decode)
+          | OracleResponse
+          | FungibleToken
+          | _ =>
+            Empty
+          },
+          reason: json.optional(. "reason", string),
+          status: json.required(. "status", string)->getPacketStatus,
+        })
+      }),
+    )
   },
   txHash: {
     let txOpt = transaction->Belt.Option.getExn
     Some(txOpt.hash)
   },
   data: {
-    switch (packetType, dataOpt) {
+    let packetParse = packetType->PacketType.parse
+    switch (packetParse, dataOpt) {
     | (OracleResponse, Some(data)) => Response(OracleResponseData.decode(data))
     | _ => Empty
     }
@@ -188,9 +200,9 @@ let toExternal = ({
 }
 
 module IncomingPacketsConfig = %graphql(`
-    query IncomingPackets($limit: Int!) {
-    incoming_packets(limit: $limit, order_by: [{block_height: desc}]) {
-        packetType: type @ppxCustom(module: "Packet")
+    subscription IncomingPackets($limit: Int!, $offset: Int! $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $chainID: String!, $sequence: Int_comparison_exp)  {
+    incoming_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType}, sequence: $sequence, dst_port: {_ilike: $port}, dst_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) @ppxAs(type: "internal_t"){
+        packetType: type
         srcPort: src_port
         srcChannel: src_channel
         sequence
@@ -198,12 +210,12 @@ module IncomingPacketsConfig = %graphql(`
         dstChannel: dst_channel
         dataOpt: data
         acknowledgement
-        transaction {
+        transaction @ppxAs(type: "tx_t") {
           hash @ppxCustom(module: "GraphQLParserModule.Hash")
         }
         blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
-        channel {
-          connection {
+        channel @ppxAs(type: "channel_t")  {
+          connection @ppxAs(type: "connection_t") {
             counterPartyChainID: counterparty_chain_id
           }
         }
@@ -212,9 +224,9 @@ module IncomingPacketsConfig = %graphql(`
 `)
 
 module OutgoingPacketsConfig = %graphql(`
-    query OutgoingPackets($limit: Int!, $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $sequence: Int_comparison_exp, $chainID: String!) {
-        outgoing_packets(limit: $limit, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType}, sequence: $sequence ,src_port: {_ilike: $port}, src_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) {
-            packetType: type @ppxCustom(module: "Packet")
+    subscription OutgoingPackets($limit: Int!, $offset: Int!, $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $chainID: String!, $sequence: Int_comparison_exp)  {
+        outgoing_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType},sequence: $sequence,  dst_port: {_ilike: $port}, dst_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) @ppxAs(type: "internal_t"){
+            packetType: type
             srcPort: src_port
             srcChannel: src_channel
             sequence
@@ -222,19 +234,21 @@ module OutgoingPacketsConfig = %graphql(`
             dstChannel: dst_channel
             dataOpt: data
             acknowledgement
-            transaction {
+            transaction @ppxAs(type: "tx_t") {
               hash @ppxCustom(module: "GraphQLParserModule.Hash")
             }
             blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
-            channel {
-              connection {
-                  counterPartyChainID: counterparty_chain_id
+            channel @ppxAs(type: "channel_t")  {
+              connection @ppxAs(type: "connection_t") {
+                counterPartyChainID: counterparty_chain_id
               }
             }
         }
     }
 `)
+
 let getList = (
+  ~page,
   ~pageSize,
   ~direction,
   ~packetType,
@@ -244,16 +258,16 @@ let getList = (
   ~chainID,
   (),
 ) => {
+  let offset = (page - 1) * pageSize
+
   let packetTypeKeyword = {
     switch packetType {
     | "Oracle Request" => Some("oracle_request")
     | "Oracle Response" => Some("oracle response")
     | "Fungible Token" => Some("fungible_token")
     | "Interchain Account" => Some("interchain_account")
-    | "Unknown"
-    | "" =>
-      None
-    | _ => raise(Not_found)
+    | _ => None
+    // | _ => raise(Not_found)
     }
   }
   let packetTypeIsNull = {
@@ -263,83 +277,11 @@ let getList = (
     }
   }
 
-  let sequenceFilter = {
-    switch sequence {
-    | Some(_) => {
-        "_eq": sequence,
-        "_gt": None,
-        "_gte": None,
-        "_in": None,
-        "_is_null": None,
-        "_lt": None,
-        "_lte": None,
-        "_neq": None,
-        "_nin": None,
-      }
-    | _ => {
-        "_eq": None,
-        "_gt": None,
-        "_gte": None,
-        "_in": None,
-        "_is_null": None,
-        "_lt": None,
-        "_lte": None,
-        "_neq": None,
-        "_nin": None,
-      }
-    }
-  }
-
   let result = switch direction {
   | Incoming =>
     let data = IncomingPacketsConfig.use({
       limit: pageSize,
-      // packetType: {
-      //   switch packetTypeKeyword {
-      //   | Some("oracle_request") => "oracle_request"
-      //   | Some("oracle response") => "oracle response"
-      //   | Some("fungible_token") => "fungible_token"
-      //   | Some("interchain_account") => "interchain_account"
-      //   | _ => "%%"
-      //   }
-      // },
-      // packetTypeIsNull: {
-      //   switch packetTypeIsNull {
-      //   | Some(true) => true
-      //   | _ => false
-      //   }
-      // },
-      // port: {
-      //   port !== "" ? port : "%%"
-      // },
-      // channel: {
-      //   channel !== "" ? channel : "%%"
-      // },
-      // chainID: {
-      //   chainID !== "" ? chainID : "%%"
-      // },
-    })->Query.resolve
-
-    // data->Query.fromData->Query.map(internal => internal.data_sources->Belt.Array.map(toExternal))
-    Js.log(data)
-
-    switch data {
-    | Data(x) =>
-      switch x {
-      | {data: Some({incoming_packets: _, _}), error: None, loading: true, _} => Query.NoData
-      | {loading: false, error: None, data: Some({incoming_packets})} =>
-        Query.Data(incoming_packets->Belt.Array.map(packet => toExternal))
-      | {error: Some(_error)} => Error(_error)
-      | _ => Query.NoData
-      }->Query.resolve
-    | Error(_error) => Error(_error)
-    | NoData => Query.NoData
-    | Loading => Query.Loading
-    }
-
-  | Outgoing =>
-    let data = OutgoingPacketsConfig.use({
-      limit: pageSize,
+      offset,
       packetType: {
         switch packetTypeKeyword {
         | Some("oracle_request") => "oracle_request"
@@ -364,21 +306,84 @@ let getList = (
       chainID: {
         chainID !== "" ? chainID : "%%"
       },
-      sequence: None,
-    })->Query.resolve
+      sequence: Some({
+        _eq: sequence,
+        _gt: None,
+        _gte: None,
+        _in: None,
+        _is_null: None,
+        _lt: None,
+        _lte: None,
+        _neq: None,
+        _nin: None,
+      }),
+    })
 
-    switch data {
-    | Data(x) =>
-      switch x {
-      | {data: Some({outgoing_packets: _, _}), error: None, loading: true, _} => Query.NoData
-      | {loading: false, error: None, data: Some({outgoing_packets})} =>
-        Query.Data(outgoing_packets->Belt.Array.map(packet => toExternal))->Query.resolve
-      | {error: Some(_error)} => Error(_error)
-      | _ => Query.NoData
-      }
-    | Error(_error) => Error(_error)
-    | NoData => Query.NoData
-    | Loading => Query.Loading
-    }
+    data
+    ->Sub.fromData
+    ->Sub.map(({incoming_packets}) => incoming_packets->Belt.Array.map(toExternal))
+
+  | Outgoing =>
+    let data = OutgoingPacketsConfig.use({
+      limit: pageSize,
+      offset,
+      packetType: {
+        switch packetTypeKeyword {
+        | Some("oracle_request") => "oracle_request"
+        | Some("oracle response") => "oracle response"
+        | Some("fungible_token") => "fungible_token"
+        | Some("interchain_account") => "interchain_account"
+        | _ => "%%"
+        }
+      },
+      packetTypeIsNull: {
+        switch packetTypeIsNull {
+        | Some(true) => true
+        | _ => false
+        }
+      },
+      port: {
+        port !== "" ? port : "%%"
+      },
+      channel: {
+        channel !== "" ? channel : "%%"
+      },
+      chainID: {
+        chainID !== "" ? chainID : "%%"
+      },
+      sequence: Some({
+        _eq: sequence,
+        _gt: None,
+        _gte: None,
+        _in: None,
+        _is_null: None,
+        _lt: None,
+        _lte: None,
+        _neq: None,
+        _nin: None,
+      }),
+    })
+
+    data
+    ->Sub.fromData
+    ->Sub.flatMap(({outgoing_packets}) => {
+      outgoing_packets->Belt.Array.map(toExternal)->Sub.resolve
+    })
+
+  // switch data {
+  // | Data(x) =>
+  //   switch x {
+  //   | {data: Some({outgoing_packets: _, _}), error: None, loading: true, _} => Query.NoData
+  //   | {loading: false, error: None, data: Some({outgoing_packets})} =>
+  //     outgoing_packets->Belt.Array.map(toExternal)->Query.resolve
+  //   | {error: Some(_error)} => Error(_error)
+  //   | _ => Query.NoData
+  //   }
+  // | Error(_error) => Error(_error)
+  // | NoData => Query.NoData
+  // | Loading => Query.Loading
+  // }
   }
+
+  result
 }

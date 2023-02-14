@@ -1,8 +1,8 @@
 module Styles = {
   open CssJs
-  let withWidth = (w, theme: Theme.t) =>
+  let withWidth = (w, theme: Theme.t, fullHash) =>
     style(. [
-      display(#flex),
+      display(fullHash ? #flex : #inlineBlock),
       maxWidth(px(w)),
       cursor(pointer),
       selector("> span:hover", [color(theme.primary_600)]),

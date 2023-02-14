@@ -46,7 +46,7 @@ module Styles = {
 
 module ComponentCreator = (RawID: ID.IDSig) => {
   @react.component
-  let make = (~id, ~position=Text) => {
+  let make = (~id, ~position=Text, ~block=false) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <Link
