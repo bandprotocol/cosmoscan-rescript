@@ -23,7 +23,7 @@ module Styles = {
       background(theme.neutral_000),
       border(#px(1), #solid, isDarkMode ? theme.neutral_400 : theme.neutral_300),
       borderRadius(#px(8)),
-      padding4(~left=#px(15), ~right=Spacing.md, ~top=#px(10), ~bottom=#px(10)),
+      padding4(~left=#px(16), ~right=#px(16), ~top=#px(10), ~bottom=#px(10)),
       boxShadows([
         Shadow.box(~x=#zero, ~y=#px(1), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.07))),
         Shadow.box(~x=#zero, ~y=#px(4), ~blur=#px(12), Css.rgba(0, 0, 0, #num(0.02))),

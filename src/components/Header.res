@@ -7,7 +7,7 @@ module Styles = {
       backgroundColor(theme.neutral_000),
       zIndex(3),
       Media.mobile([
-        padding(Spacing.md),
+        padding(#px(16)),
         marginBottom(#zero),
         position(#sticky),
         top(#zero),
@@ -147,6 +147,11 @@ module MobileRender = {
         </Col>
         <Col colSm=Col.Six>
           <UserAccount />
+        </Col>
+      </Row>
+      <Row marginTop=24>
+        <Col colSm=Col.Twelve>
+          <SearchBar />
         </Col>
       </Row>
     </header>

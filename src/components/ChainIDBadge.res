@@ -11,7 +11,7 @@ module Styles = {
       alignItems(#center),
       position(#relative),
       cursor(#pointer),
-      zIndex(5),
+      // zIndex(5),
       Media.mobile([padding2(~v=#px(5), ~h=#px(10))]),
       Media.smallMobile([minWidth(#px(90))]),
     ]);
@@ -143,15 +143,16 @@ let getName = x =>
 
 @react.component
 let make = (~dropdown=false) => {
-    let (show, setShow) = React.useState(_ => false);
-    let trackingSub = TrackingSub.use();
-    let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+    let isMobile = Media.isMobile()
+    let (show, setShow) = React.useState(_ => false)
+    let trackingSub = TrackingSub.use()
+    let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     
     
     switch trackingSub {
       | Data(tracking) =>  {
         let currentChainID = tracking.chainID->parseChainID;
-        let networkNames = [LaoziMainnet, LaoziTestnet] -> Belt.Array.map(chainID => chainID->getName);
+        let networkNames = [LaoziMainnet, LaoziTestnet] -> Belt.Array.map(chainID => chainID->getName)
         let isMainnet = (currentChainID->getName) == "laozi-mainnet"
 
         {dropdown ? <div
@@ -203,6 +204,6 @@ let make = (~dropdown=false) => {
           </AbsoluteLink>
         </div> }
       }
-      | _ =>  <LoadingCensorBar width=310 height=30 />;
+      | _ =>  <LoadingCensorBar width={isMobile ? 150 : 310} height=30 />;
     }
   }
