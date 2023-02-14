@@ -28,6 +28,7 @@ module Styles = {
 
   let link = (theme: Theme.t) =>
     style(. [
+      width(#percent(100.)),
       cursor(pointer),
       selector("&:hover > span", [color(theme.primary_600)]),
       selector("> span", [transition(~duration=200, "all")]),

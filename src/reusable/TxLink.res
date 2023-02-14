@@ -22,7 +22,7 @@ let make = (~txHash: Hash.t, ~width: int, ~size=Text.Body2, ~weight=Text.Medium)
       weight
       ellipsis=true
       size
-      color={theme.neutral_900}
+      color={theme.primary_600}
     />
   </Link>
 }
