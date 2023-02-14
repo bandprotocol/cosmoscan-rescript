@@ -1,54 +1,45 @@
+module Styles = {
+  open CssJs
+
+  let root = style(. [ position(#relative)]);
+  let content = style(. [ position(#relative), zIndex(1)]);
+  let baseBg = style(. [ position(#absolute), top(#px(40))]);
+  let left = style(. [ left(#zero)]);
+  let right = style(. [ right(#zero), transform(rotateZ(#deg(180.)))]);
+};
+
 @react.component
 let make = () => {
-  // this is used for debug graphql
-  // will remove later
-  // let requestsByTxHash = RequestSub.Mini.getListByTxHash("45b9e63e8c5fab1085d1361a6f723c04ba40f2be770968012685f35d8292a49b" -> Hash.fromHex);
-  // let requestsByDs = RequestSub.Mini.getListByDataSource(1 -> ID.DataSource.fromInt, ~page=1, ~pageSize=5);
+  // Subscribe for latest 5 blocks here so both "LatestBlocks" and "ChainInfoHighLights"
+  // share the same infomation.
+  let pageSize = 10;
+  let latest5BlocksSub = BlockSub.getList(~pageSize, ~page=1);
+  let latestBlockSub = latest5BlocksSub->Sub.map(blocks => blocks->Belt_Array.getExn(0));
+  let latest5RequestSub = RequestSub.getList(~pageSize, ~page=1);
+  let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+  let isMobile = Media.isMobile();
 
-  <Section>
-    <div className=CssHelper.container id="proposalsSection">
-      <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
-        // <Col col=Col.Twelve>
-        //   {
-        //     switch requestsByDs {
-        //       | Data(data) => <Text value={data[0].txHash -> Belt.Option.getExn -> Hash.toHex} size=Text.Body1 />
-        //       | Loading => <Text value="Loading" size=Text.Body1 />
-        //       | NoData => <Text value="NoData" size=Text.Body1 />
-        //       | Error(err) => <Text value=err.message size=Text.Body1 />
-        //     }
-        //   }
-        // </Col>
-        // <Col col=Col.Twelve>
-        //   {
-        //     switch requestsByTxHash {
-        //       | Data(data) => <Text value={data[0].txHash -> Belt.Option.getExn -> Hash.toHex} size=Text.Body1 />
-        //       | Loading => <Text value="Loading" size=Text.Body1 />
-        //       | NoData => <Text value="NoData" size=Text.Body1 />
-        //       | Error(err) => <Text value=err.message size=Text.Body1 />
-        //     }
-        //   }
-        // </Col>
-        <SeperatedLine />
-        // {
-        //   switch requestsByTxHashSub {
-        //     | Data(res) => res -> Belt.Array.map(
-        //       ({id,responseTime}) =>
-        //       <>
-        //         <Col col=Col.Twelve>
-        //           <Text value={id ->ID.OracleScript.toString} size=Text.Body1 />
-        //         </Col>
-        //         <Col col=Col.Twelve>
-        //           <Text value={responseTime -> Belt.Float.toString} size=Text.Body1 />
-        //         </Col>
-        //         <SeperatedLine/>
-        //       </>
-        //     ) -> React.array
-        //     | Loading => <Text value="Loading" size=Text.Body1 />
-        //     | NoData => <Text value="NoData" size=Text.Body1 />
-        //     | Error(err) => <Text value=err.message size=Text.Body1 />
-        //   }
-        // }
-      </Row>
+  <Section pt=80 pb=80 ptSm=0 pbSm=24 bg={theme.neutral_000} style=Styles.root>
+    {!isMobile
+       ? <>
+           <img
+             alt="Homepage Background"
+             src={isDarkMode ? Images.bgLeftDark : Images.bgLeftLight}
+             className={Css.merge(list{Styles.baseBg, Styles.left})}
+           />
+           <img
+             alt="Homepage Background"
+             src={isDarkMode ? Images.bgLeftDark : Images.bgLeftLight}
+             className={Css.merge(list{Styles.baseBg, Styles.right})}
+           />
+         </>
+       : React.null}
+    <div className={Css.merge(list{CssHelper.container, Styles.content})} id="homePageContainer">
+      <ChainInfoHighlights latestBlockSub />
+      // <Row marginTop=24>
+      //   <Col col=Col.Six> <LatestTxTable /> </Col>
+      //   <Col col=Col.Six> <LatestRequests latest5RequestSub /> </Col>
+      // </Row>
     </div>
-  </Section>
-}
+  </Section>;
+};

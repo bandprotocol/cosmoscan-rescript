@@ -255,6 +255,22 @@ let getList = (~isActive, ()) => {
   )
 }
 
+let avgCommission = (~isActive, ()) => {
+  let result = MultiConfig.use({jailed: !isActive})
+
+  result
+  ->Sub.fromData
+  ->Sub.map(x => {
+    let exclude100percent = x.validators ->Belt_Array.keep(({commissionRate} )=> commissionRate != 1.)
+    let length = Belt_Array.length(exclude100percent) |> float_of_int
+
+    exclude100percent
+    ->Belt_Array.reduce(0., (acc, {commissionRate}) => acc +. commissionRate)
+    ->(sum => sum /. length *. 100. )
+    }
+  );
+};
+
 let count = () => {
   let result = ValidatorCountConfig.use()
 
