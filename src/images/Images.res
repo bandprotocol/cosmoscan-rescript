@@ -41,6 +41,12 @@
 @module("./no-oracle-light.png") external noOracleLight: string = "default"
 @module("./no-data-light.png") external noDataLight: string = "default"
 
+// Homepage
+@module("./band-token.svg") external bandToken: string = "default"
+@module("./bgleft-dark.png") external bgLeftDark: string = "default"
+@module("./bgleft-light.png") external bgLeftLight: string = "default"
+
+
 // IBC
 @module("./tx-ibc-icon.svg") external ibcIcon: string = "default"
 

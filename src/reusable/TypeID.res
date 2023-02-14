@@ -28,6 +28,7 @@ module Styles = {
 
   let link = (theme: Theme.t) =>
     style(. [
+      width(#percent(100.)),
       cursor(pointer),
       selector("&:hover > span", [color(theme.primary_600)]),
       selector("> span", [transition(~duration=200, "all")]),
@@ -46,25 +47,33 @@ module Styles = {
 
 module ComponentCreator = (RawID: ID.IDSig) => {
   @react.component
-  let make = (~id, ~position=Text) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let make = (~id, ~position=Text, ~primary=false, ~weight=Text.Regular, ~details="") => {
+    let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
 
     <Link
-      className={CssJs.merge(. [Styles.link(theme), Styles.pointerEvents(position)])}
-      route={id->RawID.getRoute}>
-      <Text
-        value={id->RawID.toString}
-        size={position->fontSize}
-        weight=Text.Semibold
-        height={position->lineHeight}
-        nowrap=true
-        code=true
-        block=true
-        color={theme.neutral_900}
-      />
-    </Link>
-  }
-}
+      className={Css.merge(list{Styles.link(theme), Styles.pointerEvents(position)})}
+      route={id |> RawID.getRoute}>
+      <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
+        <Text
+          value={id |> RawID.toString}
+          size={position |> fontSize}
+          weight
+          height={position |> lineHeight}
+          nowrap=true
+          code=true
+          block=true
+          color=theme.primary_600
+        />
+        {
+          details != "" ? <>
+            <HSpacing size=Spacing.sm />
+            <Text value=details ellipsis=true />
+          </> : React.null
+        }
+      </div>
+    </Link>;
+  };
+};
 
 module PlainLinkCreator = (RawID: ID.IDSig) => {
   @react.component
