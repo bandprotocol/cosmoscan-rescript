@@ -34,7 +34,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
   let isTablet = Media.isTablet()
 
   let (page, setPage) = React.useState(_ => 1)
-  let (packetType, setPacketType) = React.useState(_ => "")
+  let (packetType, setPacketType) = React.useState(_ => "All")
 
   let packetCountSub = IBCSub.outgoingCount()
   let pageSize = 5
@@ -43,7 +43,12 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
     ~page,
     ~pageSize,
     ~direction=Outgoing,
-    ~packetType,
+    ~packetType={
+      switch packetType {
+      | "All" => ""
+      | _ => packetType
+      }
+    },
     ~port,
     ~channel,
     ~sequence,
@@ -66,33 +71,17 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
     <Row>
       <Col col=Col.Twelve>
         <div className={Styles.filterButtonsContainer}>
-          <ChipButton
-            variant={ChipButton.Outline}
-            onClick={_ => setPacketType(_ => "")}
-            isActive={switch packetType {
-            | "" => true
-            | _ => false
-            }}>
-            {"All"->React.string}
-          </ChipButton>
-          <ChipButton
-            variant={ChipButton.Outline}
-            onClick={_ => setPacketType(_ => "Oracle Response")}
-            isActive={switch packetType {
-            | "Oracle Response" => true
-            | _ => false
-            }}>
-            {"Oracle Response"->React.string}
-          </ChipButton>
-          <ChipButton
-            variant={ChipButton.Outline}
-            onClick={_ => setPacketType(_ => "Fungible Token")}
-            isActive={switch packetType {
-            | "Fungible Token" => true
-            | _ => false
-            }}>
-            {"Fungible Token"->React.string}
-          </ChipButton>
+          {["All", "Oracle Response", "Fungible Token"]
+          ->Belt.Array.mapWithIndex((i, pt) =>
+            <ChipButton
+              key={i->Belt.Int.toString}
+              variant={ChipButton.Outline}
+              onClick={_ => setPacketType(_ => pt)}
+              isActive={pt === packetType}>
+              {pt->React.string}
+            </ChipButton>
+          )
+          ->React.array}
         </div>
       </Col>
     </Row>
