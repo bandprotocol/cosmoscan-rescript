@@ -1,6 +1,7 @@
 type pos_t =
   | Landing
   | Title
+  | MobileCard
   | Subtitle
   | Text
   | Mini
@@ -9,6 +10,7 @@ let fontSize = pos =>
   switch pos {
   | Landing => Text.Xxxxl
   | Title => Text.Xxl
+  | MobileCard => Text.Body1
   | Subtitle => Text.Body1
   | Text => Text.Body2
   | Mini => Text.Caption
@@ -18,6 +20,7 @@ let lineHeight = pos =>
   switch pos {
   | Landing => Text.Px(31)
   | Title => Text.Px(23)
+  | MobileCard => Text.Px(20)
   | Subtitle => Text.Px(18)
   | Text => Text.Px(16)
   | Mini => Text.Px(16)
@@ -26,11 +29,11 @@ let lineHeight = pos =>
 module Styles = {
   open CssJs
 
-  let link = (theme: Theme.t) =>
+  let link = (theme: Theme.t, hasDetails) =>
     style(. [
-      width(#percent(100.)),
+      hasDetails ? width(#percent(100.)) : width(#auto),
       cursor(pointer),
-      selector("&:hover > span", [color(theme.primary_600)]),
+      selector("&:hover span", [color(theme.primary_800)]),
       selector("> span", [transition(~duration=200, "all")]),
     ])
 
@@ -38,6 +41,7 @@ module Styles = {
     switch pos {
     | Title => style(. [pointerEvents(#none)])
     | Landing
+    | MobileCard
     | Subtitle
     | Text
     | Mini =>
@@ -51,7 +55,7 @@ module ComponentCreator = (RawID: ID.IDSig) => {
     let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
 
     <Link
-      className={Css.merge(list{Styles.link(theme), Styles.pointerEvents(position)})}
+      className={Css.merge(list{Styles.link(theme, details != ""), Styles.pointerEvents(position)})}
       route={id |> RawID.getRoute}>
       <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
         <Text
@@ -79,7 +83,7 @@ module PlainLinkCreator = (RawID: ID.IDSig) => {
   @react.component
   let make = (~id, ~children, ~style="") => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    <Link className={CssJs.merge(. [Styles.link(theme), style])} route={id->RawID.getRoute}>
+    <Link className={CssJs.merge(. [Styles.link(theme, false), style])} route={id->RawID.getRoute}>
       children
     </Link>
   }

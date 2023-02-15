@@ -145,9 +145,6 @@ module MobileRender = {
         <Col colSm=Col.Six>
           <ChainIDBadge dropdown=true />
         </Col>
-        <Col colSm=Col.Six>
-          <UserAccount />
-        </Col>
       </Row>
       <Row marginTop=24>
         <Col colSm=Col.Twelve>

@@ -15,7 +15,7 @@ let countOffset = (~timestamp) => {
   let result = 
     TxCountWithOffsetConfig.use({
      greater: Some(timestamp -> Js.Json.string)
-    })
+    }, ~pollInterval=500)
 
   result
   -> Query.fromData

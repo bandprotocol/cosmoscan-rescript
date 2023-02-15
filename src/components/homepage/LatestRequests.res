@@ -105,7 +105,7 @@ let make = (~latestRequestsSub: Sub.variant<array<RequestSub.t>>) => {
 
   <>
     {isMobile ? <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ()), Styles.headingContainer})}>
-      <Heading value="Latest Request" size=Heading.H4 />
+      <Text value="Latest Request" size=Text.Xl weight=Text.Semibold color=theme.neutral_900  />
       <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
         <Link className={CssHelper.flexBox(~align=#center, ())} route=Route.RequestHomePage>
           <div className=Styles.textMRight>
@@ -126,7 +126,7 @@ let make = (~latestRequestsSub: Sub.variant<array<RequestSub.t>>) => {
         ? React.null
         : <Row marginTop=30 marginBottom=25 marginTopSm=24 marginBottomSm=0>
           <Col col=Col.Six colSm=Col.Six>
-            <Heading value="Latest Requests" size=Heading.H4 />
+            <Text value="Latest Request" size=Text.Xl weight=Text.Semibold color=theme.neutral_900  />
           </Col>
           <Col col=Col.Six colSm=Col.Six>
             <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
@@ -199,7 +199,7 @@ let make = (~latestRequestsSub: Sub.variant<array<RequestSub.t>>) => {
           )
         ->React.array
       | _ =>
-        Belt_Array.make(5, Sub.NoData)
+        Belt_Array.make(10, Sub.NoData)
         ->Belt_Array.mapWithIndex((i, noData) =>
             isMobile
               ? <RenderBodyMobile key={i -> Belt.Int.toString} reserveIndex=i requestSub=noData />

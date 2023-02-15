@@ -27,7 +27,7 @@ module RenderBody = {
           {switch (txSub) {
            | Data({messages, txHash, success, errMsg}) =>
              <MsgBadgeGroup txHash messages/>
-           | _ => <LoadingCensorBar width=320 height=15 />
+           | _ => <LoadingCensorBar width=50 height=15 />
            }}
         </Col>
         <Col col=Col.Two>
@@ -101,7 +101,7 @@ let make = () => {
 
   <>
     {isMobile ? <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ()), Styles.headingContainer})}>
-      <Heading value="Latest Transactions" size=Heading.H4 />
+      <Text value="Latest Transactions" size=Text.Xl weight=Text.Semibold color=theme.neutral_900 />
       <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
         <Link className={CssHelper.flexBox(~align=#center, ())} route=Route.TxHomePage>
           <div className=Styles.textMRight>
@@ -122,7 +122,7 @@ let make = () => {
         ? React.null
         : <Row marginTop=30 marginBottom=25 marginTopSm=24 marginBottomSm=0>
           <Col col=Col.Six colSm=Col.Six>
-            <Heading value="Latest Transactions" size=Heading.H4 />
+            <Text value="Latest Transactions" size=Text.Xl weight=Text.Semibold color=theme.neutral_900 />
           </Col>
           <Col col=Col.Six colSm=Col.Six>
             <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>

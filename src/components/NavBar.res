@@ -51,7 +51,7 @@ module RenderMobile = {
         flexDirection(#column),
         alignItems(#center),
         opacity(show ? 1. : 0.),
-        zIndex(2),
+        zIndex(99),
         pointerEvents(show ? #auto : #none),
         width(#percent(100.)),
         height(#vh(100.)),

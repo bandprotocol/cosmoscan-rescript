@@ -11,7 +11,7 @@ module Styles = {
       alignItems(#center),
       position(#relative),
       cursor(#pointer),
-      // zIndex(5),
+      zIndex(5),
       Media.mobile([padding2(~v=#px(5), ~h=#px(10))]),
       Media.smallMobile([minWidth(#px(90))]),
     ]);
@@ -144,6 +144,7 @@ let getName = x =>
 @react.component
 let make = (~dropdown=false) => {
     let isMobile = Media.isMobile()
+    let currentRouteString = RescriptReactRouter.useUrl() -> Route.fromUrl -> Route.toAbsoluteString
     let (show, setShow) = React.useState(_ => false)
     let trackingSub = TrackingSub.use()
     let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
@@ -166,6 +167,7 @@ let make = (~dropdown=false) => {
               color={theme.neutral_900}
               nowrap=true
               weight=Text.Semibold
+              size=Text.Body1
             />
             <div className={CssJs.style(. [CssJs.paddingLeft(#px(4))])}>
               {show
@@ -178,13 +180,13 @@ let make = (~dropdown=false) => {
               ->Belt.Array.map(chainID => {
                   let name = chainID->getName;
                   <AbsoluteLink href={getLink(chainID)} key=name className={Styles.link(theme)}>
-                    <Text value=name color={theme.neutral_900} nowrap=true weight=Text.Semibold />
+                    <Text value=name color={theme.neutral_900} nowrap=true size=Text.Body1 weight=Text.Semibold />
                   </AbsoluteLink>;
                 })
               ->React.array}
             </div>
           </div> : <div className={Css.merge(list{CssHelper.flexBox(), Styles.buttonContainer})}>
-          <AbsoluteLink href={isMainnet ? "" : getLink(LaoziMainnet)} >
+          <AbsoluteLink href={isMainnet ? "" : getLink(LaoziMainnet) ++ currentRouteString} >
             <Button
               px=16
               py=8
@@ -193,7 +195,7 @@ let make = (~dropdown=false) => {
               {networkNames[0]  |> React.string}
             </Button>
           </AbsoluteLink>
-          <AbsoluteLink href={isMainnet ? getLink(LaoziTestnet) : ""} >
+          <AbsoluteLink href={isMainnet ? getLink(LaoziTestnet) ++ currentRouteString: ""} >
             <Button
               px=16
               py=8

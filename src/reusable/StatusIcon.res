@@ -22,7 +22,7 @@ module Styles = {
         isMobile ? 
         <Text 
           value={status ? "Success" : "Fail"} 
-          size=Text.Body2
+          size={isMobile ? Text.Body1 : Text.Body2}
           color={status ? theme.success_600 : theme.error_600}
         /> 
         : React.null

@@ -72,19 +72,19 @@ let make = (~info) => {
     </div>
   | Height(height) =>
     <div className=Styles.vFlex>
-      <TypeID.Block id=height position=TypeID.Text />
+      <TypeID.Block id=height position=TypeID.MobileCard />
     </div>
   | Coin({value, hasDenom}) =>
     <AmountRender coins=value pos={hasDenom ? AmountRender.TxIndex : Fee} />
   | Count(value) => <Text value={value->Format.iPretty} size=Text.Body2 />
   | DataSource(id, name) =>
     <div className=Styles.vFlex>
-      <TypeID.DataSource id />
+      <TypeID.DataSource id position=TypeID.MobileCard/>
       <HSpacing size=Spacing.sm />
       <Text value=name ellipsis=true />
     </div>
-  | OracleScript(id, name) => <TypeID.OracleScript id details=name/>
-  | RequestID(id) => <TypeID.Request id />
+  | OracleScript(id, name) => <TypeID.OracleScript id position=TypeID.MobileCard details=name/>
+  | RequestID(id) => <TypeID.Request id position=TypeID.MobileCard/>
   | RequestResponse({requestCount, responseTime: responseTimeOpt}) =>
     <div className={CssHelper.flexBox()}>
       <Text value={requestCount->Format.iPretty} block=true ellipsis=true />
@@ -137,7 +137,7 @@ let make = (~info) => {
   | Validator(address, moniker, identity) =>
     <ValidatorMonikerLink validatorAddress=address moniker size=Text.Body2 identity width={#px(230)} />
   | PubKey(publicKey) => <PubKeyRender alignLeft=true pubKey=publicKey display=#block />
-  | TxHash(txHash, width) => <TxLink txHash width />
+  | TxHash(txHash, width) => <TxLink txHash width size=Text.Body1 />
   | BlockHash(hash) =>
     <Text
       value={hash->Hash.toHex(~upper=true)}

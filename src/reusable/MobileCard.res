@@ -72,10 +72,10 @@ module InnerPanel = {
             switch value {
             | InfoMobileCard.Nothing =>
               <div className=Styles.cardItemHeadingLg>
-                <Text key=each value=each size=Text.Caption />
+                <Text key=each value=each size=Text.Body2 />
               </div>
             | _ =>
-              <Text key=each value=each size=Text.Caption weight=Text.Semibold />
+              <Text key=each value=each size=Text.Body2 weight=Text.Semibold />
             }
           })
           ->React.array}
