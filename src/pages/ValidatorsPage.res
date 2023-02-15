@@ -24,7 +24,7 @@ let make = () => {
   let (prevDayTime, setPrevDayTime) = React.useState(getPrevDay)
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
   let (sortedBy, setSortedBy) = React.useState(_ => ValidatorsTable.VotingPowerDesc)
-  let (isActive, _) = React.useState(_ => true)
+  let (isActive, setIsActive) = React.useState(_ => true)
 
   React.useEffect0(() => {
     let timeOutID = Js.Global.setInterval(() => {setPrevDayTime(getPrevDay)}, 60_000)
@@ -168,8 +168,7 @@ let make = () => {
           </Col>
           {isMobile
             ? <Col col=Col.Six colSm=Col.Four mbSm=16>
-                <div
-                  className={CssHelper.flexBox(~justify=#flexEnd, ())}
+                <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
                 //  <SortableDropdown
                 //    sortedBy
                 //    setSortedBy
@@ -184,14 +183,13 @@ let make = () => {
                 //      (UptimeDesc, getName(UptimeDesc)),
                 //    ]
                 //  />
-                />
+                </div>
               </Col>
             : React.null}
           <Col col=Col.Six>
-            <div
-              className={CssHelper.flexBox(~justify=#flexEnd, ())}
-            // <ToggleButton isActive setIsActive />
-            />
+            <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+              <ToggleButton state=isActive setState=setIsActive nameArray=["Active", "inActive"] />
+            </div>
           </Col>
         </Row>
         <ValidatorsTable allSub searchTerm sortedBy setSortedBy />
