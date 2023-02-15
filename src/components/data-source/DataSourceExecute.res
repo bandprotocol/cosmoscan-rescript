@@ -153,7 +153,7 @@ module ResultRender = {
 
 @react.component
 let make = (~executable: JsBuffer.t) => {
-  let params = ExecutableParser.parseExecutableScript(executable)->Belt_Option.getWithDefault([])
+  let params = ExecutableParser.parseExecutableScript(executable)->Belt.Option.getWithDefault([])
   let numParams = params->Belt.Array.length
 
   let (callDataList, setCalldataList) = React.useState(_ => Belt.List.make(numParams, ""))
@@ -224,7 +224,7 @@ let make = (~executable: JsBuffer.t) => {
                   })
                   ->Promise.catch(err => {
                     let errorValue =
-                      Js.Json.stringifyAny(err)->Belt_Option.getWithDefault("Unknown")
+                      Js.Json.stringifyAny(err)->Belt.Option.getWithDefault("Unknown")
                     setResult(_ => Error(errorValue))
                     Promise.resolve()
                   })
