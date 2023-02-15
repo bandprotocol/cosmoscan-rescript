@@ -14,6 +14,7 @@ module Styles = {
     ~pySm=py,
     theme: Theme.t,
     isDarkMode,
+    ~isActive=false,
     (),
   ) => {
     let base = style(. [
@@ -48,8 +49,8 @@ module Styles = {
       ])
     | Outline =>
       style(. [
-        backgroundColor(#transparent),
-        color(theme.textPrimary),
+        backgroundColor(isActive ? theme.baseBlue : #transparent),
+        color(isActive ? Theme.white : theme.textPrimary),
         border(#px(1), #solid, theme.baseBlue),
         selector("i", [color(theme.textPrimary)]),
         hover([
@@ -91,12 +92,13 @@ let make = (
   ~style="",
   ~disabled=false,
   ~className="",
+  ~isActive=false,
 ) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <button
     className={CssJs.merge(. [
-      Styles.btn(~variant, ~px, ~py, ~pxSm, ~pySm, ~fsize, theme, isDarkMode, ()),
+      Styles.btn(~variant, ~px, ~py, ~pxSm, ~pySm, ~fsize, theme, isDarkMode, ~isActive, ()),
       CssHelper.flexBox(~align=#center, ~justify=#center, ()),
       style,
       className,
