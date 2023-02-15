@@ -285,7 +285,7 @@ let make = () => {
   let (chainID, setChainID) = React.useState(_ => "")
   let chainIDFilterSub = IBCFilterSub.getChainFilterList()
 
-  let incomingCount = IBCSub.incomingcount()
+  let incomingCount = IBCSub.incomingCount()
   let outgoingCount = IBCSub.outgoingCount()
 
   let countSub = Sub.all2(incomingCount, outgoingCount)
@@ -372,6 +372,7 @@ let make = () => {
         </Col>
       </Row>
       <IncomingSection />
+      <OutgoingSection />
     </div>
   </Section>
 }
