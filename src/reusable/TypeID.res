@@ -7,7 +7,7 @@ type pos_t =
 
 let fontSize = pos =>
   switch pos {
-  | Landing => Text.Xxxl
+  | Landing => Text.Xxxxl
   | Title => Text.Xxl
   | Subtitle => Text.Body1
   | Text => Text.Body2
@@ -59,6 +59,7 @@ module ComponentCreator = (RawID: ID.IDSig) => {
         height={position->lineHeight}
         nowrap=true
         code=true
+        mono=true
         block=true
         color={theme.neutral_900}
       />
