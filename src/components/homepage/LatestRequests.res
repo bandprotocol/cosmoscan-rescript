@@ -153,7 +153,7 @@ let make = (~latestRequestsSub: Sub.variant<array<RequestSub.t>>) => {
                 <Text
                   block=true
                   value="Request ID"
-                  size=Text.Caption
+                  size=Text.Body2
                   weight=Text.Semibold
                 />
               </Col>
@@ -161,7 +161,7 @@ let make = (~latestRequestsSub: Sub.variant<array<RequestSub.t>>) => {
                 <Text
                   block=true
                   value="Oracle Script"
-                  size=Text.Caption
+                  size=Text.Body2
                   weight=Text.Semibold
                 />
               </Col>
@@ -169,7 +169,7 @@ let make = (~latestRequestsSub: Sub.variant<array<RequestSub.t>>) => {
                 <Text
                   block=true
                   value="Report Status"
-                  size=Text.Caption
+                  size=Text.Body2
                   weight=Text.Semibold
                   align=Text.Right
                 />

@@ -2,7 +2,7 @@ module Styles = {
   open CssJs
 
   let container = style(. [
-    maxWidth(#px(340)),
+    maxWidth(#px(564)),
     width(#percent(100.)),
     height(#percent(100.)),
     position(#relative),
@@ -28,10 +28,16 @@ module Styles = {
         Shadow.box(~x=#zero, ~y=#px(1), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.07))),
         Shadow.box(~x=#zero, ~y=#px(4), ~blur=#px(12), Css.rgba(0, 0, 0, #num(0.02))),
       ]),
+      fontFamilies([#custom("Roboto Mono"), #monospace]),
       fontSize(#px(12)),
       outline(#px(1), #none, theme.neutral_100),
       border(#px(1), #solid, theme.neutral_100),
-      placeholder([color(theme.neutral_500)]),
+      placeholder([
+        width(#percent(90.)),
+        color(theme.neutral_500),
+        fontWeight(#num(300)),
+        textOverflow(#ellipsis)
+      ]),
       Media.mobile([fontSize(#px(10))]),
     ])
 
@@ -200,7 +206,7 @@ let make = () => {
         }}
       value=searchTerm
       className={Styles.search(theme, isDarkMode)}
-      placeholder="Search Address / TXN Hash / Block"
+      placeholder="Search Address / TXN Hash / Block / Validator / etc."
     />
     {switch resultState {
     | ShowAndFocus(_)

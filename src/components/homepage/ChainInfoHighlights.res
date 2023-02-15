@@ -13,7 +13,7 @@ module Styles = {
       zIndex(2),
       minHeight(#px(152)),
       padding2(~v=#px(24), ~h=#px(32)),
-      Media.mobile([padding2(~v=#px(10), ~h=#px(12)), minHeight(#px(146))]),
+      Media.mobile([padding2(~v=#px(16), ~h=#px(23)), minHeight(#px(122))]),
     ]);
 
   let fullWidth = style(. [width(#percent(100.))]);
@@ -41,13 +41,13 @@ module Styles = {
   let innerLongCard =
     style(. [
       minHeight(#px(106)),
-      padding2(~v=#px(24), ~h=#px(12)),
-      Media.mobile([padding2(~v=#px(10), ~h=#px(12)), minHeight(#px(50))]),
+      padding2(~v=#px(24), ~h=#zero),
+      Media.mobile([padding2(~v=#px(12), ~h=#zero), minHeight(#px(50))]),
     ]);
 
   let halfWidth =
     style(. [
-      width(#calc((#sub, #percent(50.), #px(17)))),
+      width(#calc((#sub, #percent(50.), #px(41)))),
       Media.mobile([width(#percent(100.))]),
     ]);
 
@@ -80,7 +80,7 @@ module HighlightCard = {
         })}>
         {switch (valueAndExtraComponentSub) {
          | Some((valueComponent, extraComponent)) =>
-           <> <Text value=label size=Text.Xl weight=Text.Regular /> valueComponent extraComponent </>
+           <> <Text value=label size={isMobile ? Text.Body1 : Text.Xl} weight=Text.Regular /> valueComponent extraComponent </>
          | None =>
            <>
              <LoadingCensorBar width=90 height=18 />
@@ -150,13 +150,14 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
             | Data({financial}) => Some(
               {
                 let bandPriceInUSD = "$" ++ (financial.usdPrice |> Format.fPretty(~digits=2));
-                <div className=CssHelper.flexBox()>
+                <div className=CssHelper.flexBox(~align=#flexEnd, ())>
                   <div className=Styles.mr2>
-                    <Text 
+                    <Heading 
                       value=bandPriceInUSD
-                      size=Text.Xxxl 
-                      weight=Text.Bold 
+                      size=Heading.H1 
+                      weight=Heading.Bold 
                       color=theme.white
+                      mono=true
                     />
                   </div>
                   <Text 
@@ -165,9 +166,10 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                       ++ (financial.usd24HrChange |> Format.fPretty(~digits=2)) 
                       ++ "%"
                     }
-                    size=Text.Body2
+                    size=Text.Body1
                     weight=Text.Regular 
                     color=(financial.usd24HrChange > 0. ? theme.success_600 : theme.error_600)
+                    mono=true
                   />
                 </div>
               },
@@ -195,16 +197,17 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
             switch (infoSub) {
             | Data({financial}) => Some(
               {
-                <Text
+                <Heading
                   value={"$" ++ (financial.usdMarketCap |> Format.fCurrency)}
-                  size=Text.Xxxl
+                  size=Heading.H1
                   color={theme.neutral_900}
-                  weight=Text.Semibold
-                />;
+                  weight=Heading.Semibold
+                  mono=true
+                />
               },
               {
                 let marketcap = financial.btcMarketCap;
-                <Text value={(marketcap |> Format.fPretty) ++ " BTC"} />;
+                <Text value={(marketcap |> Format.fPretty) ++ " BTC"} mono=true/>;
               },
             )
             | _ => None
@@ -240,16 +243,19 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
             | Data(activeValidatorCount, _, avgBlockTime) => Some(
               {
                 let activeValidators = activeValidatorCount->Format.iPretty;
-                <Text
+                <Heading
                   value=activeValidators
-                  size=Text.Xxxl
+                  size=Heading.H1
                   color={theme.primary_600}
-                  weight=Text.Semibold
+                  weight=Heading.Semibold
+                  marginTop=8
+                  marginBottom=8
+                  mono=true
                 />
               },
               <Text
                 value={"block time " ++ (avgBlockTime |> Format.fPretty(~digits=2)) ++ " secs"}
-                size=Text.Body1 
+                size={isMobile ? Text.Body2 : Text.Body1} 
                 weight=Text.Regular 
               />
             )
@@ -287,6 +293,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                           weight=Text.Bold 
                           height={Text.Px(20)}
                           color=theme.neutral_900
+                          mono=true
                         />
                       </div>
                     | _ =>
@@ -333,6 +340,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                           weight=Text.Bold 
                           height={Text.Px(20)}
                           color=theme.neutral_900
+                          mono=true
                         />
                       </div>
                     | _ =>
@@ -356,7 +364,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
             </Col>
         </Row>
       </div>
-      {isMobile ? React.null : <Divider ml=16 mr=16 h=58 />}
+      {isMobile ? React.null : <Divider ml=40 mr=40 h=58 />}
       <div className=Styles.halfWidth>
         <Row justify=Row.Between >
           <Col col=Col.Three colSm=Col.Twelve>
@@ -377,6 +385,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                     weight=Text.Bold 
                     height={Text.Px(20)}
                     color=theme.neutral_900
+                    mono=true
                   />
                 </>
               | _ =>
@@ -403,8 +412,9 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                     value={(avgCommission |> Format.fPretty(~digits=2)) ++ "%"} 
                     size=Text.Xxl 
                     weight=Text.Bold 
-                      height={Text.Px(20)}
+                    height={Text.Px(20)}
                     color=theme.neutral_900
+                    mono=true
                   />
                 </>
               | _ =>
@@ -440,13 +450,15 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                         size=Text.Xxl 
                         weight=Text.Bold 
                         color=theme.neutral_900
+                        mono=true
                       />
                     </div>
                     <Text 
                       value={
-                        (bondedTokenCount |> Coin.getBandAmountFromCoin |> Format.fCurrency)
+                        "( "
+                        ++ (bondedTokenCount |> Coin.getBandAmountFromCoin |> Format.fCurrency)
                         ++ "/" ++ (financial.circulatingSupply |> Format.fCurrency)
-                        ++ " BAND"
+                        ++ " BAND )"
                       }
                       size=Text.Body2 
                       weight=Text.Regular 

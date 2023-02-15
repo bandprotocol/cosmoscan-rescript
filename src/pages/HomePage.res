@@ -36,7 +36,7 @@ let make = () => {
        : React.null}
     <div className={Css.merge(list{CssHelper.container, Styles.content})} id="homePageContainer">
       <ChainInfoHighlights latestBlockSub />
-      <Row marginTop=24>
+      <Row marginTop=40>
         <Col col=Col.Six> <LatestTxTable /> </Col>
         <Col col=Col.Six> <LatestRequests latestRequestsSub /> </Col>
       </Row>

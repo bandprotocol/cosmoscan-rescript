@@ -146,16 +146,16 @@ let make = () => {
         : <THead height=30>
             <Row alignItems=Row.Center>
               <Col col=Col.Four>
-                  <Text value="Tx Hash" size=Text.Caption />
+                  <Text value="Tx Hash" size=Text.Body2 weight=Text.Semibold />
               </Col>
               <Col col=Col.Three>
-                  <Text value="Block" size=Text.Caption />
+                  <Text value="Block" size=Text.Body2 weight=Text.Semibold />
               </Col>
               <Col col=Col.Three>
-                  <Text value="Message" size=Text.Caption />
+                  <Text value="Message" size=Text.Body2 weight=Text.Semibold />
               </Col>
               <Col col=Col.Two>
-                  <Text value="Status" size=Text.Caption />
+                  <Text value="Status" size=Text.Body2 weight=Text.Semibold />
               </Col>
             </Row>
           </THead>}
