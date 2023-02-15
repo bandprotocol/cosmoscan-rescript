@@ -1,6 +1,7 @@
 type btn_style_t =
   | Primary
   | Outline
+  | Text
 
 module Styles = {
   open CssJs
@@ -64,6 +65,27 @@ module Styles = {
           hover([backgroundColor(#transparent)]),
           opacity(0.5),
         ]),
+      ])
+    | Text =>
+      style(. [
+        padding(#zero),
+        backgroundColor(#transparent),
+        color(theme.textPrimary),
+        border(#px(1), #solid, #transparent),
+        selector("i", [color(theme.textPrimary)]),
+        hover([
+          backgroundColor(#transparent),
+          color(theme.baseBlue),
+          selector("i", [color(theme.baseBlue)]),
+        ]),
+        active([backgroundColor(CssJs.hex("E5E8F7"))]),
+        disabled([
+          color(theme.textSecondary),
+          hover([backgroundColor(#transparent)]),
+          opacity(0.5),
+        ]),
+        selector(":focus", [outlineStyle(#none), backgroundColor(#transparent)]),
+        Media.mobile([padding(#zero)]),
       ])
     }
     merge(. [base, custom])

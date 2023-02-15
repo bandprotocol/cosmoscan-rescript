@@ -15,15 +15,26 @@ module Styles = {
   ])
   let txListContainer = style(. [marginTop(#px(16)), width(#percent(100.))])
   let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
+
+  let paperStyle = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      width(#percent(100.)),
+      backgroundColor(isDarkMode ? theme.white : theme.white),
+      borderRadius(#px(10)),
+      boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
+      padding(#px(16)),
+      border(#px(1), #solid, isDarkMode ? hex("F3F4F6") : hex("F3F4F6")), // TODO: will change to theme color
+    ])
 }
 
 @react.component
-let make = () => {
+let make = (~chainID, ~channel, ~port, ~sequence) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let isMobile = Media.isMobile()
   let isTablet = Media.isTablet()
 
   let (page, setPage) = React.useState(_ => 1)
+  let (packetType, setPacketType) = React.useState(_ => "")
 
   let packetCountSub = IBCSub.incomingCount()
   let pageSize = 5
@@ -32,11 +43,11 @@ let make = () => {
     ~page,
     ~pageSize,
     ~direction=Incoming,
-    ~packetType="",
-    ~port="",
-    ~channel="",
-    ~sequence=None,
-    ~chainID="",
+    ~packetType,
+    ~port,
+    ~channel,
+    ~sequence,
+    ~chainID,
     (),
   )
 
@@ -56,13 +67,30 @@ let make = () => {
       <Col col=Col.Twelve>
         <div className={Styles.filterButtonsContainer}>
           <ChipButton
-            variant={ChipButton.Outline} onClick={_ => Js.log("click")} className="selected">
+            variant={ChipButton.Outline}
+            onClick={_ => setPacketType(_ => "")}
+            isActive={switch packetType {
+            | "" => true
+            | _ => false
+            }}>
             {"All"->React.string}
           </ChipButton>
-          <ChipButton variant={ChipButton.Outline} onClick={_ => Js.log("click")}>
+          <ChipButton
+            variant={ChipButton.Outline}
+            onClick={_ => setPacketType(_ => "Oracle Request")}
+            isActive={switch packetType {
+            | "Oracle Request" => true
+            | _ => false
+            }}>
             {"Oracle Request"->React.string}
           </ChipButton>
-          <ChipButton variant={ChipButton.Outline} onClick={_ => Js.log("click")}>
+          <ChipButton
+            variant={ChipButton.Outline}
+            onClick={_ => setPacketType(_ => "Fungible Token")}
+            isActive={switch packetType {
+            | "Fungible Token" => true
+            | _ => false
+            }}>
             {"Fungible Token"->React.string}
           </ChipButton>
         </div>
@@ -72,20 +100,22 @@ let make = () => {
     <Row marginTop=8>
       {switch packetsSub {
       | Data(packets) if packets->Belt.Array.length === 0 =>
-        <EmptyContainer backgroundColor={theme.mainBg}>
-          <img
-            alt="No Packets"
-            src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
-            className=Styles.noDataImage
-          />
-          <Heading
-            size=Heading.H4
-            value="No Packets"
-            align=Heading.Center
-            weight=Heading.Regular
-            color={theme.textSecondary}
-          />
-        </EmptyContainer>
+        <div className={Styles.paperStyle(theme, isDarkMode)}>
+          <EmptyContainer backgroundColor={theme.mainBg}>
+            <img
+              alt="No Packets"
+              src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
+              className=Styles.noDataImage
+            />
+            <Heading
+              size=Heading.H4
+              value="No Packets"
+              align=Heading.Center
+              weight=Heading.Regular
+              color={theme.textSecondary}
+            />
+          </EmptyContainer>
+        </div>
       | Data(packets) =>
         packets
         ->Belt_Array.mapWithIndex((i, e) =>
@@ -95,20 +125,22 @@ let make = () => {
         )
         ->React.array
       | Error(_) =>
-        <EmptyContainer backgroundColor={theme.mainBg}>
-          <img
-            alt="No Packets"
-            src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
-            className=Styles.noDataImage
-          />
-          <Heading
-            size=Heading.H4
-            value="No Packets"
-            align=Heading.Center
-            weight=Heading.Regular
-            color={theme.textSecondary}
-          />
-        </EmptyContainer>
+        <div className={Styles.paperStyle(theme, isDarkMode)}>
+          <EmptyContainer backgroundColor={theme.mainBg}>
+            <img
+              alt="No Packets"
+              src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
+              className=Styles.noDataImage
+            />
+            <Heading
+              size=Heading.H4
+              value="No Packets"
+              align=Heading.Center
+              weight=Heading.Regular
+              color={theme.textSecondary}
+            />
+          </EmptyContainer>
+        </div>
       | _ =>
         Belt_Array.make(pageSize, Sub.NoData)
         ->Belt_Array.mapWithIndex((i, noData) =>
