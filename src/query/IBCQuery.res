@@ -76,7 +76,7 @@ module PacketType = {
   let parse = packetT => {
     switch packetT {
     | Some("oracle_request") => OracleRequest
-    | Some("oracle_response") => OracleResponse
+    | Some("oracle response") => OracleResponse
     | Some("fungible_token") => FungibleToken
     | Some("interchain_account") => InterchainAccount
     | _ => Unknown
@@ -166,29 +166,35 @@ let toExternal = ({
     (channel->Belt.Option.getExn).connection.counterPartyChainID
   },
   acknowledgement: {
-    let ackOpt = acknowledgement->Belt.Option.getExn
-    open JsonUtils.Decode
-    Some(
-      ackOpt->mustDecode({
-        object(json => {
-          data: switch packetType->PacketType.parse {
-          | InterchainAccount
-          | OracleRequest =>
-            Request(ackOpt->OracleRequestAcknowledge.decode)
-          | OracleResponse
-          | FungibleToken
-          | _ =>
-            Empty
-          },
-          reason: json.optional(. "reason", string),
-          status: json.required(. "status", string)->getPacketStatus,
-        })
-      }),
-    )
+    switch acknowledgement {
+    | None => None
+    | Some(ackOpt) => {
+        open JsonUtils.Decode
+        Some(
+          ackOpt->mustDecode({
+            object(json => {
+              data: switch packetType->PacketType.parse {
+              | InterchainAccount
+              | OracleRequest =>
+                Request(ackOpt->OracleRequestAcknowledge.decode)
+              | OracleResponse
+              | FungibleToken
+              | _ =>
+                Empty
+              },
+              reason: json.optional(. "reason", string),
+              status: json.required(. "status", string)->getPacketStatus,
+            })
+          }),
+        )
+      }
+    }
   },
   txHash: {
-    let txOpt = transaction->Belt.Option.getExn
-    Some(txOpt.hash)
+    switch transaction {
+    | None => None
+    | Some(tx) => Some(tx.hash)
+    }
   },
   data: {
     let packetParse = packetType->PacketType.parse

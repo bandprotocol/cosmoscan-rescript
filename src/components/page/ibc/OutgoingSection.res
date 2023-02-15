@@ -25,13 +25,13 @@ let make = () => {
 
   let (page, setPage) = React.useState(_ => 1)
 
-  let packetCountSub = IBCSub.incomingCount()
+  let packetCountSub = IBCSub.outgoingCount()
   let pageSize = 5
 
   let packetsSub = IBCQuery.getList(
     ~page,
     ~pageSize,
-    ~direction=Incoming,
+    ~direction=Outgoing,
     ~packetType="",
     ~port="",
     ~channel="",
@@ -43,12 +43,12 @@ let make = () => {
   <div>
     <Row>
       <Col col=Col.Twelve>
-        <Heading value="Incoming" size=Heading.H3 marginBottom=8 />
+        <Heading value="Outgoing" size=Heading.H3 marginBottom=8 />
         <Text
           size=Text.Lg
           weight=Text.Thin
           color=theme.textSecondary
-          value="Receiving transaction information from counterparty chain to BandChain"
+          value="Sending transaction information from BandChain to counterparty chain"
         />
       </Col>
     </Row>
@@ -60,7 +60,7 @@ let make = () => {
             {"All"->React.string}
           </ChipButton>
           <ChipButton variant={ChipButton.Outline} onClick={_ => Js.log("click")}>
-            {"Oracle Request"->React.string}
+            {"Oracle Response"->React.string}
           </ChipButton>
           <ChipButton variant={ChipButton.Outline} onClick={_ => Js.log("click")}>
             {"Fungible Token"->React.string}
@@ -68,7 +68,7 @@ let make = () => {
         </div>
       </Col>
     </Row>
-    {isTablet ? React.null : <IncomingPacketTableHead />}
+    {isTablet ? React.null : <OutgoingPacketTableHead />}
     <Row marginTop=8>
       {switch packetsSub {
       | Data(packets) if packets->Belt.Array.length === 0 =>

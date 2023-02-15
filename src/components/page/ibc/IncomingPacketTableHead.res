@@ -13,7 +13,7 @@ module Styles = {
     marginLeft(#px(8)),
     marginRight(#px(8)),
     // minWidth(#calc((#sub, #percent(16.), #px(8)))),
-    minWidth(#px(135)),
+    minWidth(#px(120)),
     textAlign(#center),
   ])
 
@@ -24,6 +24,8 @@ module Styles = {
 
 @react.component
 let make = () => {
+  let isTablet = Media.isTablet()
+
   <div className=Styles.tableWrapper>
     <div className={Css.merge(list{Styles.tableHeadItem, Styles.leftAlign})}>
       <Text value="Tx Hash" weight={Text.Semibold} />
@@ -34,9 +36,13 @@ let make = () => {
     <div className={Css.merge(list{Styles.tableHeadItem, Styles.largeColumn})}>
       <Text value="Port & Channel" weight={Text.Semibold} />
     </div>
-    <div className=Styles.tableHeadItem>
-      <Text value="Sequence" weight={Text.Semibold} />
-    </div>
+    {switch isTablet {
+    | true => React.null
+    | false =>
+      <div className=Styles.tableHeadItem>
+        <Text value="Sequence" weight={Text.Semibold} />
+      </div>
+    }}
     <div className=Styles.tableHeadItem>
       <Text value="Packet Type" weight={Text.Semibold} />
     </div>
