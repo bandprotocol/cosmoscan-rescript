@@ -48,6 +48,7 @@ module Styles = {
   let mb = (~mb, ~mbSm, ()) =>
     style(. [marginBottom(#px(mb)), Media.mobile([marginBottom(#px(mbSm))])])
   let mt = (~mt, ~mtSm, ()) => style(. [marginTop(#px(mt)), Media.mobile([marginTop(#px(mtSm))])])
+  let mono = style(. [fontFamilies([#custom("Roboto Mono"), #monospace])])
 }
 
 @react.component
@@ -62,6 +63,7 @@ let make = (
   ~marginBottomSm=marginBottom,
   ~style="",
   ~color=?,
+  ~mono=false,
 ) => {
   let children_ = React.string(value)
 
@@ -76,6 +78,7 @@ let make = (
       Styles.lineHeight,
       Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
       Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),
+      mono ? Styles.mono : "",
       style,
     ])
 

@@ -7,7 +7,7 @@ type pos_t =
 
 let fontSize = pos =>
   switch pos {
-  | Landing => Text.Xxxl
+  | Landing => Text.Xxxxl
   | Title => Text.Xxl
   | Subtitle => Text.Body1
   | Text => Text.Body2
