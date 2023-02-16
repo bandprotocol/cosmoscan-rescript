@@ -11,7 +11,7 @@ module Styles = {
 let getPrevDay = _ =>
   MomentRe.momentNow()
   ->MomentRe.Moment.defaultUtc
-  ->MomentRe.Moment.subtract(~duration=MomentRe.duration(1->float_of_int, #days))
+  ->MomentRe.Moment.subtract(~duration=MomentRe.duration(1->Belt.Int.toFloat, #days))
   ->MomentRe.Moment.format(Config.timestampUseFormat, _)
 
 @react.component

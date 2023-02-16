@@ -192,7 +192,7 @@ let make = (~dropdown=false) => {
               py=8
               variant=Button.Outline
               style={Css.merge(list{Styles.baseBtn, Styles.leftBtn(isMainnet, theme, isDarkMode)})}>
-              {networkNames[0]  |> React.string}
+              {networkNames[0]  -> React.string}
             </Button>
           </AbsoluteLink>
           <AbsoluteLink href={isMainnet ? getLink(LaoziTestnet) ++ currentRouteString: ""} >
@@ -201,7 +201,7 @@ let make = (~dropdown=false) => {
               py=8
               variant=Button.Outline
               style={Css.merge(list{Styles.baseBtn, Styles.rightBtn(isMainnet, theme, isDarkMode)})}>
-              {networkNames[1] |> React.string}
+              {networkNames[1] -> React.string}
             </Button>
           </AbsoluteLink>
         </div> }

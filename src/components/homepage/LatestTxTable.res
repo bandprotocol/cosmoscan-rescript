@@ -64,8 +64,8 @@ module RenderBodyMobile = {
             ("Actions", MsgBadgeGroup(txHash, messages)),
             ("Status", Status(success)),
           ]}
-        key={txHash |> Hash.toHex}
-        idx={txHash |> Hash.toHex}
+        key={txHash -> Hash.toHex}
+        idx={txHash -> Hash.toHex}
         status=success
       />
     | _ =>
@@ -85,8 +85,8 @@ module RenderBodyMobile = {
             ),
             ("Status", Loading(70)),
           ]}
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex -> Belt.Int.toString}
+        idx={reserveIndex -> Belt.Int.toString}
       />
     };
   };
@@ -162,22 +162,22 @@ let make = () => {
       {switch (txsSub) {
       | Data(txs) =>
         txs
-        ->Belt_Array.mapWithIndex((i, e) =>
+        ->Belt.Array.mapWithIndex((i, e) =>
             isMobile
               ? <RenderBodyMobile
-                  key={e.txHash |> Hash.toHex}
+                  key={e.txHash -> Hash.toHex}
                   reserveIndex=i
                   txSub={Sub.resolve(e)}
                 />
-              : <RenderBody key={e.txHash |> Hash.toHex} txSub={Sub.resolve(e)} />
+              : <RenderBody key={e.txHash -> Hash.toHex} txSub={Sub.resolve(e)} />
           )
         ->React.array
       | _ =>
-        Belt_Array.make(txCount, Sub.NoData)
-        ->Belt_Array.mapWithIndex((i, noData) =>
+        Belt.Array.make(txCount, Sub.NoData)
+        ->Belt.Array.mapWithIndex((i, noData) =>
             isMobile
-              ? <RenderBodyMobile key={string_of_int(i)} reserveIndex=i txSub=noData />
-              : <RenderBody key={string_of_int(i)} txSub=noData />
+              ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i txSub=noData />
+              : <RenderBody key={i->Belt.Int.toString} txSub=noData />
           )
         ->React.array
       }}

@@ -188,7 +188,7 @@ let make = (~latestRequestsSub: Sub.variant<array<RequestSub.t>>) => {
         </EmptyContainer>
       | Data(requests) =>
         requests
-        ->Belt_Array.mapWithIndex((i, e) =>
+        ->Belt.Array.mapWithIndex((i, e) =>
             isMobile
               ? <RenderBodyMobile
                   key={e.id -> ID.Request.toString}
@@ -199,11 +199,11 @@ let make = (~latestRequestsSub: Sub.variant<array<RequestSub.t>>) => {
           )
         ->React.array
       | _ =>
-        Belt_Array.make(10, Sub.NoData)
-        ->Belt_Array.mapWithIndex((i, noData) =>
+        Belt.Array.make(10, Sub.NoData)
+        ->Belt.Array.mapWithIndex((i, noData) =>
             isMobile
-              ? <RenderBodyMobile key={i -> Belt.Int.toString} reserveIndex=i requestSub=noData />
-              : <RenderBody key={i -> Belt.Int.toString} requestSub=noData />
+              ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i requestSub=noData />
+              : <RenderBody key={i->Belt.Int.toString} requestSub=noData />
           )
         ->React.array
       }}

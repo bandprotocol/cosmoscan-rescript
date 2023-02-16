@@ -45,7 +45,7 @@ let make = (~state, ~setState, ~nameArray) => {
       variant=Button.Outline
       onClick={_ => setState(_ => true)}
       style={Css.merge(list{Styles.baseBtn, Styles.leftBtn(state, theme, isDarkMode)})}>
-      {nameArray[0]  |> React.string}
+      {nameArray[0]  -> React.string}
     </Button>
     <Button
       px=16
@@ -53,7 +53,7 @@ let make = (~state, ~setState, ~nameArray) => {
       variant=Button.Outline
       onClick={_ => setState(_ => false)}
       style={Css.merge(list{Styles.baseBtn, Styles.rightBtn(state, theme, isDarkMode)})}>
-      {nameArray[1] |> React.string}
+      {nameArray[1] -> React.string}
     </Button>
   </div>;
 };

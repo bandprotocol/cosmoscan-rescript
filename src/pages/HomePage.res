@@ -14,7 +14,7 @@ let make = () => {
   // share the same infomation.
   let pageSize = 10;
   let latestBlocksSub = BlockSub.getList(~pageSize, ~page=1);
-  let latestBlockSub = latestBlocksSub->Sub.map(blocks => blocks->Belt_Array.getExn(0));
+  let latestBlockSub = latestBlocksSub->Sub.map(blocks => blocks->Belt.Array.getExn(0));
   let latestRequestsSub = RequestSub.getList(~pageSize, ~page=1);
   let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
   let isMobile = Media.isMobile();

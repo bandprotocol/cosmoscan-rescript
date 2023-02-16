@@ -56,13 +56,13 @@ module ComponentCreator = (RawID: ID.IDSig) => {
 
     <Link
       className={Css.merge(list{Styles.link(theme, details != ""), Styles.pointerEvents(position)})}
-      route={id |> RawID.getRoute}>
+      route={id -> RawID.getRoute}>
       <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
         <Text
-          value={id |> RawID.toString}
-          size={position |> fontSize}
+          value={id -> RawID.toString}
+          size={position -> fontSize}
           weight
-          height={position |> lineHeight}
+          height={position -> lineHeight}
           nowrap=true
           code=true
           block=true

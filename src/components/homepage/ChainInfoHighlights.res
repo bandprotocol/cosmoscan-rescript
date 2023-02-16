@@ -95,23 +95,23 @@ module HighlightCard = {
 
 let getPrevDay = _ => {
   MomentRe.momentNow()
-  |> MomentRe.Moment.defaultUtc
-  |> MomentRe.Moment.subtract(~duration=MomentRe.duration(1., #days))
-  |> MomentRe.Moment.format(Config.timestampUseFormat);
+  -> MomentRe.Moment.defaultUtc
+  -> MomentRe.Moment.subtract(~duration=MomentRe.duration(1., #days))
+  -> MomentRe.Moment.format(Config.timestampUseFormat, _);
 };
 
 let getUnixTime = _ => {
   MomentRe.momentNow()
-  |> MomentRe.Moment.defaultUtc
-  |> MomentRe.Moment.subtract(~duration=MomentRe.duration(1., #days))
-  |> MomentRe.Moment.toUnix;
+  -> MomentRe.Moment.defaultUtc
+  -> MomentRe.Moment.subtract(~duration=MomentRe.duration(1., #days))
+  -> MomentRe.Moment.toUnix;
 };
 
 @react.component
 let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
   let isMobile = Media.isMobile();
   let currentTime =
-    React.useContext(TimeContext.context) |> MomentRe.Moment.format(Config.timestampUseFormat);
+    React.useContext(TimeContext.context) -> MomentRe.Moment.format(Config.timestampUseFormat, _);
   let (prevDayTime, setPrevDayTime) = React.useState(getPrevDay);
   let (prevUnixTime, setPrevUnixTime) = React.useState(getUnixTime);
 
@@ -149,7 +149,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
             switch (infoSub) {
             | Data({financial}) => Some(
               {
-                let bandPriceInUSD = "$" ++ (financial.usdPrice |> Format.fPretty(~digits=2));
+                let bandPriceInUSD = "$" ++ (financial.usdPrice -> Format.fPretty(~digits=2));
                 <div className=CssHelper.flexBox(~align=#flexEnd, ())>
                   <div className=Styles.mr2>
                     <Heading 
@@ -163,7 +163,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                   <Text 
                     value={
                       (financial.usd24HrChange > 0. ? "+" : "") 
-                      ++ (financial.usd24HrChange |> Format.fPretty(~digits=2)) 
+                      ++ (financial.usd24HrChange -> Format.fPretty(~digits=2)) 
                       ++ "%"
                     }
                     size=Text.Body1
@@ -198,7 +198,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
             | Data({financial}) => Some(
               {
                 <Heading
-                  value={"$" ++ (financial.usdMarketCap |> Format.fCurrency)}
+                  value={"$" ++ (financial.usdMarketCap -> Format.fCurrency)}
                   size=Heading.H1
                   color={theme.neutral_900}
                   weight=Heading.Semibold
@@ -207,7 +207,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
               },
               {
                 let marketcap = financial.btcMarketCap;
-                <Text value={(marketcap |> Format.fPretty) ++ " BTC"} mono=true/>;
+                <Text value={(marketcap -> Format.fPretty) ++ " BTC"} mono=true/>;
               },
             )
             | _ => None
@@ -254,7 +254,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                 />
               },
               <Text
-                value={"block time " ++ (avgBlockTime |> Format.fPretty(~digits=2)) ++ " secs"}
+                value={"block time " ++ (avgBlockTime -> Format.fPretty(~digits=2)) ++ " secs"}
                 size={isMobile ? Text.Body2 : Text.Body1} 
                 weight=Text.Regular 
               />
@@ -286,7 +286,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                             latestTx
                             ->Belt.Array.get(0)
                             ->Belt.Option.mapWithDefault(0, ({id}) => id )
-                            ->float_of_int
+                            ->Belt.Int.toFloat
                             ->Format.fCurrency
                           }
                           size=Text.Xxl 
@@ -303,7 +303,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                     | Data((last24Tx)) =>
                       <div className=Styles.mr2>
                         <Text 
-                          value={"( " ++ (last24Tx |> float_of_int |> Format.fCurrency ) ++ " last 24 hr)"}
+                          value={"( " ++ (last24Tx -> Belt.Int.toFloat -> Format.fCurrency ) ++ " last 24 hr)"}
                           size=Text.Body2 
                           weight=Text.Regular 
                           color=theme.neutral_900
@@ -332,8 +332,8 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                           value={
                             latestRequest
                             ->Belt.Array.get(0)
-                            ->Belt.Option.mapWithDefault(0, ({id}) => id |> ID.Request.toInt)
-                            ->float_of_int
+                            ->Belt.Option.mapWithDefault(0, ({id}) => id -> ID.Request.toInt)
+                            ->Belt.Int.toFloat
                             ->Format.fCurrency
                           }
                           size=Text.Xxl 
@@ -350,7 +350,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                     | Data((last24Request)) =>
                       <div className=Styles.mr2>
                         <Text 
-                          value={"( " ++ (last24Request |> float_of_int |> Format.fCurrency ) ++ " last 24 hr)"}
+                          value={"( " ++ (last24Request -> Belt.Int.toFloat -> Format.fCurrency ) ++ " last 24 hr)"}
                           size=Text.Body2 
                           weight=Text.Regular 
                           color=theme.neutral_900
@@ -380,7 +380,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                     <Text value="Inflation Rate" size=Text.Body1 weight=Text.Regular />
                   </div>
                   <Text 
-                     value={(inflation *. 100. |> Format.fPretty(~digits=2)) ++ "%"}
+                     value={(inflation *. 100.) -> Format.fPretty(~digits=2) ++ "%"}
                     size=Text.Xxl 
                     weight=Text.Bold 
                     height={Text.Px(20)}
@@ -409,7 +409,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                     <Text value="Staking APR" size=Text.Body1 weight=Text.Regular />
                   </div>
                   <Text 
-                    value={(avgCommission |> Format.fPretty(~digits=2)) ++ "%"} 
+                    value={(avgCommission -> Format.fPretty(~digits=2)) ++ "%"} 
                     size=Text.Xxl 
                     weight=Text.Bold 
                     height={Text.Px(20)}
@@ -442,8 +442,8 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                       <Text 
                         value={
                           (
-                            ((bondedTokenCount |> Coin.getBandAmountFromCoin) /. financial.circulatingSupply *. 100.) 
-                            |> Format.fPretty(~digits=2)
+                            ((bondedTokenCount -> Coin.getBandAmountFromCoin) /. financial.circulatingSupply *. 100.) 
+                            -> Format.fPretty(~digits=2)
                           )
                           ++ "%"
                         }
@@ -456,8 +456,8 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                     <Text 
                       value={
                         "( "
-                        ++ (bondedTokenCount |> Coin.getBandAmountFromCoin |> Format.fCurrency)
-                        ++ "/" ++ (financial.circulatingSupply |> Format.fCurrency)
+                        ++ (bondedTokenCount -> Coin.getBandAmountFromCoin -> Format.fCurrency)
+                        ++ "/" ++ (financial.circulatingSupply -> Format.fCurrency)
                         ++ " BAND )"
                       }
                       size=Text.Body2 
