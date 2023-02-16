@@ -63,12 +63,7 @@ let searchOracleScript = (~filter, ()) => {
       _nin: None,
     }),
     name: Some({
-      _regex: {
-        switch isNumber {
-        | true => None
-        | false => Some(filter)
-        }
-      },
+      _regex: None,
       _eq: None,
       _gt: None,
       _gte: None,
@@ -76,7 +71,7 @@ let searchOracleScript = (~filter, ()) => {
       _in: None,
       _iregex: None,
       _is_null: None,
-      _like: None,
+      _like: Some(j`%$filter%`),
       _lt: None,
       _lte: None,
       _neq: None,
@@ -137,12 +132,7 @@ let searchDataSource = (~filter, ()) => {
       _nin: None,
     }),
     name: Some({
-      _regex: {
-        switch isNumber {
-        | true => None
-        | false => Some(filter)
-        }
-      },
+      _regex: None,
       _eq: None,
       _gt: None,
       _gte: None,
@@ -150,7 +140,7 @@ let searchDataSource = (~filter, ()) => {
       _in: None,
       _iregex: None,
       _is_null: None,
-      _like: None,
+      _like: Some(j`%$filter%`),
       _lt: None,
       _lte: None,
       _neq: None,
