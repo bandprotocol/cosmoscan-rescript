@@ -61,7 +61,7 @@ module Styles = {
 module MobilePacketItem = {
   // Module contents
   @react.component
-  let make = (~packetSub: Sub.variant<IBCQuery.t>) => {
+  let make = (~packetSub: Query.variant<IBCQuery.t>) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     <div className={Css.merge(list{Styles.paperStyle(theme, isDarkMode), Styles.packetMobileItem})}>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
@@ -247,7 +247,7 @@ module DesktopPacketItem = {
   // Module contents
 
   @react.component
-  let make = (~packetSub: Sub.variant<IBCQuery.t>) => {
+  let make = (~packetSub: Query.variant<IBCQuery.t>) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let isTablet = Media.isTablet()
     <div className={Styles.paperStyle(theme, isDarkMode)}>
@@ -391,7 +391,7 @@ module DesktopPacketItem = {
 }
 
 @react.component
-let make = (~packetSub: Sub.variant<IBCQuery.t>) => {
+let make = (~packetSub: Query.variant<IBCQuery.t>) => {
   let isTablet = Media.isTablet()
   <div>
     {switch isTablet {

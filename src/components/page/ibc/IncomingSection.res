@@ -109,7 +109,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
         packets
         ->Belt_Array.mapWithIndex((i, e) =>
           <Col col=Col.Twelve key={i->Belt.Int.toString} mb=16>
-            <PacketItem packetSub={Sub.resolve(e)} />
+            <PacketItem packetSub={Query.resolve(e)} />
           </Col>
         )
         ->React.array
@@ -131,7 +131,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
           </EmptyContainer>
         </div>
       | _ =>
-        Belt_Array.make(pageSize, Sub.NoData)
+        Belt_Array.make(pageSize, Query.NoData)
         ->Belt_Array.mapWithIndex((i, noData) =>
           <Col col=Col.Twelve key={i->Belt.Int.toString} mb=24>
             <PacketItem packetSub=noData />

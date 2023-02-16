@@ -4,20 +4,25 @@ type pos_t =
   | Subtitle
   | Text
   | Mini
+  | Body
 
 let fontSize = pos =>
   switch pos {
   | Landing => Text.Xxxl
   | Title => Text.Xxl
-  | Subtitle => Text.Body1
-  | Text => Text.Body2
-  | Mini => Text.Caption
+  | Body
+  | Subtitle =>
+    Text.Lg
+  | Text => Text.Md
+  | Mini => Text.Sm
   }
 
 let lineHeight = pos =>
   switch pos {
   | Landing => Text.Px(31)
-  | Title => Text.Px(23)
+  | Body
+  | Title =>
+    Text.Px(23)
   | Subtitle => Text.Px(18)
   | Text => Text.Px(16)
   | Mini => Text.Px(16)
@@ -35,7 +40,9 @@ module Styles = {
 
   let pointerEvents = pos =>
     switch pos {
-    | Title => style(. [pointerEvents(#none)])
+    | Body
+    | Title =>
+      style(. [pointerEvents(#none)])
     | Landing
     | Subtitle
     | Text
