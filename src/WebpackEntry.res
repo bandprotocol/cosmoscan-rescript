@@ -1,4 +1,4 @@
 switch ReactDOM.querySelector("#root") {
-| Some(root) => ReactDOM.render(<Index />, root)
+| Some(container) => ReactDOM.Client.createRoot(container)->ReactDOM.Client.Root.render(<Index />)
 | None => ()
 }

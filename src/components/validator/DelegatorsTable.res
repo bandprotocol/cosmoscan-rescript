@@ -168,7 +168,7 @@ let make = (~address) => {
       <>
         {delegatorCount > 0
           ? delegators
-            ->Belt_Array.mapWithIndex((i, e) =>
+            ->Belt.Array.mapWithIndex((i, e) =>
               isMobile
                 ? <RenderBodyMobile
                     key={e.delegatorAddress |> Address.toBech32}
@@ -201,8 +201,8 @@ let make = (~address) => {
             />}
       </>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i delegatorSub=noData />
           : <RenderBody key={i->Belt.Int.toString} delegatorSub=noData />

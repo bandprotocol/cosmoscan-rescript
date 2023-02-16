@@ -90,9 +90,9 @@ let make = (
   ~colorLighter=?,
   ~isRight=false,
   ~mt=0,
-  ~mtSm=mt,
+  ~mtSm=0,
   ~mb=0,
-  ~mbSm=mb,
+  ~mbSm=0,
 ) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   <div

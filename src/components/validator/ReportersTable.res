@@ -117,7 +117,7 @@ let make = (~address) => {
       <>
         {reporterCount > 0
           ? reporters
-            ->Belt_Array.mapWithIndex((i, e) =>
+            ->Belt.Array.mapWithIndex((i, e) =>
               isMobile
                 ? <RenderBodyMobile
                     key={e |> Address.toBech32} reserveIndex=i reporterSub={Sub.resolve(e)}
@@ -146,8 +146,8 @@ let make = (~address) => {
             />}
       </>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile key={string_of_int(i)} reserveIndex=i reporterSub=noData />
           : <RenderBody key={string_of_int(i)} reporterSub=noData />

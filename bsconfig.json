@@ -21,10 +21,10 @@
   "bsc-flags": [
     "-open JsonCombinators"
   ],
-  "reason": {
-    "react-jsx": 3
+  "jsx": {
+    "version": 4,
+    "mode": "classic"
   },
-  "refmt": 3,
   "sources": [
     {
       "dir": "src",
@@ -48,8 +48,10 @@
     "rescript-webapi",
     "@glennsl/rescript-json-combinators"
   ],
-  "bs-dev-dependencies": ["@glennsl/rescript-jest"],
-  "warnings" : { 
+  "bs-dev-dependencies": [
+    "@glennsl/rescript-jest"
+  ],
+  "warnings": {
     "number": "-20-26-27-20-32-33-34-35-36-37-38-39-48"
   }
 }
