@@ -32,9 +32,9 @@ module RenderBody = {
           {switch (requestsSub) {
            | Data({requestedValidators, minCount, reports}) =>
              <ProgressBar
-               reportedValidators={reports |> Belt.Array.size}
+               reportedValidators={reports -> Belt.Array.size}
                minimumValidators=minCount
-               requestValidators={requestedValidators |> Belt.Array.size}
+               requestValidators={requestedValidators -> Belt.Array.size}
              />
            | _ => <LoadingCensorBar width=212 height=15 />
            }}
@@ -88,11 +88,11 @@ module RenderBodyMobile = {
               "Report Status",
               ProgressBar({
                 reportedValidators: {
-                  reports |> Belt_Array.size;
+                  reports -> Belt.Array.size;
                 },
                 minimumValidators: minCount,
                 requestValidators: {
-                  requestedValidators |> Belt_Array.size;
+                  requestedValidators -> Belt.Array.size;
                 },
               }),
             ),
@@ -104,8 +104,8 @@ module RenderBodyMobile = {
               },
             ),
         ]}
-        key={id |> ID.Request.toString}
-        idx={id |> ID.Request.toString}
+        key={id -> ID.Request.toString}
+        idx={id -> ID.Request.toString}
         requestStatus=resolveStatus
       />
     | _ =>
@@ -118,8 +118,8 @@ module RenderBodyMobile = {
             ("Report Status", Loading(20)),
             ("Timestamp", Loading(166)),
           ]}
-        key={reserveIndex |> string_of_int}
-        idx={reserveIndex |> string_of_int}
+        key={reserveIndex -> Belt.Int.toString}
+        idx={reserveIndex -> Belt.Int.toString}
       />
     };
   };
@@ -150,7 +150,7 @@ let make = () => {
                value={
                  latestRequest
                  ->Belt.Array.get(0)
-                 ->Belt.Option.mapWithDefault(0, ({id}) => id |> ID.Request.toInt)
+                 ->Belt.Option.mapWithDefault(0, ({id}) => id -> ID.Request.toInt)
                  ->Format.iPretty
                  ++ " In total"
                }
@@ -209,20 +209,20 @@ let make = () => {
            let requestsCount =
              latestRequest
              ->Belt.Array.get(0)
-             ->Belt.Option.mapWithDefault(0, ({id}) => id |> ID.Request.toInt);
+             ->Belt.Option.mapWithDefault(0, ({id}) => id -> ID.Request.toInt);
            let pageCount = Page.getPageCount(requestsCount, pageSize);
            <>
              {requestsCount > 0
                 ? requests
-                  ->Belt_Array.mapWithIndex((i, e) =>
+                  ->Belt.Array.mapWithIndex((i, e) =>
                       isMobile
                         ? <RenderBodyMobile
                             reserveIndex=i
-                            key={e.id |> ID.Request.toString}
+                            key={e.id -> ID.Request.toString}
                             requestsSub={Sub.resolve(e)}
                           />
                         : <RenderBody
-                            key={e.id |> ID.Request.toString}
+                            key={e.id -> ID.Request.toString}
                             requestsSub={Sub.resolve(e)}
                           />
                     )
@@ -250,11 +250,11 @@ let make = () => {
                   />}
            </>;
          | _ =>
-           Belt_Array.make(pageSize, Sub.NoData)
-           ->Belt_Array.mapWithIndex((i, noData) =>
+           Belt.Array.make(pageSize, Sub.NoData)
+           ->Belt.Array.mapWithIndex((i, noData) =>
                isMobile
-                 ? <RenderBodyMobile reserveIndex=i key={i |> string_of_int} requestsSub=noData />
-                 : <RenderBody key={i |> string_of_int} requestsSub=noData />
+                 ? <RenderBodyMobile reserveIndex=i key={i -> Belt.Int.toString} requestsSub=noData />
+                 : <RenderBody key={i -> Belt.Int.toString} requestsSub=noData />
              )
            ->React.array
          }}
