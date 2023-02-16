@@ -106,11 +106,15 @@ module RenderSearchResult = {
       array<SearchBarQuery.OracleScriptSearch.t>,
     > = SearchBarQuery.searchOracleScript(~filter=searchTerm, ())
 
+    let resultDataSourceQuery: Query.variant<
+      array<SearchBarQuery.DataSourceSearch.t>,
+    > = SearchBarQuery.searchDataSource(~filter=searchTerm, ())
+
     let resultBlockQuery: Query.variant<
       array<SearchBarQuery.BlockSearch.t>,
     > = SearchBarQuery.searchBlockID(~id=searchTerm, ())
 
-    let allQuery = Query.all2(resultOracleScriptQuery, resultBlockQuery)
+    let allQuery = Query.all3(resultOracleScriptQuery, resultBlockQuery, resultDataSourceQuery)
 
     <>
       <nav role="navigation" className={Styles.resultContent}>
@@ -178,8 +182,10 @@ module RenderSearchResult = {
         } else {
           <div>
             {switch allQuery {
-            | Data(osResults, blockResults) =>
-              switch osResults->Belt.Array.length + blockResults->Belt.Array.length > 0 {
+            | Data(osResults, blockResults, dsResults) =>
+              switch osResults->Belt.Array.length +
+              blockResults->Belt.Array.length +
+              dsResults->Belt.Array.length > 0 {
               | true =>
                 <ul role="tablist">
                   <li role="presentation">
@@ -235,6 +241,41 @@ module RenderSearchResult = {
                                   />
                                 </div>
                               </TypeID.OracleScriptLink>
+                            </div>
+                          })
+                          ->React.array}
+                        </div>
+                      </div>
+
+                    | false => React.null
+                    }}
+                  </li>
+                  <li role="presentation">
+                    {switch dsResults->Belt.Array.length > 0 {
+                    | true =>
+                      <div className={Styles.resultItem}>
+                        <div className={Styles.resultHeading}>
+                          <Heading
+                            size=Heading.H4
+                            value="Data Sources"
+                            align=Heading.Left
+                            weight=Heading.Semibold
+                            color={theme.textPrimary}
+                          />
+                        </div>
+                        <div className={Styles.resultInner(theme)}>
+                          {dsResults
+                          ->Belt.Array.mapWithIndex((i, result) => {
+                            <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
+                              <TypeID.DataSourceLink id={result.id}>
+                                <div className={Css.merge(list{CssHelper.flexBox()})}>
+                                  <TypeID.DataSource id={result.id} position=TypeID.Body />
+                                  <HSpacing size=Spacing.sm />
+                                  <Heading
+                                    size=Heading.H4 value={result.name} weight=Heading.Thin
+                                  />
+                                </div>
+                              </TypeID.DataSourceLink>
                             </div>
                           })
                           ->React.array}

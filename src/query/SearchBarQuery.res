@@ -27,6 +27,24 @@ module OracleScriptSearchConfig = %graphql(`
 
 `)
 
+module DataSourceSearch = {
+  type t = {
+    id: ID.DataSource.t,
+    name: string,
+  }
+}
+
+module DataSourceSearchConfig = %graphql(`
+    query SearchDataSourceID( $id: Int_comparison_exp, $name: String_comparison_exp) {
+        data_sources (where: { _and: [{ id: $id }, { name: $name}] }
+	) @ppxAs(type: "DataSourceSearch.t") {
+            id @ppxCustom(module: "GraphQLParserModule.DataSourceID")
+            name
+        }
+    }
+
+`)
+
 let searchOracleScript = (~filter, ()) => {
   let isNumber = switch filter->Belt.Int.fromString {
   | Some(_) => true
@@ -97,6 +115,61 @@ let searchBlockID = (~id, ()) => {
     switch blocks_by_pk {
     | Some(block) => [block]
     | None => []
+    }
+  })
+}
+
+let searchDataSource = (~filter, ()) => {
+  let isNumber = switch filter->Belt.Int.fromString {
+  | Some(_) => true
+  | None => false
+  }
+  let result = DataSourceSearchConfig.use({
+    id: Some({
+      _eq: filter->Belt.Int.fromString,
+      _gt: None,
+      _gte: None,
+      _in: None,
+      _is_null: None,
+      _lt: None,
+      _lte: None,
+      _neq: None,
+      _nin: None,
+    }),
+    name: Some({
+      _regex: {
+        switch isNumber {
+        | true => None
+        | false => Some(filter)
+        }
+      },
+      _eq: None,
+      _gt: None,
+      _gte: None,
+      _ilike: None,
+      _in: None,
+      _iregex: None,
+      _is_null: None,
+      _like: None,
+      _lt: None,
+      _lte: None,
+      _neq: None,
+      _nilike: None,
+      _nin: None,
+      _niregex: None,
+      _nlike: None,
+      _nregex: None,
+      _nsimilar: None,
+      _similar: None,
+    }),
+  })
+
+  result
+  ->Query.fromData
+  ->Query.map(({data_sources}) => {
+    switch data_sources->Belt.Array.length > 0 {
+    | true => data_sources
+    | false => []
     }
   })
 }
