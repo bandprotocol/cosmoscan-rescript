@@ -12,7 +12,7 @@ let make = (~showProof: bool, ~setShowProof) => {
     <div className={CssHelper.flexBox(~align=#center, ~justify=#center, ())}>
       <Icon name={showProof ? "fal fa-long-arrow-up" : "fal fa-long-arrow-down"} />
       <HSpacing size=Spacing.sm />
-      {(showProof ? "Hide" : "Show") ++ (isMobile ? " Proof" : " Proof JSON") |> React.string}
+      {((showProof ? "Hide" : "Show") ++ (isMobile ? " Proof" : " Proof JSON")) -> React.string}
     </div>
   </Button>;
 };

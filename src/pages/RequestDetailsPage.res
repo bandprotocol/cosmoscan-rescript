@@ -335,7 +335,7 @@ let make = (~reqID) => {
                        <Text
                          block=true
                          value={
-                           (gasFee |> Coin.getBandAmountFromCoins |> Format.fPretty(~digits=6))
+                           (gasFee -> Coin.getBandAmountFromCoins -> Format.fPretty(~digits=6))
                            ++ " BAND"
                          }
                          size=Text.Lg
@@ -361,7 +361,7 @@ let make = (~reqID) => {
                    | Data({prepareGas}) =>
                      <Text
                        block=true
-                       value={prepareGas |> string_of_int}
+                       value={prepareGas -> Belt.Int.toString}
                        size=Text.Lg
                        color={theme.textSecondary}
                      />
@@ -383,7 +383,7 @@ let make = (~reqID) => {
                    | Data({executeGas}) =>
                      <Text
                        block=true
-                       value={executeGas |> string_of_int}
+                       value={executeGas -> Belt.Int.toString}
                        size=Text.Lg
                        color={theme.textSecondary}
                      />
@@ -406,7 +406,7 @@ let make = (~reqID) => {
                      <Text
                        block=true
                        value={
-                         (feeLimit |> Coin.getBandAmountFromCoins |> Format.fPretty(~digits=6))
+                         (feeLimit -> Coin.getBandAmountFromCoins -> Format.fPretty(~digits=6))
                          ++ " BAND"
                        }
                        size=Text.Lg
@@ -428,16 +428,15 @@ let make = (~reqID) => {
                 <Col col=Col.Eight>
                   {switch (requestSub) {
                    | Data({feeUsed, feeLimit}) =>
-                     let feeUsed_ = feeUsed |> Coin.getBandAmountFromCoins;
-                     let feeLimit_ = feeLimit |> Coin.getBandAmountFromCoins;
+                     let feeUsed_ = feeUsed -> Coin.getBandAmountFromCoins;
+                     let feeLimit_ = feeLimit -> Coin.getBandAmountFromCoins;
                      let usedRatio =
-                       (feeLimit_ == 0. ? 0. : feeUsed_ /. feeLimit_)
-                       *. 100.
-                       |> Format.fPercent(~digits=2);
+                       ((feeLimit_ == 0. ? 0. : feeUsed_ /. feeLimit_) *. 100.)
+                       -> Format.fPercent(~digits=2)
                      <Text
                        block=true
                        value={
-                         (feeUsed_ |> Format.fPretty(~digits=6)) ++ " BAND " ++ {j`($usedRatio)`}
+                         (feeUsed_ -> Format.fPretty(~digits=6)) ++ " BAND " ++ {j`($usedRatio)`}
                        }
                        size=Text.Lg
                        color={theme.textSecondary}
@@ -581,7 +580,7 @@ let make = (~reqID) => {
                 {switch (requestSub) {
                  | Data({calldata}) =>
                    <CopyButton
-                     data={calldata |> JsBuffer.toHex(~with0x=false)}
+                     data={calldata -> JsBuffer.toHex(~with0x=false)}
                      title="Copy as bytes"
                      width=125
                    />
@@ -611,7 +610,7 @@ let make = (~reqID) => {
                    switch (resultOpt, resolveStatus) {
                    | (Some(result), Success) =>
                      <CopyButton
-                       data={result |> JsBuffer.toHex(~with0x=false)}
+                       data={result -> JsBuffer.toHex(~with0x=false)}
                        title="Copy as bytes"
                        width=125
                      />
@@ -771,7 +770,7 @@ let make = (~reqID) => {
                                ("External ID", Text(externalID)),
                                ("Fee\n(BAND)", Coin({value: list{fee}, hasDenom: false})),
                                ("Data Source", DataSource(dataSourceID, name)),
-                               ("Param", Text(calldata |> JsBuffer.toUTF8)),
+                               ("Param", Text(calldata -> JsBuffer.toUTF8)),
                              ]}
                              key={externalID ++ name}
                              idx={externalID ++ name}

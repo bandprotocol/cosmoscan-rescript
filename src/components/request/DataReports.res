@@ -35,7 +35,7 @@ let make = (~reports: array<RequestSub.report_t>) => {
               reportDetails,
             },
           ) => {
-          <div key={operatorAddress |> Address.toOperatorBech32} className=Styles.reportCard>
+          <div key={operatorAddress -> Address.toOperatorBech32} className=Styles.reportCard>
             {idx == 0 ? React.null : <SeperatedLine mt=32 mb=24 />}
             <Row marginBottom=24 alignItems=Row.Center>
               <Col col=Col.Four mbSm=8>
@@ -98,7 +98,7 @@ let make = (~reports: array<RequestSub.report_t>) => {
                           [
                            ("External ID", Text(externalID)),
                            ("Exit Code", Text(exitCode)),
-                           ("Value", Text(data |> JsBuffer.toUTF8)),
+                           ("Value", Text(data -> JsBuffer.toUTF8)),
                          ]}
                          key={externalID ++ exitCode}
                          idx={externalID ++ exitCode}
@@ -109,7 +109,7 @@ let make = (~reports: array<RequestSub.report_t>) => {
                          <Col col=Col.Three> <Text value=exitCode weight=Text.Medium /> </Col>
                          <Col col=Col.Six>
                            <Text
-                             value={data |> JsBuffer.toUTF8}
+                             value={data -> JsBuffer.toUTF8}
                              weight=Text.Medium
                              breakAll=true
                            />

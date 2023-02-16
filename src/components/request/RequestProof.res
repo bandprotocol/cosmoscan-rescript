@@ -61,7 +61,7 @@ let make = (~request: RequestSub.t) => {
       <div className={Css.merge(list{CssHelper.flexBox(), Styles.proofContainer})}>
         <ShowProofButton showProof setShowProof />
         <CopyButton
-          data={proof.evmProofBytes |> JsBuffer.toHex(~with0x=false)}
+          data={proof.evmProofBytes -> JsBuffer.toHex(~with0x=false)}
           title={isMobile ? "EVM" : "Copy EVM proof"}
           py=12
           px=20
@@ -72,7 +72,7 @@ let make = (~request: RequestSub.t) => {
          switch (nonEVMProofOpt) {
          | Some(proof) =>
            <CopyButton
-             data={proof |> JsBuffer.toHex(~with0x=false)}
+             data={proof -> JsBuffer.toHex(~with0x=false)}
              title={isMobile ? "non-EVM" : "Copy non-EVM proof"}
              py=10
              px=14
@@ -83,7 +83,7 @@ let make = (~request: RequestSub.t) => {
       {showProof
          ? <div className=Styles.scriptContainer>
              <ReactHighlight className=Styles.padding>
-               {proof.jsonProof |> Js.Json.stringifyWithSpace(_, 2) |> React.string}
+               {proof.jsonProof -> Js.Json.stringifyWithSpace(2) -> React.string}
              </ReactHighlight>
            </div>
          : React.null}
