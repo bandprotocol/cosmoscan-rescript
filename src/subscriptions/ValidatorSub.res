@@ -261,7 +261,7 @@ let count = () => {
   result
   ->Sub.fromData
   ->Sub.map(({validators_aggregate}) =>
-    validators_aggregate.aggregate->Belt_Option.getExn->(y => y->ValidatorAggCount.toExternal)
+    validators_aggregate.aggregate->Belt.Option.getExn->(y => y->ValidatorAggCount.toExternal)
   )
 }
 
@@ -271,7 +271,7 @@ let countByActive = isActive => {
   result
   ->Sub.fromData
   ->Sub.map(({validators_aggregate}) =>
-    validators_aggregate.aggregate->Belt_Option.getExn->(y => y->ValidatorAggCount.toExternal)
+    validators_aggregate.aggregate->Belt.Option.getExn->(y => y->ValidatorAggCount.toExternal)
   )
 }
 
@@ -282,9 +282,9 @@ let getTotalBondedAmount = () => {
   ->Sub.fromData
   ->Sub.map(a =>
     a.validators_aggregate.aggregate
-    ->Belt_Option.getExn
+    ->Belt.Option.getExn
     ->((y: TotalBondedAmount.aggregate_t) => y.sum)
-    ->Belt_Option.getExn
+    ->Belt.Option.getExn
     ->TotalBondedAmount.toExternal
   )
 }

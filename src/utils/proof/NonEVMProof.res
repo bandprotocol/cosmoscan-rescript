@@ -184,7 +184,7 @@ let obi_encode_int = (i, n) =>
     "{x: " ++ n ++ "}/{_:u64}",
     "input",
     [{fieldName: "x", fieldValue: i->Belt.Int.toString}],
-  )->Belt_Option.getExn
+  )->Belt.Option.getExn
 
 type variant_of_proof_t =
   | RequestPacket(request_packet_t)
@@ -257,7 +257,7 @@ let rec encode = x =>
       | _ => None
       }
     )
-    ->Belt_Option.map(_, x =>
+    ->Belt.Option.map(_, x =>
       JsBuffer.concat([obi_encode_int(iavl_merkle_paths->Belt.List.length, "u32"), x])
     )
 
@@ -344,7 +344,7 @@ let rec encode = x =>
       | _ => None
       }
     )
-    ->Belt_Option.map(_, x =>
+    ->Belt.Option.map(_, x =>
       JsBuffer.concat([obi_encode_int(tm_signatures->Belt.List.length, "u32"), x])
     )
 

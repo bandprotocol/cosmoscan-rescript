@@ -107,22 +107,17 @@ module SendBtn = {
 module Balance = {
   @react.component
   let make = (~address) => {
-    Js.log(address)
-    // Todo will patch later
-    // let accountSub = AccountSub.get(address)
-
+    let accountSub = AccountSub.get(address)
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
       <Text value="Balance" weight=Text.Medium color=theme.textPrimary />
       <div className={CssHelper.flexBox()} id="bandBalance">
         <Text
-          value="account"
-          //   value={switch accountSub {
-          //   | Data(account) =>
-          //     account.balance -> Coin.getBandAmountFromCoins -> Format.fPretty(~digits=6)
-          //   | _ => "0"
-          //   }}
+          value={switch accountSub {
+          | Data(account) => account.balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)
+          | _ => "0"
+          }}
           code=true
           color=theme.textPrimary
         />

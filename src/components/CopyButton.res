@@ -5,7 +5,7 @@ module Styles = {
 }
 
 @react.component
-let make = (~data, ~title, ~width=105, ~py=5, ~px=10, ~pySm=py, ~pxSm=px) => {
+let make = (~data, ~title, ~width=105, ~py=5, ~px=10, ~pySm=5, ~pxSm=10) => {
   let (copied, setCopy) = React.useState(_ => false)
   <Button
     variant=Button.Outline

@@ -158,7 +158,7 @@ let getList = (~page, ~pageSize) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({limit: pageSize, offset})
 
-  result->Sub.fromData->Sub.map(({blocks}) => blocks->Belt_Array.map(toExternal))
+  result->Sub.fromData->Sub.map(({blocks}) => blocks->Belt.Array.map(toExternal))
 }
 
 let get = (height: ID.Block.t) => {
@@ -183,7 +183,7 @@ let getAvgBlockTime = (greater, less) => {
   result
   ->Sub.fromData
   ->Sub.map(({blocks_aggregate}) =>
-    blocks_aggregate.aggregate->Belt_Option.getExn->(y => y.count)->BlockSum.toExternal
+    blocks_aggregate.aggregate->Belt.Option.getExn->(y => y.count)->BlockSum.toExternal
   )
 }
 
@@ -213,6 +213,6 @@ let getListByConsensusAddress = (~address, ~page, ~pageSize, ()) => {
   //   result
   // ->Sub.fromData
   // ->Sub.map(({blocks_aggregate}) =>
-  //   blocks_aggregate.aggregate->Belt_Option.getExn->(y => y.count)->BlockSum.toExternal
+  //   blocks_aggregate.aggregate->Belt.Option.getExn->(y => y.count)->BlockSum.toExternal
   // )
 }

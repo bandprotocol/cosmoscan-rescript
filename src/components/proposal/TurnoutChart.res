@@ -15,7 +15,7 @@ module Styles = {
       borderRadius(#percent(50.)),
     ])
 
-  let emoCircle = (percent, theme: EmotionTheme.t) =>
+  let emoCircle = (percent, theme: Theme.t) =>
     css({
       "width": "100%",
       "height": "100%",
@@ -54,11 +54,11 @@ module Styles = {
 @react.component
 let make = (~percent) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-  let (emotionTheme, _) = React.useContext(EmotionThemeContext.context)
+  // let (emotionTheme, _) = React.useContext(EmotionThemeContext.context)
 
   <div className=Styles.chartContainer>
     <svg
-      className={Styles.emoCircle(percent->int_of_float->Belt.Int.toString, emotionTheme.theme)}
+      className={Styles.emoCircle(percent->int_of_float->Belt.Int.toString, theme)}
       viewBox="0 0 208 208">
       <circle r="104" cx="104" cy="104" />
     </svg>

@@ -150,7 +150,7 @@ let make = (~consensusAddress) => {
     | Data(blocks) =>
       <>
         {blocks
-        ->Belt_Array.mapWithIndex((i, e) =>
+        ->Belt.Array.mapWithIndex((i, e) =>
           isMobile
             ? <RenderBodyMobile
                 key={e.height |> ID.Block.toString} reserveIndex=i blockSub={Sub.resolve(e)}
@@ -160,8 +160,8 @@ let make = (~consensusAddress) => {
         ->React.array}
       </>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile key={string_of_int(i)} reserveIndex=i blockSub=noData />
           : <RenderBody key={string_of_int(i)} blockSub=noData />

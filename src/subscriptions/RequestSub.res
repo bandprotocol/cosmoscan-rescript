@@ -10,7 +10,7 @@ type resolve_status_t =
 
 module ResolveStatus = {
   let parse = json => {
-    let status = json->Js.Json.decodeString->Belt_Option.getExn
+    let status = json->Js.Json.decodeString->Belt.Option.getExn
     switch status {
     | "Open" => Pending
     | "Success" => Success
