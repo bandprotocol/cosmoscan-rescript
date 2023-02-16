@@ -1,3 +1,39 @@
+module Changes = {
+  type changes_t = {
+    subspace: string,
+    key: string,
+    value: string,
+  };
+
+  let decode = json => {
+    open JsonUtils.Decode
+
+    buildObject(json => {
+      subspace: json.at(list{"subspace"}, string),
+      key: json.at(list{"key"}, string),
+      value: json.at(list{"value"}, string),
+    })
+  }
+};
+
+module Content = {
+
+  type t = {
+    title: string,
+    description: string,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      {
+        title: json.at(list{"title"}, string),
+        description: json.at(list{"description"}, string),
+      }
+    })
+  }
+}
+
 type proposal_status_t =
   | Deposit
   | Voting
@@ -39,6 +75,7 @@ type internal_t = {
   title: string,
   status: proposal_status_t,
   description: string,
+  contentOpt: option<Js.Json.t>,
   submitTime: MomentRe.Moment.t,
   depositEndTime: MomentRe.Moment.t,
   votingStartTime: MomentRe.Moment.t,
@@ -53,6 +90,7 @@ type t = {
   name: string,
   status: proposal_status_t,
   description: string,
+  content: option<Content.t>,
   submitTime: MomentRe.Moment.t,
   depositEndTime: MomentRe.Moment.t,
   votingStartTime: MomentRe.Moment.t,
@@ -67,6 +105,7 @@ let toExternal = ({
   title,
   status,
   description,
+  contentOpt,
   submitTime,
   depositEndTime,
   votingStartTime,
@@ -79,6 +118,7 @@ let toExternal = ({
   name: title,
   status,
   description,
+  content: contentOpt->Belt.Option.map(content => content ->JsonUtils.Decode.mustDecode(Content.decode)),
   submitTime,
   depositEndTime,
   votingStartTime,
@@ -95,6 +135,7 @@ module SingleConfig = %graphql(`
       title
       status @ppxCustom(module: "ProposalStatus")
       description
+      contentOpt: content
       submitTime: submit_time @ppxCustom(module: "GraphQLParserModule.Date")
       depositEndTime: deposit_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       votingStartTime: voting_time @ppxCustom(module: "GraphQLParserModule.Date")
@@ -115,6 +156,7 @@ module MultiConfig = %graphql(`
       title
       status @ppxCustom(module: "ProposalStatus")
       description
+      contentOpt: content
       submitTime: submit_time @ppxCustom(module: "GraphQLParserModule.Date")
       depositEndTime: deposit_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       votingStartTime: voting_time @ppxCustom(module: "GraphQLParserModule.Date")
