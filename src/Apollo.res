@@ -3,7 +3,7 @@ let graphqlEndpoint = Env.graphql
 let headers = {"project": "cosmoscan"}
 
 let httpLink = ApolloClient.Link.HttpLink.make(
-  ~uri=_ => "http://" ++ graphqlEndpoint,
+  ~uri=_ => "https://" ++ graphqlEndpoint,
   ~headers=Obj.magic(headers),
   (),
 )
