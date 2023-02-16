@@ -18,7 +18,7 @@ module Styles = {
       hover([border(#px(1), #solid, hex("9096A2"))]), //TODO: neutral_500
       focus([border(#px(1), #solid, theme.baseBlue)]),
       outlineStyle(#none),
-      backgroundColor(theme.white),
+      background(theme.secondaryBg),
       paddingRight(#px(40)),
       fontFamilies([#custom("Roboto Mono"), #monospace]),
       fontWeight(#num(300)),
@@ -39,7 +39,7 @@ module Styles = {
       top(#px(50)),
       left(#zero),
       width(#percent(100.)),
-      backgroundColor(theme.white),
+      background(theme.secondaryBg),
       borderRadius(#px(8)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(16, 18, 20, #num(0.15)))),
       padding3(~top=#px(0), ~bottom=#px(0), ~h=#zero),
@@ -97,6 +97,9 @@ module RenderSearchResult = {
   let make = (~searchTerm) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
+    let len = searchTerm->String.length
+    let capStr = searchTerm->String.capitalize_ascii
+
     let searchResults = Belt.Array.make(0, {title: "", link: ""})
 
     let resultOracleScriptQuery: Query.variant<
@@ -109,113 +112,239 @@ module RenderSearchResult = {
 
     let allQuery = Query.all2(resultOracleScriptQuery, resultBlockQuery)
 
-    <div>
-      {switch allQuery {
-      | Data(osResults, blockResults) =>
-        switch osResults->Belt.Array.length + blockResults->Belt.Array.length > 0 {
-        | true =>
-          //   <div className={Styles.resultContent}>
-          <nav role="navigation" className={Styles.resultContent}>
-            <ul role="tablist">
-              <li role="presentation">
-                {switch blockResults->Belt.Array.length > 0 {
-                | true =>
-                  <div className={Styles.resultItem}>
-                    <div className={Styles.resultHeading}>
-                      <Heading
-                        size=Heading.H4
-                        value="Blocks"
-                        align=Heading.Left
-                        weight=Heading.Semibold
-                        color={theme.textPrimary}
-                      />
-                    </div>
-                    <div className={Styles.resultInner(theme)}>
-                      {blockResults
-                      ->Belt.Array.mapWithIndex((i, result) => {
-                        <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
-                          <TypeID.Block id=result.height position=TypeID.Subtitle block=true />
-                        </div>
-                      })
-                      ->React.array}
-                    </div>
-                  </div>
-
-                | false => React.null
-                }}
-              </li>
-              <li role="presentation">
-                {switch osResults->Belt.Array.length > 0 {
-                | true =>
-                  <div className={Styles.resultItem}>
-                    <div className={Styles.resultHeading}>
-                      <Heading
-                        size=Heading.H4
-                        value="Oracle Scripts"
-                        align=Heading.Left
-                        weight=Heading.Semibold
-                        color={theme.textPrimary}
-                      />
-                    </div>
-                    <div className={Styles.resultInner(theme)}>
-                      {osResults
-                      ->Belt.Array.mapWithIndex((i, result) => {
-                        <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
-                          <TypeID.OracleScriptLink id={result.id}>
-                            <div className={Css.merge(list{CssHelper.flexBox()})}>
-                              <TypeID.OracleScript id={result.id} position=TypeID.Body />
-                              <HSpacing size=Spacing.sm />
-                              <Heading size=Heading.H4 value={result.name} weight=Heading.Thin />
-                            </div>
-                          </TypeID.OracleScriptLink>
-                        </div>
-                      })
-                      ->React.array}
-                    </div>
-                  </div>
-
-                | false => React.null
-                }}
-              </li>
-            </ul>
-          </nav>
-        | false =>
-          <div className={Styles.resultNotFound}>
-            <Text value={j`No search result for "$searchTerm"`} size=Text.Lg />
+    <>
+      <nav role="navigation" className={Styles.resultContent}>
+        {if searchTerm->Js.String2.startsWith("bandvaloper") && len == 50 {
+          <ul role="tablist" className={Styles.resultItem}>
+            <li role="presentation">
+              <div className={Styles.resultHeading}>
+                <Heading
+                  size=Heading.H4
+                  value="Address"
+                  align=Heading.Left
+                  weight=Heading.Semibold
+                  color={theme.textPrimary}
+                />
+              </div>
+              <div className={Styles.resultInner(theme)}>
+                <div className={Styles.innerResultItem}>
+                  <AddressRender
+                    address={searchTerm->Address.fromBech32}
+                    position=AddressRender.Text
+                    accountType=#validator
+                  />
+                </div>
+              </div>
+            </li>
+          </ul>
+        } else if searchTerm->Js.String2.startsWith("band") && len == 43 {
+          <ul role="tablist" className={Styles.resultItem}>
+            <li role="presentation">
+              <div className={Styles.resultHeading}>
+                <Heading
+                  size=Heading.H4
+                  value="Address"
+                  align=Heading.Left
+                  weight=Heading.Semibold
+                  color={theme.textPrimary}
+                />
+              </div>
+              <div className={Styles.resultInner(theme)}>
+                <div className={Styles.innerResultItem}>
+                  <AddressRender
+                    address={searchTerm->Address.fromBech32} position=AddressRender.Subtitle
+                  />
+                </div>
+              </div>
+            </li>
+          </ul>
+        } else if len == 64 || (searchTerm->Js.String2.startsWith("0x") && len == 66) {
+          <div className={Styles.resultItem}>
+            <div className={Styles.resultHeading}>
+              <Heading
+                size=Heading.H4
+                value="Transactions"
+                align=Heading.Left
+                weight=Heading.Semibold
+                color={theme.textPrimary}
+              />
+            </div>
+            <div className={Styles.resultInner(theme)}>
+              <div className={Styles.innerResultItem}>
+                <TxLink txHash={searchTerm->Hash.fromHex} width=500 size=Text.Lg />
+              </div>
+            </div>
           </div>
-        }
+        } else {
+          <div>
+            {switch allQuery {
+            | Data(osResults, blockResults) =>
+              switch osResults->Belt.Array.length + blockResults->Belt.Array.length > 0 {
+              | true =>
+                <ul role="tablist">
+                  <li role="presentation">
+                    {switch blockResults->Belt.Array.length > 0 {
+                    | true =>
+                      <div className={Styles.resultItem}>
+                        <div className={Styles.resultHeading}>
+                          <Heading
+                            size=Heading.H4
+                            value="Blocks"
+                            align=Heading.Left
+                            weight=Heading.Semibold
+                            color={theme.textPrimary}
+                          />
+                        </div>
+                        <div className={Styles.resultInner(theme)}>
+                          {blockResults
+                          ->Belt.Array.mapWithIndex((i, result) => {
+                            <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
+                              <TypeID.Block id=result.height position=TypeID.Subtitle block=true />
+                            </div>
+                          })
+                          ->React.array}
+                        </div>
+                      </div>
 
-      | Loading =>
-        <div className={Styles.resultInner(theme)}>
-          <LoadingCensorBar width=100 height=20 />
-        </div>
-      | _ =>
-        <div className={Styles.resultNotFound}>
-          <Text value={j`No search result for "$searchTerm"`} size=Text.Lg />
-        </div>
-      }}
-    </div>
+                    | false => React.null
+                    }}
+                  </li>
+                  <li role="presentation">
+                    {switch osResults->Belt.Array.length > 0 {
+                    | true =>
+                      <div className={Styles.resultItem}>
+                        <div className={Styles.resultHeading}>
+                          <Heading
+                            size=Heading.H4
+                            value="Oracle Scripts"
+                            align=Heading.Left
+                            weight=Heading.Semibold
+                            color={theme.textPrimary}
+                          />
+                        </div>
+                        <div className={Styles.resultInner(theme)}>
+                          {osResults
+                          ->Belt.Array.mapWithIndex((i, result) => {
+                            <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
+                              <TypeID.OracleScriptLink id={result.id}>
+                                <div className={Css.merge(list{CssHelper.flexBox()})}>
+                                  <TypeID.OracleScript id={result.id} position=TypeID.Body />
+                                  <HSpacing size=Spacing.sm />
+                                  <Heading
+                                    size=Heading.H4 value={result.name} weight=Heading.Thin
+                                  />
+                                </div>
+                              </TypeID.OracleScriptLink>
+                            </div>
+                          })
+                          ->React.array}
+                        </div>
+                      </div>
+
+                    | false => React.null
+                    }}
+                  </li>
+                </ul>
+              | false =>
+                <div className={Styles.resultNotFound}>
+                  <Text value={j`No search result for "$searchTerm"`} size=Text.Lg />
+                </div>
+              }
+
+            | Loading =>
+              <div className={Styles.resultInner(theme)}>
+                <LoadingCensorBar width=100 height=20 />
+              </div>
+            | _ =>
+              <div className={Styles.resultNotFound}>
+                <Text value={j`No search result for "$searchTerm"`} size=Text.Lg />
+              </div>
+            }}
+          </div>
+        }}
+      </nav>
+    </>
   }
 }
+
+type resultState =
+  | Hidden
+  | ShowAndFocus(int)
+
+type validArrowDirection =
+  | Up
+  | Down
+
+type state = {
+  searchTerm: string,
+  resultState: resultState,
+}
+
+type action =
+  | ChangeSearchTerm(string)
+  | ArrowPressed(validArrowDirection)
+  | StartTyping
+  | StopTyping
+  | HoverResultAt(int)
+
+let reducer = (state, x) =>
+  switch x {
+  | ChangeSearchTerm(newTerm) => {...state, searchTerm: newTerm}
+  | ArrowPressed(direction) =>
+    switch state.resultState {
+    | Hidden => state
+    | ShowAndFocus(focusIndex) => {
+        ...state,
+        resultState: ShowAndFocus(
+          switch direction {
+          | Up => focusIndex - 1
+          | Down => focusIndex + 1
+          },
+        ),
+      }
+    }
+  | StartTyping => {...state, resultState: ShowAndFocus(0)}
+  | StopTyping => {...state, resultState: Hidden}
+  | HoverResultAt(resultIndex) => {...state, resultState: ShowAndFocus(resultIndex)}
+  }
 
 @react.component
 let make = () => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  let (searchTerm, setSearchTerm) = React.useState(_ => "")
   let (isSearching, setIsSearching) = React.useState(_ => false)
+
+  let ({searchTerm, resultState}, dispatch) = React.useReducer(
+    reducer,
+    {searchTerm: "", resultState: Hidden},
+  )
 
   let clickOutside = ClickOutside.useClickOutside(_ => setIsSearching(_ => false))
 
   <div className={Styles.searchbarWrapper(theme)} ref={ReactDOM.Ref.domRef(clickOutside)}>
     <input
+      onFocus={_evt => dispatch(StartTyping)}
+      onBlur={_evt => dispatch(StopTyping)}
       onChange={evt => {
         let inputVal = ReactEvent.Form.target(evt)["value"]
-        let len = inputVal->String.length
-        let capStr = inputVal->String.capitalize_ascii
-        setSearchTerm(_ => inputVal)
         setIsSearching(_ => inputVal !== "")
+        dispatch(ChangeSearchTerm(inputVal))
       }}
+      onKeyDown={event =>
+        switch ReactEvent.Keyboard.key(event) {
+        | "ArrowUp" =>
+          dispatch(ArrowPressed(Up))
+          ReactEvent.Keyboard.preventDefault(event)
+        | "ArrowDown" =>
+          dispatch(ArrowPressed(Down))
+          ReactEvent.Keyboard.preventDefault(event)
+        | "Enter" =>
+          dispatch(ChangeSearchTerm(""))
+          setIsSearching(_ => false)
+          ReactEvent.Keyboard.preventDefault(event)
+          Route.redirect(searchTerm->Route.search)
+        | _ => ()
+        }}
       value=searchTerm
       className={Styles.searchbarInput(theme)}
       placeholder="Search Address / TXN Hash / Block / Validator / etc."
@@ -224,14 +353,19 @@ let make = () => {
       <button
         className=Styles.buttonStyled
         onClick={_ => {
-          Js.log(searchTerm)
+          setIsSearching(_ => false)
+          dispatch(ChangeSearchTerm(""))
+          Route.redirect(searchTerm->Route.search)
         }}>
         <Icon name="far fa-search" color=theme.textPrimary size=16 />
       </button>
     </div>
     <div
       className={Styles.resultContainer(theme, ~isShow={isSearching})}
-      onClick={_ => setIsSearching(_ => false)}>
+      onClick={_ => {
+        setIsSearching(_ => false)
+        dispatch(ChangeSearchTerm(""))
+      }}>
       <RenderSearchResult searchTerm />
     </div>
   </div>
