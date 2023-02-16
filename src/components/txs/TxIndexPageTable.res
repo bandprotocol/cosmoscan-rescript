@@ -17,7 +17,7 @@ module Styles = {
 let renderUnknownMessage = () =>
   <Col col=Col.Six>
     <div className=Styles.topicContainer>
-      <Text value="Unknown Message" size=Text.Sm transform=Text.Uppercase />
+      <Text value="Unknown Message" size=Text.Caption transform=Text.Uppercase />
       <img src=Images.fail className=Styles.failIcon />
     </div>
   </Col>
@@ -124,7 +124,7 @@ module MsgDetailCard = {
           <Heading value=badgeTheme.name size=Heading.H4 />
         </div>
         <div className=Styles.jsonMode onClick={_ => toggle()}>
-          <Text value="JSON Mode" weight=Text.Semibold color=theme.textPrimary />
+          <Text value="JSON Mode" weight=Text.Semibold color=theme.neutral_900 />
           <Switch checked=showJson />
         </div>
       </div>

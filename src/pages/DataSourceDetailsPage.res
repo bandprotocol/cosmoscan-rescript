@@ -1,7 +1,7 @@
 module Styles = {
   open CssJs
   let infoHeader = (theme: Theme.t) =>
-    style(. [borderBottom(#px(1), #solid, theme.tableRowBorderColor), paddingBottom(#px(16))])
+    style(. [borderBottom(#px(1), #solid, theme.neutral_100), paddingBottom(#px(16))])
 }
 
 module Content = {
@@ -34,11 +34,11 @@ module Content = {
                 <Col col=Col.Four mbSm=8>
                   <div className={CssHelper.flexBox()}>
                     <Heading
-                      value="Owner" size=Heading.H4 weight=Heading.Thin color={theme.textSecondary}
+                      value="Owner" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                     />
                     <HSpacing size=Spacing.xs />
                     <CTooltip tooltipText="The owner of the data source">
-                      <Icon name="fal fa-info-circle" size=10 color={theme.textSecondary} />
+                      <Icon name="fal fa-info-circle" size=10 color={theme.neutral_600} />
                     </CTooltip>
                   </div>
                 </Col>
@@ -52,7 +52,7 @@ module Content = {
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Treasury" size=Heading.H4 weight=Heading.Thin color={theme.textSecondary}
+                    value="Treasury" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -66,7 +66,7 @@ module Content = {
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Fee" size=Heading.H4 weight=Heading.Thin color={theme.textSecondary}
+                    value="Fee" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -82,7 +82,7 @@ module Content = {
                     value="Accumulated Revenue"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -99,12 +99,12 @@ module Content = {
                     value="Description"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
                   {switch dataSourceSub {
-                  | Data({description}) => <Text size=Text.Lg value=description />
+                  | Data({description}) => <Text size=Text.Body1 value=description />
                   | _ => <LoadingCensorBar width=284 height=15 />
                   }}
                 </Col>

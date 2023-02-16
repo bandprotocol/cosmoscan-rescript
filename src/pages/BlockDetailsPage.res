@@ -7,7 +7,7 @@ module Styles = {
     style(. [
       paddingTop(#px(50)),
       minHeight(#px(450)),
-      backgroundColor(theme.secondaryBg),
+      backgroundColor(theme.neutral_100),
       borderRadius(#px(4)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(0, 0, 0, #num(0.1)))),
     ])
@@ -49,21 +49,21 @@ let make = (~height) => {
           {height > latestBlock.height
              ? <Text
                  value=j`This block(#B$height) hasn't mined yet.`
-                 size=Text.Lg
-                 color={theme.textSecondary}
+                 size=Text.Body1
+                 color={theme.neutral_600}
                />
              : <div className={CssHelper.flexBox(~justify=#center, ())}>
                  <Text
                    value="The database is syncing."
-                   size=Text.Lg
-                   color={theme.textSecondary}
+                   size=Text.Body1
+                   color={theme.neutral_600}
                    block=true
                  />
                  <VSpacing size=Spacing.md />
                  <Text
                    value="Please waiting for the state up to date."
-                   size=Text.Lg
-                   color={theme.textSecondary}
+                   size=Text.Body1
+                   color={theme.neutral_600}
                    block=true
                  />
                </div>}
@@ -72,8 +72,8 @@ let make = (~height) => {
             <Text
               value="Back to Homepage"
               weight=Text.Bold
-              size=Text.Md
-              color={theme.textSecondary}
+              size=Text.Body2
+              color={theme.neutral_600}
             />
             <HSpacing size=Spacing.md />
             <img alt="Right Arrow Icon" src=Images.rightArrow className=Styles.rightArrow />
@@ -105,7 +105,7 @@ let make = (~height) => {
                     value="Block Hash"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -115,7 +115,7 @@ let make = (~height) => {
                        value={hash->Hash.toHex(~upper=true)}
                        code=true
                        block=true
-                       size=Text.Lg
+                       size=Text.Body1
                        breakAll=true
                      />
                    | Error(_) | Loading | NoData => <LoadingCensorBar width={isMobile ? 200 : 350} height=15 />
@@ -128,12 +128,12 @@ let make = (~height) => {
                     value="Transaction"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
                   {switch (blockSub) {
-                   | Data({txn}) => <Text value={txn->Belt.Int.toString} size=Text.Lg />
+                   | Data({txn}) => <Text value={txn->Belt.Int.toString} size=Text.Body1 />
                    | Error(_) | Loading | NoData => <LoadingCensorBar width=40 height=15 />
                    }}
                 </Col>
@@ -144,7 +144,7 @@ let make = (~height) => {
                     value="Timestamp"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -157,14 +157,14 @@ let make = (~height) => {
                            ->MomentRe.Moment.format(Config.timestampDisplayFormat, _)
                            ->String.uppercase_ascii
                          }
-                         size=Text.Lg
+                         size=Text.Body1
                        />
                        <HSpacing size=Spacing.sm />
                        <TimeAgos
                          time=timestamp
                          prefix="("
                          suffix=")"
-                         size=Text.Md
+                         size=Text.Body2
                          weight=Text.Thin
                        />
                      </div>
@@ -178,7 +178,7 @@ let make = (~height) => {
                     value="Proposer"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -189,7 +189,7 @@ let make = (~height) => {
                          validatorAddress=operatorAddress
                          moniker
                          identity
-                         size=Text.Lg
+                         size=Text.Body1
                          avatarWidth=33
                        />
                      </div>

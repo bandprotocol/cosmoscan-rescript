@@ -11,20 +11,20 @@ let make = () => {
         // <Col col=Col.Twelve>
         //   {
         //     switch requestsByDs {
-        //       | Data(data) => <Text value={data[0].txHash -> Belt.Option.getExn -> Hash.toHex} size=Text.Lg />
-        //       | Loading => <Text value="Loading" size=Text.Lg />
-        //       | NoData => <Text value="NoData" size=Text.Lg />
-        //       | Error(err) => <Text value=err.message size=Text.Lg />
+        //       | Data(data) => <Text value={data[0].txHash -> Belt.Option.getExn -> Hash.toHex} size=Text.Body1 />
+        //       | Loading => <Text value="Loading" size=Text.Body1 />
+        //       | NoData => <Text value="NoData" size=Text.Body1 />
+        //       | Error(err) => <Text value=err.message size=Text.Body1 />
         //     }
         //   }
         // </Col>
         // <Col col=Col.Twelve>
         //   {
         //     switch requestsByTxHash {
-        //       | Data(data) => <Text value={data[0].txHash -> Belt.Option.getExn -> Hash.toHex} size=Text.Lg />
-        //       | Loading => <Text value="Loading" size=Text.Lg />
-        //       | NoData => <Text value="NoData" size=Text.Lg />
-        //       | Error(err) => <Text value=err.message size=Text.Lg />
+        //       | Data(data) => <Text value={data[0].txHash -> Belt.Option.getExn -> Hash.toHex} size=Text.Body1 />
+        //       | Loading => <Text value="Loading" size=Text.Body1 />
+        //       | NoData => <Text value="NoData" size=Text.Body1 />
+        //       | Error(err) => <Text value=err.message size=Text.Body1 />
         //     }
         //   }
         // </Col>
@@ -35,17 +35,17 @@ let make = () => {
         //       ({id,responseTime}) =>
         //       <>
         //         <Col col=Col.Twelve>
-        //           <Text value={id ->ID.OracleScript.toString} size=Text.Lg />
+        //           <Text value={id ->ID.OracleScript.toString} size=Text.Body1 />
         //         </Col>
         //         <Col col=Col.Twelve>
-        //           <Text value={responseTime -> Belt.Float.toString} size=Text.Lg />
+        //           <Text value={responseTime -> Belt.Float.toString} size=Text.Body1 />
         //         </Col>
         //         <SeperatedLine/>
         //       </>
         //     ) -> React.array
-        //     | Loading => <Text value="Loading" size=Text.Lg />
-        //     | NoData => <Text value="NoData" size=Text.Lg />
-        //     | Error(err) => <Text value=err.message size=Text.Lg />
+        //     | Loading => <Text value="Loading" size=Text.Body1 />
+        //     | NoData => <Text value="NoData" size=Text.Body1 />
+        //     | Error(err) => <Text value=err.message size=Text.Body1 />
         //   }
         // }
       </Row>

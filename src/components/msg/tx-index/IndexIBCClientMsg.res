@@ -10,7 +10,7 @@ module CreateClient = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=client.signer />
       </Col>
@@ -30,7 +30,7 @@ module UpdateClient = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=client.signer />
       </Col>
@@ -40,9 +40,9 @@ module UpdateClient = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=client.clientID />
+        <Text size=Text.Body1 value=client.clientID />
       </Col>
     </Row>
   }
@@ -60,7 +60,7 @@ module UpgradeClient = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=client.signer />
       </Col>
@@ -70,9 +70,9 @@ module UpgradeClient = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=client.clientID />
+        <Text size=Text.Body1 value=client.clientID />
       </Col>
     </Row>
   }
@@ -90,7 +90,7 @@ module SubmitClientMisbehaviour = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=client.signer />
       </Col>
@@ -100,9 +100,9 @@ module SubmitClientMisbehaviour = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=client.clientID />
+        <Text size=Text.Body1 value=client.clientID />
       </Col>
     </Row>
   }

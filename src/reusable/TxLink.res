@@ -5,13 +5,13 @@ module Styles = {
       display(#flex),
       maxWidth(px(w)),
       cursor(pointer),
-      selector("> span:hover", [color(theme.baseBlue)]),
+      selector("> span:hover", [color(theme.primary_600)]),
       selector("> span", [transition(~duration=200, "all")]),
     ])
 }
 
 @react.component
-let make = (~txHash: Hash.t, ~width: int, ~size=Text.Md, ~weight=Text.Medium) => {
+let make = (~txHash: Hash.t, ~width: int, ~size=Text.Body2, ~weight=Text.Medium) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   <Link className={Styles.withWidth(width, theme)} route={Route.TxIndexPage(txHash)}>
     <Text
@@ -22,7 +22,7 @@ let make = (~txHash: Hash.t, ~width: int, ~size=Text.Md, ~weight=Text.Medium) =>
       weight
       ellipsis=true
       size
-      color={theme.textPrimary}
+      color={theme.neutral_900}
     />
   </Link>
 }

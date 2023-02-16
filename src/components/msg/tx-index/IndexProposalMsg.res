@@ -9,7 +9,7 @@ module SubmitProposalMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender position=AddressRender.Subtitle address=proposal.proposer />
       </Col>
@@ -19,7 +19,7 @@ module SubmitProposalMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <TypeID.Proposal position=TypeID.Subtitle id=proposal.proposalID />
       </Col>
@@ -29,9 +29,9 @@ module SubmitProposalMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=proposal.title />
+        <Text size=Text.Body1 value=proposal.title />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -39,7 +39,7 @@ module SubmitProposalMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=proposal.initialDeposit pos=AmountRender.TxIndex />
       </Col>
@@ -58,7 +58,7 @@ module SubmitProposalFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender position=AddressRender.Subtitle address=proposal.proposer />
       </Col>
@@ -68,9 +68,9 @@ module SubmitProposalFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=proposal.title />
+        <Text size=Text.Body1 value=proposal.title />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -78,7 +78,7 @@ module SubmitProposalFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=proposal.initialDeposit pos=AmountRender.TxIndex />
       </Col>
@@ -97,7 +97,7 @@ module DepositMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender position=AddressRender.Subtitle address=deposit.depositor />
       </Col>
@@ -107,7 +107,7 @@ module DepositMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <TypeID.Proposal position=TypeID.Subtitle id=deposit.proposalID />
       </Col>
@@ -117,9 +117,9 @@ module DepositMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=deposit.title />
+        <Text size=Text.Body1 value=deposit.title />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -127,7 +127,7 @@ module DepositMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=deposit.amount pos=AmountRender.TxIndex />
       </Col>
@@ -146,7 +146,7 @@ module DepositFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender position=AddressRender.Subtitle address=deposit.depositor />
       </Col>
@@ -156,7 +156,7 @@ module DepositFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <TypeID.Proposal position=TypeID.Subtitle id=deposit.proposalID />
       </Col>
@@ -166,7 +166,7 @@ module DepositFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=deposit.amount pos=AmountRender.TxIndex />
       </Col>
@@ -185,7 +185,7 @@ module VoteMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender position=AddressRender.Subtitle address=vote.voterAddress />
       </Col>
@@ -195,7 +195,7 @@ module VoteMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <TypeID.Proposal position=TypeID.Subtitle id=vote.proposalID />
       </Col>
@@ -205,9 +205,9 @@ module VoteMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=vote.title />
+        <Text size=Text.Body1 value=vote.title />
       </Col>
       <Col col=Col.Six>
         <Heading
@@ -215,9 +215,9 @@ module VoteMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=vote.option />
+        <Text size=Text.Body1 value=vote.option />
       </Col>
     </Row>
   }
@@ -234,7 +234,7 @@ module VoteFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender position=AddressRender.Subtitle address=vote.voterAddress />
       </Col>
@@ -244,7 +244,7 @@ module VoteFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <TypeID.Proposal position=TypeID.Subtitle id=vote.proposalID />
       </Col>
@@ -254,9 +254,9 @@ module VoteFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=vote.option />
+        <Text size=Text.Body1 value=vote.option />
       </Col>
     </Row>
   }

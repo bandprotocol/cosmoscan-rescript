@@ -33,14 +33,14 @@ let make = (~accountAddress: Address.t) => {
             | Data(txsCount) =>
               <div className={CssHelper.flexBox()}>
                 <Text
-                  block=true value={txsCount->Belt.Int.toString} weight=Text.Semibold size=Text.Sm
+                  block=true value={txsCount->Belt.Int.toString} weight=Text.Semibold size=Text.Caption
                 />
                 <HSpacing size=Spacing.xs />
                 <Text
                   block=true
                   value="Transactions"
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
               </div>
@@ -60,7 +60,7 @@ let make = (~accountAddress: Address.t) => {
                     block=true
                     value="Transactions"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </div>
@@ -69,14 +69,14 @@ let make = (~accountAddress: Address.t) => {
             </Col>
             <Col col=Col.One>
               <Text
-                block=true value="Block" weight=Text.Semibold size=Text.Sm transform=Text.Uppercase
+                block=true value="Block" weight=Text.Semibold size=Text.Caption transform=Text.Uppercase
               />
             </Col>
             <Col col=Col.One>
               <Text
                 block=true
                 value="Status"
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
                 weight=Text.Semibold
                 align=Text.Center
@@ -87,7 +87,7 @@ let make = (~accountAddress: Address.t) => {
                 block=true
                 value="Gas Fee (BAND)"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
               />
             </Col>
@@ -96,7 +96,7 @@ let make = (~accountAddress: Address.t) => {
                 block=true
                 value="Actions"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
               />
             </Col>

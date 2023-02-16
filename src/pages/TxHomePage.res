@@ -24,7 +24,7 @@ let make = () => {
               ->Format.iPretty ++ " In total"}
               size=Heading.H3
               weight=Heading.Thin
-              color=theme.textSecondary
+              color=theme.neutral_600
             />
           | _ => <LoadingCensorBar width=65 height=21 />
           }}
@@ -41,7 +41,7 @@ let make = () => {
                     value="TX Hash"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                 </Col>
                 <Col col=Col.One>
@@ -50,7 +50,7 @@ let make = () => {
                     value="Block"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                 </Col>
                 <Col col=Col.One>
@@ -59,7 +59,7 @@ let make = () => {
                     value="Status"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                     align=Text.Center
                   />
                 </Col>
@@ -69,7 +69,7 @@ let make = () => {
                     value="Gas Fee (BAND)"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                 </Col>
                 <Col col=Col.Five>
@@ -78,7 +78,7 @@ let make = () => {
                     value="Actions"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                 </Col>
               </Row>

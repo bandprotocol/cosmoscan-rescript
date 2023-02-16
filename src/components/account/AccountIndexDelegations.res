@@ -25,7 +25,7 @@ module RenderBody = {
                 identity
                 width={#px(300)}
                 avatarWidth=30
-                size=Text.Lg
+                size=Text.Body1
               />
             </div>
           | _ => <LoadingCensorBar width=200 height=20 />
@@ -48,13 +48,13 @@ module RenderBody = {
                 | Some({address}) if Address.isEqual(address, delegatorAddress) =>
                   <div className={CssHelper.flexBox()}>
                     <div className=Styles.actionText onClick={_ => delegate()}>
-                      <Text value="Delegate" underline=true color={theme.textPrimary} />
+                      <Text value="Delegate" underline=true color=theme.neutral_900 />
                     </div>
                     <div className=Styles.actionText onClick={_ => redelegate()}>
-                      <Text value="Redelegate" underline=true color={theme.textPrimary} />
+                      <Text value="Redelegate" underline=true color=theme.neutral_900 />
                     </div>
                     <div className=Styles.actionText onClick={_ => undelegate()}>
-                      <Text value="Undelegate" underline=true color={theme.textPrimary} />
+                      <Text value="Undelegate" underline=true color=theme.neutral_900 />
                     </div>
                   </div>
                 | _ => React.null
@@ -84,10 +84,10 @@ module RenderBody = {
                 | Some({address}) if Address.isEqual(address, delegatorAddress) =>
                   <div className={CssHelper.flexBox()}>
                     <div className=Styles.actionText onClick={_ => withdrawReward()}>
-                      <Text value="Claim" underline=true color={theme.textPrimary} />
+                      <Text value="Claim" underline=true color=theme.neutral_900 />
                     </div>
                     <div className=Styles.actionText onClick={_ => reinvest()}>
-                      <Text value="Reinvest" underline=true color={theme.textPrimary} />
+                      <Text value="Reinvest" underline=true color=theme.neutral_900 />
                     </div>
                   </div>
                 | _ => React.null
@@ -162,7 +162,7 @@ let make = (~address) => {
                   block=true
                   value={delegationsCount->Belt.Int.toString}
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
                 <HSpacing size=Spacing.xs />
@@ -170,7 +170,7 @@ let make = (~address) => {
                   block=true
                   value="Validators Delegated"
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
               </div>
@@ -188,7 +188,7 @@ let make = (~address) => {
                     block=true
                     value={delegationsCount->Belt.Int.toString}
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                   <HSpacing size=Spacing.xs />
@@ -196,7 +196,7 @@ let make = (~address) => {
                     block=true
                     value="Validators Delegated"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </div>
@@ -208,7 +208,7 @@ let make = (~address) => {
                 block=true
                 value="Amount (BAND)"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
               />
             </Col>
@@ -217,7 +217,7 @@ let make = (~address) => {
                 block=true
                 value="Reward (BAND)"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
               />
             </Col>
@@ -255,7 +255,7 @@ let make = (~address) => {
               value="No Delegation"
               align=Heading.Center
               weight=Heading.Regular
-              color={theme.textSecondary}
+              color={theme.neutral_600}
             />
           </EmptyContainer>
     | _ =>

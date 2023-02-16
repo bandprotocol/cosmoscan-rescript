@@ -69,7 +69,7 @@ let make = (~address) => {
                   value={reporterCount->Belt.Int.toString}
                   weight=Text.Semibold
                   transform=Text.Uppercase
-                  size=Text.Sm
+                  size=Text.Caption
                 />
                 <HSpacing size=Spacing.xs />
                 <Text
@@ -77,7 +77,7 @@ let make = (~address) => {
                   value="Reporters"
                   weight=Text.Semibold
                   transform=Text.Uppercase
-                  size=Text.Sm
+                  size=Text.Caption
                 />
               </div>
             | _ => <LoadingCensorBar width=100 height=15 />
@@ -95,7 +95,7 @@ let make = (~address) => {
                     value={reporterCount->Belt.Int.toString}
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                   <HSpacing size=Spacing.xs />
                   <Text
@@ -103,7 +103,7 @@ let make = (~address) => {
                     value="Reporters"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                 </div>
               | _ => <LoadingCensorBar width=100 height=15 />
@@ -136,7 +136,7 @@ let make = (~address) => {
                 value="No Reporter"
                 align=Heading.Center
                 weight=Heading.Regular
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             </EmptyContainer>}
         {isMobile

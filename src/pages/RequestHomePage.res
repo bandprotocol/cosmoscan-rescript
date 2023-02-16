@@ -1,4 +1,4 @@
 @react.component
 let make = () => {
-  <Text value="Request Homepage" size=Text.Lg />
+  <Text value="Request Homepage" size=Text.Body1 />
 }

@@ -22,7 +22,7 @@ let make = (
   ~time,
   ~prefix="",
   ~suffix="",
-  ~size=Text.Sm,
+  ~size=Text.Caption,
   ~weight=Text.Regular,
   ~spacing=Text.Unset,
   ~color=?,
@@ -50,7 +50,7 @@ let make = (
             size
             weight
             spacing
-            color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+            color={color->Belt.Option.getWithDefault(theme.neutral_600)}
             code
             nowrap=true
           />
@@ -62,7 +62,7 @@ let make = (
       size
       weight
       spacing
-      color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+      color={color->Belt.Option.getWithDefault(theme.neutral_600)}
       code
       nowrap=true
     />
@@ -74,7 +74,7 @@ let make = (
             size
             weight
             spacing
-            color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+            color={color->Belt.Option.getWithDefault(theme.neutral_600)}
             code
             nowrap=true
           />

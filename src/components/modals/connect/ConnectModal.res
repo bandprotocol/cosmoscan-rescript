@@ -1,12 +1,14 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [
+  let container = (theme: Theme.t, isDarkMode) => 
+  style(. [
     display(#flex),
     justifyContent(#center),
     position(#relative),
     width(#px(800)),
     height(#px(520)),
+    background(isDarkMode ? theme.neutral_100 : theme.neutral_000)
   ])
 
   let innerContainer = style(. [display(#flex), flexDirection(#column), width(#percent(100.))])
@@ -20,13 +22,13 @@ module Styles = {
       flexDirection(#column),
       alignItems(#center),
       paddingTop(#px(30)),
-      borderBottom(#px(1), #solid, theme.tableRowBorderColor),
+      borderBottom(#px(1), #solid, theme.neutral_200),
     ])
 
   let row = style(. [height(#percent(100.))])
   let rowContainer = style(. [margin2(~v=#zero, ~h=#px(12)), height(#percent(100.))])
 
-  let header = (active, theme: Theme.t) =>
+  let header = (theme: Theme.t, active) =>
     style(. [
       display(#flex),
       flexDirection(#row),
@@ -35,21 +37,22 @@ module Styles = {
       padding2(~v=#zero, ~h=#px(20)),
       fontSize(#px(14)),
       fontWeight(active ? #bold : #normal),
-      color(active ? theme.textPrimary : theme.textSecondary),
+      color(active ? theme.neutral_900 : theme.neutral_600),
     ])
 
-  let loginList = active =>
+  let loginList = (theme: Theme.t, active) =>
     style(. [
       display(#flex),
       width(#percent(100.)),
       height(#px(50)),
       borderRadius(#px(8)),
-      border(#px(2), #solid, active ? Theme.baseBlue : #transparent),
+      border(#px(2), #solid, active ? theme.primary_600 : #transparent),
       cursor(#pointer),
       overflow(#hidden),
     ])
 
-  let loginSelectionBackground = (theme: Theme.t) => style(. [background(theme.contrastBg)])
+  let loginSelectionBackground = (theme: Theme.t, isDarkMode) => 
+    style(. [background(isDarkMode ? theme.neutral_000 : theme.neutral_100)]);
 
   let ledgerIcon = style(. [height(#px(28)), width(#px(28)), transform(translateY(#px(3)))])
   let ledgerImageContainer = active => style(. [opacity(active ? 1.0 : 0.5), marginRight(#px(15))])
@@ -71,8 +74,8 @@ module LoginMethod = {
   let make = (~name, ~active, ~onClick) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-    <div className={Styles.loginList(active)} onClick>
-      <div className={Styles.header(active, theme)}>
+    <div className={Styles.loginList(theme, active)} onClick>
+      <div className={Styles.header(theme, active)}>
         {switch name {
         | LedgerWithCosmos =>
           <div className={Styles.ledgerImageContainer(active)}>
@@ -93,9 +96,9 @@ module LoginMethod = {
 @react.component
 let make = (~chainID) => {
   let (loginMethod, setLoginMethod) = React.useState(_ => Mnemonic)
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  <div className=Styles.container>
+  <div className=Styles.container(theme, isDarkMode)>
     <div className=Styles.innerContainer>
       <div className={Styles.modalTitle(theme)}>
         <Heading value="Connect with your wallet" size=Heading.H4 />
@@ -103,13 +106,13 @@ let make = (~chainID) => {
           ? <>
               <VSpacing size=Spacing.md />
               <div className={CssHelper.flexBox()}>
-                <Text value="Please check that you are visiting" size=Text.Lg />
+                <Text value="Please check that you are visiting" size=Text.Body1 />
                 <HSpacing size=Spacing.sm />
                 <Text
                   value="https://www.cosmoscan.io"
-                  size=Text.Lg
+                  size=Text.Body1
                   weight=Text.Medium
-                  color={theme.textPrimary}
+                  color={theme.neutral_900}
                 />
               </div>
             </>
@@ -118,7 +121,7 @@ let make = (~chainID) => {
       </div>
       <div className=Styles.rowContainer>
         <Row style=Styles.row>
-          <Col col=Col.Five style={Styles.loginSelectionBackground(theme)}>
+          <Col col=Col.Five style={Styles.loginSelectionBackground(theme, isDarkMode)}>
             <div className=Styles.loginSelectionContainer>
               <VSpacing size=Spacing.xl />
               <Heading size=Heading.H5 value="Select your connection method" />

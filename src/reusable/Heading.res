@@ -71,7 +71,7 @@ let make = (
     CssJs.merge(. [
       Styles.fontSize(size),
       Styles.fontWeight(weight),
-      Styles.textColor(color->Belt.Option.getWithDefault(theme.textPrimary)),
+      Styles.textColor(color->Belt.Option.getWithDefault(theme.neutral_900)),
       Styles.textAlign(align),
       Styles.lineHeight,
       Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),

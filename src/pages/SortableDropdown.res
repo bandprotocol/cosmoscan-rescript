@@ -18,7 +18,7 @@ module Styles = {
   let sortDropdownItem = (isActive, theme: Theme.t) => {
     style(. [
       backgroundColor({
-        isActive ? theme.dropdownHover : theme.secondaryBg
+        isActive ? theme.neutral_100 : theme.neutral_100
       }),
       transition(~duration=200, "all"),
       cursor(#pointer),
@@ -48,8 +48,8 @@ let make = (~sortedBy, ~setSortedBy, ~sortList) => {
       <Text block=true value="Sort By" align=Text.Right />
       <div className=Styles.iconContainer>
         {show
-          ? <Icon name="far fa-angle-up" color={theme.textPrimary} size=14 />
-          : <Icon name="far fa-angle-down" color={theme.textPrimary} size=14 />}
+          ? <Icon name="far fa-angle-up" color={theme.neutral_900} size=14 />
+          : <Icon name="far fa-angle-down" color={theme.neutral_900} size=14 />}
       </div>
     </div>
     <div className={Styles.sortDrowdownPanel(show)}>
@@ -67,7 +67,7 @@ let make = (~sortedBy, ~setSortedBy, ~sortList) => {
             setShow(_ => false)
           }}>
           <Text block=true value=name />
-          {isActive ? <Icon name="far fa-check" color={theme.textPrimary} size=12 /> : React.null}
+          {isActive ? <Icon name="far fa-check" color={theme.neutral_900} size=12 /> : React.null}
         </div>
       })
       ->Array.of_list

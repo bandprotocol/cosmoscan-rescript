@@ -6,7 +6,7 @@ module Styles = {
 
   let textContainer = (theme: Theme.t) =>
     style(. [
-      background(theme.secondaryBg),
+      background(theme.neutral_000),
       position(#absolute),
       top(#px(8)),
       left(#px(8)),
@@ -21,40 +21,18 @@ module Styles = {
       "height": "100%",
       "borderRadius": "50%",
       "& > circle": {
-        "fill": theme.tableRowBorderColor,
+        "fill": theme.neutral_100 -> Css_AtomicTypes.Color.toString,
         "strokeWidth": "16px",
-        "stroke": theme.baseBlue,
+        "stroke": theme.primary_600 -> Css_AtomicTypes.Color.toString,
         "strokeDasharray": j`calc($percent * 653.45 / 100) 653.45`,
         "transform": "rotate(-90deg) translateX(-100%)",
       },
     })
-
-  // let circle = (percent, theme: Theme.t) => {
-  //   style(. [
-  //     width(#percent(100.)),
-  //     height(#percent(100.)),
-  //     borderRadius(#percent(50.)),
-  //     selector(
-  //       "> circle",
-  //       [
-  //         SVG.fill(theme.tableRowBorderColor),
-  //         SVG.strokeWidth(#px(16)),
-  //         SVG.stroke(theme.baseBlue),
-  //         //TODO: it will be remove when the bs-css upgrade to have this proporty
-  //         // 653.45 is from 2 * pi(3.141) * r(104)
-  //         strokeDasharray: j`calc($percent * 653.45 / 100) 653.45`,
-  //       //   unsafe("stroke-dasharray", {j|calc($percent * 653.45 / 100) 653.45|j}),
-  //         transforms([#rotate(#deg(-90.)), #translateX(#percent(-100.))]),
-  //       ],
-  //     ),
-  //   ]);
-  // };
 }
 
 @react.component
 let make = (~percent) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-  // let (emotionTheme, _) = React.useContext(EmotionThemeContext.context)
 
   <div className=Styles.chartContainer>
     <svg
@@ -72,13 +50,13 @@ let make = (~percent) => {
         value="Turnout"
         align=Heading.Center
         marginBottom=8
-        color={theme.textSecondary}
+        color={theme.neutral_600}
       />
       <Text
         size=Text.Xxxl
         value={percent->Format.fPercent(~digits=2)}
         block=true
-        color={theme.textPrimary}
+        color={theme.neutral_900}
       />
     </div>
   </div>
