@@ -2,7 +2,7 @@ module Styles = {
   open CssJs
 
   let searchbarWrapper = (theme: Theme.t) =>
-    style(. [width(#percent(100.)), boxSizing(#borderBox), zIndex(1000), position(#relative)])
+    style(. [width(#percent(100.)), boxSizing(#borderBox), zIndex(1), position(#relative)])
 
   let searchbarInput = (theme: Theme.t) =>
     style(. [
@@ -45,6 +45,7 @@ module Styles = {
       padding3(~top=#px(0), ~bottom=#px(0), ~h=#zero),
       maxHeight(#vh(50.)),
       overflow(#scroll),
+      zIndex(1),
     ])
 
   let resultInner = (theme: Theme.t) =>
@@ -65,8 +66,14 @@ module Styles = {
   ])
 
   let innerResultItem = style(. [
-    padding2(~v=#px(8), ~h=#px(16)),
-    hover([backgroundColor(Css.rgba(16, 18, 20, #num(0.05)))]),
+    selector(
+      "> a",
+      [
+        display(#block),
+        padding2(~v=#px(8), ~h=#px(16)),
+        hover([backgroundColor(Css.rgba(16, 18, 20, #num(0.05)))]),
+      ],
+    ),
   ])
   let resultHeading = style(. [padding2(~v=#px(8), ~h=#px(16))])
   let resultItem = style(. [padding2(~v=#px(16), ~h=#zero)])
@@ -75,9 +82,9 @@ module Styles = {
     selector(
       "ul > li",
       [
-        borderTop(#px(1), solid, hex("E5E7EB")),
+        borderBottom(#px(1), solid, hex("E5E7EB")),
         marginTop(#px(0)),
-        selector(":first-child", [borderTop(#zero, solid, hex("E5E7EB"))]),
+        selector(":last-child", [borderBottom(#zero, solid, hex("E5E7EB"))]),
       ],
     ),
   ])
@@ -114,7 +121,16 @@ module RenderSearchResult = {
       array<SearchBarQuery.BlockSearch.t>,
     > = SearchBarQuery.searchBlockID(~id=searchTerm, ())
 
-    let allQuery = Query.all3(resultOracleScriptQuery, resultBlockQuery, resultDataSourceQuery)
+    let resultProposalQuery: Query.variant<
+      array<SearchBarQuery.ProposalSearch.t>,
+    > = SearchBarQuery.searchProposal(~filter=searchTerm, ())
+
+    let allQuery = Query.all4(
+      resultOracleScriptQuery,
+      resultBlockQuery,
+      resultDataSourceQuery,
+      resultProposalQuery,
+    )
 
     <>
       <nav role="navigation" className={Styles.resultContent}>
@@ -163,29 +179,33 @@ module RenderSearchResult = {
             </li>
           </ul>
         } else if len == 64 || (searchTerm->Js.String2.startsWith("0x") && len == 66) {
-          <div className={Styles.resultItem}>
-            <div className={Styles.resultHeading}>
-              <Heading
-                size=Heading.H4
-                value="Transactions"
-                align=Heading.Left
-                weight=Heading.Semibold
-                color={theme.textPrimary}
-              />
-            </div>
-            <div className={Styles.resultInner(theme)}>
-              <div className={Styles.innerResultItem}>
-                <TxLink txHash={searchTerm->Hash.fromHex} width=500 size=Text.Lg />
+          <ul role="tablist" className={Styles.resultItem}>
+            <li>
+              <div className={Styles.resultHeading}>
+                <Heading
+                  size=Heading.H4
+                  value="Transactions"
+                  align=Heading.Left
+                  weight=Heading.Semibold
+                  color={theme.textPrimary}
+                />
               </div>
-            </div>
-          </div>
+              <div className={Styles.resultInner(theme)}>
+                <div className={Styles.innerResultItem}>
+                  <TxLink txHash={searchTerm->Hash.fromHex} width=500 size=Text.Lg />
+                </div>
+              </div>
+            </li>
+          </ul>
         } else {
           <div>
+            // TODO: refactor with NoData
             {switch allQuery {
-            | Data(osResults, blockResults, dsResults) =>
+            | Data(osResults, blockResults, dsResults, proposalResults) =>
               switch osResults->Belt.Array.length +
               blockResults->Belt.Array.length +
-              dsResults->Belt.Array.length > 0 {
+              dsResults->Belt.Array.length +
+              proposalResults->Belt.Array.length > 0 {
               | true =>
                 <ul role="tablist">
                   <li role="presentation">
@@ -285,6 +305,41 @@ module RenderSearchResult = {
                     | false => React.null
                     }}
                   </li>
+                  <li role="presentation">
+                    {switch proposalResults->Belt.Array.length > 0 {
+                    | true =>
+                      <div className={Styles.resultItem}>
+                        <div className={Styles.resultHeading}>
+                          <Heading
+                            size=Heading.H4
+                            value="Proposal"
+                            align=Heading.Left
+                            weight=Heading.Semibold
+                            color={theme.textPrimary}
+                          />
+                        </div>
+                        <div className={Styles.resultInner(theme)}>
+                          {proposalResults
+                          ->Belt.Array.mapWithIndex((i, result) => {
+                            <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
+                              <TypeID.ProposalLink id={result.id}>
+                                <div className={Css.merge(list{CssHelper.flexBox()})}>
+                                  <TypeID.Proposal id={result.id} position=TypeID.Body />
+                                  <HSpacing size=Spacing.sm />
+                                  <Heading
+                                    size=Heading.H4 value={result.title} weight=Heading.Thin
+                                  />
+                                </div>
+                              </TypeID.ProposalLink>
+                            </div>
+                          })
+                          ->React.array}
+                        </div>
+                      </div>
+
+                    | false => React.null
+                    }}
+                  </li>
                 </ul>
               | false =>
                 <div className={Styles.resultNotFound}>
@@ -293,7 +348,7 @@ module RenderSearchResult = {
               }
 
             | Loading =>
-              <div className={Styles.resultInner(theme)}>
+              <div className={Styles.resultNotFound}>
                 <LoadingCensorBar width=100 height=20 />
               </div>
             | _ =>

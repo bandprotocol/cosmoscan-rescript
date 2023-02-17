@@ -26,7 +26,7 @@ let make = () => {
     {isMobile
       ? <Section pt=16 pb=16 ptSm=24 pbSm=24>
           <div className=CssHelper.container>
-            <SearchBar />
+            <SearchBarV2 />
           </div>
         </Section>
       : React.null}

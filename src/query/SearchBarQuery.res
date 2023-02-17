@@ -45,11 +45,25 @@ module DataSourceSearchConfig = %graphql(`
 
 `)
 
-let searchOracleScript = (~filter, ()) => {
-  let isNumber = switch filter->Belt.Int.fromString {
-  | Some(_) => true
-  | None => false
+module ProposalSearch = {
+  type t = {
+    id: ID.Proposal.t,
+    title: string,
   }
+}
+
+module ProposalSearchConfig = %graphql(`
+    query SearchProposalID( $id: Int_comparison_exp, $title: String_comparison_exp) {
+        proposals (where: { _and: [{ id: $id }, { title: $title}] }
+	) @ppxAs(type: "ProposalSearch.t") {
+            id @ppxCustom(module: "GraphQLParserModule.ProposalID")
+            title
+        }
+    }
+
+`)
+
+let searchOracleScript = (~filter, ()) => {
   let result = OracleScriptSearchConfig.use({
     id: Some({
       _eq: filter->Belt.Int.fromString,
@@ -67,11 +81,11 @@ let searchOracleScript = (~filter, ()) => {
       _eq: None,
       _gt: None,
       _gte: None,
-      _ilike: None,
       _in: None,
       _iregex: None,
       _is_null: None,
-      _like: Some(j`%$filter%`),
+      _like: None,
+      _ilike: Some(j`%$filter%`),
       _lt: None,
       _lte: None,
       _neq: None,
@@ -115,10 +129,6 @@ let searchBlockID = (~id, ()) => {
 }
 
 let searchDataSource = (~filter, ()) => {
-  let isNumber = switch filter->Belt.Int.fromString {
-  | Some(_) => true
-  | None => false
-  }
   let result = DataSourceSearchConfig.use({
     id: Some({
       _eq: filter->Belt.Int.fromString,
@@ -136,11 +146,11 @@ let searchDataSource = (~filter, ()) => {
       _eq: None,
       _gt: None,
       _gte: None,
-      _ilike: None,
       _in: None,
       _iregex: None,
       _is_null: None,
-      _like: Some(j`%$filter%`),
+      _like: None,
+      _ilike: Some(j`%$filter%`),
       _lt: None,
       _lte: None,
       _neq: None,
@@ -159,6 +169,52 @@ let searchDataSource = (~filter, ()) => {
   ->Query.map(({data_sources}) => {
     switch data_sources->Belt.Array.length > 0 {
     | true => data_sources
+    | false => []
+    }
+  })
+}
+
+let searchProposal = (~filter, ()) => {
+  let result = ProposalSearchConfig.use({
+    id: Some({
+      _eq: filter->Belt.Int.fromString,
+      _gt: None,
+      _gte: None,
+      _in: None,
+      _is_null: None,
+      _lt: None,
+      _lte: None,
+      _neq: None,
+      _nin: None,
+    }),
+    title: Some({
+      _regex: None,
+      _eq: None,
+      _gt: None,
+      _gte: None,
+      _in: None,
+      _iregex: None,
+      _is_null: None,
+      _like: None,
+      _ilike: Some(j`%$filter%`),
+      _lt: None,
+      _lte: None,
+      _neq: None,
+      _nilike: None,
+      _nin: None,
+      _niregex: None,
+      _nlike: None,
+      _nregex: None,
+      _nsimilar: None,
+      _similar: None,
+    }),
+  })
+
+  result
+  ->Query.fromData
+  ->Query.map(({proposals}) => {
+    switch proposals->Belt.Array.length > 0 {
+    | true => proposals
     | false => []
     }
   })
