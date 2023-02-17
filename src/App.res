@@ -51,7 +51,8 @@ let make = () => {
       | ProposalPage => <ProposalPage />
       | ProposalDetailsPage(proposalID) =>
         <ProposalDetailsPage proposalID=ID.Proposal.ID(proposalID) />
-      | IBCHomePage => <IBCHomePage />
+      | RelayersHomepage => <RelayersHomepage />
+      | IBCTxPage => <IBCHomePage />
       | NotFound => <NotFound />
       }}
     </div>
