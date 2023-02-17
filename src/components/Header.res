@@ -142,11 +142,11 @@ module MobileRender = {
         </Col>
       </Row>
       <Row marginTop=20>
-        <Col colSm=Col.Six>
+        <Col colSm=Col.Twelve>
           <ChainIDBadge dropdown=true />
         </Col>
       </Row>
-      <Row marginTop=24>
+      <Row marginTop=20>
         <Col colSm=Col.Twelve>
           <SearchBar />
         </Col>

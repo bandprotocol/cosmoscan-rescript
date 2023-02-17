@@ -45,7 +45,7 @@ module RenderBody = {
 
                <div className={CssHelper.flexBox()}>
                  <Text value=j`$reportedCount of $requestedCount` />
-                 <HSpacing size=Spacing.sm />
+                 <HSpacing size=#px(16) />
                  <RequestStatus resolveStatus />
                </div>;
              | _ => <LoadingCensorBar width=70 height=15 />

@@ -1,51 +1,18 @@
 module Styles = {
   open CssJs
 
-  let version = (theme: Theme.t, isDarkMode) =>
-    style(. [
-      display(#flex),
-      borderRadius(#px(8)),
-      backgroundColor(theme.neutral_000),
-      padding2(~v=#px(8), ~h=#px(16)),
-      minWidth(#px(153)),
-      alignItems(#center),
-      position(#relative),
-      cursor(#pointer),
-      zIndex(5),
-      Media.mobile([padding2(~v=#px(5), ~h=#px(10))]),
-      Media.smallMobile([minWidth(#px(90))]),
-    ]);
-
-  let dropdown = (show, theme: Theme.t, isDarkMode) =>
-    style(. [
-      position(#absolute),
+  let buttonContainer = style(. [
+    Media.mobile([
       width(#percent(100.)),
-      border(#px(1), #solid, isDarkMode ? theme.neutral_100 : theme.neutral_600),
-      backgroundColor(theme.neutral_100),
-      borderRadius(#px(8)),
-      transition(~duration=200, "all"),
-      top(#percent(110.)),
-      left(#zero),
-      height(#auto),
-      opacity(show ? 1. : 0.),
-      pointerEvents(show ? #auto : #none),
-      overflow(#hidden),
-      Media.mobile([top(#px(35))]),
+      marginTop(#px(16)),
+      marginBottom(#px(24)),
+    ])
     ]);
-
-  let link = (theme: Theme.t) =>
-    style(. [
-      textDecoration(#none),
-      backgroundColor(theme.neutral_100),
-      display(#block),
-      padding2(~v=#px(5), ~h=#px(10)),
-      hover([backgroundColor(theme.neutral_100)]),
-    ]);
-  let buttonContainer = style(. [Media.mobile([width(#percent(100.))])]);
+  let link = style(. [Media.mobile([flexBasis(#percent(50.))])])
   let baseBtn =
     style(. [
       textAlign(#center),
-      Media.mobile([flexGrow(0.), flexShrink(0.), flexBasis(#percent(50.))]),
+      Media.mobile([width(#percent(100.)), flexGrow(0.), flexShrink(0.), flexBasis(#percent(50.))]),
     ]);
 
   let leftBtn = (state, theme: Theme.t, isDarkMode) => {
@@ -156,37 +123,12 @@ let make = (~dropdown=false) => {
         let networkNames = [LaoziMainnet, LaoziTestnet] -> Belt.Array.map(chainID => chainID->getName)
         let isMainnet = (currentChainID->getName) == "laozi-mainnet"
 
-        {dropdown ? <div
-            className={Styles.version(theme, isDarkMode)}
-            onClick={event => {
-              setShow(oldVal => !oldVal);
-              ReactEvent.Mouse.stopPropagation(event);
-            }}>
-            <Text
-              value={currentChainID->getName}
-              color={theme.neutral_900}
-              nowrap=true
-              weight=Text.Semibold
-              size=Text.Body1
-            />
-            <div className={CssJs.style(. [CssJs.paddingLeft(#px(4))])}>
-              {show
-                ? <Icon name="far fa-angle-up" color={theme.neutral_900} />
-                : <Icon name="far fa-angle-down" color={theme.neutral_900} />}
-            </div>
-            <div className={Styles.dropdown(show, theme, isDarkMode)}>
-              {[LaoziMainnet, LaoziTestnet]
-              ->Belt.Array.keep(chainID => chainID != currentChainID)
-              ->Belt.Array.map(chainID => {
-                  let name = chainID->getName;
-                  <AbsoluteLink href={getLink(chainID)} key=name className={Styles.link(theme)}>
-                    <Text value=name color={theme.neutral_900} nowrap=true size=Text.Body1 weight=Text.Semibold />
-                  </AbsoluteLink>;
-                })
-              ->React.array}
-            </div>
-          </div> : <div className={Css.merge(list{CssHelper.flexBox(), Styles.buttonContainer})}>
-          <AbsoluteLink href={isMainnet ? "" : getLink(LaoziMainnet) ++ currentRouteString} >
+        <div className={Css.merge(list{CssHelper.flexBox(), Styles.buttonContainer})}>
+          <AbsoluteLink 
+            className=Styles.link
+            href={isMainnet ? "" : getLink(LaoziMainnet) ++ currentRouteString} 
+            noNewTab=true
+          >
             <Button
               px=16
               py=8
@@ -195,7 +137,11 @@ let make = (~dropdown=false) => {
               {networkNames[0]  -> React.string}
             </Button>
           </AbsoluteLink>
-          <AbsoluteLink href={isMainnet ? getLink(LaoziTestnet) ++ currentRouteString: ""} >
+          <AbsoluteLink 
+            className=Styles.link
+            href={isMainnet ? getLink(LaoziTestnet) ++ currentRouteString: ""} 
+            noNewTab=true
+          >
             <Button
               px=16
               py=8
@@ -204,8 +150,10 @@ let make = (~dropdown=false) => {
               {networkNames[1] -> React.string}
             </Button>
           </AbsoluteLink>
-        </div> }
+        </div>
       }
-      | _ =>  <LoadingCensorBar width={isMobile ? 150 : 310} height=30 />;
+      | _ =>  <div className=Styles.buttonContainer> 
+        <LoadingCensorBar width={isMobile ? 310 : 310} height=30 />
+      </div>
     }
   }

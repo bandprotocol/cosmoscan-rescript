@@ -3,7 +3,7 @@ module Styles = {
 
   let statusImg = style(. [
     width(#px(20)),
-    marginRight(#px(8))
+    marginRight(#px(8)),
   ]);
 };
 
