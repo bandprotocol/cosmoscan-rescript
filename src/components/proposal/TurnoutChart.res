@@ -15,7 +15,7 @@ module Styles = {
       borderRadius(#percent(50.)),
     ])
 
-  let emoCircle = (percent, theme: Theme.t) => {
+  let emoCircle = (percent, theme: Theme.t) =>
     css({
       "width": "100%",
       "height": "100%",
@@ -28,7 +28,6 @@ module Styles = {
         "transform": "rotate(-90deg) translateX(-100%)",
       },
     })
-  }
 }
 
 @react.component
