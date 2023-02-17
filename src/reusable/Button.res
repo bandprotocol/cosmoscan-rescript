@@ -70,20 +70,16 @@ module Styles = {
       style(. [
         padding(#zero),
         backgroundColor(#transparent),
-        color(theme.textPrimary),
+        color(theme.neutral_900),
         border(#px(1), #solid, #transparent),
-        selector("i", [color(theme.textPrimary)]),
+        selector("i", [color(theme.neutral_900)]),
         hover([
           backgroundColor(#transparent),
-          color(theme.baseBlue),
-          selector("i", [color(theme.baseBlue)]),
+          color(theme.primary_600),
+          selector("i", [color(theme.primary_600)]),
         ]),
         active([backgroundColor(CssJs.hex("E5E8F7"))]),
-        disabled([
-          color(theme.textSecondary),
-          hover([backgroundColor(#transparent)]),
-          opacity(0.5),
-        ]),
+        disabled([color(theme.neutral_600), hover([backgroundColor(#transparent)]), opacity(0.5)]),
         selector(":focus", [outlineStyle(#none), backgroundColor(#transparent)]),
         Media.mobile([padding(#zero)]),
       ])

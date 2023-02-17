@@ -11,7 +11,13 @@ module Styles = {
 }
 
 @react.component
-let make = (~txHash: Hash.t, ~width: int, ~size=Text.Md, ~weight=Text.Medium, ~fullHash=true) => {
+let make = (
+  ~txHash: Hash.t,
+  ~width: int,
+  ~size=Text.Body2,
+  ~weight=Text.Medium,
+  ~fullHash=true,
+) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   {
@@ -38,7 +44,7 @@ let make = (~txHash: Hash.t, ~width: int, ~size=Text.Md, ~weight=Text.Medium, ~f
           weight
           ellipsis=false
           size
-          color={theme.textPrimary}
+          color={theme.neutral_900}
         />
       </Link>
     | true =>
@@ -51,7 +57,7 @@ let make = (~txHash: Hash.t, ~width: int, ~size=Text.Md, ~weight=Text.Medium, ~f
           weight
           ellipsis=true
           size
-          color={theme.textPrimary}
+          color={theme.neutral_900}
         />
       </Link>
     }

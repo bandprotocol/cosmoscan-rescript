@@ -209,7 +209,7 @@ let make = () => {
               value={(incoming + outgoing)->Format.iPretty ++ " In total"}
               size=Heading.H3
               weight=Heading.Thin
-              color=theme.textSecondary
+              color=theme.neutral_600
             />
           | _ => <LoadingCensorBar width=120 height=21 />
           }}
@@ -217,7 +217,7 @@ let make = () => {
       </Row>
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
         <Col col=Col.Two>
-          <div className=Styles.selectContainer>
+          <div className=Styles.selectPortContainer>
             <div className={CssHelper.mb(~size=8, ())}>
               <Heading value="Counterparty Chain" size=Heading.H5 />
             </div>

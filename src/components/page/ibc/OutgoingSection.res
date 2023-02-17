@@ -19,11 +19,11 @@ module Styles = {
   let paperStyle = (theme: Theme.t, isDarkMode) =>
     style(. [
       width(#percent(100.)),
-      backgroundColor(isDarkMode ? theme.white : theme.white),
+      backgroundColor(isDarkMode ? theme.neutral_100 : theme.white),
       borderRadius(#px(10)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
       padding(#px(16)),
-      border(#px(1), #solid, isDarkMode ? hex("F3F4F6") : hex("F3F4F6")), // TODO: will change to theme color
+      border(#px(1), #solid, theme.neutral_100),
     ])
 }
 
@@ -61,9 +61,9 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
       <Col col=Col.Twelve>
         <Heading value="Outgoing" size=Heading.H3 marginBottom=8 />
         <Text
-          size=Text.Lg
+          size=Text.Body1
           weight=Text.Thin
-          color=theme.textSecondary
+          color=theme.neutral_600
           value="Sending transaction information from BandChain to counterparty chain"
         />
       </Col>
@@ -90,7 +90,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
       {switch packetsSub {
       | Data(packets) if packets->Belt.Array.length === 0 =>
         <div className={Styles.paperStyle(theme, isDarkMode)}>
-          <EmptyContainer backgroundColor={theme.mainBg}>
+          <EmptyContainer>
             <img
               alt="No Packets"
               src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
@@ -101,7 +101,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
               value="No Packets"
               align=Heading.Center
               weight=Heading.Regular
-              color={theme.textSecondary}
+              color={theme.neutral_600}
             />
           </EmptyContainer>
         </div>
@@ -115,7 +115,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
         ->React.array
       | Error(_) =>
         <div className={Styles.paperStyle(theme, isDarkMode)}>
-          <EmptyContainer backgroundColor={theme.mainBg}>
+          <EmptyContainer>
             <img
               alt="No Packets"
               src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
@@ -126,7 +126,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
               value="No Packets"
               align=Heading.Center
               weight=Heading.Regular
-              color={theme.textSecondary}
+              color={theme.neutral_600}
             />
           </EmptyContainer>
         </div>
