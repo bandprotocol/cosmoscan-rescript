@@ -41,10 +41,11 @@ module Styles = {
   let largeColumn = style(. [minWidth(#px(245))])
   let smallColumn = style(. [minWidth(#px(80))])
   let leftAlign = style(. [textAlign(#left)])
-  let packetMobileItem = style(. [
-    selector("> div", [borderBottom(#px(1), #solid, hex("E5E7EB"))]), // TODO: change to theme color
-    selector("> div:last-child", [borderBottom(#zero, solid, #transparent)]),
-  ])
+  let packetMobileItem = (theme: Theme.t) =>
+    style(. [
+      selector("> div", [borderBottom(#px(1), #solid, theme.neutral_200)]), // TODO: change to theme color
+      selector("> div:last-child", [borderBottom(#zero, solid, #transparent)]),
+    ])
   let packetInnerMobile = style(. [
     width(#percent(100.)),
     paddingTop(#px(16)),
@@ -61,7 +62,11 @@ module MobilePacketItem = {
   @react.component
   let make = (~packetSub: Sub.variant<IBCQuery.t>) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-    <div className={Css.merge(list{Styles.paperStyle(theme, isDarkMode), Styles.packetMobileItem})}>
+    <div
+      className={Css.merge(list{
+        Styles.paperStyle(theme, isDarkMode),
+        Styles.packetMobileItem(theme),
+      })}>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
           {switch packetSub {
@@ -70,8 +75,8 @@ module MobilePacketItem = {
             | OracleRequest
             | InterchainAccount
             | FungibleToken =>
-              <Text value="Tx Hash" size=Text.Body1 weight=Text.Semibold />
-            | OracleResponse => <Text value="Block ID" size=Text.Body1 weight=Text.Semibold />
+              <Text value="Tx Hash" size=Text.Body2 weight=Text.Semibold />
+            | OracleResponse => <Text value="Block ID" size=Text.Body2 weight=Text.Semibold />
             | _ => React.null
             }
           | _ => React.null
@@ -96,7 +101,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Counterparty Chain ID" size=Text.Body1 weight=Text.Semibold />
+          <Text value="Counterparty Chain ID" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
@@ -107,7 +112,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Port & Channel" size=Text.Body1 weight=Text.Semibold />
+          <Text value="Port & Channel" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
@@ -146,7 +151,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Sequence" size=Text.Body1 weight=Text.Semibold />
+          <Text value="Sequence" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
@@ -157,7 +162,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Packet Type" size=Text.Body1 weight=Text.Semibold />
+          <Text value="Packet Type" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
@@ -174,7 +179,7 @@ module MobilePacketItem = {
             | OracleRequest =>
               <>
                 <div>
-                  <Text value="Request ID" size=Text.Body1 weight=Text.Semibold />
+                  <Text value="Request ID" size=Text.Body2 weight=Text.Semibold />
                 </div>
                 <div>
                   {{
@@ -196,7 +201,7 @@ module MobilePacketItem = {
               | Response(response) =>
                 <>
                   <div>
-                    <Text value="Request ID" size=Text.Body1 weight=Text.Semibold />
+                    <Text value="Request ID" size=Text.Body2 weight=Text.Semibold />
                   </div>
                   <div>
                     <TypeID.Request
@@ -214,7 +219,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Status" size=Text.Body1 weight=Text.Semibold />
+          <Text value="Status" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {

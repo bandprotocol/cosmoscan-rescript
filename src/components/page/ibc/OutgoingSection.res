@@ -8,6 +8,7 @@ module Styles = {
     justifyContent(#flexStart),
     width(#percent(100.)),
     marginTop(#px(16)),
+    marginBottom(#px(16)),
     selector(
       "> button",
       [marginRight(#px(8)), selector(":last-child", [marginRight(#px(0))]), borderRadius(#px(100))],
@@ -108,7 +109,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
       | Data(packets) =>
         packets
         ->Belt_Array.mapWithIndex((i, e) =>
-          <Col col=Col.Twelve key={i->Belt.Int.toString} mb=16>
+          <Col col=Col.Twelve key={i->Belt.Int.toString} mb=16 mbSm=16>
             <PacketItem packetSub={Sub.resolve(e)} />
           </Col>
         )
@@ -133,7 +134,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
       | _ =>
         Belt_Array.make(pageSize, Sub.NoData)
         ->Belt_Array.mapWithIndex((i, noData) =>
-          <Col col=Col.Twelve key={i->Belt.Int.toString} mb=24>
+          <Col col=Col.Twelve key={i->Belt.Int.toString} mb=24 mbSm=24>
             <PacketItem packetSub=noData />
           </Col>
         )
