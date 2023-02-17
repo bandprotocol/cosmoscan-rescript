@@ -9,6 +9,18 @@ module SearchBlockConfig = %graphql(`
     }
 `)
 
+module RequestSearch = {
+  type t = {id: ID.Request.t}
+}
+
+module SearchRequestConfig = %graphql(`
+    query SearchRequestID( $id: Int!)   {
+        requests_by_pk (id: $id) @ppxAs(type: "RequestSearch.t")  {
+            id @ppxCustom(module: "GraphQLParserModule.RequestID")
+        }
+    }
+`)
+
 module OracleScriptSearch = {
   type t = {
     id: ID.OracleScript.t,
@@ -123,6 +135,25 @@ let searchBlockID = (~id, ()) => {
   ->Query.map(({blocks_by_pk}) => {
     switch blocks_by_pk {
     | Some(block) => [block]
+    | None => []
+    }
+  })
+}
+
+let searchRequestID = (~id, ()) => {
+  let parseID = {
+    switch id->Belt.Int.fromString {
+    | Some(id) => id
+    | None => 0
+    }
+  }
+
+  let result = SearchRequestConfig.use({id: parseID})
+  result
+  ->Query.fromData
+  ->Query.map(({requests_by_pk}) => {
+    switch requests_by_pk {
+    | Some(request) => [request]
     | None => []
     }
   })

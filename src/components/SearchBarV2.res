@@ -121,13 +121,18 @@ module RenderSearchResult = {
       array<SearchBarQuery.BlockSearch.t>,
     > = SearchBarQuery.searchBlockID(~id=searchTerm, ())
 
+    let resultRequestQuery: Query.variant<
+      array<SearchBarQuery.RequestSearch.t>,
+    > = SearchBarQuery.searchRequestID(~id=searchTerm, ())
+
     let resultProposalQuery: Query.variant<
       array<SearchBarQuery.ProposalSearch.t>,
     > = SearchBarQuery.searchProposal(~filter=searchTerm, ())
 
-    let allQuery = Query.all4(
-      resultOracleScriptQuery,
+    let allQuery = Query.all5(
       resultBlockQuery,
+      resultRequestQuery,
+      resultOracleScriptQuery,
       resultDataSourceQuery,
       resultProposalQuery,
     )
@@ -201,9 +206,10 @@ module RenderSearchResult = {
           <div>
             // TODO: refactor with NoData
             {switch allQuery {
-            | Data(osResults, blockResults, dsResults, proposalResults) =>
-              switch osResults->Belt.Array.length +
-              blockResults->Belt.Array.length +
+            | Data(blockResults, requestResults, osResults, dsResults, proposalResults) =>
+              switch blockResults->Belt.Array.length +
+              requestResults->Belt.Array.length +
+              osResults->Belt.Array.length +
               dsResults->Belt.Array.length +
               proposalResults->Belt.Array.length > 0 {
               | true =>
@@ -226,6 +232,33 @@ module RenderSearchResult = {
                           ->Belt.Array.mapWithIndex((i, result) => {
                             <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
                               <TypeID.Block id=result.height position=TypeID.Subtitle block=true />
+                            </div>
+                          })
+                          ->React.array}
+                        </div>
+                      </div>
+
+                    | false => React.null
+                    }}
+                  </li>
+                  <li role="presentation">
+                    {switch requestResults->Belt.Array.length > 0 {
+                    | true =>
+                      <div className={Styles.resultItem}>
+                        <div className={Styles.resultHeading}>
+                          <Heading
+                            size=Heading.H4
+                            value="Requests"
+                            align=Heading.Left
+                            weight=Heading.Semibold
+                            color={theme.textPrimary}
+                          />
+                        </div>
+                        <div className={Styles.resultInner(theme)}>
+                          {requestResults
+                          ->Belt.Array.mapWithIndex((i, result) => {
+                            <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
+                              <TypeID.Request id=result.id position=TypeID.Subtitle block=true />
                             </div>
                           })
                           ->React.array}
