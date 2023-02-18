@@ -77,7 +77,6 @@ module Styles = {
   ])
   let resultHeading = style(. [
     padding2(~v=#px(16), ~h=#px(16)),
-    // borderBottom(#px(1), solid, hex("E5E7EB")),
     borderTop(#px(1), solid, hex("E5E7EB")),
   ])
   let resultItem = style(. [padding2(~v=#px(0), ~h=#zero)])
@@ -103,28 +102,45 @@ module HighLightText = {
   module Styles = {
     open CssJs
 
-    let highlightText = (theme: Theme.t) => style(. [color(theme.baseBlue)])
-    let normalText = style(. [fontSize(#px(14)), Media.smallMobile([fontSize(#px(12))])])
+    let highlightText = (theme: Theme.t) => style(. [color(theme.baseBlue), fontWeight(#num(600))])
+    let normalText = (theme: Theme.t) =>
+      style(. [
+        fontSize(#px(14)),
+        Media.smallMobile([fontSize(#px(12))]),
+        fontWeight(#num(300)),
+        color(theme.textPrimary),
+        textAlign(#left),
+      ])
   }
 
   @react.component
   let make = (~title, ~searchTerm) => {
-    <Heading size=Heading.H4 value={title} weight=Heading.Thin />
-    // let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    // let capStr = searchTerm->String.lowercase_ascii
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    // // Js.log(highLightText(title, searchTerm))
+    let highLightText = {
+      let index = title->Js.String.toLocaleLowerCase->Js.String2.indexOf(searchTerm)
+      if index !== -1 {
+        let before = title->Js.String2.slice(~from=0, ~to_=index)
+        let after =
+          title->Js.String2.slice(
+            ~from=index + searchTerm->String.length,
+            ~to_=title->String.length,
+          )
 
-    // // <h4 className={Styles.normalText}> {title->React.string} </h4>
-    // let highLightText = (text, searchTerm) => {
-    //   let formatted = searchTerm->Js.String2.toLocaleLowerCase
-    //   let results = Js.String2.split(text->Js.String2.toLocaleLowerCase, formatted)
-    //   results->Belt.Array.joinWithU(formatted)->Js.String2.
-    // }
-
-    // let result = highLightText(title, searchTerm)
-    // Js.log(result)
-    // <h4 className={Styles.normalText}> {highLightText->React.string} </h4>
+        let highlight =
+          {title->Js.String2.slice(~from=index, ~to_=index + searchTerm->String.length)}
+        <>
+          <span> {before->React.string} </span>
+          <span className={Styles.highlightText(theme)}> {highlight->React.string} </span>
+          <span> {after->React.string} </span>
+        </>
+      } else {
+        <span> {title->React.string} </span>
+      }
+    }
+    <h4 className={Css.merge(list{Styles.normalText(theme), Heading.Styles.fontSize(Heading.H4)})}>
+      {highLightText}
+    </h4>
   }
 }
 
@@ -224,6 +240,7 @@ module RenderSearchResult = {
                       <TypeID.OracleScriptLink id={result.id}>
                         <div className={Css.merge(list{CssHelper.flexBox()})}>
                           <TypeID.OracleScript id={result.id} position=TypeID.Body />
+                          <HSpacing size=Spacing.sm />
                           <HighLightText title={result.name} searchTerm />
                         </div>
                       </TypeID.OracleScriptLink>
