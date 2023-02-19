@@ -10,6 +10,7 @@ module Decode = {
   let bufferWithDefault =
     string->option->map((. a) => a->Belt.Option.getWithDefault(_, "")->JsBuffer.fromBase64)
   let strWithDefault = string->option->map((. a) => a->Belt.Option.getWithDefault(_, ""))
+  let arrayWithDefault = x => x->array->option->map((. a) => a->Belt.Option.getWithDefault(_, []))
   let bufferFromHex = string->map((. a) => JsBuffer.fromHex(a))
   let bufferFromBase64 = string->map((. a) => JsBuffer.fromBase64(a))
 
@@ -21,6 +22,13 @@ module Decode = {
   }
 
   let mustDecode = (json, decoder) => json->decode(decoder)->Belt.Result.getExn
+  let mustDecodeOpt = (jsonOpt, decoder) => jsonOpt->(x => switch x {
+    | Some(x) => x->decode(decoder)->(res => switch res {
+      | Ok(data) => Some(data)
+      | Error(_) => None
+    })
+    | None => None
+  })
 
   type fd_type = {at: 'a. (list<string>, t<'a>) => 'a}
 

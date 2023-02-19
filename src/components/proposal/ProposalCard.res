@@ -72,16 +72,15 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
             {switch proposalSub {
             | Data({id, name, content}) =>
               <>
-                <TypeID.Proposal id position=TypeID.Title />
-                {switch(content){
-                | Some({title}) => <Heading
-                  size=Heading.H3 value=title color={theme.neutral_600} weight=Heading.Thin
-                />
-                | None => <Heading
-                  size=Heading.H3 value="no content" color={theme.neutral_600} weight=Heading.Thin
-                />}
-                }
-                
+                // <TypeID.Proposal id position=TypeID.Title />
+                // {switch(content){
+                // | Some({title}) => <Heading
+                //   size=Heading.H3 value=title color={theme.neutral_600} weight=Heading.Thin
+                // />
+                // | None => <Heading
+                //   size=Heading.H3 value="no content" color={theme.neutral_600} weight=Heading.Thin
+                // />}
+                // }
               </>
             | _ =>
               isMobile

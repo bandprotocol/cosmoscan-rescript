@@ -5,30 +5,53 @@ module Changes = {
     value: string,
   };
 
-  let decode = json => {
+  let decode = {
+    open JsonUtils.Decode
+
+    object(fields => {
+      subspace: fields.required(. "subspace", string),
+      key: fields.required(. "key", string),
+      value: fields.required(. "value", string),
+    })
+  }
+};
+
+module Plan = {
+  type plan_t = {
+    name: string,
+    time: MomentRe.Moment.t,
+    height: int,
+  }
+
+  let decode = {
     open JsonUtils.Decode
 
     buildObject(json => {
-      subspace: json.at(list{"subspace"}, string),
-      key: json.at(list{"key"}, string),
-      value: json.at(list{"value"}, string),
+      {
+        name: json.at(list{"name"}, string),
+        time: json.at(list{"time"}, moment),
+        height: json.at(list{"height"}, int),
+      }
     })
   }
 };
 
 module Content = {
-
   type t = {
     title: string,
     description: string,
+    changes: option<array<Changes.changes_t>>,
+    plan: option<Plan.plan_t>,
   }
 
   let decode = {
     open JsonUtils.Decode
-    buildObject(json => {
+    object(fields => {
       {
-        title: json.at(list{"title"}, string),
-        description: json.at(list{"description"}, string),
+        title: fields.required(. "title", string),
+        description: fields.required(. "description", string),
+        changes: fields.optional(. "changes", array(Changes.decode)),
+        plan: fields.optional(. "plan", Plan.decode),
       }
     })
   }
@@ -40,6 +63,7 @@ type proposal_status_t =
   | Passed
   | Rejected
   | Failed
+  | Inactive
 
 module ProposalStatus = {
   type t = proposal_status_t
@@ -52,6 +76,7 @@ module ProposalStatus = {
     | "Passed" => Passed
     | "Rejected" => Rejected
     | "Failed" => Failed
+    | "Inactive" => Inactive
     | _ => raise(NotFound("The proposal status is not existing"))
     }
   }
@@ -63,6 +88,7 @@ module ProposalStatus = {
   | Passed => "Passed"->Js.Json.string
   | Rejected => "Rejected"->Js.Json.string
   | Failed => "Failed"->Js.Json.string
+  | Inactive => "Inactive"->Js.Json.string
   };
 }
 
@@ -118,7 +144,7 @@ let toExternal = ({
   name: title,
   status,
   description,
-  content: contentOpt->Belt.Option.map(content => content ->JsonUtils.Decode.mustDecode(Content.decode)),
+  content: contentOpt->JsonUtils.Decode.mustDecodeOpt(Content.decode),
   submitTime,
   depositEndTime,
   votingStartTime,
