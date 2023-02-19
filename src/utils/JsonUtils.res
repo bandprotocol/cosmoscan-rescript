@@ -10,7 +10,6 @@ module Decode = {
   let bufferWithDefault =
     string->option->map((. a) => a->Belt.Option.getWithDefault(_, "")->JsBuffer.fromBase64)
   let strWithDefault = string->option->map((. a) => a->Belt.Option.getWithDefault(_, ""))
-  let arrayWithDefault = x => x->array->option->map((. a) => a->Belt.Option.getWithDefault(_, []))
   let bufferFromHex = string->map((. a) => JsBuffer.fromHex(a))
   let bufferFromBase64 = string->map((. a) => JsBuffer.fromBase64(a))
 

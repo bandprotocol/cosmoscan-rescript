@@ -70,17 +70,12 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
               Styles.idContainer,
             })}>
             {switch proposalSub {
-            | Data({id, name, content}) =>
+            | Data({id, name}) =>
               <>
-                // <TypeID.Proposal id position=TypeID.Title />
-                // {switch(content){
-                // | Some({title}) => <Heading
-                //   size=Heading.H3 value=title color={theme.neutral_600} weight=Heading.Thin
-                // />
-                // | None => <Heading
-                //   size=Heading.H3 value="no content" color={theme.neutral_600} weight=Heading.Thin
-                // />}
-                // }
+                <TypeID.Proposal id position=TypeID.Title />
+                <Heading
+                  size=Heading.H3 value=name color={theme.neutral_600} weight=Heading.Thin
+                />
               </>
             | _ =>
               isMobile
@@ -158,6 +153,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
                 | Voting
                 | Passed
                 | Rejected
+                | Inactive
                 | Failed => "Voting End Time"
                 }}
                 size=Heading.H5
@@ -176,6 +172,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
               | Voting
               | Passed
               | Rejected
+              | Inactive
               | Failed => votingEndTime
               }}
               color={theme.neutral_900}
@@ -191,6 +188,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
           | Voting
           | Passed
           | Rejected
+          | Inactive
           | Failed =>
             <Turnout id />
           }
