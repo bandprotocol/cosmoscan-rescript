@@ -146,7 +146,7 @@ module SortableTHead = {
       <Text
         block=true
         value=title
-        size=Text.Sm
+        size=Text.Caption
         weight=Text.Semibold
         transform=Text.Uppercase
         tooltipItem={tooltipItem->Belt.Option.mapWithDefault(React.null, React.string)}
@@ -154,11 +154,11 @@ module SortableTHead = {
       />
       <HSpacing size=Spacing.xs />
       {if sortedBy == asc {
-        <Icon name="fas fa-caret-down" color={theme.textSecondary} />
+        <Icon name="fas fa-caret-down" color={theme.neutral_600} />
       } else if sortedBy == desc {
-        <Icon name="fas fa-caret-up" color={theme.textSecondary} />
+        <Icon name="fas fa-caret-up" color={theme.neutral_600} />
       } else {
-        <Icon name="fas fa-sort" color={theme.textSecondary} />
+        <Icon name="fas fa-sort" color={theme.neutral_600} />
       }}
     </div>
   }
@@ -341,7 +341,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
           <Row alignItems=Row.Center>
             <Col col=Col.One>
               <Text
-                block=true value="Rank" weight=Text.Semibold transform=Text.Uppercase size=Text.Sm
+                block=true value="Rank" weight=Text.Semibold transform=Text.Uppercase size=Text.Caption
               />
             </Col>
             <Col col=Col.Two>
@@ -384,7 +384,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
               <Text
                 block=true
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
                 weight=Text.Semibold
                 align={isLogin ? Text.Left : Center}
                 value="Oracle Status"
@@ -436,7 +436,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
                 value="No Validator"
                 align=Heading.Center
                 weight=Heading.Regular
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             </EmptyContainer>}
       </>

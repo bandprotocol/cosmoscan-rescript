@@ -90,9 +90,9 @@ let make = (
   ~colorLighter=?,
   ~isRight=false,
   ~mt=0,
-  ~mtSm=mt,
+  ~mtSm=0,
   ~mb=0,
-  ~mbSm=mb,
+  ~mbSm=0,
 ) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   <div
@@ -101,8 +101,8 @@ let make = (
         ~w=width,
         ~h=height,
         ~r=radius,
-        ~colorBase=colorBase->Belt.Option.getWithDefault(theme.loadingBaseColor),
-        ~colorLighter=colorLighter->Belt.Option.getWithDefault(theme.loadingSecondaryColor),
+        ~colorBase=colorBase->Belt.Option.getWithDefault(theme.neutral_100),
+        ~colorLighter=colorLighter->Belt.Option.getWithDefault(theme.neutral_300),
         (),
       ),
       Styles.mt(~mt, ~mtSm, ()),

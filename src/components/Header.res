@@ -4,7 +4,7 @@ module Styles = {
   let header = (theme: Theme.t) =>
     style(. [
       paddingTop(Spacing.lg),
-      backgroundColor(theme.mainBg),
+      backgroundColor(theme.neutral_000),
       zIndex(3),
       Media.mobile([
         padding(Spacing.md),
@@ -51,19 +51,19 @@ module DesktopRender = {
                   <div>
                     <Text
                       value="BANDCHAIN"
-                      size=Text.Md
+                      size=Text.Body2
                       weight=Text.Semibold
                       nowrap=true
-                      color=theme.textPrimary
+                      color=theme.neutral_900
                       special=true
                     />
                     <br />
                     <Text
                       value="Cosmoscan"
                       nowrap=true
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
-                      color=theme.textPrimary
+                      color=theme.neutral_900
                       special=true
                     />
                   </div>
@@ -79,7 +79,7 @@ module DesktopRender = {
           </Col>
         </Row>
       </div>
-      <Section bg=theme.headerBg pt=0 pb=0 style=Styles.boxShadow>
+      <Section bg=theme.neutral_100 pt=0 pb=0 style=Styles.boxShadow>
         <div className=CssHelper.container>
           <Row alignItems=Row.Center>
             <Col col=Col.Eight> <NavBar /> </Col>
@@ -114,18 +114,18 @@ module MobileRender = {
               <div className={CssHelper.flexBox(~direction=#column, ~align=#flexStart, ())}>
                 <Text
                   value="BANDCHAIN"
-                  size=Text.Md
+                  size=Text.Body2
                   weight=Text.Bold
                   nowrap=true
-                  color=theme.textPrimary
+                  color=theme.neutral_900
                   spacing=Text.Em(0.05)
                 />
                 <VSpacing size=Spacing.xs />
                 <Text
                   value="CosmoScan"
                   nowrap=true
-                  size=Text.Sm
-                  color=theme.textSecondary
+                  size=Text.Caption
+                  color=theme.neutral_600
                   spacing=Text.Em(0.03)
                 />
               </div>

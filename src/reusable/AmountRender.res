@@ -13,7 +13,7 @@ module Styles = {
 let make = (~coins, ~pos=Msg, ~color=?) => {
   let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
 
-  let textColor = color->Belt.Option.getWithDefault(theme.textSecondary);
+  let textColor = color->Belt.Option.getWithDefault(theme.neutral_600);
 
   <div className=Styles.container>
     {switch (pos) {
@@ -23,7 +23,7 @@ let make = (~coins, ~pos=Msg, ~color=?) => {
          code=true
          block=true
          nowrap=true
-         size=Text.Lg
+         size=Text.Body1
          color=textColor
        />
      | _ =>

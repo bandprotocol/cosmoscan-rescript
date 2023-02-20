@@ -46,9 +46,9 @@ let make = (
   ~style="",
   ~children,
   ~marginBottom=0,
-  ~marginBottomSm=marginBottom,
+  ~marginBottomSm=0,
   ~marginTop=0,
-  ~marginTopSm=marginTop,
+  ~marginTopSm=0,
 ) =>
   <div
     className={CssJs.merge(. [

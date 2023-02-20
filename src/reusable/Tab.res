@@ -2,9 +2,9 @@ module Styles = {
   open CssJs
 
   let container = style(. [Media.mobile([margin2(~h=px(-12), ~v=zero)])])
-  let header = (theme: Theme.t) =>
+  let header = (theme: Theme.t, isDarkMode) =>
     style(. [
-      borderBottom(px(1), solid, theme.tableRowBorderColor),
+      borderBottom(px(1), solid, isDarkMode ? theme.neutral_300 : theme.neutral_100),
       selector("> * + *", [marginLeft(px(32))]),
       Media.mobile([
         overflow(auto),
@@ -13,14 +13,14 @@ module Styles = {
       ]),
     ])
 
-  let buttonContainer = active =>
+  let buttonContainer = (theme: Theme.t, active) =>
     style(. [
       display(inlineFlex),
       justifyContent(center),
       alignItems(center),
       cursor(pointer),
       padding2(~v=#px(32), ~h=zero),
-      borderBottom(#px(4), solid, active ? Theme.baseBlue : transparent),
+      borderBottom(#px(4), solid, active ? theme.primary_600 : transparent),
       Media.mobile([whiteSpace(nowrap), padding2(~v=#px(24), ~h=zero)]),
     ])
 
@@ -34,17 +34,19 @@ module Route = {
   }
 
   let button = (~name, ~route, ~active) => {
-    <Link key=name isTab=true className={Styles.buttonContainer(active)} route>
-      <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Lg />
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
+    <Link key=name isTab=true className={Styles.buttonContainer(theme, active)} route>
+      <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Body1 />
     </Link>
   }
 
   @react.component
   let make = (~tabs: array<t>, ~currentRoute, ~children) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.container>
-      <div className={CssJs.merge(. [Styles.header(theme), CssHelper.flexBox(~wrap=#nowrap, ())])}>
+      <div className={CssJs.merge(. [Styles.header(theme, isDarkMode), CssHelper.flexBox(~wrap=#nowrap, ())])}>
         {tabs
         ->Belt.Array.map(({name, route}) => button(~name, ~route, ~active=route == currentRoute))
         ->React.array}
@@ -56,17 +58,19 @@ module Route = {
 
 module State = {
   let button = (~name, ~active, ~setTab) => {
-    <div key=name className={Styles.buttonContainer(active)} onClick={_ => setTab()}>
-      <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Lg />
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
+    <div key=name className={Styles.buttonContainer(theme, active)} onClick={_ => setTab()}>
+      <Text value=name weight={active ? Text.Semibold : Text.Regular} size=Text.Body1 />
     </div>
   }
 
   @react.component
   let make = (~tabs: array<string>, ~tabIndex, ~setTab, ~children) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.container>
-      <div className={CssJs.merge(. [Styles.header(theme), CssHelper.flexBox(~wrap=#nowrap, ())])}>
+      <div className={CssJs.merge(. [Styles.header(theme, isDarkMode), CssHelper.flexBox(~wrap=#nowrap, ())])}>
         {tabs
         ->Belt.Array.mapWithIndex((index, name) =>
           button(~name, ~active=index == tabIndex, ~setTab=() => setTab(index))

@@ -89,7 +89,7 @@ let make = (~txsSub: Sub.variant<array<TxSub.t>>) => {
                <Text
                  block=true
                  value="TX Hash"
-                 size=Text.Sm
+                 size=Text.Caption
                  weight=Text.Semibold
                  transform=Text.Uppercase
                />
@@ -99,7 +99,7 @@ let make = (~txsSub: Sub.variant<array<TxSub.t>>) => {
                  <Text
                    block=true
                    value="Gas Fee (BAND)"
-                   size=Text.Sm
+                   size=Text.Caption
                    weight=Text.Semibold
                    transform=Text.Uppercase
                  />
@@ -109,7 +109,7 @@ let make = (~txsSub: Sub.variant<array<TxSub.t>>) => {
                <Text
                  block=true
                  value="Actions"
-                 size=Text.Sm
+                 size=Text.Caption
                  weight=Text.Semibold
                  transform=Text.Uppercase
                />
@@ -141,7 +141,7 @@ let make = (~txsSub: Sub.variant<array<TxSub.t>>) => {
                value="No Transaction"
                align=Heading.Center
                weight=Heading.Regular
-               color={theme.textSecondary}
+               color={theme.neutral_600}
              />
            </EmptyContainer>
      | Error(_) | Loading | NoData =>

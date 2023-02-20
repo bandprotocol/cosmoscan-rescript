@@ -28,11 +28,11 @@ module Styles = {
       width(#px(32)),
       height(#px(32)),
       borderRadius(#px(8)),
-      border(#px(1), #solid, active ? theme.textPrimary : theme.textSecondary),
+      border(#px(1), #solid, active ? theme.neutral_900 : theme.neutral_600),
       pointerEvents(active ? #auto : #none),
       opacity(active ? 1. : 0.5),
       hover([
-        backgroundColor(theme.textPrimary),
+        backgroundColor(theme.neutral_900),
         selector("> i", [color(isDarkMode ? theme.black : theme.white)]),
       ]),
     ])
@@ -54,8 +54,8 @@ module ClickableSymbol = {
       ])}
       onClick>
       {isPrevious
-        ? <Icon name="far fa-angle-left" color=theme.textPrimary size=18 />
-        : <Icon name="far fa-angle-right" color=theme.textPrimary size=18 />}
+        ? <Icon name="far fa-angle-left" color=theme.neutral_900 size=18 />
+        : <Icon name="far fa-angle-right" color=theme.neutral_900 size=18 />}
     </div>
   }
 }
@@ -79,16 +79,16 @@ let make = (~currentPage, ~pageCount, ~onPageChange: int => unit) => {
           })}>
           <Text
             value={currentPage->Format.iPretty}
-            size=Text.Lg
+            size=Text.Body1
             weight=Text.Semibold
-            color=theme.textPrimary
+            color=theme.neutral_900
           />
-          <Text value="of" size=Text.Lg />
+          <Text value="of" size=Text.Body1 />
           <Text
             value={pageCount->Format.iPretty}
             weight=Text.Semibold
-            size=Text.Lg
-            color=theme.textPrimary
+            size=Text.Body1
+            color=theme.neutral_900
           />
         </div>
         <ClickableSymbol

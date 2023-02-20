@@ -34,33 +34,33 @@ module Styles = {
     let custom = switch variant {
     | Primary =>
       style(. [
-        backgroundColor(theme.baseBlue),
+        backgroundColor(theme.primary_600),
         color(Theme.white),
-        border(#px(1), #solid, theme.baseBlue),
-        hover([backgroundColor(theme.darkBlue)]),
-        active([backgroundColor(theme.darkenBlue)]),
+        border(#px(1), #solid, theme.primary_600),
+        hover([backgroundColor(theme.primary_500)]),
+        active([backgroundColor(theme.primary_800)]),
         disabled([
-          backgroundColor(isDarkMode ? theme.darkBlue : theme.lightBlue),
+          backgroundColor(isDarkMode ? theme.primary_500 : theme.primary_500),
           color(Theme.white),
-          borderColor(isDarkMode ? theme.darkBlue : theme.lightBlue),
+          borderColor(isDarkMode ? theme.primary_500 : theme.primary_500),
           opacity(0.5),
         ]),
       ])
     | Outline =>
       style(. [
         backgroundColor(#transparent),
-        color(theme.textPrimary),
-        border(#px(1), #solid, theme.textPrimary),
-        selector("i", [color(theme.textPrimary)]),
+        color(theme.neutral_900),
+        border(#px(1), #solid, theme.neutral_900),
+        selector("i", [color(theme.neutral_900)]),
         hover([
-          backgroundColor(theme.textPrimary),
+          backgroundColor(theme.neutral_900),
           color(isDarkMode ? Theme.black : Theme.white),
           selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
         ]),
         active([backgroundColor(CssJs.hex("E5E8F7"))]),
         disabled([
-          borderColor(theme.textSecondary),
-          color(theme.textSecondary),
+          borderColor(theme.neutral_600),
+          color(theme.neutral_600),
           hover([backgroundColor(#transparent)]),
           opacity(0.5),
         ]),
@@ -77,8 +77,8 @@ let make = (
   ~py=8,
   ~px=16,
   ~fsize=12,
-  ~pySm=py,
-  ~pxSm=px,
+  ~pySm=8,
+  ~pxSm=16,
   ~onClick,
   ~style="",
   ~disabled=false,

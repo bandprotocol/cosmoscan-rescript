@@ -10,13 +10,13 @@ module SendMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=send.fromAddress />
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
-          value="To" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.textSecondary
+          value="To" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
         />
         <AddressRender address=send.toAddress />
       </Col>
@@ -26,7 +26,7 @@ module SendMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=send.amount pos=AmountRender.TxIndex />
       </Col>
@@ -45,7 +45,7 @@ module DelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=delegation.delegatorAddress />
       </Col>
@@ -55,7 +55,7 @@ module DelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <ValidatorMonikerLink
           validatorAddress=delegation.validatorAddress
@@ -69,7 +69,7 @@ module DelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=list{delegation.amount} pos=AmountRender.TxIndex />
       </Col>
@@ -88,7 +88,7 @@ module DelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=delegation.delegatorAddress />
       </Col>
@@ -98,7 +98,7 @@ module DelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=delegation.validatorAddress accountType=#validator />
       </Col>
@@ -108,7 +108,7 @@ module DelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=list{delegation.amount} pos=AmountRender.TxIndex />
       </Col>
@@ -127,7 +127,7 @@ module UndelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=undelegation.delegatorAddress />
       </Col>
@@ -137,7 +137,7 @@ module UndelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <ValidatorMonikerLink
           validatorAddress=undelegation.validatorAddress
@@ -151,7 +151,7 @@ module UndelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=list{undelegation.amount} pos=AmountRender.TxIndex />
       </Col>
@@ -170,7 +170,7 @@ module UndelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=undelegation.delegatorAddress />
       </Col>
@@ -180,7 +180,7 @@ module UndelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=undelegation.validatorAddress accountType=#validator />
       </Col>
@@ -190,7 +190,7 @@ module UndelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=list{undelegation.amount} pos=AmountRender.TxIndex />
       </Col>
@@ -209,7 +209,7 @@ module RedelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=redelegation.delegatorAddress />
       </Col>
@@ -219,7 +219,7 @@ module RedelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <ValidatorMonikerLink
           validatorAddress=redelegation.validatorSourceAddress
@@ -233,7 +233,7 @@ module RedelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <ValidatorMonikerLink
           validatorAddress=redelegation.validatorDestinationAddress
@@ -247,7 +247,7 @@ module RedelegateMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=list{redelegation.amount} pos=AmountRender.TxIndex />
       </Col>
@@ -266,7 +266,7 @@ module RedelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=redelegation.delegatorAddress />
       </Col>
@@ -276,7 +276,7 @@ module RedelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=redelegation.validatorSourceAddress accountType=#validator />
       </Col>
@@ -286,7 +286,7 @@ module RedelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=redelegation.validatorDestinationAddress accountType=#validator />
       </Col>
@@ -296,7 +296,7 @@ module RedelegateFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=list{redelegation.amount} pos=AmountRender.TxIndex />
       </Col>
@@ -315,7 +315,7 @@ module WithdrawRewardMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=withdrawal.delegatorAddress />
       </Col>
@@ -325,7 +325,7 @@ module WithdrawRewardMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <ValidatorMonikerLink
           validatorAddress=withdrawal.validatorAddress
@@ -339,7 +339,7 @@ module WithdrawRewardMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=withdrawal.amount pos=AmountRender.TxIndex />
       </Col>
@@ -358,7 +358,7 @@ module WithdrawRewardFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=withdrawal.delegatorAddress />
       </Col>
@@ -368,7 +368,7 @@ module WithdrawRewardFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=withdrawal.validatorAddress accountType=#validator />
       </Col>
@@ -387,7 +387,7 @@ module WithdrawComissionMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <ValidatorMonikerLink
           validatorAddress=withdrawal.validatorAddress
@@ -401,7 +401,7 @@ module WithdrawComissionMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AmountRender coins=withdrawal.amount pos=AmountRender.TxIndex />
       </Col>
@@ -420,7 +420,7 @@ module WithdrawComissionFailMsg = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=withdrawal.validatorAddress accountType=#validator />
       </Col>
@@ -441,7 +441,7 @@ module MultisendMsg = {
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
-            color=theme.textSecondary
+            color=theme.neutral_600
           />
         </Col>
         {isMobile
@@ -452,7 +452,7 @@ module MultisendMsg = {
                 size=Heading.H4
                 weight=Heading.Regular
                 marginBottom=8
-                color=theme.textSecondary
+                color=theme.neutral_600
               />
             </Col>}
         {tx.inputs
@@ -471,7 +471,7 @@ module MultisendMsg = {
       </Row>
       <SeperatedLine mt=8 mb=24 />
       <Heading
-        value="To" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.textSecondary
+        value="To" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
       />
       <Row>
         {tx.outputs

@@ -7,7 +7,7 @@ module Client = {
 
   @module("@bandprotocol/bandchain.js") @new external create: string => t = "Client"
   @send
-  external getReferenceData: (t, array<string>) => Promise.t<array<reference_data_t>> =
+  external getReferenceData: (t, array<string>) => promise<array<reference_data_t>> =
     "getReferenceData"
 }
 

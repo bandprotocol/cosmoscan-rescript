@@ -1,8 +1,9 @@
 module Styles = {
   open CssJs
 
-  let iconWrapper = style(. [
-    backgroundColor(Theme.baseBlue),
+  let iconWrapper =  (theme: Theme.t) =>
+  style(. [
+    backgroundColor(theme.primary_600),
     width(#px(24)),
     height(#px(24)),
     borderRadius(#percent(50.)),
@@ -20,19 +21,21 @@ module Styles = {
 }
 
 @react.component
-let make = (~category: MsgDecoder.msg_cat_t) =>
-  <div className=Styles.iconWrapper>
+let make = (~category: MsgDecoder.msg_cat_t) => {
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  <div className=Styles.iconWrapper(theme)>
     {switch category {
-    | TokenMsg => <Icon name="far fa-wallet" color=Theme.white size=14 />
-    | ValidatorMsg => <Icon name="fas fa-user" color=Theme.white size=14 />
-    | ProposalMsg => <Icon name="fal fa-file" color=Theme.white size=14 />
-    | DataMsg => <Icon name="fal fa-globe" color=Theme.white size=14 />
+    | TokenMsg => <Icon name="far fa-wallet" color=theme.white size=14 />
+    | ValidatorMsg => <Icon name="fas fa-user" color=theme.white size=14 />
+    | ProposalMsg => <Icon name="fal fa-file" color=theme.white size=14 />
+    | DataMsg => <Icon name="fal fa-globe" color=theme.white size=14 />
     | IBCClientMsg
     | IBCConnectionMsg
     | IBCChannelMsg
     | IBCPacketMsg
     | IBCTransferMsg =>
       <img src=Images.ibcIcon />
-    | _ => <Icon name="fal fa-question" color=Theme.white size=14 />
+    | _ => <Icon name="fal fa-question" color=theme.white size=14 />
     }}
   </div>
+}

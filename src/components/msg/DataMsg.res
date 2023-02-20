@@ -72,7 +72,7 @@ module RequestMsg = {
         Styles.msgContainer,
       ])}>
       <TypeID.Request id />
-      <Text value=j` to ` size=Text.Md nowrap=true block=true />
+      <Text value=j` to ` size=Text.Body2 nowrap=true block=true />
       <TypeID.OracleScript id=oracleScriptID />
       <Text value=oracleScriptName nowrap=true block=true ellipsis=true />
     </div>

@@ -51,7 +51,7 @@ module Keybase = {
 }
 
 @react.component
-let make = (~moniker, ~identity, ~width=25, ~widthSm=width) =>
+let make = (~moniker, ~identity, ~width=25, ~widthSm=25) =>
   React.useMemo1(
     () =>
       identity != ""

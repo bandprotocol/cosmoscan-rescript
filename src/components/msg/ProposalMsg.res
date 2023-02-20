@@ -13,7 +13,7 @@ module SubmitProposal = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <TypeID.Proposal id=proposalID /> <Text value=title size=Text.Md nowrap=true block=true />
+      <TypeID.Proposal id=proposalID /> <Text value=title size=Text.Body2 nowrap=true block=true />
     </div>
 }
 
@@ -27,9 +27,9 @@ module Deposit = {
         Styles.msgContainer,
       ])}>
       <AmountRender coins=amount />
-      <Text value=j` to ` size=Text.Md nowrap=true block=true />
+      <Text value=j` to ` size=Text.Body2 nowrap=true block=true />
       <TypeID.Proposal id=proposalID />
-      <Text value=title size=Text.Md nowrap=true block=true />
+      <Text value=title size=Text.Body2 nowrap=true block=true />
     </div>
 }
 
@@ -42,6 +42,6 @@ module Vote = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <TypeID.Proposal id=proposalID /> <Text value=title size=Text.Md nowrap=true block=true />
+      <TypeID.Proposal id=proposalID /> <Text value=title size=Text.Body2 nowrap=true block=true />
     </div>
 }

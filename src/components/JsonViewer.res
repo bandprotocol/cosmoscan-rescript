@@ -1,8 +1,6 @@
 @react.component
 let make = (~src) => {
-  // TODO: complete it after implementing the ThemeContext
-  //   let ({ThemeContext.isDarkMode: isDarkMode}, _) = React.useContext(ThemeContext.context)
-  let isDarkMode = false
+  let ({ThemeContext.isDarkMode: isDarkMode}, _) = React.useContext(ThemeContext.context)
   let style = {
     "height": "300px",
     "overflow": "auto",

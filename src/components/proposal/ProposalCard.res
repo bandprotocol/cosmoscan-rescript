@@ -15,11 +15,11 @@ module Styles = {
 
   let proposalLink = (theme: Theme.t) =>
     style(. [
-      backgroundColor(theme.baseBlue),
+      backgroundColor(theme.primary_600),
       borderRadius(#px(8)),
       width(#px(32)),
       height(#px(32)),
-      hover([backgroundColor(theme.darkBlue)]),
+      hover([backgroundColor(theme.primary_500)]),
     ])
 }
 
@@ -42,11 +42,11 @@ module Turnout = {
             value="Turnout"
             size=Heading.H5
             marginBottom=8
-            color={theme.textSecondary}
+            color={theme.neutral_600}
             weight=Heading.Thin
           />
           <Text
-            value={turnoutRate->Format.fPercent(~digits=2)} size=Text.Lg color={theme.textPrimary}
+            value={turnoutRate->Format.fPercent(~digits=2)} size=Text.Body1 color={theme.neutral_900}
           />
         </Col>
       | _ => React.null
@@ -75,7 +75,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
               <>
                 <TypeID.Proposal id position=TypeID.Title />
                 <Heading
-                  size=Heading.H3 value=name color={theme.textSecondary} weight=Heading.Thin
+                  size=Heading.H3 value=name color={theme.neutral_600} weight=Heading.Thin
                 />
               </>
             | _ =>
@@ -132,7 +132,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
             size=Heading.H5
             marginBottom=8
             weight=Heading.Thin
-            color={theme.textSecondary}
+            color={theme.neutral_600}
           />
           {switch proposalSub {
           | Data({proposerAddressOpt}) =>
@@ -158,7 +158,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
                 }}
                 size=Heading.H5
                 weight=Heading.Thin
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             | _ => <LoadingCensorBar width=100 height=15 />
             }}
@@ -166,7 +166,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
           {switch proposalSub {
           | Data({depositEndTime, votingEndTime, status}) =>
             <Timestamp
-              size=Text.Lg
+              size=Text.Body1
               time={switch status {
               | Deposit => depositEndTime
               | Voting
@@ -174,7 +174,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
               | Rejected
               | Failed => votingEndTime
               }}
-              color={theme.textPrimary}
+              color={theme.neutral_900}
               suffix=" +UTC"
             />
           | _ => <LoadingCensorBar width={isMobile ? 120 : 270} height=15 />

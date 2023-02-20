@@ -28,7 +28,7 @@ let get = operatorAddress => {
     result
     ->Sub.fromData
     ->Sub.map(({historical_bonded_token_on_validators}) => {
-      historical_bonded_token_on_validators->Belt_Array.map(each => {
+      historical_bonded_token_on_validators->Belt.Array.map(each => {
         t: each.timestamp->GraphQLParser.timestamp->MomentRe.Moment.toUnix,
         y: each.bonded_tokens->Js.Json.decodeString->Belt.Option.getExn->float_of_string /. 1e6,
       })

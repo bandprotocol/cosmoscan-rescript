@@ -57,9 +57,9 @@ let make = (
   ~weight=Semibold,
   ~size=H1,
   ~marginTop=0,
-  ~marginTopSm=marginTop,
+  ~marginTopSm=0,
   ~marginBottom=0,
-  ~marginBottomSm=marginBottom,
+  ~marginBottomSm=0,
   ~style="",
   ~color=?,
 ) => {
@@ -71,11 +71,11 @@ let make = (
     CssJs.merge(. [
       Styles.fontSize(size),
       Styles.fontWeight(weight),
-      Styles.textColor(color->Belt.Option.getWithDefault(theme.textPrimary)),
+      Styles.textColor(color->Belt.Option.getWithDefault(theme.neutral_900)),
       Styles.textAlign(align),
       Styles.lineHeight,
-      Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
       Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),
+      Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
       style,
     ])
 

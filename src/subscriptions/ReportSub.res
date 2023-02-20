@@ -96,7 +96,7 @@ module ValidatorReport = {
     ->Sub.fromData
     ->Sub.flatMap(({validators_by_pk}) => {
       switch validators_by_pk {
-      | Some(data) => Sub.resolve(data.reports->Belt_Array.map(toExternal))
+      | Some(data) => Sub.resolve(data.reports->Belt.Array.map(toExternal))
       | None => []->Sub.resolve
       }
     })

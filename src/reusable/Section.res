@@ -13,7 +13,7 @@ module Styles = {
 let make = (~children, ~pt=60, ~pb=60, ~ptSm=32, ~pbSm=32, ~bg=?, ~style="") => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let css = CssJs.merge(. [
-    Styles.bgColor(bg->Belt.Option.getWithDefault(theme.mainBg)),
+    Styles.bgColor(bg->Belt.Option.getWithDefault(theme.neutral_000)),
     Styles.base(~pt, ~pb, ()),
     Styles.mobile(~ptSm, ~pbSm, ()),
     style,
