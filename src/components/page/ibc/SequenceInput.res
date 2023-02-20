@@ -21,10 +21,10 @@ module Styles = {
       borderRadius(#px(4)),
       fontSize(#px(14)),
       fontWeight(#light),
-      border(#px(1), #solid, theme.tableRowBorderColor),
-      backgroundColor(theme.inputContrastColor),
+      border(#px(1), #solid, theme.neutral_200),
+      backgroundColor(theme.neutral_000),
       outlineStyle(#none),
-      color(theme.textPrimary),
+      color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
     ])
 }

@@ -28,7 +28,7 @@ module Styles = {
       width(#px(32)),
       height(#px(32)),
       borderRadius(#px(8)),
-      // border(#px(1), #solid, active ? theme.textPrimary : theme.textSecondary),
+      // border(#px(1), #solid, active ? theme.neutral_900 : theme.textSecondary),
       pointerEvents(active ? #auto : #none),
       opacity(active ? 1. : 0.5),
       hover([
@@ -50,14 +50,14 @@ module Styles = {
       borderRadius(#px(4)),
       fontSize(#px(14)),
       fontWeight(#light),
-      border(#px(1), #solid, theme.tableRowBorderColor),
-      backgroundColor(theme.inputContrastColor),
+      border(#px(1), #solid, theme.neutral_400),
+      backgroundColor(theme.neutral_000),
       outlineStyle(#none),
-      color(theme.textPrimary),
+      color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
       textAlign(#center),
       marginLeft(#px(16)),
-      selector(":focus", [border(#px(1), #solid, theme.baseBlue)]),
+      selector(":focus", [border(#px(1), #solid, theme.primary_600)]),
     ])
 }
 module ClickableSymbol = {
@@ -72,8 +72,8 @@ module ClickableSymbol = {
       ])}
       onClick>
       {isPrevious
-        ? <Icon name="far fa-angle-left" color=theme.textPrimary size=18 />
-        : <Icon name="far fa-angle-right" color=theme.textPrimary size=18 />}
+        ? <Icon name="far fa-angle-left" color=theme.neutral_900 size=18 />
+        : <Icon name="far fa-angle-right" color=theme.neutral_900 size=18 />}
     </div>
   }
 }
@@ -115,12 +115,12 @@ let make = (
             CssHelper.flexBox(~justify=#center, ()),
             Styles.paginationBox,
           })}>
-          <Text value="of" size=Text.Lg />
+          <Text value="of" size=Text.Body2 />
           <Text
             value={pageCount->Format.iPretty}
             weight=Text.Semibold
-            size=Text.Lg
-            color=theme.textPrimary
+            size=Text.Body2
+            color=theme.neutral_900
           />
         </div>
         <ClickableSymbol

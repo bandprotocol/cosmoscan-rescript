@@ -35,40 +35,40 @@ module Styles = {
     let custom = switch variant {
     | Primary =>
       style(. [
-        backgroundColor(theme.baseBlue),
+        backgroundColor(theme.primary_600),
         color(theme.white),
-        border(#px(1), #solid, theme.baseBlue),
-        hover([backgroundColor(theme.darkBlue)]),
-        active([backgroundColor(theme.darkenBlue)]),
+        border(#px(1), #solid, theme.primary_600),
+        hover([backgroundColor(theme.primary_800)]),
+        active([backgroundColor(theme.primary_600)]),
         disabled([
-          backgroundColor(isDarkMode ? theme.darkBlue : theme.lightBlue),
+          backgroundColor(isDarkMode ? theme.primary_800 : theme.primary_500),
           color(Theme.white),
-          borderColor(isDarkMode ? theme.darkBlue : theme.lightBlue),
+          borderColor(isDarkMode ? theme.primary_800 : theme.primary_500),
           opacity(0.5),
         ]),
       ])
     | Outline =>
       style(. [
-        backgroundColor(isActive ? theme.baseBlue : #transparent),
-        color(isActive ? Theme.white : theme.textPrimary),
-        border(#px(1), #solid, theme.baseBlue),
-        selector("i", [color(theme.textPrimary)]),
+        backgroundColor(isActive ? theme.primary_600 : #transparent),
+        color(isActive ? Theme.white : theme.neutral_900),
+        border(#px(1), #solid, theme.primary_600),
+        selector("i", [color(theme.neutral_900)]),
         hover([
-          backgroundColor(theme.baseBlue),
+          backgroundColor(theme.primary_600),
           color(isDarkMode ? Theme.black : Theme.white),
           selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
         ]),
-        active([backgroundColor(theme.baseBlue)]),
+        active([backgroundColor(theme.primary_600)]),
         disabled([
-          borderColor(theme.textSecondary),
-          color(theme.textSecondary),
+          borderColor(theme.neutral_600),
+          color(theme.neutral_600),
           hover([backgroundColor(#transparent)]),
           opacity(0.5),
         ]),
         selector(
           "&.selected",
           [
-            backgroundColor(theme.baseBlue),
+            backgroundColor(theme.primary_600),
             color(isDarkMode ? Theme.black : Theme.white),
             selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
           ],

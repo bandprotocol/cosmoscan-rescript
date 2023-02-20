@@ -8,17 +8,17 @@ module Styles = {
     style(. [
       width(#percent(100.)),
       height(#px(40)),
-      border(#px(1), #solid, theme.tableRowBorderColor),
+      border(#px(1), #solid, theme.neutral_200),
       borderRadius(#px(8)),
       padding2(~v=#px(8), ~h=#px(10)),
       boxSizing(#borderBox),
       fontSize(#px(14)),
-      color(theme.textPrimary),
+      color(theme.neutral_900),
       transition("all", ~duration=200, ~timingFunction=#easeInOut, ~delay=0),
       hover([border(#px(1), #solid, hex("9096A2"))]), //TODO: neutral_500
-      focus([border(#px(1), #solid, theme.baseBlue)]),
+      focus([border(#px(1), #solid, theme.primary_600)]),
       outlineStyle(#none),
-      background(theme.secondaryBg),
+      background(theme.neutral_000),
       paddingRight(#px(40)),
       fontFamilies([#custom("Roboto Mono"), #monospace]),
       fontWeight(#num(300)),
@@ -39,7 +39,7 @@ module Styles = {
       top(#px(50)),
       left(#zero),
       width(#percent(100.)),
-      background(theme.secondaryBg),
+      background(theme.neutral_000),
       borderRadius(#px(8)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(16, 18, 20, #num(0.15)))),
       padding3(~top=#px(0), ~bottom=#px(0), ~h=#zero),
@@ -51,7 +51,7 @@ module Styles = {
   let resultInner = (theme: Theme.t) =>
     style(. [
       paddingBottom(#px(8)),
-      color(theme.textSecondary),
+      color(theme.neutral_600),
       fontFamilies([#custom("Roboto Mono"), #monospace]),
       fontWeight(#num(300)),
     ])
@@ -108,7 +108,7 @@ module RenderMonikerLink = {
         cursor(pointer),
         width(w),
         alignItems(#center),
-        selector("> span:hover", [color(theme.baseBlue)]),
+        selector("> span:hover", [color(theme.primary_600)]),
         selector("> span", [transition(~duration=200, "all")]),
       ])
   }
@@ -131,10 +131,10 @@ module RenderMonikerLink = {
             <HSpacing size=Spacing.sm />
             <Text
               value=moniker
-              color={theme.textPrimary}
+              color={theme.neutral_900}
               weight=Text.Regular
               block=true
-              size=Text.Lg
+              size=Text.Body2
               nowrap=true
               ellipsis=true
               underline=false
@@ -152,13 +152,14 @@ module HighLightText = {
   module Styles = {
     open CssJs
 
-    let highlightText = (theme: Theme.t) => style(. [color(theme.baseBlue), fontWeight(#num(600))])
+    let highlightText = (theme: Theme.t) =>
+      style(. [color(theme.primary_600), fontWeight(#num(600))])
     let normalText = (theme: Theme.t) =>
       style(. [
         fontSize(#px(14)),
         Media.smallMobile([fontSize(#px(12))]),
         fontWeight(#num(300)),
-        color(theme.textPrimary),
+        color(theme.neutral_900),
         textAlign(#left),
       ])
   }
@@ -227,7 +228,7 @@ module RenderSearchResult = {
                       value="Address"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.textPrimary}
+                      color={theme.neutral_900}
                     />
                   </li>
                   <li className={Styles.resultItem}>
@@ -239,7 +240,7 @@ module RenderSearchResult = {
               | None =>
                 <li className={Styles.resultItem}>
                   <div className={Styles.resultNotFound}>
-                    <Text value={j`No search result for "$searchTerm"`} size=Text.Lg />
+                    <Text value={j`No search result for "$searchTerm"`} size=Text.Body2 />
                   </div>
                 </li>
               }
@@ -253,7 +254,7 @@ module RenderSearchResult = {
                       value="Address"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.textPrimary}
+                      color={theme.neutral_900}
                     />
                   </li>
                   <li className={Styles.resultItem}>
@@ -265,7 +266,7 @@ module RenderSearchResult = {
               | None =>
                 <li className={Styles.resultItem}>
                   <div className={Styles.resultNotFound}>
-                    <Text value={j`No search result for "$searchTerm"`} size=Text.Lg />
+                    <Text value={j`No search result for "$searchTerm"`} size=Text.Body2 />
                   </div>
                 </li>
               }
@@ -277,19 +278,19 @@ module RenderSearchResult = {
                     value="Transaction"
                     align=Heading.Left
                     weight=Heading.Semibold
-                    color={theme.textPrimary}
+                    color={theme.neutral_900}
                   />
                 </li>
                 <li className={Styles.resultItem}>
                   <div className={Styles.innerResultItem}>
-                    <TxLink txHash={searchTerm->Hash.fromHex} width=800 size=Text.Lg />
+                    <TxLink txHash={searchTerm->Hash.fromHex} width=800 size=Text.Body2 />
                   </div>
                 </li>
               </>
             } else {
               <li className={Styles.resultItem}>
                 <div className={Styles.resultNotFound}>
-                  <Text value={j`No search result for "$searchTerm"`} size=Text.Lg />
+                  <Text value={j`No search result for "$searchTerm"`} size=Text.Body2 />
                 </div>
               </li>
             }
@@ -306,7 +307,7 @@ module RenderSearchResult = {
                       value="Blocks"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.textPrimary}
+                      color={theme.neutral_900}
                     />
                   </li>
                   {blocks
@@ -330,7 +331,7 @@ module RenderSearchResult = {
                       value="Requests"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.textPrimary}
+                      color={theme.neutral_900}
                     />
                   </li>
                   {requests
@@ -354,7 +355,7 @@ module RenderSearchResult = {
                       value="Oracle Scripts"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.textPrimary}
+                      color={theme.neutral_900}
                     />
                   </li>
                   {os
@@ -363,7 +364,7 @@ module RenderSearchResult = {
                       <div className={Styles.innerResultItem}>
                         <TypeID.OracleScriptLink id={result.id}>
                           <div className={Css.merge(list{CssHelper.flexBox()})}>
-                            <TypeID.OracleScript id={result.id} position=TypeID.Body />
+                            <TypeID.OracleScript id={result.id} position=TypeID.Subtitle />
                             <HSpacing size=Spacing.sm />
                             <HighLightText title={result.name} searchTerm />
                           </div>
@@ -384,7 +385,7 @@ module RenderSearchResult = {
                       value="Data Sources"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.textPrimary}
+                      color={theme.neutral_900}
                     />
                   </li>
                   {ds
@@ -393,7 +394,7 @@ module RenderSearchResult = {
                       <div className={Styles.innerResultItem}>
                         <TypeID.DataSourceLink id={result.id}>
                           <div className={Css.merge(list{CssHelper.flexBox()})}>
-                            <TypeID.DataSource id={result.id} position=TypeID.Body />
+                            <TypeID.DataSource id={result.id} position=TypeID.Subtitle />
                             <HSpacing size=Spacing.sm />
                             <HighLightText title={result.name} searchTerm />
                           </div>
@@ -414,7 +415,7 @@ module RenderSearchResult = {
                       value="Proposals"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.textPrimary}
+                      color={theme.neutral_900}
                     />
                   </li>
                   {proposals
@@ -423,7 +424,7 @@ module RenderSearchResult = {
                       <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
                         <TypeID.ProposalLink id={result.id}>
                           <div className={Css.merge(list{CssHelper.flexBox()})}>
-                            <TypeID.Proposal id={result.id} position=TypeID.Body />
+                            <TypeID.Proposal id={result.id} position=TypeID.Subtitle />
                             <HSpacing size=Spacing.sm />
                             <HighLightText title={result.title} searchTerm />
                           </div>
@@ -626,7 +627,7 @@ let make = () => {
           dispatch(ChangeSearchTerm(""))
           Route.redirect(searchTerm->Route.search)
         }}>
-        <Icon name="far fa-search" color=theme.textPrimary size=16 />
+        <Icon name="far fa-search" color=theme.neutral_900 size=16 />
       </button>
     </div>
     <div

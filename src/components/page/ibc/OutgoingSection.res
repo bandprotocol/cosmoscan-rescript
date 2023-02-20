@@ -61,9 +61,9 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
       <Col col=Col.Twelve>
         <Heading value="Outgoing" size=Heading.H3 marginBottom=8 />
         <Text
-          size=Text.Lg
+          size=Text.Body2
           weight=Text.Thin
-          color=theme.textSecondary
+          color=theme.neutral_600
           value="Sending transaction information from BandChain to counterparty chain"
         />
       </Col>
@@ -90,7 +90,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
       {switch packetsSub {
       | Data(packets) if packets->Belt.Array.length === 0 =>
         <div className={Styles.paperStyle(theme, isDarkMode)}>
-          <EmptyContainer backgroundColor={theme.mainBg}>
+          <EmptyContainer>
             <img
               alt="No Packets"
               src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
@@ -101,7 +101,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
               value="No Packets"
               align=Heading.Center
               weight=Heading.Regular
-              color={theme.textSecondary}
+              color={theme.neutral_600}
             />
           </EmptyContainer>
         </div>
@@ -115,7 +115,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
         ->React.array
       | Error(_) =>
         <div className={Styles.paperStyle(theme, isDarkMode)}>
-          <EmptyContainer backgroundColor={theme.mainBg}>
+          <EmptyContainer>
             <img
               alt="No Packets"
               src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
@@ -126,7 +126,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
               value="No Packets"
               align=Heading.Center
               weight=Heading.Regular
-              color={theme.textSecondary}
+              color={theme.neutral_600}
             />
           </EmptyContainer>
         </div>

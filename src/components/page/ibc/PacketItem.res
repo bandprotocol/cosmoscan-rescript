@@ -3,13 +3,11 @@ module Styles = {
 
   let paperStyle = (theme: Theme.t, isDarkMode) =>
     style(. [
-      backgroundColor(isDarkMode ? theme.white : theme.white),
+      backgroundColor(isDarkMode ? theme.neutral_100 : theme.white),
       borderRadius(#px(10)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
       padding(#px(16)),
-      border(#px(1), #solid, isDarkMode ? hex("F3F4F6") : hex("F3F4F6")), // TODO: will change to theme color
-      //   Media.mobile([padding2(~v=#px(5), ~h=#px(10))]),
-      //   Media.smallMobile([minWidth(#px(90))]),
+      border(#px(1), #solid, theme.neutral_100),
     ])
 
   let cardContainer = style(. [position(#relative), selector(" > div + div", [marginTop(#px(12))])])
@@ -43,10 +41,11 @@ module Styles = {
   let largeColumn = style(. [minWidth(#px(245))])
   let smallColumn = style(. [minWidth(#px(80))])
   let leftAlign = style(. [textAlign(#left)])
-  let packetMobileItem = style(. [
-    selector("> div", [borderBottom(#px(1), #solid, hex("E5E7EB"))]), // TODO: change to theme color
-    selector("> div:last-child", [borderBottom(#zero, solid, #transparent)]),
-  ])
+  let packetMobileItem = (theme: Theme.t) =>
+    style(. [
+      selector("> div", [borderBottom(#px(1), #solid, theme.neutral_200)]), // TODO: change to theme color
+      selector("> div:last-child", [borderBottom(#zero, solid, #transparent)]),
+    ])
   let packetInnerMobile = style(. [
     width(#percent(100.)),
     paddingTop(#px(16)),
@@ -63,7 +62,11 @@ module MobilePacketItem = {
   @react.component
   let make = (~packetSub: Query.variant<IBCQuery.t>) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-    <div className={Css.merge(list{Styles.paperStyle(theme, isDarkMode), Styles.packetMobileItem})}>
+    <div
+      className={Css.merge(list{
+        Styles.paperStyle(theme, isDarkMode),
+        Styles.packetMobileItem(theme),
+      })}>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
           {switch packetSub {
@@ -72,8 +75,8 @@ module MobilePacketItem = {
             | OracleRequest
             | InterchainAccount
             | FungibleToken =>
-              <Text value="Tx Hash" size=Text.Md weight=Text.Semibold />
-            | OracleResponse => <Text value="Block ID" size=Text.Md weight=Text.Semibold />
+              <Text value="Tx Hash" size=Text.Body2 weight=Text.Semibold />
+            | OracleResponse => <Text value="Block ID" size=Text.Body2 weight=Text.Semibold />
             | _ => React.null
             }
           | _ => React.null
@@ -86,7 +89,9 @@ module MobilePacketItem = {
             | OracleRequest
             | InterchainAccount
             | FungibleToken =>
-              <TxLink txHash={txHash->Belt.Option.getExn} width=100 size=Text.Sm fullHash=false />
+              <TxLink
+                txHash={txHash->Belt.Option.getExn} width=100 size=Text.Body2 fullHash=false
+              />
             | OracleResponse => <TypeID.Block id=blockHeight position=TypeID.Text />
             | _ => React.null
             }
@@ -96,7 +101,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Counterparty Chain ID" size=Text.Md weight=Text.Semibold />
+          <Text value="Counterparty Chain ID" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
@@ -107,7 +112,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Port & Channel" size=Text.Md weight=Text.Semibold />
+          <Text value="Port & Channel" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
@@ -120,14 +125,14 @@ module MobilePacketItem = {
                 }>
                 <Text value={srcPort} />
                 <br />
-                <Text value={srcChannel} color={theme.baseBlue} weight={Text.Semibold} />
+                <Text value={srcChannel} color={theme.primary_600} weight={Text.Semibold} />
               </div>
               <div
                 className={
                   open CssJs
                   Css.merge(list{style(. [marginLeft(#px(8))])})
                 }>
-                <Icon name="far fa-arrow-right" color={theme.textSecondary} />
+                <Icon name="far fa-arrow-right" color={theme.neutral_600} />
               </div>
               <div
                 className={
@@ -136,7 +141,7 @@ module MobilePacketItem = {
                 }>
                 <Text value={dstPort} />
                 <br />
-                <Text value={dstChannel} color={theme.baseBlue} weight={Text.Semibold} />
+                <Text value={dstChannel} color={theme.primary_600} weight={Text.Semibold} />
               </div>
             </div>
 
@@ -146,7 +151,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Sequence" size=Text.Md weight=Text.Semibold />
+          <Text value="Sequence" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
@@ -157,7 +162,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Packet Type" size=Text.Md weight=Text.Semibold />
+          <Text value="Packet Type" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
@@ -174,7 +179,7 @@ module MobilePacketItem = {
             | OracleRequest =>
               <>
                 <div>
-                  <Text value="Request ID" size=Text.Md weight=Text.Semibold />
+                  <Text value="Request ID" size=Text.Body2 weight=Text.Semibold />
                 </div>
                 <div>
                   {{
@@ -196,7 +201,7 @@ module MobilePacketItem = {
               | Response(response) =>
                 <>
                   <div>
-                    <Text value="Request ID" size=Text.Md weight=Text.Semibold />
+                    <Text value="Request ID" size=Text.Body2 weight=Text.Semibold />
                   </div>
                   <div>
                     <TypeID.Request
@@ -214,7 +219,7 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Status" size=Text.Md weight=Text.Semibold />
+          <Text value="Status" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
@@ -229,7 +234,7 @@ module MobilePacketItem = {
                   className={Css.merge(list{CssHelper.flexBox(), Styles.failText})}
                   // onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
                   onClick={_ => Js.log("Show Error")}>
-                  <Text value="View Error Message" color=Theme.failColor />
+                  <Text value="View Error Message" color=theme.error_600 />
                   <img alt="Fail Icon" src=Images.fail />
                 </div>
               }
@@ -260,7 +265,9 @@ module DesktopPacketItem = {
             | OracleRequest
             | InterchainAccount
             | FungibleToken =>
-              <TxLink txHash={txHash->Belt.Option.getExn} width=100 size=Text.Sm fullHash=false />
+              <TxLink
+                txHash={txHash->Belt.Option.getExn} width=100 size=Text.Body2 fullHash=false
+              />
             | OracleResponse => <TypeID.Block id=blockHeight position=TypeID.Text />
             | _ => React.null
             }
@@ -280,7 +287,7 @@ module DesktopPacketItem = {
               <div className=Styles.channelSource>
                 <Text value={srcPort} />
                 <br />
-                <Text value={srcChannel} color={theme.baseBlue} weight={Text.Semibold} />
+                <Text value={srcChannel} color={theme.primary_600} weight={Text.Semibold} />
               </div>
               <div>
                 <img alt="arrow" src={isDarkMode ? Images.longArrowDark : Images.longArrowLight} />
@@ -288,7 +295,7 @@ module DesktopPacketItem = {
               <div className=Styles.channelDest>
                 <Text value={dstPort} />
                 <br />
-                <Text value={dstChannel} color={theme.baseBlue} weight={Text.Semibold} />
+                <Text value={dstChannel} color={theme.primary_600} weight={Text.Semibold} />
               </div>
             </div>
 
@@ -375,7 +382,7 @@ module DesktopPacketItem = {
                     className={Css.merge(list{CssHelper.flexBox(), Styles.failText})}
                     // onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
                     onClick={_ => Js.log("Show Error")}>
-                    <Text value="View Error Message" color=Theme.failColor />
+                    <Text value="View Error Message" color=theme.error_600 />
                     <img alt="Fail Icon" src=Images.fail />
                   </div>
                 }
