@@ -75,6 +75,25 @@ module ProposalSearchConfig = %graphql(`
 
 `)
 
+module ValidatorSearch = {
+  type t = {
+    operatorAddress: Address.t,
+    moniker: string,
+    identity: string,
+  }
+}
+
+module ValidatorSearchConfig = %graphql(`
+    query SearchValidator( $operator_address: String!) {
+       validators_by_pk(operator_address: $operator_address) @ppxAs(type: "ValidatorSearch.t") {
+            operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
+            moniker
+            identity
+        }
+    }
+
+`)
+
 let searchOracleScript = (~filter, ()) => {
   let result = OracleScriptSearchConfig.use({
     id: Some({
@@ -247,6 +266,18 @@ let searchProposal = (~filter, ()) => {
     switch proposals->Belt.Array.length > 0 {
     | true => proposals
     | false => []
+    }
+  })
+}
+
+let getValidatorMoniker = (~address, ()) => {
+  let result = ValidatorSearchConfig.use({operator_address: address->Address.toOperatorBech32})
+  result
+  ->Query.fromData
+  ->Query.map(({validators_by_pk}) => {
+    switch validators_by_pk {
+    | Some(validator) => Query.resolve(validator)
+    | None => Query.NoData
     }
   })
 }
