@@ -210,16 +210,18 @@ module RenderSearchResult = {
   ) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    let len = searchTerm->String.length
-    let capStr = searchTerm->String.capitalize_ascii
+    let trimSearchTerm = searchTerm->Js.String.trim
+    let len = trimSearchTerm->String.length
+    let capStr = trimSearchTerm->String.capitalize_ascii
 
     <div className={Styles.resultInner(theme)}>
       <ul>
         <div className={Styles.resultContent}>
+          // TODO: Handle with NoData instead of []
           {switch (results, resultLength) {
           | (Data(blocks, requests, os, ds, proposals), 0) =>
-            if searchTerm->Js.String2.startsWith("bandvaloper") && len == 50 {
-              switch searchTerm->Address.fromBech32Opt {
+            if trimSearchTerm->Js.String2.startsWith("bandvaloper") && len == 50 {
+              switch trimSearchTerm->Address.fromBech32Opt {
               | Some(address) =>
                 <>
                   <li className={Styles.resultHeading}>
@@ -240,12 +242,12 @@ module RenderSearchResult = {
               | None =>
                 <li className={Styles.resultItem}>
                   <div className={Styles.resultNotFound}>
-                    <Text value={j`No search result for "$searchTerm"`} size=Text.Body2 />
+                    <Text value={j`No search result for "$trimSearchTerm"`} size=Text.Body2 />
                   </div>
                 </li>
               }
-            } else if searchTerm->Js.String2.startsWith("band") && len == 43 {
-              switch searchTerm->Address.fromBech32Opt {
+            } else if trimSearchTerm->Js.String2.startsWith("band") && len == 43 {
+              switch trimSearchTerm->Address.fromBech32Opt {
               | Some(address) =>
                 <>
                   <li className={Styles.resultHeading}>
@@ -266,11 +268,11 @@ module RenderSearchResult = {
               | None =>
                 <li className={Styles.resultItem}>
                   <div className={Styles.resultNotFound}>
-                    <Text value={j`No search result for "$searchTerm"`} size=Text.Body2 />
+                    <Text value={j`No search result for "$trimSearchTerm"`} size=Text.Body2 />
                   </div>
                 </li>
               }
-            } else if len == 64 || (searchTerm->Js.String2.startsWith("0x") && len == 66) {
+            } else if len == 64 || (trimSearchTerm->Js.String2.startsWith("0x") && len == 66) {
               <>
                 <li className={Styles.resultHeading}>
                   <Heading
@@ -283,14 +285,14 @@ module RenderSearchResult = {
                 </li>
                 <li className={Styles.resultItem}>
                   <div className={Styles.innerResultItem}>
-                    <TxLink txHash={searchTerm->Hash.fromHex} width=800 size=Text.Body2 />
+                    <TxLink txHash={trimSearchTerm->Hash.fromHex} width=800 size=Text.Body2 />
                   </div>
                 </li>
               </>
             } else {
               <li className={Styles.resultItem}>
                 <div className={Styles.resultNotFound}>
-                  <Text value={j`No search result for "$searchTerm"`} size=Text.Body2 />
+                  <Text value={j`No search result for "$trimSearchTerm"`} size=Text.Body2 />
                 </div>
               </li>
             }
@@ -366,7 +368,7 @@ module RenderSearchResult = {
                           <div className={Css.merge(list{CssHelper.flexBox()})}>
                             <TypeID.OracleScript id={result.id} position=TypeID.Subtitle />
                             <HSpacing size=Spacing.sm />
-                            <HighLightText title={result.name} searchTerm />
+                            <HighLightText title={result.name} searchTerm=trimSearchTerm />
                           </div>
                         </TypeID.OracleScriptLink>
                       </div>
@@ -396,7 +398,7 @@ module RenderSearchResult = {
                           <div className={Css.merge(list{CssHelper.flexBox()})}>
                             <TypeID.DataSource id={result.id} position=TypeID.Subtitle />
                             <HSpacing size=Spacing.sm />
-                            <HighLightText title={result.name} searchTerm />
+                            <HighLightText title={result.name} searchTerm=trimSearchTerm />
                           </div>
                         </TypeID.DataSourceLink>
                       </div>
@@ -426,7 +428,7 @@ module RenderSearchResult = {
                           <div className={Css.merge(list{CssHelper.flexBox()})}>
                             <TypeID.Proposal id={result.id} position=TypeID.Subtitle />
                             <HSpacing size=Spacing.sm />
-                            <HighLightText title={result.title} searchTerm />
+                            <HighLightText title={result.title} searchTerm=trimSearchTerm />
                           </div>
                         </TypeID.ProposalLink>
                       </div>
@@ -508,23 +510,23 @@ let make = () => {
 
   let resultOracleScriptQuery: Query.variant<
     array<SearchBarQuery.OracleScriptSearch.t>,
-  > = SearchBarQuery.searchOracleScript(~filter=searchTerm, ())
+  > = SearchBarQuery.searchOracleScript(~filter=searchTerm->Js.String.trim, ())
 
   let resultDataSourceQuery: Query.variant<
     array<SearchBarQuery.DataSourceSearch.t>,
-  > = SearchBarQuery.searchDataSource(~filter=searchTerm, ())
+  > = SearchBarQuery.searchDataSource(~filter=searchTerm->Js.String.trim, ())
 
   let resultBlockQuery: Query.variant<
     array<SearchBarQuery.BlockSearch.t>,
-  > = SearchBarQuery.searchBlockID(~id=searchTerm, ())
+  > = SearchBarQuery.searchBlockID(~id=searchTerm->Js.String.trim, ())
 
   let resultRequestQuery: Query.variant<
     array<SearchBarQuery.RequestSearch.t>,
-  > = SearchBarQuery.searchRequestID(~id=searchTerm, ())
+  > = SearchBarQuery.searchRequestID(~id=searchTerm->Js.String.trim, ())
 
   let resultProposalQuery: Query.variant<
     array<SearchBarQuery.ProposalSearch.t>,
-  > = SearchBarQuery.searchProposal(~filter=searchTerm, ())
+  > = SearchBarQuery.searchProposal(~filter=searchTerm->Js.String.trim, ())
 
   let allQuery = Query.all5(
     resultBlockQuery,
@@ -598,7 +600,7 @@ let make = () => {
         setSelectedRoute(_ => item)
         Route.redirect(item)
 
-      | _ => Route.redirect(Route.search(searchTerm))
+      | _ => Route.redirect(Route.search(searchTerm->Js.String.trim))
       }
     | _ => ()
     }
@@ -615,7 +617,7 @@ let make = () => {
         dispatch(ChangeSearchTerm(inputVal))
       }}
       onKeyDown={event => handleKeyDown(event, ())}
-      value=searchTerm
+      value={searchTerm}
       className={Styles.searchbarInput(theme)}
       placeholder="Search Address / TXN Hash / Block / Validator / etc."
     />
@@ -625,7 +627,7 @@ let make = () => {
         onClick={_ => {
           setIsSearching(_ => false)
           dispatch(ChangeSearchTerm(""))
-          Route.redirect(searchTerm->Route.search)
+          Route.redirect(searchTerm->Js.String.trim->Route.search)
         }}>
         <Icon name="far fa-search" color=theme.neutral_900 size=16 />
       </button>
@@ -636,7 +638,11 @@ let make = () => {
         setIsSearching(_ => false)
         dispatch(ChangeSearchTerm(""))
       }}>
-      <RenderSearchResult searchTerm results=allQuery resultLength={Array.length(mergedResult)} />
+      <RenderSearchResult
+        searchTerm={searchTerm->Js.String.trim}
+        results=allQuery
+        resultLength={Array.length(mergedResult)}
+      />
     </div>
   </div>
 }
