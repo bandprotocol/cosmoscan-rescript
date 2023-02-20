@@ -228,7 +228,7 @@ module RenderSearchResult = {
                       value="Address"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.neutral_900}
+                      color={theme.neutral_600}
                     />
                   </li>
                   <li className={Styles.resultItem}>
@@ -254,7 +254,7 @@ module RenderSearchResult = {
                       value="Address"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.neutral_900}
+                      color={theme.neutral_600}
                     />
                   </li>
                   <li className={Styles.resultItem}>
@@ -278,7 +278,7 @@ module RenderSearchResult = {
                     value="Transaction"
                     align=Heading.Left
                     weight=Heading.Semibold
-                    color={theme.neutral_900}
+                    color={theme.neutral_600}
                   />
                 </li>
                 <li className={Styles.resultItem}>
@@ -307,7 +307,7 @@ module RenderSearchResult = {
                       value="Blocks"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.neutral_900}
+                      color={theme.neutral_600}
                     />
                   </li>
                   {blocks
@@ -331,7 +331,7 @@ module RenderSearchResult = {
                       value="Requests"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.neutral_900}
+                      color={theme.neutral_600}
                     />
                   </li>
                   {requests
@@ -355,7 +355,7 @@ module RenderSearchResult = {
                       value="Oracle Scripts"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.neutral_900}
+                      color={theme.neutral_600}
                     />
                   </li>
                   {os
@@ -385,7 +385,7 @@ module RenderSearchResult = {
                       value="Data Sources"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.neutral_900}
+                      color={theme.neutral_600}
                     />
                   </li>
                   {ds
@@ -415,7 +415,7 @@ module RenderSearchResult = {
                       value="Proposals"
                       align=Heading.Left
                       weight=Heading.Semibold
-                      color={theme.neutral_900}
+                      color={theme.neutral_600}
                     />
                   </li>
                   {proposals
@@ -565,7 +565,7 @@ let make = () => {
         let allResults = [blockResults, requestResults, osResults, dsResults, proposalResults]
 
         let mergeResults = allResults->Belt.Array.reduce([], (acc, x) => {
-          x->Belt.Array.concat(acc)
+          acc->Belt.Array.concat(x)
         })
         mergeResults
       }
