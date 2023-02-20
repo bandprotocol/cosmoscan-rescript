@@ -1,7 +1,2 @@
-@obj external makeProps: (~children: React.element, ~className: string, unit) => _ = ""
-
-@module("react-highlight")
-external make: React.component<{
-  "children": React.element,
-  "className": string,
-}> = "default"
+@react.component @module("react-highlight")
+external make: (~children: React.element, ~className: string) => React.element = "default"

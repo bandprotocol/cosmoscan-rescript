@@ -6,15 +6,15 @@ type pos_t =
 let prefixFontSize = pos =>
   switch pos {
   | Title => Text.Xxl
-  | Subtitle => Text.Lg
-  | Text => Text.Md
+  | Subtitle => Text.Body1
+  | Text => Text.Body2
   }
 
 let pubKeyFontSize = pos =>
   switch pos {
   | Title => Text.Xxl
-  | Subtitle => Text.Lg
-  | Text => Text.Md
+  | Subtitle => Text.Body1
+  | Text => Text.Body2
   }
 
 let lineHeight = pos =>

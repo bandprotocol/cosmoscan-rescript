@@ -18,7 +18,7 @@ let make = (~value, ~size, ~weight, ~spacing=?, ~color=?, ~code=true, ~smallNumb
     None
   }, [value])
   let newVal = CountUp.countUpGet(countUp)->Js.Float.toString
-  let color_ = color->Belt.Option.getWithDefault(theme.textPrimary)
+  let color_ = color->Belt.Option.getWithDefault(theme.neutral_900)
 
   smallNumber
     ? {
@@ -35,7 +35,7 @@ let make = (~value, ~size, ~weight, ~spacing=?, ~color=?, ~code=true, ~smallNumb
           />
           <Text
             value={"." ++ adjustedText->Belt.Array.get(1)->Belt.Option.getWithDefault("0")}
-            size=Text.Lg
+            size=Text.Body1
             weight
             spacing={spacing->Belt.Option.getWithDefault(Text.Em(0.))}
             code

@@ -20,7 +20,7 @@ module RenderBody = {
         <Col col=Col.Four>
           {switch delegatorSub {
           | Data({sharePercentage}) =>
-            <Text block=true value={sharePercentage->Format.fPretty} color={theme.textPrimary} />
+            <Text block=true value={sharePercentage->Format.fPretty} color={theme.neutral_900} />
           | _ => <LoadingCensorBar width=100 height=15 />
           }}
         </Col>
@@ -31,7 +31,7 @@ module RenderBody = {
               <Text
                 block=true
                 value={amount->Coin.getBandAmountFromCoin->Format.fPretty}
-                color={theme.textPrimary}
+                color={theme.neutral_900}
               />
             | _ => <LoadingCensorBar width=100 height=15 />
             }}
@@ -101,14 +101,14 @@ let make = (~address) => {
                   block=true
                   value={delegatorCount->Format.iPretty}
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                 />
                 <HSpacing size=Spacing.xs />
                 <Text
                   block=true
                   value="Delegators"
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
               </div>
@@ -127,7 +127,7 @@ let make = (~address) => {
                     value={delegatorCount |> Format.iPretty}
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                   <HSpacing size=Spacing.xs />
                   <Text
@@ -135,7 +135,7 @@ let make = (~address) => {
                     value="Delegators"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                 </div>
               | _ => <LoadingCensorBar width=100 height=15 />
@@ -147,7 +147,7 @@ let make = (~address) => {
                 value="Share(%)"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
               />
             </Col>
             <Col col=Col.Two>
@@ -156,7 +156,7 @@ let make = (~address) => {
                 value="Amount"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
                 align=Text.Right
               />
             </Col>
@@ -168,7 +168,7 @@ let make = (~address) => {
       <>
         {delegatorCount > 0
           ? delegators
-            ->Belt_Array.mapWithIndex((i, e) =>
+            ->Belt.Array.mapWithIndex((i, e) =>
               isMobile
                 ? <RenderBodyMobile
                     key={e.delegatorAddress |> Address.toBech32}
@@ -191,7 +191,7 @@ let make = (~address) => {
                 value="No Delegators"
                 align=Heading.Center
                 weight=Heading.Regular
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             </EmptyContainer>}
         {isMobile
@@ -201,8 +201,8 @@ let make = (~address) => {
             />}
       </>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i delegatorSub=noData />
           : <RenderBody key={i->Belt.Int.toString} delegatorSub=noData />

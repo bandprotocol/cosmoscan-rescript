@@ -1,8 +1,8 @@
 type size =
   | Xs
-  | Sm
-  | Md
-  | Lg
+  | Caption
+  | Body2
+  | Body1
   | Xl
   | Xxl
   | Xxxl
@@ -74,12 +74,12 @@ module Styles = {
       switch x {
       | Xs =>
         style(. [fontSize(#px(8)), lineHeight(#em(1.41)), Media.smallMobile([fontSize(#px(7))])])
-      | Sm =>
-        style(. [fontSize(#px(10)), lineHeight(#em(1.41)), Media.smallMobile([fontSize(#px(8))])])
-      | Md =>
-        style(. [fontSize(#px(12)), lineHeight(#em(1.41)), Media.smallMobile([fontSize(#px(10))])])
-      | Lg =>
-        style(. [fontSize(#px(14)), lineHeight(#em(1.41)), Media.smallMobile([fontSize(#px(12))])])
+      | Caption =>
+        style(. [fontSize(#px(10)), lineHeight(#px(16)), Media.smallMobile([fontSize(#px(8))])])
+      | Body2 =>
+        style(. [fontSize(#px(12)), lineHeight(#px(20)), Media.smallMobile([fontSize(#px(10))])])
+      | Body1 =>
+        style(. [fontSize(#px(14)), lineHeight(#px(22)), Media.smallMobile([fontSize(#px(12))])])
       | Xl =>
         style(. [fontSize(#px(16)), lineHeight(#em(1.41)), Media.smallMobile([fontSize(#px(14))])])
       | Xxl => style(. [fontSize(#px(18)), Media.smallMobile([fontSize(#px(16))])])
@@ -177,7 +177,7 @@ let make = (
           Styles.letterSpacing(spacing),
           Styles.lineHeight(height),
           Styles.textTransform(transform),
-          Styles.textColor(color->Belt.Option.getWithDefault(theme.textSecondary)),
+          Styles.textColor(color->Belt.Option.getWithDefault(theme.neutral_600)),
           nowrap ? Styles.noWrap : "",
           block ? Styles.block : "",
           code ? Styles.code : "",
@@ -203,7 +203,7 @@ let make = (
             Styles.letterSpacing(spacing),
             Styles.lineHeight(height),
             Styles.textTransform(transform),
-            Styles.textColor(color->Belt.Option.getWithDefault(theme.textSecondary)),
+            Styles.textColor(color->Belt.Option.getWithDefault(theme.neutral_600)),
             nowrap ? Styles.noWrap : "",
             block ? Styles.block : "",
             code ? Styles.code : "",

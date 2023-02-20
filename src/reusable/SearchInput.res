@@ -6,10 +6,10 @@ module Styles = {
     style(. [
       backgroundColor(#transparent),
       borderRadius(#zero),
-      border(#zero, #none, theme.textSecondary),
-      borderBottom(#px(1), #solid, theme.textSecondary),
-      placeholder([color(theme.textSecondary)]),
-      color(theme.textPrimary),
+      border(#zero, #none, theme.neutral_600),
+      borderBottom(#px(1), #solid, theme.neutral_600),
+      placeholder([color(theme.neutral_600)]),
+      color(theme.neutral_900),
       paddingLeft(#px(20)),
       paddingBottom(#px(10)),
       focus([outlineStyle(#none)]),
@@ -31,7 +31,7 @@ let make = (~placeholder, ~onChange, ~debounce=500, ~maxWidth=240) => {
 
   <div className=Styles.searchContainer>
     <div className=Styles.iconContainer>
-      <Icon name="far fa-search" color=theme.textPrimary size=14 />
+      <Icon name="far fa-search" color=theme.neutral_900 size=14 />
     </div>
     <input
       type_="text"

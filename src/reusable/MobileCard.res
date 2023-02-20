@@ -4,7 +4,7 @@ module Styles = {
     style(. [
       position(relative),
       padding2(~v=px(22), ~h=zero),
-      selector("+ div", [marginTop(px(10)), borderTop(px(1), solid, theme.tableRowBorderColor)]),
+      selector("+ div", [marginTop(px(10)), borderTop(px(1), solid, theme.neutral_100)]),
     ])
   let cardItem = (alignItems_, isOneColumn) =>
     style(. [
@@ -25,7 +25,7 @@ module Styles = {
     style(. [width(#percent(100.)), marginTop(isOneColumn ? px(10) : zero), overflow(hidden)])
   let toggle = (theme: Theme.t) =>
     style(. [
-      borderTop(px(1), solid, theme.tableRowBorderColor),
+      borderTop(px(1), solid, theme.neutral_100),
       paddingTop(px(10)),
       marginTop(px(10)),
       cursor(pointer),
@@ -42,7 +42,7 @@ module Styles = {
       pointerEvents(none),
       selector("> div + div", [paddingTop(px(16))]),
       overflow(hidden),
-      backgroundColor(theme.tableRowBorderColor),
+      backgroundColor(theme.neutral_100),
     ])
   }
 }
@@ -72,11 +72,11 @@ module InnerPanel = {
             switch value {
             | InfoMobileCard.Nothing =>
               <div className=Styles.cardItemHeadingLg>
-                <Text key=each value=each size=Text.Sm transform=Text.Uppercase />
+                <Text key=each value=each size=Text.Caption transform=Text.Uppercase />
               </div>
             | _ =>
               <Text
-                key=each value=each size=Text.Sm weight=Text.Semibold transform=Text.Uppercase
+                key=each value=each size=Text.Caption weight=Text.Semibold transform=Text.Uppercase
               />
             }
           })
@@ -128,11 +128,11 @@ let make = (~values, ~idx, ~status=?, ~requestStatus=?, ~styles="", ~panels=[]) 
               block=true
               value={show ? "Hide Report" : "Show Report"}
               weight=Text.Semibold
-              color={theme.textPrimary}
+              color={theme.neutral_900}
             />
             <HSpacing size=Spacing.xs />
             <Icon
-              name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.textSecondary}
+              name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.neutral_600}
             />
           </div>
         </>

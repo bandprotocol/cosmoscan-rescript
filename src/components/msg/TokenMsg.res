@@ -14,7 +14,7 @@ module SendMsg = {
         Styles.msgContainer,
       ])}>
       <AmountRender coins=amount />
-      <Text value={j` to `} size=Text.Md nowrap=true block=true />
+      <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
       <AddressRender address=toAddress />
     </div>
 }
@@ -29,7 +29,7 @@ module ReceiveMsg = {
         Styles.msgContainer,
       ])}>
       <AmountRender coins=amount />
-      <Text value={j` from `} size=Text.Md nowrap=true block=true />
+      <Text value={j` from `} size=Text.Body2 nowrap=true block=true />
       <AddressRender address=fromAddress />
     </div>
 }
@@ -45,7 +45,7 @@ module MultisendMsg = {
       ])}>
       <Text value={inputs->Belt.List.length->Belt.Int.toString} weight=Text.Semibold />
       <Text value="Inputs" />
-      <Text value={j` to `} size=Text.Md nowrap=true block=true />
+      <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
       <Text value={outputs->Belt.List.length->Belt.Int.toString} weight=Text.Semibold />
       <Text value="Outputs" />
     </div>

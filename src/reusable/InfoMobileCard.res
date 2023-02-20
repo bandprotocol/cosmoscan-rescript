@@ -74,7 +74,7 @@ let make = (~info) => {
     </div>
   | Coin({value, hasDenom}) =>
     <AmountRender coins=value pos={hasDenom ? AmountRender.TxIndex : Fee} />
-  | Count(value) => <Text value={value->Format.iPretty} size=Text.Md />
+  | Count(value) => <Text value={value->Format.iPretty} size=Text.Body2 />
   | DataSource(id, name) =>
     <div className=Styles.vFlex>
       <TypeID.DataSource id />
@@ -135,9 +135,9 @@ let make = (~info) => {
   // CopyButton(calldata) => <CopyButton data={calldata -> JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125 />
   | Percentage(value, digits) => <Text value={value->Format.fPercent(~digits?)} />
   | Text(text) => <Text value=text spacing={Text.Em(0.02)} nowrap=true ellipsis=true block=true />
-  | Timestamp(time) => <Timestamp time size=Text.Md weight=Text.Regular />
+  | Timestamp(time) => <Timestamp time size=Text.Body2 weight=Text.Regular />
   | Validator(address, moniker, identity) =>
-    <ValidatorMonikerLink validatorAddress=address moniker size=Text.Md identity width={#px(230)} />
+    <ValidatorMonikerLink validatorAddress=address moniker size=Text.Body2 identity width={#px(230)} />
   | PubKey(publicKey) => <PubKeyRender alignLeft=true pubKey=publicKey display=#block />
   | TxHash(txHash, width) => <TxLink txHash width />
   | BlockHash(hash) =>
@@ -147,7 +147,7 @@ let make = (~info) => {
       block=true
       code=true
       ellipsis=true
-      color={theme.textPrimary}
+      color={theme.neutral_900}
     />
   | Messages(txHash, messages, success, errMsg) => <TxMessages txHash messages success errMsg />
   // TODO: do it later

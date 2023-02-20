@@ -17,7 +17,7 @@ module Styles = {
   let chartContainer = style(. [paddingRight(#px(20)), Media.mobile([paddingRight(#zero)])])
 
   let parameterChanges = (theme: Theme.t) =>
-    style(. [padding2(~v=#px(16), ~h=#px(24)), backgroundColor(theme.secondaryTableBg)])
+    style(. [padding2(~v=#px(16), ~h=#px(24)), backgroundColor(theme.neutral_100)])
 }
 
 @react.component
@@ -79,7 +79,7 @@ let make = (~proposalID) => {
             <Row marginBottom=24 alignItems=Row.Center>
               <Col col=Col.Four mbSm=8>
                 <Heading
-                  value="Proposer" size=Heading.H4 weight=Heading.Thin color={theme.textSecondary}
+                  value="Proposer" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                 />
               </Col>
               <Col col=Col.Eight>
@@ -100,12 +100,12 @@ let make = (~proposalID) => {
                   value="Submit Time"
                   size=Heading.H4
                   weight=Heading.Thin
-                  color={theme.textSecondary}
+                  color={theme.neutral_600}
                 />
               </Col>
               <Col col=Col.Eight>
                 {switch allSub {
-                | Data(({submitTime}, _, _)) => <Timestamp size=Text.Lg time=submitTime />
+                | Data(({submitTime}, _, _)) => <Timestamp size=Text.Body1 time=submitTime />
                 | _ => <LoadingCensorBar width={isMobile ? 120 : 270} height=15 />
                 }}
               </Col>
@@ -116,13 +116,13 @@ let make = (~proposalID) => {
                   value="Proposal Type"
                   size=Heading.H4
                   weight=Heading.Thin
-                  color={theme.textSecondary}
+                  color={theme.neutral_600}
                 />
               </Col>
               <Col col=Col.Eight>
                 {switch allSub {
                 | Data(({proposalType}, _, _)) =>
-                  <Text value=proposalType size=Text.Lg block=true />
+                  <Text value=proposalType size=Text.Body1 block=true />
                 | _ => <LoadingCensorBar width=90 height=15 />
                 }}
               </Col>
@@ -133,7 +133,7 @@ let make = (~proposalID) => {
                   value="Description"
                   size=Heading.H4
                   weight=Heading.Thin
-                  color={theme.textSecondary}
+                  color={theme.neutral_600}
                 />
               </Col>
               <Col col=Col.Eight>
@@ -152,12 +152,12 @@ let make = (~proposalID) => {
                     value="Parameter Changes"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
                   <div className={Styles.parameterChanges(theme)}>
-                    <Text value="IBCRequestEnabled: True" size=Text.Lg block=true />
+                    <Text value="IBCRequestEnabled: True" size=Text.Body1 block=true />
                   </div>
                 </Col>
               </Row>
@@ -168,14 +168,14 @@ let make = (~proposalID) => {
                     value="Parameter Changes"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
                   <div className={Styles.parameterChanges(theme)}>
-                    <Text value="HistoricalEntries: 10000" size=Text.Lg block=true />
-                    <Text value="SendEnabled: True" size=Text.Lg block=true />
-                    <Text value="ReceiveEnabled: True" size=Text.Lg block=true />
+                    <Text value="HistoricalEntries: 10000" size=Text.Body1 block=true />
+                    <Text value="SendEnabled: True" size=Text.Body1 block=true />
+                    <Text value="ReceiveEnabled: True" size=Text.Body1 block=true />
                   </div>
                 </Col>
               </Row>
@@ -190,12 +190,12 @@ let make = (~proposalID) => {
                     value="Parameter Changes"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
                   <div className={Styles.parameterChanges(theme)}>
-                    <Text value="PerValidatorRequestGas: 0" size=Text.Lg block=true />
+                    <Text value="PerValidatorRequestGas: 0" size=Text.Body1 block=true />
                   </div>
                 </Col>
               </Row>
@@ -207,12 +207,12 @@ let make = (~proposalID) => {
                     value="Parameter Changes"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
                   <div className={Styles.parameterChanges(theme)}>
-                    <Text value="MaxRawRequestCount: 16" size=Text.Lg block=true />
+                    <Text value="MaxRawRequestCount: 16" size=Text.Body1 block=true />
                   </div>
                 </Col>
               </Row>
@@ -271,36 +271,36 @@ let make = (~proposalID) => {
                           <Heading
                             value="Total Vote"
                             size=Heading.H5
-                            color={theme.textSecondary}
+                            color={theme.neutral_600}
                             marginBottom=4
                           />
                           <Text
                             value={total->Format.fPretty(~digits=2) ++ " BAND"}
-                            size=Text.Lg
+                            size=Text.Body1
                             block=true
-                            color={theme.textPrimary}
+                            color={theme.neutral_900}
                           />
                         </Col>
                         <Col mb=24 mbSm=0 colSm=Col.Six>
                           <Heading
                             value="Voting Start"
                             size=Heading.H5
-                            color={theme.textSecondary}
+                            color={theme.neutral_600}
                             marginBottom=4
                           />
                           <Timestamp.Grid
-                            size=Text.Lg time=votingStartTime color={theme.textPrimary}
+                            size=Text.Body1 time=votingStartTime color={theme.neutral_900}
                           />
                         </Col>
                         <Col mbSm=0 colSm=Col.Six>
                           <Heading
                             value="Voting End"
                             size=Heading.H5
-                            color={theme.textSecondary}
+                            color={theme.neutral_600}
                             marginBottom=4
                           />
                           <Timestamp.Grid
-                            size=Text.Lg time=votingEndTime color={theme.textPrimary}
+                            size=Text.Body1 time=votingEndTime color={theme.neutral_900}
                           />
                         </Col>
                       </Row>
@@ -353,7 +353,7 @@ let make = (~proposalID) => {
                   value="Deposit Status"
                   size=Heading.H4
                   weight=Heading.Thin
-                  color={theme.textSecondary}
+                  color={theme.neutral_600}
                 />
               </Col>
               <Col col=Col.Eight>
@@ -366,7 +366,7 @@ let make = (~proposalID) => {
                       <img alt="Success Icon" src=Images.success className=Styles.statusLogo />
                       <HSpacing size=Spacing.sm />
                       // TODO: remove hard-coded later
-                      <Text value="Completed Min Deposit 1,000 BAND" size=Text.Lg />
+                      <Text value="Completed Min Deposit 1,000 BAND" size=Text.Body1 />
                     </div>
                   }
                 | _ => <LoadingCensorBar width={isMobile ? 120 : 270} height=15 />
@@ -379,12 +379,12 @@ let make = (~proposalID) => {
                   value="Deposit End Time"
                   size=Heading.H4
                   weight=Heading.Thin
-                  color={theme.textSecondary}
+                  color={theme.neutral_600}
                 />
               </Col>
               <Col col=Col.Eight>
                 {switch proposalSub {
-                | Data({depositEndTime}) => <Timestamp size=Text.Lg time=depositEndTime />
+                | Data({depositEndTime}) => <Timestamp size=Text.Body1 time=depositEndTime />
                 | _ => <LoadingCensorBar width=90 height=15 />
                 }}
               </Col>

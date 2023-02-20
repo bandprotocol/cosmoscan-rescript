@@ -69,7 +69,7 @@ let make = (~address) => {
                   value={reporterCount->Belt.Int.toString}
                   weight=Text.Semibold
                   transform=Text.Uppercase
-                  size=Text.Sm
+                  size=Text.Caption
                 />
                 <HSpacing size=Spacing.xs />
                 <Text
@@ -77,7 +77,7 @@ let make = (~address) => {
                   value="Reporters"
                   weight=Text.Semibold
                   transform=Text.Uppercase
-                  size=Text.Sm
+                  size=Text.Caption
                 />
               </div>
             | _ => <LoadingCensorBar width=100 height=15 />
@@ -95,7 +95,7 @@ let make = (~address) => {
                     value={reporterCount->Belt.Int.toString}
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                   <HSpacing size=Spacing.xs />
                   <Text
@@ -103,7 +103,7 @@ let make = (~address) => {
                     value="Reporters"
                     weight=Text.Semibold
                     transform=Text.Uppercase
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                 </div>
               | _ => <LoadingCensorBar width=100 height=15 />
@@ -117,7 +117,7 @@ let make = (~address) => {
       <>
         {reporterCount > 0
           ? reporters
-            ->Belt_Array.mapWithIndex((i, e) =>
+            ->Belt.Array.mapWithIndex((i, e) =>
               isMobile
                 ? <RenderBodyMobile
                     key={e |> Address.toBech32} reserveIndex=i reporterSub={Sub.resolve(e)}
@@ -136,7 +136,7 @@ let make = (~address) => {
                 value="No Reporter"
                 align=Heading.Center
                 weight=Heading.Regular
-                color={theme.textSecondary}
+                color={theme.neutral_600}
               />
             </EmptyContainer>}
         {isMobile
@@ -146,8 +146,8 @@ let make = (~address) => {
             />}
       </>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile key={string_of_int(i)} reserveIndex=i reporterSub=noData />
           : <RenderBody key={string_of_int(i)} reporterSub=noData />

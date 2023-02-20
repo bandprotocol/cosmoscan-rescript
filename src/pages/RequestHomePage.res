@@ -23,7 +23,7 @@ module RenderBody = {
              <div className={CssHelper.flexBox()}>
                <TypeID.OracleScript id=oracleScriptID />
                <HSpacing size=Spacing.sm />
-               <Text value=name ellipsis=true color=theme.textPrimary />
+               <Text value=name ellipsis=true color=theme.neutral_900 />
              </div>
            | _ => <LoadingCensorBar width=270 height=15 />
            }}
@@ -53,7 +53,7 @@ module RenderBody = {
              | Data({transactionOpt}) =>
                switch (transactionOpt) {
                | Some(transaction) =>
-                 <Timestamp time={transaction.block.timestamp} textAlign=Text.Right size=Text.Md />
+                 <Timestamp time={transaction.block.timestamp} textAlign=Text.Right size=Text.Body2 />
                | None => <Text value="Syncing" />
                }
              | _ => <LoadingCensorBar width=80 height=15 />
@@ -169,7 +169,7 @@ let make = () => {
                    <Text
                      block=true
                      value="Request ID"
-                     size=Text.Sm
+                     size=Text.Caption
                      weight=Text.Semibold
                      transform=Text.Uppercase
                    />
@@ -178,7 +178,7 @@ let make = () => {
                    <Text
                      block=true
                      value="Oracle Script"
-                     size=Text.Sm
+                     size=Text.Caption
                      weight=Text.Semibold
                      transform=Text.Uppercase
                    />
@@ -187,7 +187,7 @@ let make = () => {
                    <Text
                      block=true
                      value="Report Status"
-                     size=Text.Sm
+                     size=Text.Caption
                      weight=Text.Semibold
                      transform=Text.Uppercase
                    />
@@ -196,7 +196,7 @@ let make = () => {
                    <Text
                      block=true
                      value="Timestamp"
-                     size=Text.Sm
+                     size=Text.Caption
                      weight=Text.Semibold
                      align=Text.Right
                      transform=Text.Uppercase
@@ -238,7 +238,7 @@ let make = () => {
                       value="No Request"
                       align=Heading.Center
                       weight=Heading.Regular
-                      color={theme.textSecondary}
+                      color={theme.neutral_600}
                     />
                   </EmptyContainer>}
              {isMobile

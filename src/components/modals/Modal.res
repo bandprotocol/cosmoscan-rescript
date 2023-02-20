@@ -33,7 +33,7 @@ module Styles = {
       position(#absolute),
       top(#percent(50.)),
       left(#percent(50.)),
-      backgroundColor(theme.secondaryBg),
+      backgroundColor(theme.neutral_100),
       borderRadius(#px(8)),
       overflow(#hidden),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.2)))),
@@ -106,11 +106,11 @@ let make = () => {
         onClick={e => ReactEvent.Mouse.stopPropagation(e)}>
         <div
           id="closeModal" onClick={_ => canExit ? closeModal() : ()} className=Styles.closeButton>
-          <Icon name="fal fa-times" color=theme.textPrimary size=18 />
+          <Icon name="fal fa-times" color=theme.neutral_900 size=18 />
         </div>
         {switch //TODO: Will patch the modal component later
         modal {
-        | Connect(_) => "Connect"->React.string
+        | Connect(chainID) => <ConnectModal chainID />
         | SubmitTx(_) => "SubmitTx"->React.string
         | QRCode(_) => "QRCode"->React.string
         | IBCPacketError(_) => "Connect"->React.string

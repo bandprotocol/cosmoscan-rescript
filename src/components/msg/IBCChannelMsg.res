@@ -18,7 +18,7 @@ module ChannelOpenCommon = {
         Styles.msgContainer,
       ])}>
       <Text value=portID nowrap=true block=true />
-      <Icon name="far fa-arrow-right" color=theme.textSecondary />
+      <Icon name="far fa-arrow-right" color=theme.neutral_600 />
       <Text value=counterpartyPortID nowrap=true block=true />
     </div>
   }
@@ -35,7 +35,7 @@ module ChannelOpenAck = {
         Styles.msgContainer,
       ])}>
       <Text value=channelID nowrap=true block=true />
-      <Icon name="far fa-arrow-right" color=theme.textSecondary />
+      <Icon name="far fa-arrow-right" color=theme.neutral_600 />
       <Text value=counterpartyChannelID nowrap=true block=true />
     </div>
   }

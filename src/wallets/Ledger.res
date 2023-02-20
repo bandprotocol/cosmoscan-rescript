@@ -5,27 +5,22 @@ type t = {
   prefix: string,
 }
 
-type ledger_app_t =
-  | Cosmos
-  | BandChain
+type ledger_app_t = Cosmos
 
 let getPath = (ledgerApp, accountIndex) =>
   switch ledgerApp {
   | Cosmos => [44, 118, 0, 0, accountIndex]
-  | BandChain => [44, 494, 0, 0, accountIndex]
   }
 
 let getAppName = x =>
   switch x {
   | Cosmos => "Cosmos"
-  | BandChain => "BandChain"
   }
 
 // TODO: hard-coded minimum version
 let getRequiredVersion = x =>
   switch x {
   | Cosmos => "1.5.0"
-  | BandChain => "2.12.0"
   }
 
 let getAddressAndPubKey = x => {

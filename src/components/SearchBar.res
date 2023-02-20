@@ -16,11 +16,12 @@ module Styles = {
     width(#px(15)),
     height(#px(15)),
   ])
-  let search = (theme: Theme.t) =>
+  let search = (theme: Theme.t, isDarkMode) =>
     style(. [
       width(#percent(100.)),
-      color(theme.textPrimary),
-      background(theme.secondaryBg),
+      color(theme.neutral_900),
+      background(theme.neutral_000),
+      border(#px(1), #solid, isDarkMode ? theme.neutral_400 : theme.neutral_300),
       borderRadius(#px(8)),
       padding4(~left=#px(15), ~right=Spacing.md, ~top=#px(10), ~bottom=#px(10)),
       boxShadows([
@@ -28,9 +29,9 @@ module Styles = {
         Shadow.box(~x=#zero, ~y=#px(4), ~blur=#px(12), Css.rgba(0, 0, 0, #num(0.02))),
       ]),
       fontSize(#px(12)),
-      outline(#px(1), #none, theme.secondaryBg),
-      border(#px(1), #solid, theme.secondaryBg),
-      placeholder([color(theme.textSecondary)]),
+      outline(#px(1), #none, theme.neutral_100),
+      border(#px(1), #solid, theme.neutral_100),
+      placeholder([color(theme.neutral_500)]),
       Media.mobile([fontSize(#px(10))]),
     ])
 
@@ -90,7 +91,7 @@ module SearchResults = {
             <VSpacing size=#px(-2) />
             <Text value="ADDRESS" size=Text.Xs weight=Text.Semibold />
             <VSpacing size=Spacing.xs />
-            <Text value={searchTerm ++ "1f2bce"} weight=Text.Bold size=Text.Lg block=true />
+            <Text value={searchTerm ++ "1f2bce"} weight=Text.Bold size=Text.Body1 block=true />
             <VSpacing size=Spacing.sm />
           </>
         : React.null,
@@ -99,7 +100,7 @@ module SearchResults = {
             <VSpacing size=#px(-2) />
             <Text value="TRANSACTION" size=Text.Xs weight=Text.Semibold />
             <VSpacing size=Spacing.xs />
-            <Text value={searchTerm ++ "dd92b"} weight=Text.Bold size=Text.Lg block=true />
+            <Text value={searchTerm ++ "dd92b"} weight=Text.Bold size=Text.Body1 block=true />
             <VSpacing size=Spacing.sm />
           </>
         : React.null,
@@ -176,7 +177,7 @@ let make = () => {
     {searchTerm: "", resultState: Hidden},
   )
 
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <div className=Styles.container>
     <input
@@ -198,7 +199,7 @@ let make = () => {
         | _ => ()
         }}
       value=searchTerm
-      className={Styles.search(theme)}
+      className={Styles.search(theme, isDarkMode)}
       placeholder="Search Address / TXN Hash / Block"
     />
     {switch resultState {
@@ -211,7 +212,7 @@ let make = () => {
         Route.redirect(searchTerm->Route.search)
         dispatch(ChangeSearchTerm(""))
       }}>
-      <Icon name="far fa-search" color=theme.textPrimary size=16 />
+      <Icon name="far fa-search" color=theme.neutral_900 size=16 />
     </button>
   </div>
 }

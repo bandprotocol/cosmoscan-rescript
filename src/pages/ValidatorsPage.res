@@ -60,7 +60,7 @@ let make = () => {
               value={validatorCount->Belt.Int.toString ++ " In total"}
               size=Heading.H3
               weight=Heading.Thin
-              color={theme.textSecondary}
+              color={theme.neutral_600}
             />
           | _ => <LoadingCensorBar width=65 height=21 />
           }}
@@ -76,7 +76,7 @@ let make = () => {
                   size=Heading.H4
                   marginBottom=28
                   weight=Heading.Thin
-                  color={theme.textSecondary}
+                  color={theme.neutral_600}
                 />
                 {switch topPartAllSub {
                 | Data((_, isActiveValidatorCount, _, _, _)) =>
@@ -85,7 +85,7 @@ let make = () => {
                     size=Text.Xxxl
                     block=true
                     weight=Text.Semibold
-                    color={theme.textPrimary}
+                    color={theme.neutral_900}
                   />
                 | _ => <LoadingCensorBar width=100 height=24 />
                 }}
@@ -98,7 +98,7 @@ let make = () => {
                   size=Heading.H4
                   marginBottom=28
                   weight=Heading.Thin
-                  color={theme.textSecondary}
+                  color={theme.neutral_600}
                 />
                 {switch topPartAllSub {
                 | Data((_, _, bondedTokenCount, _, _)) =>
@@ -107,7 +107,7 @@ let make = () => {
                     size=Text.Xxxl
                     block=true
                     weight=Text.Semibold
-                    color={theme.textPrimary}
+                    color={theme.neutral_900}
                   />
                 | _ => <LoadingCensorBar width=100 height=24 />
                 }}
@@ -120,14 +120,14 @@ let make = () => {
                   size=Heading.H4
                   marginBottom=28
                   weight=Heading.Thin
-                  color={theme.textSecondary}
+                  color={theme.neutral_600}
                 />
                 {switch topPartAllSub {
                 | Data((_, _, _, _, {inflation})) =>
                   <Text
                     value={(inflation *. 100.)->Format.fPretty(~digits=2) ++ "%"}
                     size=Text.Xxxl
-                    color={theme.textPrimary}
+                    color={theme.neutral_900}
                     block=true
                     weight=Text.Semibold
                   />
@@ -142,7 +142,7 @@ let make = () => {
                   value="24 Hour AVG Block Time"
                   size=Heading.H4
                   weight=Heading.Thin
-                  color={theme.textSecondary}
+                  color={theme.neutral_600}
                   marginBottom=28
                 />
                 {switch topPartAllSub {
@@ -150,7 +150,7 @@ let make = () => {
                   <Text
                     value={avgBlockTime->Format.fPretty(~digits=2) ++ " secs"}
                     size=Text.Xxxl
-                    color={theme.textPrimary}
+                    color={theme.neutral_900}
                     block=true
                     weight=Text.Semibold
                   />

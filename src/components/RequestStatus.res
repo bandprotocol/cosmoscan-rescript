@@ -12,7 +12,7 @@ let toString = x =>
   }
 
 @react.component
-let make = (~resolveStatus, ~display=Mini, ~style="", ~size=Text.Lg) => {
+let make = (~resolveStatus, ~display=Mini, ~style="", ~size=Text.Body1) => {
   <div className={CssHelper.flexBox(~align=#center, ())}>
     {switch (resolveStatus) {
     | RequestSub.Success => <img alt="Success Icon" src=Images.success className=style />

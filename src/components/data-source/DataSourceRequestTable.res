@@ -35,7 +35,7 @@ module RenderBody = {
             <div className={CssHelper.flexBox()}>
               <TypeID.OracleScript id=oracleScriptID />
               <HSpacing size=Spacing.sm />
-              <Text value=oracleScriptName ellipsis=true color={theme.textPrimary} />
+              <Text value=oracleScriptName ellipsis=true color={theme.neutral_900} />
             </div>
           | _ => <LoadingCensorBar width=212 height=15 />
           }}
@@ -65,7 +65,7 @@ module RenderBody = {
               switch txTimestamp {
               | Some(txTimestamp') =>
                 <Timestamp
-                  time=txTimestamp' size=Text.Md weight=Text.Regular textAlign=Text.Right
+                  time=txTimestamp' size=Text.Body2 weight=Text.Regular textAlign=Text.Right
                 />
               | None => <Text value="Syncing" />
               }
@@ -166,14 +166,14 @@ let make = (~dataSourceID: ID.DataSource.t) => {
                     block=true
                     value={totalRequestCount->Format.iPretty}
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                   />
                   <HSpacing size=Spacing.xs />
                   <Text
                     block=true
                     value="Requests"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </div>
@@ -189,7 +189,7 @@ let make = (~dataSourceID: ID.DataSource.t) => {
                         value={totalRequestCount->Format.iPretty}
                         weight=Text.Semibold
                         transform=Text.Uppercase
-                        size=Text.Sm
+                        size=Text.Caption
                       />
                       <HSpacing size=Spacing.xs />
                       <Text
@@ -197,7 +197,7 @@ let make = (~dataSourceID: ID.DataSource.t) => {
                         value="Requests"
                         weight=Text.Semibold
                         transform=Text.Uppercase
-                        size=Text.Sm
+                        size=Text.Caption
                       />
                     </div>
                   </Col>
@@ -207,7 +207,7 @@ let make = (~dataSourceID: ID.DataSource.t) => {
                       value="Fee Earned"
                       weight=Text.Semibold
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                     />
                   </Col>
                   <Col col=Col.Three>
@@ -216,14 +216,14 @@ let make = (~dataSourceID: ID.DataSource.t) => {
                       value="Oracle Script"
                       weight=Text.Semibold
                       transform=Text.Uppercase
-                      size=Text.Sm
+                      size=Text.Caption
                     />
                   </Col>
                   <Col col=Col.Three>
                     <Text
                       block=true
                       value="Report Status"
-                      size=Text.Sm
+                      size=Text.Caption
                       weight=Text.Semibold
                       transform=Text.Uppercase
                     />
@@ -233,7 +233,7 @@ let make = (~dataSourceID: ID.DataSource.t) => {
                       block=true
                       value="Timestamp"
                       weight=Text.Semibold
-                      size=Text.Sm
+                      size=Text.Caption
                       align=Text.Right
                       transform=Text.Uppercase
                     />
@@ -281,7 +281,7 @@ let make = (~dataSourceID: ID.DataSource.t) => {
           value="No Request Found"
           align=Heading.Center
           weight=Heading.Regular
-          color={theme.textSecondary}
+          color={theme.neutral_600}
         />
       </EmptyContainer>
     | _ => React.null

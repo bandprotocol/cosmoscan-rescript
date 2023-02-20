@@ -3,10 +3,10 @@ module Styles = {
 
   let button = (isDarkMode, theme: Theme.t) =>
     style(. [
-      backgroundColor(isDarkMode ? theme.white : theme.black),
+      backgroundColor(isDarkMode ? theme.neutral_900 : theme.neutral_800),
       position(#relative),
       borderRadius(#px(8)),
-      border(#px(1), #solid, isDarkMode ? theme.white : theme.black),
+      border(#px(1), #solid, isDarkMode ? theme.neutral_900 : theme.neutral_800),
       cursor(#pointer),
       outlineStyle(#none),
       width(#px(32)),
@@ -30,12 +30,10 @@ let make = () => {
   let ({ThemeContext.isDarkMode: isDarkMode, theme}, toggle) = React.useContext(
     ThemeContext.context,
   )
-  // Will migrate to this later
-  let (_, emotionToggle) = React.useContext(
-    EmotionThemeContext.context,
-  )
 
-  <button className={Styles.button(isDarkMode, theme)} onClick={_ => {toggle(); emotionToggle();}}>
+  <button
+    className={Styles.button(isDarkMode, theme)}
+    onClick={_ => toggle()}>
     {isDarkMode
       ? <img src=Images.sunIcon className=Styles.icon />
       : <Icon name="fal fa-moon" size=14 color=theme.white />}

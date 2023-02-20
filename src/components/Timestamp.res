@@ -9,7 +9,7 @@ let make = (
   ~time,
   ~prefix="",
   ~suffix="",
-  ~size=Text.Sm,
+  ~size=Text.Caption,
   ~weight=Text.Regular,
   ~spacing=Text.Unset,
   ~code=false,
@@ -25,7 +25,7 @@ let make = (
             value=prefix
             size
             weight
-            color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+            color={color->Belt.Option.getWithDefault(theme.neutral_600)}
             spacing
             code
           />
@@ -40,7 +40,7 @@ let make = (
       code
       block=true
       align=textAlign
-      color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+      color={color->Belt.Option.getWithDefault(theme.neutral_600)}
     />
     {suffix != ""
       ? <>
@@ -51,7 +51,7 @@ let make = (
             weight
             spacing
             code
-            color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+            color={color->Belt.Option.getWithDefault(theme.neutral_600)}
           />
         </>
       : React.null}
@@ -64,7 +64,7 @@ module Grid = {
     ~time,
     ~prefix="",
     ~suffix="",
-    ~size=Text.Sm,
+    ~size=Text.Caption,
     ~weight=Text.Regular,
     ~spacing=Text.Unset,
     ~color=?,
@@ -80,7 +80,7 @@ module Grid = {
               size
               weight
               spacing
-              color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+              color={color->Belt.Option.getWithDefault(theme.neutral_600)}
               code
               nowrap=true
             />
@@ -93,7 +93,7 @@ module Grid = {
           size
           weight
           spacing
-          color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+          color={color->Belt.Option.getWithDefault(theme.neutral_600)}
           code
           nowrap=true
           block=true
@@ -106,7 +106,7 @@ module Grid = {
           size
           weight
           spacing
-          color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+          color={color->Belt.Option.getWithDefault(theme.neutral_600)}
           code
           nowrap=true
           block=true
@@ -121,7 +121,7 @@ module Grid = {
               size
               weight
               spacing
-              color={color->Belt.Option.getWithDefault(theme.textSecondary)}
+              color={color->Belt.Option.getWithDefault(theme.neutral_600)}
               code
               nowrap=true
             />

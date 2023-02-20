@@ -5,19 +5,19 @@ module Styles = {
 
   let header = (theme: Theme.t) =>
     style(. [
-      borderBottom(#px(1), #solid, theme.tableRowBorderColor),
+      borderBottom(#px(1), #solid, theme.neutral_100),
       selector("> div + div", [marginLeft(#px(32))]),
       Media.mobile([overflow(#auto), padding2(~v=#px(1), ~h=#px(15))]),
     ])
 
-  let buttonContainer = active =>
+  let buttonContainer = (theme: Theme.t, active) =>
     style(. [
       display(#inlineFlex),
       justifyContent(#center),
       alignItems(#center),
       cursor(#pointer),
       padding2(~v=#px(32), ~h=#zero),
-      borderBottom(#px(4), #solid, active ? Theme.baseBlue : #transparent),
+      borderBottom(#px(4), #solid, active ? theme.primary_600 : #transparent),
       Media.mobile([whiteSpace(#nowrap), padding2(~v=#px(24), ~h=#zero)]),
     ])
 
@@ -65,7 +65,7 @@ module RenderBody = {
             | Data({timestampOpt}) =>
               switch timestampOpt {
               | Some(timestamp) =>
-                <Timestamp time=timestamp size=Text.Md weight=Text.Regular textAlign=Text.Right />
+                <Timestamp time=timestamp size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
               | None => <Text value="Created on Wenchang" />
               }
             | _ => <LoadingCensorBar width=80 height=15 />
@@ -134,9 +134,10 @@ module TabButton = {
   @react.component
   let make = (~tab, ~active, ~setTab) => {
     let tabString = tab->VoteSub.toString(~withSpace=true)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    <div className={Styles.buttonContainer(active)} onClick={_ => setTab(_ => tab)}>
-      <Text value=tabString weight={active ? Text.Semibold : Text.Regular} size=Text.Lg />
+    <div className={Styles.buttonContainer(theme, active)} onClick={_ => setTab(_ => tab)}>
+      <Text value=tabString weight={active ? Text.Semibold : Text.Regular} size=Text.Body1 />
     </div>
   }
 }
@@ -173,7 +174,7 @@ let make = (~proposalID) => {
                         block=true
                         value={voteCount->Belt.Int.toString}
                         weight=Text.Semibold
-                        size=Text.Sm
+                        size=Text.Caption
                         transform=Text.Uppercase
                       />
                       <HSpacing size=Spacing.xs />
@@ -181,7 +182,7 @@ let make = (~proposalID) => {
                         block=true
                         value="Voters"
                         weight=Text.Semibold
-                        size=Text.Sm
+                        size=Text.Caption
                         transform=Text.Uppercase
                       />
                     </div>
@@ -199,7 +200,7 @@ let make = (~proposalID) => {
                           block=true
                           value={voteCount->Belt.Int.toString}
                           weight=Text.Semibold
-                          size=Text.Sm
+                          size=Text.Caption
                           transform=Text.Uppercase
                         />
                         <HSpacing size=Spacing.xs />
@@ -207,7 +208,7 @@ let make = (~proposalID) => {
                           block=true
                           value="Voters"
                           weight=Text.Semibold
-                          size=Text.Sm
+                          size=Text.Caption
                           transform=Text.Uppercase
                         />
                       </div>
@@ -219,7 +220,7 @@ let make = (~proposalID) => {
                       block=true
                       value="TX Hash"
                       weight=Text.Semibold
-                      size=Text.Sm
+                      size=Text.Caption
                       transform=Text.Uppercase
                     />
                   </Col>
@@ -228,7 +229,7 @@ let make = (~proposalID) => {
                       block=true
                       value="Timestamp"
                       weight=Text.Semibold
-                      size=Text.Sm
+                      size=Text.Caption
                       transform=Text.Uppercase
                       align=Text.Right
                     />
@@ -258,7 +259,7 @@ let make = (~proposalID) => {
                     value="No Voters"
                     align=Heading.Center
                     weight=Heading.Regular
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </EmptyContainer>
           | _ =>

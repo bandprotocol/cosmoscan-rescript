@@ -12,7 +12,7 @@ module Styles = {
       width(#percent(100.)),
       height(px(12)),
       borderRadius(px(7)),
-      border(px(1), solid, theme.tableRowBorderColor),
+      border(px(1), solid, theme.neutral_100),
       padding(px(1)),
       overflow(hidden),
     ])
@@ -22,7 +22,7 @@ module Styles = {
       height(#percent(100.)),
       borderRadius(px(7)),
       transition(~duration=200, "all"),
-      background(success ? theme.baseBlue : theme.failColor),
+      background(success ? theme.primary_600 : theme.error_600),
     ])
   let leftText = style(. [
     position(absolute),
@@ -75,8 +75,8 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
         value={"Min " ++ minimumValidators->Format.iPretty}
         transform=Text.Uppercase
         weight=Text.Semibold
-        size=Text.Sm
-        color={theme.textPrimary}
+        size=Text.Caption
+        color={theme.neutral_900}
       />
     </div>
     <div className={Styles.progressOuter(theme)}>
@@ -85,10 +85,10 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
     <div className=Styles.rightText>
       <Text
         value={reportedValidators->Format.iPretty ++ " of " ++ requestValidators->Format.iPretty}
-        size=Text.Sm
+        size=Text.Caption
         transform=Text.Uppercase
         weight=Text.Semibold
-        color={theme.textPrimary}
+        color={theme.neutral_900}
       />
     </div>
   </div>
@@ -97,15 +97,15 @@ let make = (~reportedValidators, ~minimumValidators, ~requestValidators) => {
 module Uptime = {
   @react.component
   let make = (~percent) => {
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     let color = if percent == 100. {
-      Theme.baseBlue
+      theme.primary_600
     } else if percent < 100. && percent >= 79. {
-      Theme.lightBlue
+      theme.primary_200
     } else {
-      Theme.failColor
+      theme.error_600
     }
 
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div className={Styles.progressOuter(theme)}>
       <div className={Styles.progressUptimeInner(percent, color)} />
     </div>
@@ -130,13 +130,13 @@ module Deposit = {
           CssHelper.mb(~size=8, ()),
           CssHelper.flexBox(~justify=#spaceBetween, ()),
         ])}>
-        <Text value={`Min Deposit ${formatedMinDeposit} BAND`} color=Theme.gray size=Text.Lg />
+        <Text value={`Min Deposit ${formatedMinDeposit} BAND`} color=theme.neutral_200 size=Text.Body1 />
         <Text
-          value={`${formatedTotalDeposit} / ${formatedMinDeposit}`} color=Theme.gray size=Text.Lg
+          value={`${formatedTotalDeposit} / ${formatedMinDeposit}`} color=theme.neutral_200 size=Text.Body1
         />
       </div>
       <div className={Styles.progressOuter(theme)}>
-        <div className={Styles.progressUptimeInner(percent, Theme.baseBlue)} />
+        <div className={Styles.progressUptimeInner(percent, theme.primary_600)} />
       </div>
     </div>
   }
@@ -160,18 +160,18 @@ module Voting = {
         //   value={VoteSub.toString(label, ~withSpace=true)} size=Heading.H4 weight=Heading.Thin
         // />
         <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-          <Text value={percent->Format.fPercent(~digits=2)} size=Text.Lg block=true />
+          <Text value={percent->Format.fPercent(~digits=2)} size=Text.Body1 block=true />
           {isMobile
             ? React.null
             : <>
                 <HSpacing size=Spacing.sm />
-                <Text value="/" size=Text.Lg block=true />
+                <Text value="/" size=Text.Body1 block=true />
                 <HSpacing size=Spacing.sm />
                 <Text
                   value={amount->Format.fPretty(~digits=2) ++ " BAND"}
-                  size=Text.Lg
+                  size=Text.Body1
                   block=true
-                  color={theme.textPrimary}
+                  color={theme.neutral_900}
                 />
               </>}
         </div>

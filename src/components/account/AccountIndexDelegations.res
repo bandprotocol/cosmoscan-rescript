@@ -23,9 +23,9 @@ module RenderBody = {
                 validatorAddress=operatorAddress
                 moniker
                 identity
-                width=#px(300)
+                width={#px(300)}
                 avatarWidth=30
-                size=Text.Lg
+                size=Text.Body1
               />
             </div>
           | _ => <LoadingCensorBar width=200 height=20 />
@@ -48,13 +48,13 @@ module RenderBody = {
                 | Some({address}) if Address.isEqual(address, delegatorAddress) =>
                   <div className={CssHelper.flexBox()}>
                     <div className=Styles.actionText onClick={_ => delegate()}>
-                      <Text value="Delegate" underline=true color=theme.textPrimary />
+                      <Text value="Delegate" underline=true color=theme.neutral_900 />
                     </div>
                     <div className=Styles.actionText onClick={_ => redelegate()}>
-                      <Text value="Redelegate" underline=true color=theme.textPrimary />
+                      <Text value="Redelegate" underline=true color=theme.neutral_900 />
                     </div>
                     <div className=Styles.actionText onClick={_ => undelegate()}>
-                      <Text value="Undelegate" underline=true color=theme.textPrimary />
+                      <Text value="Undelegate" underline=true color=theme.neutral_900 />
                     </div>
                   </div>
                 | _ => React.null
@@ -68,8 +68,9 @@ module RenderBody = {
           <div className={CssHelper.flexBox(~justify=#flexStart, ())}>
             {switch delegationsSub {
             | Data({reward, operatorAddress, delegatorAddress}) =>
-              let withdrawReward = () =>
+              let withdrawReward = () => {
                 operatorAddress->SubmitMsg.WithdrawReward->SubmitTx->OpenModal->dispatchModal
+              }
               let reinvest = _ =>
                 (operatorAddress, reward.amount)
                 ->SubmitMsg.Reinvest
@@ -83,10 +84,10 @@ module RenderBody = {
                 | Some({address}) if Address.isEqual(address, delegatorAddress) =>
                   <div className={CssHelper.flexBox()}>
                     <div className=Styles.actionText onClick={_ => withdrawReward()}>
-                      <Text value="Claim" underline=true color=theme.textPrimary />
+                      <Text value="Claim" underline=true color=theme.neutral_900 />
                     </div>
                     <div className=Styles.actionText onClick={_ => reinvest()}>
-                      <Text value="Reinvest" underline=true color=theme.textPrimary />
+                      <Text value="Reinvest" underline=true color=theme.neutral_900 />
                     </div>
                   </div>
                 | _ => React.null
@@ -103,7 +104,7 @@ module RenderBody = {
 
 module RenderBodyMobile = {
   @react.component
-  let make = (~reserveIndex, ~delegationsSub: Sub.variant<DelegationSub.Stake.t>) =>
+  let make = (~reserveIndex, ~delegationsSub: Sub.variant<DelegationSub.Stake.t>) => {
     switch delegationsSub {
     | Data({amount, moniker, operatorAddress, reward, identity}) =>
       let key_ =
@@ -137,6 +138,7 @@ module RenderBodyMobile = {
         idx={reserveIndex->Belt.Int.toString}
       />
     }
+  }
 }
 
 @react.component
@@ -160,7 +162,7 @@ let make = (~address) => {
                   block=true
                   value={delegationsCount->Belt.Int.toString}
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
                 <HSpacing size=Spacing.xs />
@@ -168,7 +170,7 @@ let make = (~address) => {
                   block=true
                   value="Validators Delegated"
                   weight=Text.Semibold
-                  size=Text.Sm
+                  size=Text.Caption
                   transform=Text.Uppercase
                 />
               </div>
@@ -186,7 +188,7 @@ let make = (~address) => {
                     block=true
                     value={delegationsCount->Belt.Int.toString}
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                   <HSpacing size=Spacing.xs />
@@ -194,7 +196,7 @@ let make = (~address) => {
                     block=true
                     value="Validators Delegated"
                     weight=Text.Semibold
-                    size=Text.Sm
+                    size=Text.Caption
                     transform=Text.Uppercase
                   />
                 </div>
@@ -206,7 +208,7 @@ let make = (~address) => {
                 block=true
                 value="Amount (BAND)"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
               />
             </Col>
@@ -215,45 +217,47 @@ let make = (~address) => {
                 block=true
                 value="Reward (BAND)"
                 weight=Text.Semibold
-                size=Text.Sm
+                size=Text.Caption
                 transform=Text.Uppercase
               />
             </Col>
           </Row>
         </THead>}
     {switch delegationsSub {
-    | Data(delegations) if delegations->Belt.Array.size > 0 =>
-      delegations
-      ->Belt.Array.mapWithIndex((i, e) =>
-        isMobile
-          ? <RenderBodyMobile
-              key={e.operatorAddress->Address.toBech32 ++
-                (address->Address.toBech32 ++
-                i->Belt.Int.toString)}
-              reserveIndex=i
-              delegationsSub={Sub.resolve(e)}
+    | Data(delegations) =>
+      delegations->Belt.Array.size > 0
+        ? delegations
+          ->Belt.Array.mapWithIndex((i, e) =>
+            isMobile
+              ? <RenderBodyMobile
+                  key={e.operatorAddress->Address.toBech32 ++
+                  address->Address.toBech32 ++
+                  i->Belt.Int.toString}
+                  reserveIndex=i
+                  delegationsSub={Sub.resolve(e)}
+                />
+              : <RenderBody
+                  key={e.operatorAddress->Address.toBech32 ++
+                  address->Address.toBech32 ++
+                  i->Belt.Int.toString}
+                  delegationsSub={Sub.resolve(e)}
+                />
+          )
+          ->React.array
+        : <EmptyContainer>
+            <img
+              alt="No Delegation"
+              src={isDarkMode ? Images.noDataDark : Images.noDataLight}
+              className=Styles.noDataImage
             />
-          : <RenderBody
-              key={e.operatorAddress->Address.toBech32 ++
-                (address->Address.toBech32 ++
-                i->Belt.Int.toString)}
-              delegationsSub={Sub.resolve(e)}
+            <Heading
+              size=Heading.H4
+              value="No Delegation"
+              align=Heading.Center
+              weight=Heading.Regular
+              color={theme.neutral_600}
             />
-      )
-      ->React.array
-    | Data(delegations) if delegations->Belt.Array.size > 0 =>
-      <EmptyContainer>
-        <img
-          src={isDarkMode ? Images.noDataDark : Images.noDataLight} className=Styles.noDataImage
-        />
-        <Heading
-          size=Heading.H4
-          value="No Delegation"
-          align=Heading.Center
-          weight=Heading.Regular
-          color=theme.textSecondary
-        />
-      </EmptyContainer>
+          </EmptyContainer>
     | _ =>
       Belt.Array.make(pageSize, Sub.NoData)
       ->Belt.Array.mapWithIndex((i, noData) =>

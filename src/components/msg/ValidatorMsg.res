@@ -13,7 +13,7 @@ module CreateValidator = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <Text value=moniker size=Text.Md nowrap=true block=true />
+      <Text value=moniker size=Text.Body2 nowrap=true block=true />
     </div>
 }
 
@@ -26,7 +26,7 @@ module EditValidator = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <Text value=moniker size=Text.Md nowrap=true block=true />
+      <Text value=moniker size=Text.Body2 nowrap=true block=true />
     </div>
 }
 
@@ -65,7 +65,7 @@ module SetWithdrawAddress = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <Text value=j` to ` size=Text.Md nowrap=true block=true />
+      <Text value=j` to ` size=Text.Body2 nowrap=true block=true />
       <AddressRender address=withdrawAddress />
     </div>
 }

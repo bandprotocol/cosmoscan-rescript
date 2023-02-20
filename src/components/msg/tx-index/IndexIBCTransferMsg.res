@@ -10,7 +10,7 @@ module Transfer = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <AddressRender address=msg.sender />
       </Col>
@@ -20,9 +20,9 @@ module Transfer = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=msg.receiver />
+        <Text size=Text.Body1 value=msg.receiver />
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
@@ -30,9 +30,9 @@ module Transfer = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=msg.sourcePort />
+        <Text size=Text.Body1 value=msg.sourcePort />
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
@@ -40,9 +40,9 @@ module Transfer = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Text size=Text.Lg value=msg.sourceChannel />
+        <Text size=Text.Body1 value=msg.sourceChannel />
       </Col>
       <Col col=Col.Six mbSm=24>
         <Heading
@@ -50,10 +50,10 @@ module Transfer = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
         <Text
-          size=Text.Lg
+          size=Text.Body1
           value={msg.token.amount->Format.fPretty ++ (" " ++ msg.token.denom)}
           breakAll=true
         />
@@ -64,9 +64,9 @@ module Transfer = {
           size=Heading.H4
           weight=Heading.Regular
           marginBottom=8
-          color=theme.textSecondary
+          color=theme.neutral_600
         />
-        <Timestamp time=msg.timeoutTimestamp size=Text.Lg />
+        <Timestamp time=msg.timeoutTimestamp size=Text.Body1 />
       </Col>
     </Row>
   }

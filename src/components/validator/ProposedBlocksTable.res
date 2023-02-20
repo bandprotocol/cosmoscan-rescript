@@ -25,7 +25,7 @@ module RenderBody = {
               block=true
               code=true
               ellipsis=true
-              color={theme.textPrimary}
+              color={theme.neutral_900}
             />
           | _ => <LoadingCensorBar width=522 height=15 />
           }}
@@ -34,7 +34,7 @@ module RenderBody = {
           <div className={CssHelper.flexBox(~justify=#center, ())}>
             {switch blockSub {
             | Data({txn}) =>
-              <Text value={txn->Format.iPretty} align=Text.Center color={theme.textPrimary} />
+              <Text value={txn->Format.iPretty} align=Text.Center color={theme.neutral_900} />
             | _ => <LoadingCensorBar width=20 height=15 />
             }}
           </div>
@@ -43,7 +43,7 @@ module RenderBody = {
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch blockSub {
             | Data({timestamp}) =>
-              <Timestamp time=timestamp size=Text.Md weight=Text.Regular textAlign=Text.Right />
+              <Timestamp time=timestamp size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
             | _ => <LoadingCensorBar width=80 height=15 />
             }}
           </div>
@@ -112,7 +112,7 @@ let make = (~consensusAddress) => {
           <Row alignItems=Row.Center>
             <Col col=Col.Two>
               <Text
-                block=true value="Block" weight=Text.Semibold transform=Text.Uppercase size=Text.Sm
+                block=true value="Block" weight=Text.Semibold transform=Text.Uppercase size=Text.Caption
               />
             </Col>
             <Col col=Col.Seven>
@@ -121,7 +121,7 @@ let make = (~consensusAddress) => {
                 value="Block Hash"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
               />
             </Col>
             <Col col=Col.One>
@@ -130,7 +130,7 @@ let make = (~consensusAddress) => {
                 value="Txn"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
                 align=Text.Center
               />
             </Col>
@@ -140,7 +140,7 @@ let make = (~consensusAddress) => {
                 value="Timestamp"
                 weight=Text.Semibold
                 transform=Text.Uppercase
-                size=Text.Sm
+                size=Text.Caption
                 align=Text.Right
               />
             </Col>
@@ -150,7 +150,7 @@ let make = (~consensusAddress) => {
     | Data(blocks) =>
       <>
         {blocks
-        ->Belt_Array.mapWithIndex((i, e) =>
+        ->Belt.Array.mapWithIndex((i, e) =>
           isMobile
             ? <RenderBodyMobile
                 key={e.height |> ID.Block.toString} reserveIndex=i blockSub={Sub.resolve(e)}
@@ -160,8 +160,8 @@ let make = (~consensusAddress) => {
         ->React.array}
       </>
     | _ =>
-      Belt_Array.make(pageSize, Sub.NoData)
-      ->Belt_Array.mapWithIndex((i, noData) =>
+      Belt.Array.make(pageSize, Sub.NoData)
+      ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile key={string_of_int(i)} reserveIndex=i blockSub=noData />
           : <RenderBody key={string_of_int(i)} blockSub=noData />
