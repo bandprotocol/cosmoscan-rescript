@@ -195,6 +195,65 @@ module HighLightText = {
   }
 }
 
+module RenderNotFound = {
+  @react.component
+  let make = (~searchTerm) => {
+    <li className={Styles.resultItem}>
+      <div className={Styles.resultNotFound}>
+        <Text value={j`No search result for "$searchTerm"`} size=Text.Body2 />
+      </div>
+    </li>
+  }
+}
+
+module RenderDataSourceWithNameLink = {
+  @react.component
+  let make = (~id) => {
+    let datasourceName = SearchBarQuery.searchDataSource(~filter=id, ())
+    switch datasourceName {
+    | Data(data) =>
+      let result = data->Belt.Array.get(0)
+      switch result {
+      | Some({id, name}) =>
+        <TypeID.DataSourceLink id={id}>
+          <div className={Css.merge(list{CssHelper.flexBox()})}>
+            <TypeID.DataSource id={id} position=TypeID.Subtitle />
+            <HSpacing size=Spacing.sm />
+            <Heading size=Heading.H4 value=name weight=Heading.Thin />
+          </div>
+        </TypeID.DataSourceLink>
+      | _ => <RenderNotFound searchTerm={id} />
+      }
+
+    | _ => <LoadingCensorBar width=100 height=20 />
+    }
+  }
+}
+
+module RenderOracleScriptWithNameLink = {
+  @react.component
+  let make = (~id) => {
+    let osName = SearchBarQuery.searchOracleScript(~filter=id, ())
+    switch osName {
+    | Data(data) =>
+      let result = data->Belt.Array.get(0)
+      switch result {
+      | Some({id, name}) =>
+        <TypeID.OracleScriptLink id={id}>
+          <div className={Css.merge(list{CssHelper.flexBox()})}>
+            <TypeID.OracleScript id={id} position=TypeID.Subtitle />
+            <HSpacing size=Spacing.sm />
+            <Heading size=Heading.H4 value=name weight=Heading.Thin />
+          </div>
+        </TypeID.OracleScriptLink>
+      | _ => <RenderNotFound searchTerm={id} />
+      }
+
+    | _ => <LoadingCensorBar width=100 height=20 />
+    }
+  }
+}
+
 module RenderSearchResult = {
   @react.component
   let make = (
@@ -212,19 +271,20 @@ module RenderSearchResult = {
 
     let trimSearchTerm = searchTerm->Js.String.trim
     let len = trimSearchTerm->String.length
-    let capStr = trimSearchTerm->String.capitalize_ascii
 
     <div className={Styles.resultInner(theme)}>
       <ul>
         <div className={Styles.resultContent}>
-          {if trimSearchTerm->Js.String2.startsWith("bandvaloper") && len == 50 {
-            switch trimSearchTerm->Address.fromBech32Opt {
-            | Some(address) =>
+          {
+            let route = Route.search(trimSearchTerm)
+            open Route
+            switch route {
+            | BlockDetailsPage(id) =>
               <>
                 <li className={Styles.resultHeading}>
                   <Heading
                     size=Heading.H4
-                    value="Address"
+                    value="Block"
                     align=Heading.Left
                     weight=Heading.Semibold
                     color={theme.neutral_600}
@@ -232,25 +292,16 @@ module RenderSearchResult = {
                 </li>
                 <li className={Styles.resultItem}>
                   <div className={Styles.innerResultItem}>
-                    <RenderMonikerLink validatorAddress={address} />
+                    <TypeID.Block id={id->ID.Block.fromInt} position=TypeID.Subtitle block=true />
                   </div>
                 </li>
               </>
-            | None =>
-              <li className={Styles.resultItem}>
-                <div className={Styles.resultNotFound}>
-                  <Text value={j`No search result for "$trimSearchTerm"`} size=Text.Body2 />
-                </div>
-              </li>
-            }
-          } else if trimSearchTerm->Js.String2.startsWith("band") && len == 43 {
-            switch trimSearchTerm->Address.fromBech32Opt {
-            | Some(address) =>
+            | RequestIndexPage(id) =>
               <>
                 <li className={Styles.resultHeading}>
                   <Heading
                     size=Heading.H4
-                    value="Address"
+                    value="Requests"
                     align=Heading.Left
                     weight=Heading.Semibold
                     color={theme.neutral_600}
@@ -258,79 +309,111 @@ module RenderSearchResult = {
                 </li>
                 <li className={Styles.resultItem}>
                   <div className={Styles.innerResultItem}>
-                    <AddressRender address={address} position=AddressRender.Subtitle />
+                    <TypeID.Request
+                      id={id->ID.Request.fromInt} position=TypeID.Subtitle block=true
+                    />
                   </div>
                 </li>
               </>
-            | None =>
-              <li className={Styles.resultItem}>
-                <div className={Styles.resultNotFound}>
-                  <Text value={j`No search result for "$trimSearchTerm"`} size=Text.Body2 />
-                </div>
-              </li>
-            }
-          } else if len == 64 || (trimSearchTerm->Js.String2.startsWith("0x") && len == 66) {
-            <>
-              <li className={Styles.resultHeading}>
-                <Heading
-                  size=Heading.H4
-                  value="Transaction"
-                  align=Heading.Left
-                  weight=Heading.Semibold
-                  color={theme.neutral_600}
-                />
-              </li>
-              <li className={Styles.resultItem}>
-                <div className={Styles.innerResultItem}>
-                  <TxLink txHash={trimSearchTerm->Hash.fromHex} width=800 size=Text.Body2 />
-                </div>
-              </li>
-            </>
-          } else if capStr->Js.String2.startsWith("B") {
-            let blockIDOpt = trimSearchTerm->String.sub(1, len - 1)->Belt.Int.fromString
-            let routeOpt = blockIDOpt->Belt.Option.map(blockID => Route.BlockDetailsPage(blockID))
-            <>
-              <li className={Styles.resultHeading}>
-                <Heading
-                  size=Heading.H4
-                  value="Blocks"
-                  align=Heading.Left
-                  weight=Heading.Semibold
-                  color={theme.neutral_600}
-                />
-              </li>
-              <li className={Styles.resultItem}>
-                <div className={Styles.innerResultItem}>
-                  <TxLink txHash={trimSearchTerm->Hash.fromHex} width=800 size=Text.Body2 />
-                </div>
-              </li>
-            </>
-          } else if capStr->Js.String2.startsWith("D") {
-            let dataSourceIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
-            dataSourceIDOpt->Belt.Option.map(dataSourceID => DataSourceDetailsPage(
-              dataSourceID,
-              DataSourceRequests,
-            ))
-          } else if capStr->Js.String2.startsWith("R") {
-            let requestIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
-            requestIDOpt->Belt.Option.map(requestID => RequestIndexPage(requestID))
-          } else if capStr->Js.String2.startsWith("O") {
-            let oracleScriptIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
-            oracleScriptIDOpt->Belt.Option.map(oracleScriptID => OracleScriptDetailsPage(
-              oracleScriptID,
-              OracleScriptRequests,
-            ))
-          } else {
-            // TODO: Handle with NoData instead of []
 
-            {
-              switch (results, resultLength) {
-              | (Data(_), 0) =>
+            | DataSourceDetailsPage(id, _) =>
+              <>
+                <li className={Styles.resultHeading}>
+                  <Heading
+                    size=Heading.H4
+                    value="Data Sources"
+                    align=Heading.Left
+                    weight=Heading.Semibold
+                    color={theme.neutral_600}
+                  />
+                </li>
                 <li className={Styles.resultItem}>
-                  <div className={Styles.resultNotFound}>
-                    <Text value={j`No search result for "$trimSearchTerm"`} size=Text.Body2 />
+                  <div className={Styles.innerResultItem}>
+                    <RenderDataSourceWithNameLink id={id->Belt.Int.toString} />
                   </div>
                 </li>
+              </>
+
+            | OracleScriptDetailsPage(id, _) =>
+              <>
+                <li className={Styles.resultHeading}>
+                  <Heading
+                    size=Heading.H4
+                    value="Oracle Scripts"
+                    align=Heading.Left
+                    weight=Heading.Semibold
+                    color={theme.neutral_600}
+                  />
+                </li>
+                <li className={Styles.resultItem}>
+                  <div className={Styles.innerResultItem}>
+                    <RenderOracleScriptWithNameLink id={id->Belt.Int.toString} />
+                  </div>
+                </li>
+              </>
+
+            | ValidatorDetailsPage(_, _) =>
+              switch trimSearchTerm->Address.fromBech32Opt {
+              | Some(address) =>
+                <>
+                  <li className={Styles.resultHeading}>
+                    <Heading
+                      size=Heading.H4
+                      value="Address"
+                      align=Heading.Left
+                      weight=Heading.Semibold
+                      color={theme.neutral_600}
+                    />
+                  </li>
+                  <li className={Styles.resultItem}>
+                    <div className={Styles.innerResultItem}>
+                      <RenderMonikerLink validatorAddress={address} />
+                    </div>
+                  </li>
+                </>
+              | None => <RenderNotFound searchTerm=trimSearchTerm />
+              }
+            | AccountIndexPage(_, _) =>
+              switch trimSearchTerm->Address.fromBech32Opt {
+              | Some(address) =>
+                <>
+                  <li className={Styles.resultHeading}>
+                    <Heading
+                      size=Heading.H4
+                      value="Address"
+                      align=Heading.Left
+                      weight=Heading.Semibold
+                      color={theme.neutral_600}
+                    />
+                  </li>
+                  <li className={Styles.resultItem}>
+                    <div className={Styles.innerResultItem}>
+                      <AddressRender address={address} position=AddressRender.Subtitle />
+                    </div>
+                  </li>
+                </>
+              | None => <RenderNotFound searchTerm=trimSearchTerm />
+              }
+            | TxIndexPage(_) =>
+              <>
+                <li className={Styles.resultHeading}>
+                  <Heading
+                    size=Heading.H4
+                    value="Transaction"
+                    align=Heading.Left
+                    weight=Heading.Semibold
+                    color={theme.neutral_600}
+                  />
+                </li>
+                <li className={Styles.resultItem}>
+                  <div className={Styles.innerResultItem}>
+                    <TxLink txHash={trimSearchTerm->Hash.fromHex} width=800 size=Text.Body2 />
+                  </div>
+                </li>
+              </>
+            | _ =>
+              switch (results, resultLength) {
+              | (Data(_), 0) => <RenderNotFound searchTerm=trimSearchTerm />
 
               | (Data(blocks, requests, os, ds, proposals), _) =>
                 <>
@@ -478,15 +561,10 @@ module RenderSearchResult = {
                 <div className={Styles.resultNotFound}>
                   <LoadingCensorBar width=100 height=20 />
                 </div>
-              | _ =>
-                <li className={Styles.resultItem}>
-                  <div className={Styles.resultNotFound}>
-                    <Text value={j`No search result for "$trimSearchTerm"`} size=Text.Body2 />
-                  </div>
-                </li>
+              | _ => <RenderNotFound searchTerm=trimSearchTerm />
               }
             }
-          }}
+          }
         </div>
       </ul>
     </div>
@@ -631,19 +709,23 @@ let make = () => {
       dispatch(ChangeSearchTerm(""))
       setIsSearching(_ => false)
       ReactEvent.Keyboard.preventDefault(event)
-      switch resultLen > 0 {
-      | true =>
-        let item = {
-          switch mergedResult->Belt.Array.get(0) {
-          | Some(item) => item
-          | None => Route.NotFound
-          }
-        }
-        setSelectedRoute(_ => item)
-        Route.redirect(item)
 
-      | _ => Route.redirect(Route.search(searchTerm->Js.String.trim))
+      let route = Route.search(searchTerm->Js.String.trim)
+      switch route {
+      | Route.NotFound => {
+          let item = {
+            switch mergedResult->Belt.Array.get(0) {
+            | Some(item) => item
+            | None => Route.NotFound
+            }
+          }
+          setSelectedRoute(_ => item)
+          Route.redirect(item)
+        }
+
+      | _ => Route.redirect(route)
       }
+
     | _ => ()
     }
   }
