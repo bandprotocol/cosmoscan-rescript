@@ -13,7 +13,12 @@ module CreateDataSourceMsg = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <TypeID.DataSource id /> <Text value=name nowrap=true block=true ellipsis=true />
+      {id->Belt.Option.mapWithDefault(React.null, i => {
+        <React.Fragment>
+          <TypeID.DataSource id=i />
+          <Text value=name nowrap=true block=true ellipsis=true />
+        </React.Fragment>
+      })}
     </div>
 }
 
@@ -42,7 +47,8 @@ module CreateOracleScriptMsg = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <TypeID.OracleScript id /> <Text value=name nowrap=true block=true ellipsis=true />
+      <TypeID.OracleScript id />
+      <Text value=name nowrap=true block=true ellipsis=true />
     </div>
 }
 
@@ -71,10 +77,14 @@ module RequestMsg = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <TypeID.Request id />
-      <Text value=j` to ` size=Text.Body2 nowrap=true block=true />
-      <TypeID.OracleScript id=oracleScriptID />
-      <Text value=oracleScriptName nowrap=true block=true ellipsis=true />
+      <React.Fragment>
+        {id->Belt.Option.mapWithDefault(React.null, i => <TypeID.Request id=i />)}
+        <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
+        <TypeID.OracleScript id=oracleScriptID />
+        {oracleScriptName->Belt.Option.mapWithDefault(React.null, name =>
+          <Text value=name nowrap=true block=true ellipsis=true />
+        )}
+      </React.Fragment>
     </div>
 }
 

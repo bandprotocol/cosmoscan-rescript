@@ -33,9 +33,9 @@ type t =
   | TxHash(Hash.t, int)
   | BlockHash(Hash.t)
   | Validator(Address.t, string, string)
-  | Messages(Hash.t, list<MsgDecoder.t>, bool, string)
+  | Messages(Hash.t, list<Msg.t>, bool, string)
   | PubKey(PubKey.t)
-  | Badge(MsgDecoder.badge_theme_t)
+  | Badge(Msg.badge_theme_t)
   | VotingPower(Coin.t, float)
   | Uptime(option<float>)
   | Loading(int)
@@ -137,7 +137,9 @@ let make = (~info) => {
   | Text(text) => <Text value=text spacing={Text.Em(0.02)} nowrap=true ellipsis=true block=true />
   | Timestamp(time) => <Timestamp time size=Text.Body2 weight=Text.Regular />
   | Validator(address, moniker, identity) =>
-    <ValidatorMonikerLink validatorAddress=address moniker size=Text.Body2 identity width={#px(230)} />
+    <ValidatorMonikerLink
+      validatorAddress=address moniker size=Text.Body2 identity width={#px(230)}
+    />
   | PubKey(publicKey) => <PubKeyRender alignLeft=true pubKey=publicKey display=#block />
   | TxHash(txHash, width) => <TxLink txHash width />
   | BlockHash(hash) =>

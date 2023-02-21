@@ -52,22 +52,13 @@ module IDCreator = (RawID: RawIDSig) => {
 
   type t = ID(int)
 
-  let getRoute = x =>
-    switch x {
-    | ID(id) => RawID.route(id, RawID.defaultTab)
-    }
+  let getRoute = (ID(id)) => RawID.route(id, RawID.defaultTab)
 
   let getRouteWithTab = (ID(id), tab) => RawID.route(id, tab)
 
-  let toString = x =>
-    switch x {
-    | ID(id) => RawID.prefix ++ Belt.Int.toString(id)
-    }
+  let toString = (ID(id)) => RawID.prefix ++ Belt.Int.toString(id)
 
-  let toInt = x =>
-    switch x {
-    | ID(id) => id
-    }
+  let toInt = (ID(id)) => id
 
   let decoder = {
     open JsonUtils.Decode
@@ -79,10 +70,7 @@ module IDCreator = (RawID: RawIDSig) => {
 
   let fromIntExn = x => ID(x->Belt.Option.getExn)
 
-  let toJson = x =>
-    switch x {
-    | ID(id) => id->float_of_int->Js.Json.number
-    }
+  let toJson = (ID(id)) => id->float_of_int->Js.Json.number
 }
 
 module DataSource = IDCreator(RawDataSourceID)

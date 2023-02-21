@@ -4,15 +4,16 @@ module Styles = {
   let tableWrapper = style(. [Media.mobile([padding2(~v=#px(16), ~h=#zero)])])
 }
 
-let transform = (account, {raw, decoded}: MsgDecoder.t) => {
-  let transformDecoded = switch decoded {
-  | SendMsgSuccess({toAddress, fromAddress, amount})
-  | SendMsgFail({toAddress, fromAddress, amount}) if Address.isEqual(toAddress, account) =>
-    MsgDecoder.ReceiveMsg({toAddress, fromAddress, amount})
-  | _ => decoded
-  }
-  open MsgDecoder
-  {raw, decoded: transformDecoded, isIBC: transformDecoded->MsgDecoder.isIBC}
+let transform = (account, msg: Msg.t) => {
+  // TODO: Bring it back when defind ReceiveMsg
+  // let transformDecoded = switch decoded {
+  // | SendMsg({toAddress, fromAddress, amount}) if Address.isEqual(toAddress, account) =>
+  //   MsgDecoder.ReceiveMsg({toAddress, fromAddress, amount})
+  // | _ => decoded
+  // }
+  // open MsgDecoder
+  // {raw, decoded: transformDecoded, isIBC: transformDecoded->MsgDecoder.isIBC}
+  msg
 }
 
 @react.component
@@ -33,7 +34,10 @@ let make = (~accountAddress: Address.t) => {
             | Data(txsCount) =>
               <div className={CssHelper.flexBox()}>
                 <Text
-                  block=true value={txsCount->Belt.Int.toString} weight=Text.Semibold size=Text.Caption
+                  block=true
+                  value={txsCount->Belt.Int.toString}
+                  weight=Text.Semibold
+                  size=Text.Caption
                 />
                 <HSpacing size=Spacing.xs />
                 <Text
@@ -69,7 +73,11 @@ let make = (~accountAddress: Address.t) => {
             </Col>
             <Col col=Col.One>
               <Text
-                block=true value="Block" weight=Text.Semibold size=Text.Caption transform=Text.Uppercase
+                block=true
+                value="Block"
+                weight=Text.Semibold
+                size=Text.Caption
+                transform=Text.Uppercase
               />
             </Col>
             <Col col=Col.One>

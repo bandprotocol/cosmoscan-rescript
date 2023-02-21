@@ -1,6 +1,6 @@
 module CreateDataSourceMsg = {
   @react.component
-  let make = (~dataSource: MsgDecoder.CreateDataSource.success_t) => {
+  let make = (~dataSource: Msg.CreateDataSource.t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <Row>
       <Col col=Col.Six mb=24>
@@ -15,15 +15,15 @@ module CreateDataSourceMsg = {
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
-          value="Name"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
+          value="Name" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
         />
         <div className={CssHelper.flexBox()}>
-          <TypeID.DataSource position=TypeID.Subtitle id=dataSource.id />
-          <HSpacing size=Spacing.sm />
+          {dataSource.id->Belt.Option.mapWithDefault(React.null, id => {
+            <React.Fragment>
+              <TypeID.DataSource position=TypeID.Subtitle id />
+              <HSpacing size=Spacing.sm />
+            </React.Fragment>
+          })}
           <Text value=dataSource.name size=Text.Body1 />
         </div>
       </Col>
@@ -39,60 +39,7 @@ module CreateDataSourceMsg = {
       </Col>
       <Col col=Col.Six>
         <Heading
-          value="Fee"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <AmountRender coins=dataSource.fee />
-      </Col>
-    </Row>
-  }
-}
-
-module CreateDataSourceFailMsg = {
-  @react.component
-  let make = (~dataSource: MsgDecoder.CreateDataSource.fail_t) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    <Row>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Owner"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <AddressRender position=AddressRender.Subtitle address=dataSource.owner />
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Name"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value=dataSource.name size=Text.Body1 />
-      </Col>
-      <Col col=Col.Six mbSm=24>
-        <Heading
-          value="Treasury"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <AddressRender position=AddressRender.Subtitle address=dataSource.treasury />
-      </Col>
-      <Col col=Col.Six>
-        <Heading
-          value="Fee"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
+          value="Fee" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
         />
         <AmountRender coins=dataSource.fee />
       </Col>
@@ -117,11 +64,7 @@ module EditDataSourceMsg = {
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
-          value="Name"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
+          value="Name" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
         />
         <div className={CssHelper.flexBox()}>
           <TypeID.DataSource position=TypeID.Subtitle id=dataSource.id />
@@ -145,11 +88,7 @@ module EditDataSourceMsg = {
       </Col>
       <Col col=Col.Six>
         <Heading
-          value="Fee"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
+          value="Fee" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
         />
         <AmountRender coins=dataSource.fee />
       </Col>
@@ -174,46 +113,13 @@ module CreateOracleScriptMsg = {
       </Col>
       <Col col=Col.Six>
         <Heading
-          value="Name"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
+          value="Name" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
         />
         <div className={CssHelper.flexBox()}>
           <TypeID.OracleScript position=TypeID.Subtitle id=oracleScript.id />
           <HSpacing size=Spacing.sm />
           <Text value=oracleScript.name />
         </div>
-      </Col>
-    </Row>
-  }
-}
-
-module CreateOracleScriptFailMsg = {
-  @react.component
-  let make = (~oracleScript: MsgDecoder.CreateOracleScript.fail_t) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    <Row>
-      <Col col=Col.Six mbSm=24>
-        <Heading
-          value="Owner"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <AddressRender position=AddressRender.Subtitle address=oracleScript.owner />
-      </Col>
-      <Col col=Col.Six>
-        <Heading
-          value="Name"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value=oracleScript.name size=Text.Body1 />
       </Col>
     </Row>
   }
@@ -236,11 +142,7 @@ module EditOracleScriptMsg = {
       </Col>
       <Col col=Col.Six>
         <Heading
-          value="Name"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
+          value="Name" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
         />
         <div className={CssHelper.flexBox()}>
           <TypeID.OracleScript position=TypeID.Subtitle id=oracleScript.id />
@@ -257,10 +159,33 @@ module EditOracleScriptMsg = {
 }
 
 module RequestMsg = {
+  module Calldata = {
+    @react.component
+    let make = (~schema, ~calldata) => {
+      let failed =
+        <Text
+          value="Could not decode calldata."
+          spacing=Text.Em(0.02)
+          nowrap=true
+          ellipsis=true
+          code=true
+          block=true
+          size=Text.Body1
+        />
+      schema->Belt.Option.mapWithDefault(failed, s => {
+        Obi.decode(s, "input", calldata)->Belt.Option.mapWithDefault(failed, calldataKVs =>
+          <KVTable
+            rows={calldataKVs->Belt.Array.map(
+              ({fieldName, fieldValue}) => [KVTable.Value(fieldName), KVTable.Value(fieldValue)],
+            )}
+          />
+        )
+      })
+    }
+  }
   @react.component
-  let make = (~request: MsgDecoder.Request.success_t) => {
+  let make = (~request: Msg.Request.t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    let calldataKVsOpt = Obi.decode(request.schema, "input", request.calldata)
     <Row>
       <Col col=Col.Six mb=24>
         <Heading
@@ -280,7 +205,9 @@ module RequestMsg = {
           marginBottom=8
           color=theme.neutral_600
         />
-        <TypeID.Request position=TypeID.Subtitle id=request.id />
+        {request.id->Belt.Option.mapWithDefault(<Text value="-" />, id =>
+          <TypeID.Request position=TypeID.Subtitle id />
+        )}
       </Col>
       <Col col=Col.Six mb=24>
         <Heading
@@ -293,7 +220,9 @@ module RequestMsg = {
         <div className={CssHelper.flexBox()}>
           <TypeID.OracleScript position=TypeID.Subtitle id=request.oracleScriptID />
           <HSpacing size=Spacing.sm />
-          <Text value=request.oracleScriptName size=Text.Body1 />
+          {request.oracleScriptName->Belt.Option.mapWithDefault(<Text value="-" />, name =>
+            <Text value=name size=Text.Body1 />
+          )}
         </div>
       </Col>
       <Col col=Col.Six mb=24>
@@ -339,120 +268,7 @@ module RequestMsg = {
             data={request.calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
           />
         </div>
-        {switch calldataKVsOpt {
-        | Some(calldataKVs) =>
-          <KVTable
-            rows={calldataKVs->Belt.Array.map(({fieldName, fieldValue}) => [
-              KVTable.Value(fieldName),
-              KVTable.Value(fieldValue),
-            ])}
-          />
-        | None =>
-          <Text
-            value="Could not decode calldata."
-            spacing=Text.Em(0.02)
-            nowrap=true
-            ellipsis=true
-            code=true
-            block=true
-            size=Text.Body1
-          />
-        }}
-      </Col>
-      <Col col=Col.Six mbSm=24>
-        <Heading
-          value="Request Validator Count"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value={request.askCount->Belt.Int.toString} size=Text.Body1 />
-      </Col>
-      <Col col=Col.Six>
-        <Heading
-          value="Sufficient Validator Count"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value={request.minCount->Belt.Int.toString} size=Text.Body1 />
-      </Col>
-    </Row>
-  }
-}
-
-module RequestFailMsg = {
-  @react.component
-  let make = (~request: MsgDecoder.Request.fail_t) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    <Row>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Owner"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <AddressRender position=AddressRender.Subtitle address=request.sender />
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Oracle Script"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <div className={CssHelper.flexBox()}>
-          <TypeID.OracleScript position=TypeID.Subtitle id=request.oracleScriptID />
-        </div>
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Fee Limit"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color={theme.neutral_600}
-        />
-        <AmountRender coins={request.feeLimit} pos=AmountRender.TxIndex />
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Prepare Gas"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value={request.prepareGas->Belt.Int.toString} size=Text.Body1 />
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Execute Gas"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value={request.executeGas->Belt.Int.toString} size=Text.Body1 />
-      </Col>
-      <Col mb=24>
-        <Heading
-          value="Calldata"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <div className={CssHelper.flexBox()}>
-          <Text value={request.calldata->JsBuffer.toHex} size=Text.Body1 />
-          <HSpacing size=Spacing.sm />
-          <CopyRender width=14 message={request.calldata->JsBuffer.toHex} />
-        </div>
+        <Calldata schema=request.schema calldata=request.calldata />
       </Col>
       <Col col=Col.Six mbSm=24>
         <Heading

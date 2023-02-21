@@ -118,9 +118,9 @@ module Send = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      fromAddress: json.at(list{"msg", "from_address"}, address),
-      toAddress: json.at(list{"msg", "to_address"}, address),
-      amount: json.at(list{"msg", "amount"}, list(Coin.decodeCoin)),
+      fromAddress: json.required(list{"msg", "from_address"}, address),
+      toAddress: json.required(list{"msg", "to_address"}, address),
+      amount: json.required(list{"msg", "amount"}, list(Coin.decodeCoin)),
     })
   }
 }
@@ -156,25 +156,25 @@ module CreateDataSource = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      id: json.at(list{"msg", "id"}, ID.DataSource.decoder),
-      owner: json.at(list{"msg", "owner"}, address),
-      name: json.at(list{"msg", "name"}, string),
-      executable: json.at(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
-      treasury: json.at(list{"msg", "treasury"}, address),
-      fee: json.at(list{"msg", "fee"}, list(Coin.decodeCoin)),
-      sender: json.at(list{"msg", "sender"}, address),
+      id: json.required(list{"msg", "id"}, ID.DataSource.decoder),
+      owner: json.required(list{"msg", "owner"}, address),
+      name: json.required(list{"msg", "name"}, string),
+      executable: json.required(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
+      treasury: json.required(list{"msg", "treasury"}, address),
+      fee: json.required(list{"msg", "fee"}, list(Coin.decodeCoin)),
+      sender: json.required(list{"msg", "sender"}, address),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      owner: json.at(list{"msg", "owner"}, address),
-      name: json.at(list{"msg", "name"}, string),
-      executable: json.at(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
-      treasury: json.at(list{"msg", "treasury"}, address),
-      fee: json.at(list{"msg", "fee"}, list(Coin.decodeCoin)),
-      sender: json.at(list{"msg", "sender"}, address),
+      owner: json.required(list{"msg", "owner"}, address),
+      name: json.required(list{"msg", "name"}, string),
+      executable: json.required(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
+      treasury: json.required(list{"msg", "treasury"}, address),
+      fee: json.required(list{"msg", "fee"}, list(Coin.decodeCoin)),
+      sender: json.required(list{"msg", "sender"}, address),
     })
   }
 }
@@ -193,13 +193,13 @@ module EditDataSource = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      id: json.at(list{"msg", "data_source_id"}, ID.DataSource.decoder),
-      owner: json.at(list{"msg", "owner"}, address),
-      name: json.at(list{"msg", "name"}, string),
-      executable: json.at(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
-      treasury: json.at(list{"msg", "treasury"}, address),
-      fee: json.at(list{"msg", "fee"}, list(Coin.decodeCoin)),
-      sender: json.at(list{"msg", "sender"}, address),
+      id: json.required(list{"msg", "data_source_id"}, ID.DataSource.decoder),
+      owner: json.required(list{"msg", "owner"}, address),
+      name: json.required(list{"msg", "name"}, string),
+      executable: json.required(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
+      treasury: json.required(list{"msg", "treasury"}, address),
+      fee: json.required(list{"msg", "fee"}, list(Coin.decodeCoin)),
+      sender: json.required(list{"msg", "sender"}, address),
     })
   }
 }
@@ -223,21 +223,21 @@ module CreateOracleScript = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      id: json.at(list{"msg", "id"}, ID.OracleScript.decoder),
-      owner: json.at(list{"msg", "owner"}, address),
-      name: json.at(list{"msg", "name"}, string),
-      code: json.at(list{"msg", "code"}, string)->JsBuffer.fromBase64,
-      sender: json.at(list{"msg", "sender"}, address),
+      id: json.required(list{"msg", "id"}, ID.OracleScript.decoder),
+      owner: json.required(list{"msg", "owner"}, address),
+      name: json.required(list{"msg", "name"}, string),
+      code: json.required(list{"msg", "code"}, string)->JsBuffer.fromBase64,
+      sender: json.required(list{"msg", "sender"}, address),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      owner: json.at(list{"msg", "owner"}, address),
-      name: json.at(list{"msg", "name"}, string),
-      code: json.at(list{"msg", "code"}, string)->JsBuffer.fromBase64,
-      sender: json.at(list{"msg", "sender"}, address),
+      owner: json.required(list{"msg", "owner"}, address),
+      name: json.required(list{"msg", "name"}, string),
+      code: json.required(list{"msg", "code"}, string)->JsBuffer.fromBase64,
+      sender: json.required(list{"msg", "sender"}, address),
     })
   }
 }
@@ -254,11 +254,11 @@ module EditOracleScript = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      id: json.at(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
-      owner: json.at(list{"msg", "owner"}, address),
-      name: json.at(list{"msg", "name"}, string),
-      code: json.at(list{"msg", "code"}, string)->JsBuffer.fromBase64,
-      sender: json.at(list{"msg", "sender"}, address),
+      id: json.required(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
+      owner: json.required(list{"msg", "owner"}, address),
+      name: json.required(list{"msg", "name"}, string),
+      code: json.required(list{"msg", "code"}, string)->JsBuffer.fromBase64,
+      sender: json.required(list{"msg", "sender"}, address),
     })
   }
 }
@@ -292,31 +292,31 @@ module Request = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      id: json.at(list{"msg", "id"}, ID.Request.decoder),
-      oracleScriptID: json.at(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
-      oracleScriptName: json.at(list{"msg", "name"}, string),
-      calldata: json.at(list{"msg", "calldata"}, bufferWithDefault),
-      askCount: json.at(list{"msg", "ask_count"}, int),
-      minCount: json.at(list{"msg", "min_count"}, int),
-      prepareGas: json.at(list{"msg", "prepare_gas"}, int),
-      executeGas: json.at(list{"msg", "execute_gas"}, int),
-      feeLimit: json.at(list{"msg", "fee_limit"}, list(Coin.decodeCoin)),
-      schema: json.at(list{"msg", "schema"}, string),
-      sender: json.at(list{"msg", "sender"}, address),
+      id: json.required(list{"msg", "id"}, ID.Request.decoder),
+      oracleScriptID: json.required(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
+      oracleScriptName: json.required(list{"msg", "name"}, string),
+      calldata: json.required(list{"msg", "calldata"}, bufferWithDefault),
+      askCount: json.required(list{"msg", "ask_count"}, int),
+      minCount: json.required(list{"msg", "min_count"}, int),
+      prepareGas: json.required(list{"msg", "prepare_gas"}, int),
+      executeGas: json.required(list{"msg", "execute_gas"}, int),
+      feeLimit: json.required(list{"msg", "fee_limit"}, list(Coin.decodeCoin)),
+      schema: json.required(list{"msg", "schema"}, string),
+      sender: json.required(list{"msg", "sender"}, address),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      oracleScriptID: json.at(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
-      calldata: json.at(list{"msg", "calldata"}, bufferWithDefault),
-      askCount: json.at(list{"msg", "ask_count"}, int),
-      minCount: json.at(list{"msg", "min_count"}, int),
-      prepareGas: json.at(list{"msg", "prepare_gas"}, int),
-      executeGas: json.at(list{"msg", "execute_gas"}, int),
-      feeLimit: json.at(list{"msg", "fee_limit"}, list(Coin.decodeCoin)),
-      sender: json.at(list{"msg", "sender"}, address),
+      oracleScriptID: json.required(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
+      calldata: json.required(list{"msg", "calldata"}, bufferWithDefault),
+      askCount: json.required(list{"msg", "ask_count"}, int),
+      minCount: json.required(list{"msg", "min_count"}, int),
+      prepareGas: json.required(list{"msg", "prepare_gas"}, int),
+      executeGas: json.required(list{"msg", "execute_gas"}, int),
+      feeLimit: json.required(list{"msg", "fee_limit"}, list(Coin.decodeCoin)),
+      sender: json.required(list{"msg", "sender"}, address),
     })
   }
 }
@@ -349,10 +349,10 @@ module Report = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      requestID: json.at(list{"msg", "request_id"}, ID.Request.decoder),
-      rawReports: json.at(list{"msg", "raw_reports"}, list(RawDataReport.decode)),
-      validator: json.at(list{"msg", "validator"}, address),
-      reporter: json.at(list{"msg", "reporter"}, address),
+      requestID: json.required(list{"msg", "request_id"}, ID.Request.decoder),
+      rawReports: json.required(list{"msg", "raw_reports"}, list(RawDataReport.decode)),
+      validator: json.required(list{"msg", "validator"}, address),
+      reporter: json.required(list{"msg", "reporter"}, address),
     })
   }
 }
@@ -372,17 +372,17 @@ module AddReporter = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      validator: json.at(list{"msg", "validator"}, address),
-      reporter: json.at(list{"msg", "reporter"}, address),
-      validatorMoniker: json.at(list{"msg", "validator_moniker"}, string),
+      validator: json.required(list{"msg", "validator"}, address),
+      reporter: json.required(list{"msg", "reporter"}, address),
+      validatorMoniker: json.required(list{"msg", "validator_moniker"}, string),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      validator: json.at(list{"msg", "validator"}, address),
-      reporter: json.at(list{"msg", "reporter"}, address),
+      validator: json.required(list{"msg", "validator"}, address),
+      reporter: json.required(list{"msg", "reporter"}, address),
     })
   }
 }
@@ -402,17 +402,17 @@ module RemoveReporter = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      validator: json.at(list{"msg", "validator"}, address),
-      reporter: json.at(list{"msg", "reporter"}, address),
-      validatorMoniker: json.at(list{"msg", "validator_moniker"}, string),
+      validator: json.required(list{"msg", "validator"}, address),
+      reporter: json.required(list{"msg", "reporter"}, address),
+      validatorMoniker: json.required(list{"msg", "validator_moniker"}, string),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      validator: json.at(list{"msg", "validator"}, address),
-      reporter: json.at(list{"msg", "reporter"}, address),
+      validator: json.required(list{"msg", "validator"}, address),
+      reporter: json.required(list{"msg", "reporter"}, address),
     })
   }
 }
@@ -435,21 +435,21 @@ module CreateValidator = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      moniker: json.at(list{"msg", "description", "moniker"}, string),
-      identity: json.at(list{"msg", "description", "identity"}, string),
-      website: json.at(list{"msg", "description", "website"}, string),
-      details: json.at(list{"msg", "description", "details"}, string),
-      commissionRate: json.at(list{"msg", "commission", "rate"}, floatstr),
-      commissionMaxRate: json.at(list{"msg", "commission", "max_rate"}, floatstr),
-      commissionMaxChange: json.at(list{"msg", "commission", "max_change_rate"}, floatstr),
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
-      validatorAddress: json.at(list{"msg", "validator_address"}, address),
-      publicKey: json.at(list{"msg", "pubkey"}, string)->PubKey.fromBech32,
-      minSelfDelegation: json.at(
+      moniker: json.required(list{"msg", "description", "moniker"}, string),
+      identity: json.required(list{"msg", "description", "identity"}, string),
+      website: json.required(list{"msg", "description", "website"}, string),
+      details: json.required(list{"msg", "description", "details"}, string),
+      commissionRate: json.required(list{"msg", "commission", "rate"}, floatstr),
+      commissionMaxRate: json.required(list{"msg", "commission", "max_rate"}, floatstr),
+      commissionMaxChange: json.required(list{"msg", "commission", "max_change_rate"}, floatstr),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.required(list{"msg", "validator_address"}, address),
+      publicKey: json.required(list{"msg", "pubkey"}, string)->PubKey.fromBech32,
+      minSelfDelegation: json.required(
         list{"msg", "min_self_delegation"},
         floatstr,
       )->Coin.newUBANDFromAmount,
-      selfDelegation: json.at(list{"msg", "value"}, Coin.decodeCoin),
+      selfDelegation: json.required(list{"msg", "value"}, Coin.decodeCoin),
     })
   }
 }
@@ -468,13 +468,13 @@ module EditValidator = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      moniker: json.at(list{"msg", "description", "moniker"}, string),
-      identity: json.at(list{"msg", "description", "identity"}, string),
-      website: json.at(list{"msg", "description", "website"}, string),
-      details: json.at(list{"msg", "description", "details"}, string),
-      commissionRate: json.at(list{"msg", "commission_rate"}, option(floatstr)),
-      sender: json.at(list{"msg", "validator_address"}, address),
-      minSelfDelegation: json.at(
+      moniker: json.required(list{"msg", "description", "moniker"}, string),
+      identity: json.required(list{"msg", "description", "identity"}, string),
+      website: json.required(list{"msg", "description", "website"}, string),
+      details: json.required(list{"msg", "description", "details"}, string),
+      commissionRate: json.required(list{"msg", "commission_rate"}, option(floatstr)),
+      sender: json.required(list{"msg", "validator_address"}, address),
+      minSelfDelegation: json.required(
         list{"msg", "min_self_delegation"},
         option(floatstr)->map((. a) => a->(Coin.newUBANDFromAmount->Belt.Option.map)),
       ),
@@ -499,20 +499,20 @@ module Delegate = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
-      validatorAddress: json.at(list{"msg", "validator_address"}, address),
-      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
-      moniker: json.at(list{"msg", "moniker"}, string),
-      identity: json.at(list{"msg", "identity"}, string),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.required(list{"msg", "validator_address"}, address),
+      amount: json.required(list{"msg", "amount"}, Coin.decodeCoin),
+      moniker: json.required(list{"msg", "moniker"}, string),
+      identity: json.required(list{"msg", "identity"}, string),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
-      validatorAddress: json.at(list{"msg", "validator_address"}, address),
-      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.required(list{"msg", "validator_address"}, address),
+      amount: json.required(list{"msg", "amount"}, Coin.decodeCoin),
     })
   }
 }
@@ -534,20 +534,20 @@ module Undelegate = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
-      validatorAddress: json.at(list{"msg", "validator_address"}, address),
-      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
-      moniker: json.at(list{"msg", "moniker"}, string),
-      identity: json.at(list{"msg", "identity"}, string),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.required(list{"msg", "validator_address"}, address),
+      amount: json.required(list{"msg", "amount"}, Coin.decodeCoin),
+      moniker: json.required(list{"msg", "moniker"}, string),
+      identity: json.required(list{"msg", "identity"}, string),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
-      validatorAddress: json.at(list{"msg", "validator_address"}, address),
-      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.required(list{"msg", "validator_address"}, address),
+      amount: json.required(list{"msg", "amount"}, Coin.decodeCoin),
     })
   }
 }
@@ -573,36 +573,36 @@ module Redelegate = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      validatorSourceAddress: json.at(
+      validatorSourceAddress: json.required(
         list{"msg", "validator_src_address"},
         string,
       )->Address.fromBech32,
-      validatorDestinationAddress: json.at(
+      validatorDestinationAddress: json.required(
         list{"msg", "validator_dst_address"},
         string,
       )->Address.fromBech32,
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
-      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
-      monikerSource: json.at(list{"msg", "val_src_moniker"}, string),
-      monikerDestination: json.at(list{"msg", "val_dst_moniker"}, string),
-      identitySource: json.at(list{"msg", "val_src_identity"}, string),
-      identityDestination: json.at(list{"msg", "val_dst_identity"}, string),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
+      amount: json.required(list{"msg", "amount"}, Coin.decodeCoin),
+      monikerSource: json.required(list{"msg", "val_src_moniker"}, string),
+      monikerDestination: json.required(list{"msg", "val_dst_moniker"}, string),
+      identitySource: json.required(list{"msg", "val_src_identity"}, string),
+      identityDestination: json.required(list{"msg", "val_dst_identity"}, string),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      validatorSourceAddress: json.at(
+      validatorSourceAddress: json.required(
         list{"msg", "validator_src_address"},
         string,
       )->Address.fromBech32,
-      validatorDestinationAddress: json.at(
+      validatorDestinationAddress: json.required(
         list{"msg", "validator_dst_address"},
         string,
       )->Address.fromBech32,
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
-      amount: json.at(list{"msg", "amount"}, Coin.decodeCoin),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
+      amount: json.required(list{"msg", "amount"}, Coin.decodeCoin),
     })
   }
 }
@@ -623,19 +623,19 @@ module WithdrawReward = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      validatorAddress: json.at(list{"msg", "validator_address"}, address),
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
-      amount: json.at(list{"msg", "reward_amount"}, string)->GraphQLParser.coins,
-      moniker: json.at(list{"msg", "moniker"}, string),
-      identity: json.at(list{"msg", "identity"}, string),
+      validatorAddress: json.required(list{"msg", "validator_address"}, address),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
+      amount: json.required(list{"msg", "reward_amount"}, string)->GraphQLParser.coins,
+      moniker: json.required(list{"msg", "moniker"}, string),
+      identity: json.required(list{"msg", "identity"}, string),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      validatorAddress: json.at(list{"msg", "validator_address"}, address),
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
+      validatorAddress: json.required(list{"msg", "validator_address"}, address),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
     })
   }
 }
@@ -646,7 +646,7 @@ module Unjail = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      address: json.at(list{"msg", "validator_address"}, address),
+      address: json.required(list{"msg", "validator_address"}, address),
     })
   }
 }
@@ -659,8 +659,8 @@ module SetWithdrawAddress = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      delegatorAddress: json.at(list{"msg", "delegator_address"}, address),
-      withdrawAddress: json.at(list{"msg", "withdraw_address"}, address),
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, address),
+      withdrawAddress: json.required(list{"msg", "withdraw_address"}, address),
     })
   }
 }
@@ -684,21 +684,21 @@ module SubmitProposal = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      proposer: json.at(list{"msg", "proposer"}, address),
-      title: json.at(list{"msg", "content", "title"}, string),
-      description: json.at(list{"msg", "content", "description"}, string),
-      initialDeposit: json.at(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
-      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      proposer: json.required(list{"msg", "proposer"}, address),
+      title: json.required(list{"msg", "content", "title"}, string),
+      description: json.required(list{"msg", "content", "description"}, string),
+      initialDeposit: json.required(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
+      proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      proposer: json.at(list{"msg", "proposer"}, address),
-      title: json.at(list{"msg", "content", "title"}, string),
-      description: json.at(list{"msg", "content", "description"}, string),
-      initialDeposit: json.at(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
+      proposer: json.required(list{"msg", "proposer"}, address),
+      title: json.required(list{"msg", "content", "title"}, string),
+      description: json.required(list{"msg", "content", "description"}, string),
+      initialDeposit: json.required(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
     })
   }
 }
@@ -720,19 +720,19 @@ module Deposit = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      depositor: json.at(list{"msg", "depositor"}, address),
-      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
-      amount: json.at(list{"msg", "amount"}, list(Coin.decodeCoin)),
-      title: json.at(list{"msg", "title"}, string),
+      depositor: json.required(list{"msg", "depositor"}, address),
+      proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      amount: json.required(list{"msg", "amount"}, list(Coin.decodeCoin)),
+      title: json.required(list{"msg", "title"}, string),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      depositor: json.at(list{"msg", "depositor"}, address),
-      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
-      amount: json.at(list{"msg", "amount"}, list(Coin.decodeCoin)),
+      depositor: json.required(list{"msg", "depositor"}, address),
+      proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      amount: json.required(list{"msg", "amount"}, list(Coin.decodeCoin)),
     })
   }
 }
@@ -765,19 +765,19 @@ module Vote = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      voterAddress: json.at(list{"msg", "voter"}, address),
-      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
-      option: json.at(list{"msg", "option"}, int)->parse,
-      title: json.at(list{"msg", "title"}, string),
+      voterAddress: json.required(list{"msg", "voter"}, address),
+      proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      option: json.required(list{"msg", "option"}, int)->parse,
+      title: json.required(list{"msg", "title"}, string),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      voterAddress: json.at(list{"msg", "voter"}, address),
-      proposalID: json.at(list{"msg", "proposal_id"}, ID.Proposal.decoder),
-      option: json.at(list{"msg", "option"}, string),
+      voterAddress: json.required(list{"msg", "voter"}, address),
+      proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      option: json.required(list{"msg", "option"}, string),
     })
   }
 }
@@ -794,17 +794,17 @@ module WithdrawCommission = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      validatorAddress: json.at(list{"msg", "validator_address"}, address),
-      amount: json.at(list{"msg", "commission_amount"}, string)->GraphQLParser.coins,
-      moniker: json.at(list{"msg", "moniker"}, string),
-      identity: json.at(list{"msg", "identity"}, string),
+      validatorAddress: json.required(list{"msg", "validator_address"}, address),
+      amount: json.required(list{"msg", "commission_amount"}, string)->GraphQLParser.coins,
+      moniker: json.required(list{"msg", "moniker"}, string),
+      identity: json.required(list{"msg", "identity"}, string),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      validatorAddress: json.at(list{"msg", "validator_address"}, address),
+      validatorAddress: json.required(list{"msg", "validator_address"}, address),
     })
   }
 }
@@ -828,8 +828,8 @@ module MultiSend = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      inputs: json.at(list{"msg", "inputs"}, list(decodeSendTx)),
-      outputs: json.at(list{"msg", "outputs"}, list(decodeSendTx)),
+      inputs: json.required(list{"msg", "inputs"}, list(decodeSendTx)),
+      outputs: json.required(list{"msg", "outputs"}, list(decodeSendTx)),
     })
   }
 }
@@ -840,7 +840,7 @@ module Activate = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      validatorAddress: json.at(list{"msg", "validator"}, address),
+      validatorAddress: json.required(list{"msg", "validator"}, address),
     })
   }
 }
@@ -850,7 +850,7 @@ module CreateClient = {
 
   let decode = {
     open JsonUtils.Decode
-    buildObject(json => {signer: json.at(list{"msg", "signer"}, address)})
+    buildObject(json => {signer: json.required(list{"msg", "signer"}, address)})
   }
 }
 
@@ -862,8 +862,8 @@ module UpdateClient = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      clientID: json.at(list{"msg", "client_id"}, string),
+      signer: json.required(list{"msg", "signer"}, address),
+      clientID: json.required(list{"msg", "client_id"}, string),
     })
   }
 }
@@ -876,8 +876,8 @@ module UpgradeClient = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      clientID: json.at(list{"msg", "client_id"}, string),
+      signer: json.required(list{"msg", "signer"}, address),
+      clientID: json.required(list{"msg", "client_id"}, string),
     })
   }
 }
@@ -890,8 +890,8 @@ module SubmitClientMisbehaviour = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      clientID: json.at(list{"msg", "client_id"}, string),
+      signer: json.required(list{"msg", "signer"}, address),
+      clientID: json.required(list{"msg", "client_id"}, string),
     })
   }
 }
@@ -937,10 +937,10 @@ module ConnectionOpenInit = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      clientID: json.at(list{"msg", "client_id"}, string),
-      delayPeriod: json.at(list{"msg", "delay_period"}, int),
-      counterparty: json.at(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      clientID: json.required(list{"msg", "client_id"}, string),
+      delayPeriod: json.required(list{"msg", "delay_period"}, int),
+      counterparty: json.required(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
     })
   }
 }
@@ -958,13 +958,13 @@ module ConnectionOpenTry = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      clientID: json.at(list{"msg", "client_id"}, string),
-      previousConnectionID: json.at(list{"msg", "previous_connection_id"}, string),
-      delayPeriod: json.at(list{"msg", "delay_period"}, int),
-      counterparty: json.at(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
-      consensusHeight: json.at(list{"msg", "consensus_height"}, Height.decode),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      clientID: json.required(list{"msg", "client_id"}, string),
+      previousConnectionID: json.required(list{"msg", "previous_connection_id"}, string),
+      delayPeriod: json.required(list{"msg", "delay_period"}, int),
+      counterparty: json.required(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
+      consensusHeight: json.required(list{"msg", "consensus_height"}, Height.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -980,11 +980,11 @@ module ConnectionOpenAck = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      connectionID: json.at(list{"msg", "connection_id"}, string),
-      counterpartyConnectionID: json.at(list{"msg", "counterparty_connection_id"}, string),
-      consensusHeight: json.at(list{"msg", "consensus_height"}, Height.decode),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      connectionID: json.required(list{"msg", "connection_id"}, string),
+      counterpartyConnectionID: json.required(list{"msg", "counterparty_connection_id"}, string),
+      consensusHeight: json.required(list{"msg", "consensus_height"}, Height.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -998,9 +998,9 @@ module ConnectionOpenConfirm = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      connectionID: json.at(list{"msg", "connection_id"}, string),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      connectionID: json.required(list{"msg", "connection_id"}, string),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -1065,9 +1065,9 @@ module ChannelOpenInit = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      portID: json.at(list{"msg", "port_id"}, string),
-      channel: json.at(list{"msg", "channel"}, Channel.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      portID: json.required(list{"msg", "port_id"}, string),
+      channel: json.required(list{"msg", "channel"}, Channel.decode),
     })
   }
 }
@@ -1083,10 +1083,10 @@ module ChannelOpenTry = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      portID: json.at(list{"msg", "port_id"}, string),
-      channel: json.at(list{"msg", "channel"}, Channel.decode),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      portID: json.required(list{"msg", "port_id"}, string),
+      channel: json.required(list{"msg", "channel"}, Channel.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -1102,11 +1102,11 @@ module ChannelOpenAck = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      portID: json.at(list{"msg", "port_id"}, string),
-      channelID: json.at(list{"msg", "channel_id"}, string),
-      counterpartyChannelID: json.at(list{"msg", "counterparty_channel_id"}, string),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      portID: json.required(list{"msg", "port_id"}, string),
+      channelID: json.required(list{"msg", "channel_id"}, string),
+      counterpartyChannelID: json.required(list{"msg", "counterparty_channel_id"}, string),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -1121,10 +1121,10 @@ module ChannelOpenConfirm = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      portID: json.at(list{"msg", "port_id"}, string),
-      channelID: json.at(list{"msg", "channel_id"}, string),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      portID: json.required(list{"msg", "port_id"}, string),
+      channelID: json.required(list{"msg", "channel_id"}, string),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -1139,9 +1139,9 @@ module ChannelCloseInit = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      portID: json.at(list{"msg", "port_id"}, string),
-      channelID: json.at(list{"msg", "channel_id"}, string),
+      signer: json.required(list{"msg", "signer"}, address),
+      portID: json.required(list{"msg", "port_id"}, string),
+      channelID: json.required(list{"msg", "channel_id"}, string),
     })
   }
 }
@@ -1157,10 +1157,10 @@ module ChannelCloseConfirm = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      portID: json.at(list{"msg", "port_id"}, string),
-      channelID: json.at(list{"msg", "channel_id"}, string),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      portID: json.required(list{"msg", "port_id"}, string),
+      channelID: json.required(list{"msg", "channel_id"}, string),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -1180,14 +1180,14 @@ module Packet = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      sequence: json.at(list{"sequence"}, int),
-      sourcePort: json.at(list{"source_port"}, string),
-      sourceChannel: json.at(list{"source_channel"}, string),
-      destinationPort: json.at(list{"destination_port"}, string),
-      destinationChannel: json.at(list{"destination_channel"}, string),
-      timeoutHeight: json.at(list{"timeout_height", "revision_height"}, int),
-      timeoutTimestamp: json.at(list{"timeout_timestamp"}, GraphQLParser.timeNS),
-      data: json.at(list{"data"}, string),
+      sequence: json.required(list{"sequence"}, int),
+      sourcePort: json.required(list{"source_port"}, string),
+      sourceChannel: json.required(list{"source_channel"}, string),
+      destinationPort: json.required(list{"destination_port"}, string),
+      destinationChannel: json.required(list{"destination_channel"}, string),
+      timeoutHeight: json.required(list{"timeout_height", "revision_height"}, int),
+      timeoutTimestamp: json.required(list{"timeout_timestamp"}, GraphQLParser.timeNS),
+      data: json.required(list{"data"}, string),
     })
   }
 }
@@ -1209,19 +1209,19 @@ module RecvPacket = {
   let decodeSuccess = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      packet: json.at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
-      packetData: json.at(list{}, PacketDecoder.decodeAction),
+      signer: json.required(list{"msg", "signer"}, address),
+      packet: json.required(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      packetData: json.required(list{}, PacketDecoder.decodeAction),
     })
   }
 
   let decodeFail = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      packet: json.at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      packet: json.required(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -1236,9 +1236,9 @@ module AcknowledgePacket = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      packet: json.at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      packet: json.required(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -1253,9 +1253,9 @@ module Timeout = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      packet: json.at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      packet: json.required(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -1270,9 +1270,9 @@ module TimeoutOnClose = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      signer: json.at(list{"msg", "signer"}, address),
-      packet: json.at(list{"msg", "packet"}, Packet.decode),
-      proofHeight: json.at(list{"msg", "proof_height"}, Height.decode),
+      signer: json.required(list{"msg", "signer"}, address),
+      packet: json.required(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -1291,13 +1291,13 @@ module Transfer = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      sender: json.at(list{"msg", "sender"}, address),
-      receiver: json.at(list{"msg", "receiver"}, string),
-      sourcePort: json.at(list{"msg", "source_port"}, string),
-      sourceChannel: json.at(list{"msg", "source_channel"}, string),
-      token: json.at(list{"msg", "token"}, Coin.decodeCoin),
-      timeoutHeight: json.at(list{"msg", "timeout_height"}, Height.decode),
-      timeoutTimestamp: json.at(list{"msg", "timeout_timestamp"}, GraphQLParser.timeNS),
+      sender: json.required(list{"msg", "sender"}, address),
+      receiver: json.required(list{"msg", "receiver"}, string),
+      sourcePort: json.required(list{"msg", "source_port"}, string),
+      sourceChannel: json.required(list{"msg", "source_channel"}, string),
+      token: json.required(list{"msg", "token"}, Coin.decodeCoin),
+      timeoutHeight: json.required(list{"msg", "timeout_height"}, Height.decode),
+      timeoutTimestamp: json.required(list{"msg", "timeout_timestamp"}, GraphQLParser.timeNS),
     })
   }
 }

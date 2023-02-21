@@ -1,16 +1,12 @@
 module SendMsg = {
   @react.component
-  let make = (~send: MsgDecoder.Send.t) => {
+  let make = (~send: Msg.Send.t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <Row>
       <Col col=Col.Six mb=24>
         <Heading
-          value="From"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
+          value="From" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
         />
         <AddressRender address=send.fromAddress />
       </Col>

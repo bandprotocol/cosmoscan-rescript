@@ -22,12 +22,20 @@ module Decode = {
 
   let mustDecode = (json, decoder) => json->decode(decoder)->Belt.Result.getExn
 
-  type fd_type = {at: 'a. (list<string>, t<'a>) => 'a}
+  type fd_type = {
+    required: 'a. (list<string>, t<'a>) => 'a,
+    optional: 'a. (list<string>, t<'a>) => option<'a>,
+  }
 
   let buildObject = builder =>
     custom((. json) =>
       builder({
-        at: (keys, decode) => mustDecode(json, at(keys, decode)),
+        required: (keys, decode) => mustDecode(json, at(keys, decode)),
+        optional: (keys, decoder) =>
+          switch json->decode(at(keys, decoder)) {
+          | Ok(decoded) => Some(decoded)
+          | Error(_) => None
+          },
       })
     )
 
@@ -45,12 +53,12 @@ module Decode = {
 // Example how to use
 type t = {
   a: int,
-  b: string,
+  b: option<string>,
 }
 
 let decode_t = Decode.buildObject(access => {
-  a: access.at(list{"a"}, Decode.int),
-  b: access.at(list{"b"}, Decode.string),
+  a: access.required(list{"a"}, Decode.int),
+  b: access.optional(list{"b"}, Decode.string),
 })
 
 // Or decode to value on specific field

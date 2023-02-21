@@ -22,106 +22,106 @@ let renderUnknownMessage = () =>
     </div>
   </Col>
 
-let renderBody = (msg: MsgDecoder.t) =>
+let renderBody = (msg: Msg.t) =>
   switch msg.decoded {
-  | SendMsgSuccess(send)
-  | SendMsgFail(send) =>
-    <IndexTokenMsg.SendMsg send />
-  | DelegateMsgSuccess(delegation) => <IndexTokenMsg.DelegateMsg delegation />
-  | DelegateMsgFail(delegation) => <IndexTokenMsg.DelegateFailMsg delegation />
-  | UndelegateMsgSuccess(undelegation) => <IndexTokenMsg.UndelegateMsg undelegation />
-  | UndelegateMsgFail(undelegation) => <IndexTokenMsg.UndelegateFailMsg undelegation />
-  | RedelegateMsgSuccess(redelegation) => <IndexTokenMsg.RedelegateMsg redelegation />
-  | RedelegateMsgFail(redelegation) => <IndexTokenMsg.RedelegateFailMsg redelegation />
-  | WithdrawRewardMsgSuccess(withdrawal) => <IndexTokenMsg.WithdrawRewardMsg withdrawal />
-  | WithdrawRewardMsgFail(withdrawal) => <IndexTokenMsg.WithdrawRewardFailMsg withdrawal />
-  | WithdrawCommissionMsgSuccess(withdrawal) => <IndexTokenMsg.WithdrawComissionMsg withdrawal />
-  | WithdrawCommissionMsgFail(withdrawal) => <IndexTokenMsg.WithdrawComissionFailMsg withdrawal />
-  | MultiSendMsgSuccess(tx)
-  | MultiSendMsgFail(tx) =>
-    <IndexTokenMsg.MultisendMsg tx />
-  | CreateDataSourceMsgSuccess(dataSource) => <IndexDataMsg.CreateDataSourceMsg dataSource />
-  | CreateDataSourceMsgFail(dataSource) => <IndexDataMsg.CreateDataSourceFailMsg dataSource />
-  | EditDataSourceMsgSuccess(dataSource)
-  | EditDataSourceMsgFail(dataSource) =>
-    <IndexDataMsg.EditDataSourceMsg dataSource />
-  | CreateOracleScriptMsgSuccess(oracleScript) =>
-    <IndexDataMsg.CreateOracleScriptMsg oracleScript />
-  | CreateOracleScriptMsgFail(oracleScript) =>
-    <IndexDataMsg.CreateOracleScriptFailMsg oracleScript />
-  | EditOracleScriptMsgSuccess(oracleScript)
-  | EditOracleScriptMsgFail(oracleScript) =>
-    <IndexDataMsg.EditOracleScriptMsg oracleScript />
-  | RequestMsgSuccess(request) => <IndexDataMsg.RequestMsg request />
-  | RequestMsgFail(request) => <IndexDataMsg.RequestFailMsg request />
-  | ReportMsgSuccess(report)
-  | ReportMsgFail(report) =>
-    <IndexDataMsg.ReportMsg report />
-  | AddReporterMsgSuccess(address) => <IndexValidatorMsg.AddReporterMsg address />
-  | AddReporterMsgFail(address) => <IndexValidatorMsg.AddReporterFailMsg address />
-  | RemoveReporterMsgSuccess(address) => <IndexValidatorMsg.RemoveReporterMsg address />
-  | RemoveReporterMsgFail(address) => <IndexValidatorMsg.RemoveReporterFailMsg address />
-  | CreateValidatorMsgSuccess(validator)
-  | CreateValidatorMsgFail(validator) =>
-    <IndexValidatorMsg.CreateValidatorMsg validator />
-  | EditValidatorMsgSuccess(validator)
-  | EditValidatorMsgFail(validator) =>
-    <IndexValidatorMsg.EditValidatorMsg validator />
-  | UnjailMsgSuccess(unjail)
-  | UnjailMsgFail(unjail) =>
-    <IndexValidatorMsg.UnjailMsg unjail />
-  | SetWithdrawAddressMsgSuccess(set)
-  | SetWithdrawAddressMsgFail(set) =>
-    <IndexValidatorMsg.SetWithdrawAddressMsg set />
-  | SubmitProposalMsgSuccess(proposal) => <IndexProposalMsg.SubmitProposalMsg proposal />
-  | SubmitProposalMsgFail(proposal) => <IndexProposalMsg.SubmitProposalFailMsg proposal />
-  | DepositMsgSuccess(deposit) => <IndexProposalMsg.DepositMsg deposit />
-  | DepositMsgFail(deposit) => <IndexProposalMsg.DepositFailMsg deposit />
-  | VoteMsgSuccess(vote) => <IndexProposalMsg.VoteMsg vote />
-  | VoteMsgFail(vote) => <IndexProposalMsg.VoteFailMsg vote />
-  | ActivateMsgSuccess(activate)
-  | ActivateMsgFail(activate) =>
-    <IndexValidatorMsg.ActivateMsg activate />
-  | UnknownMsg => renderUnknownMessage()
-  // IBC Msg
-  | CreateClientMsg(client) => <IndexIBCClientMsg.CreateClient client />
-  | UpdateClientMsg(client) => <IndexIBCClientMsg.UpdateClient client />
-  | UpgradeClientMsg(client) => <IndexIBCClientMsg.UpgradeClient client />
-  | SubmitClientMisbehaviourMsg(client) => <IndexIBCClientMsg.SubmitClientMisbehaviour client />
-  | ConnectionOpenInitMsg(connection) => <IndexIBCConnectionMsg.ConnectionOpenInit connection />
-  | ConnectionOpenTryMsg(connection) => <IndexIBCConnectionMsg.ConnectionOpenTry connection />
-  | ConnectionOpenAckMsg(connection) => <IndexIBCConnectionMsg.ConnectionOpenAck connection />
-  | ConnectionOpenConfirmMsg(connection) =>
-    <IndexIBCConnectionMsg.ConnectionOpenConfirm connection />
-  | ChannelOpenInitMsg(channel) => <IndexIBCChannelMsg.ChannelOpenInit channel />
-  | ChannelOpenTryMsg(channel) => <IndexIBCChannelMsg.ChannelOpenTry channel />
-  | ChannelOpenAckMsg(channel) => <IndexIBCChannelMsg.ChannelOpenAck channel />
-  | ChannelOpenConfirmMsg(channel) => <IndexIBCChannelMsg.ChannelOpenConfirm channel />
-  | ChannelCloseInitMsg(channel) => <IndexIBCChannelMsg.ChannelCloseInit channel />
-  | ChannelCloseConfirmMsg(channel) => <IndexIBCChannelMsg.ChannelCloseConfirm channel />
-  | AcknowledgePacketMsg(packet) => <IndexIBCPacketMsg.AcknowledgePacket packet />
-  | RecvPacketMsgSuccess(packet) => <IndexIBCPacketMsg.RecvPacketSuccess packet />
-  | RecvPacketMsgFail(packet) => <IndexIBCPacketMsg.RecvPacketFail packet />
-  | TimeoutMsg(packet) => <IndexIBCPacketMsg.Timeout packet />
-  | TimeoutOnCloseMsg(packet) => <IndexIBCPacketMsg.TimeoutOnClose packet />
-  | TransferMsg(msg) => <IndexIBCTransferMsg.Transfer msg />
-  | _ => React.null
+  | SendMsg(send) => <IndexTokenMsg.SendMsg send />
+  | RequestMsg(request) => <IndexOracleMsg.RequestMsg request />
+  | CreateDataSourceMsg(dataSource) => <IndexOracleMsg.CreateDataSourceMsg dataSource />
+  // | DelegateMsgSuccess(delegation) => <IndexTokenMsg.DelegateMsg delegation />
+  // | DelegateMsgFail(delegation) => <IndexTokenMsg.DelegateFailMsg delegation />
+  // | UndelegateMsgSuccess(undelegation) => <IndexTokenMsg.UndelegateMsg undelegation />
+  // | UndelegateMsgFail(undelegation) => <IndexTokenMsg.UndelegateFailMsg undelegation />
+  // | RedelegateMsgSuccess(redelegation) => <IndexTokenMsg.RedelegateMsg redelegation />
+  // | RedelegateMsgFail(redelegation) => <IndexTokenMsg.RedelegateFailMsg redelegation />
+  // | WithdrawRewardMsgSuccess(withdrawal) => <IndexTokenMsg.WithdrawRewardMsg withdrawal />
+  // | WithdrawRewardMsgFail(withdrawal) => <IndexTokenMsg.WithdrawRewardFailMsg withdrawal />
+  // | WithdrawCommissionMsgSuccess(withdrawal) => <IndexTokenMsg.WithdrawComissionMsg withdrawal />
+  // | WithdrawCommissionMsgFail(withdrawal) => <IndexTokenMsg.WithdrawComissionFailMsg withdrawal />
+  // | MultiSendMsgSuccess(tx)
+  // | MultiSendMsgFail(tx) =>
+  //   <IndexTokenMsg.MultisendMsg tx />
+  // | CreateDataSourceMsgSuccess(dataSource) => <IndexDataMsg.CreateDataSourceMsg dataSource />
+  // | CreateDataSourceMsgFail(dataSource) => <IndexDataMsg.CreateDataSourceFailMsg dataSource />
+  // | EditDataSourceMsgSuccess(dataSource)
+  // | EditDataSourceMsgFail(dataSource) =>
+  //   <IndexDataMsg.EditDataSourceMsg dataSource />
+  // | CreateOracleScriptMsgSuccess(oracleScript) =>
+  //   <IndexDataMsg.CreateOracleScriptMsg oracleScript />
+  // | CreateOracleScriptMsgFail(oracleScript) =>
+  //   <IndexDataMsg.CreateOracleScriptFailMsg oracleScript />
+  // | EditOracleScriptMsgSuccess(oracleScript)
+  // | EditOracleScriptMsgFail(oracleScript) =>
+  //   <IndexDataMsg.EditOracleScriptMsg oracleScript />
+  // | RequestMsgSuccess(request) => <IndexDataMsg.RequestMsg request />
+  // | RequestMsgFail(request) => <IndexDataMsg.RequestFailMsg request />
+  // | ReportMsgSuccess(report)
+  // | ReportMsgFail(report) =>
+  //   <IndexDataMsg.ReportMsg report />
+  // | AddReporterMsgSuccess(address) => <IndexValidatorMsg.AddReporterMsg address />
+  // | AddReporterMsgFail(address) => <IndexValidatorMsg.AddReporterFailMsg address />
+  // | RemoveReporterMsgSuccess(address) => <IndexValidatorMsg.RemoveReporterMsg address />
+  // | RemoveReporterMsgFail(address) => <IndexValidatorMsg.RemoveReporterFailMsg address />
+  // | CreateValidatorMsgSuccess(validator)
+  // | CreateValidatorMsgFail(validator) =>
+  //   <IndexValidatorMsg.CreateValidatorMsg validator />
+  // | EditValidatorMsgSuccess(validator)
+  // | EditValidatorMsgFail(validator) =>
+  //   <IndexValidatorMsg.EditValidatorMsg validator />
+  // | UnjailMsgSuccess(unjail)
+  // | UnjailMsgFail(unjail) =>
+  //   <IndexValidatorMsg.UnjailMsg unjail />
+  // | SetWithdrawAddressMsgSuccess(set)
+  // | SetWithdrawAddressMsgFail(set) =>
+  //   <IndexValidatorMsg.SetWithdrawAddressMsg set />
+  // | SubmitProposalMsgSuccess(proposal) => <IndexProposalMsg.SubmitProposalMsg proposal />
+  // | SubmitProposalMsgFail(proposal) => <IndexProposalMsg.SubmitProposalFailMsg proposal />
+  // | DepositMsgSuccess(deposit) => <IndexProposalMsg.DepositMsg deposit />
+  // | DepositMsgFail(deposit) => <IndexProposalMsg.DepositFailMsg deposit />
+  // | VoteMsgSuccess(vote) => <IndexProposalMsg.VoteMsg vote />
+  // | VoteMsgFail(vote) => <IndexProposalMsg.VoteFailMsg vote />
+  // | ActivateMsgSuccess(activate)
+  // | ActivateMsgFail(activate) =>
+  //   <IndexValidatorMsg.ActivateMsg activate />
+  // | UnknownMsg => renderUnknownMessage()
+  // // IBC Msg
+  // | CreateClientMsg(client) => <IndexIBCClientMsg.CreateClient client />
+  // | UpdateClientMsg(client) => <IndexIBCClientMsg.UpdateClient client />
+  // | UpgradeClientMsg(client) => <IndexIBCClientMsg.UpgradeClient client />
+  // | SubmitClientMisbehaviourMsg(client) => <IndexIBCClientMsg.SubmitClientMisbehaviour client />
+  // | ConnectionOpenInitMsg(connection) => <IndexIBCConnectionMsg.ConnectionOpenInit connection />
+  // | ConnectionOpenTryMsg(connection) => <IndexIBCConnectionMsg.ConnectionOpenTry connection />
+  // | ConnectionOpenAckMsg(connection) => <IndexIBCConnectionMsg.ConnectionOpenAck connection />
+  // | ConnectionOpenConfirmMsg(connection) =>
+  //   <IndexIBCConnectionMsg.ConnectionOpenConfirm connection />
+  // | ChannelOpenInitMsg(channel) => <IndexIBCChannelMsg.ChannelOpenInit channel />
+  // | ChannelOpenTryMsg(channel) => <IndexIBCChannelMsg.ChannelOpenTry channel />
+  // | ChannelOpenAckMsg(channel) => <IndexIBCChannelMsg.ChannelOpenAck channel />
+  // | ChannelOpenConfirmMsg(channel) => <IndexIBCChannelMsg.ChannelOpenConfirm channel />
+  // | ChannelCloseInitMsg(channel) => <IndexIBCChannelMsg.ChannelCloseInit channel />
+  // | ChannelCloseConfirmMsg(channel) => <IndexIBCChannelMsg.ChannelCloseConfirm channel />
+  // | AcknowledgePacketMsg(packet) => <IndexIBCPacketMsg.AcknowledgePacket packet />
+  // | RecvPacketMsgSuccess(packet) => <IndexIBCPacketMsg.RecvPacketSuccess packet />
+  // | RecvPacketMsgFail(packet) => <IndexIBCPacketMsg.RecvPacketFail packet />
+  // | TimeoutMsg(packet) => <IndexIBCPacketMsg.Timeout packet />
+  // | TimeoutOnCloseMsg(packet) => <IndexIBCPacketMsg.TimeoutOnClose packet />
+  // | TransferMsg(msg) => <IndexIBCTransferMsg.Transfer msg />
+  | UnknownMsg => React.null
   }
 
 module MsgDetailCard = {
   @react.component
-  let make = (~msg: MsgDecoder.t) => {
+  let make = (~msg: Msg.t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    let badgeTheme = msg->MsgDecoder.getBadgeTheme
+    let badge = msg.decoded->Msg.getBadge
     let (showJson, setShowJson) = React.useState(_ => false)
     let toggle = () => setShowJson(prev => !prev)
 
     <InfoContainer>
       <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
         <div className={CssHelper.flexBox()}>
-          <IndexMsgIcon category=badgeTheme.category />
+          <IndexMsgIcon category=badge.category />
           <HSpacing size=Spacing.sm />
-          <Heading value=badgeTheme.name size=Heading.H4 />
+          <Heading value=badge.name size=Heading.H4 />
         </div>
         <div className=Styles.jsonMode onClick={_ => toggle()}>
           <Text value="JSON Mode" weight=Text.Semibold color=theme.neutral_900 />
@@ -141,12 +141,12 @@ module MsgDetailCard = {
 }
 
 @react.component
-let make = (~messages: list<MsgDecoder.t>) =>
+let make = (~messages: list<Msg.t>) =>
   <div className=Styles.msgContainer>
     {messages
     ->Belt.List.mapWithIndex((index, msg) => {
-      let badgeTheme = msg->MsgDecoder.getBadgeTheme
-      <MsgDetailCard key={index->Belt.Int.toString ++ badgeTheme.name} msg />
+      let badge = msg.decoded->Msg.getBadge
+      <MsgDetailCard key={index->Belt.Int.toString ++ badge.name} msg />
     })
     ->Array.of_list
     ->React.array}

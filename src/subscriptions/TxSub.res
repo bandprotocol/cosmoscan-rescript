@@ -10,7 +10,7 @@ type t = {
   gasUsed: int,
   sender: Address.t,
   timestamp: MomentRe.Moment.t,
-  messages: list<MsgDecoder.t>,
+  messages: list<Msg.t>,
   memo: string,
   errMsg: string,
 }
@@ -68,7 +68,7 @@ let toExternal = ({
   timestamp: block.timestamp,
   messages: {
     let msg = messages->Js.Json.decodeArray->Belt.Option.getExn->Belt.List.fromArray
-    msg->Belt.List.map(success ? MsgDecoder.decodeAction : MsgDecoder.decodeFailAction)
+    msg->Belt.List.map(Msg.decodeMsg)
   },
   errMsg: errMsg->Belt.Option.getWithDefault(""),
 }
@@ -217,7 +217,7 @@ let getListBySender = (sender, ~page, ~pageSize) => {
   })
 }
 
-let getListByBlockHeight = (height) => {
+let getListByBlockHeight = height => {
   let result = MultiByHeightConfig.use({height: height->ID.Block.toInt})
 
   result->Sub.fromData->Sub.map(({transactions}) => transactions->Belt.Array.map(toExternal))
