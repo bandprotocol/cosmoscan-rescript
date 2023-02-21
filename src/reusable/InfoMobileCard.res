@@ -72,7 +72,7 @@ let make = (~info) => {
     </div>
   | Height(height) =>
     <div className=Styles.vFlex>
-      <TypeID.Block id=height position=TypeID.MobileCard />
+      <TypeID.Block id=height size=Text.Xl position=TypeID.MobileCard />
     </div>
   | Coin({value, hasDenom}) =>
     <AmountRender coins=value pos={hasDenom ? AmountRender.TxIndex : Fee} />
@@ -83,8 +83,8 @@ let make = (~info) => {
       <HSpacing size=Spacing.sm />
       <Text value=name ellipsis=true />
     </div>
-  | OracleScript(id, name) => <TypeID.OracleScript id position=TypeID.MobileCard details=name/>
-  | RequestID(id) => <TypeID.Request id position=TypeID.MobileCard/>
+  | OracleScript(id, name) => <TypeID.OracleScript id size=Text.Xl position=TypeID.MobileCard details=name/>
+  | RequestID(id) => <TypeID.Request id size=Text.Xl position=TypeID.MobileCard/>
   | RequestResponse({requestCount, responseTime: responseTimeOpt}) =>
     <div className={CssHelper.flexBox()}>
       <Text value={requestCount->Format.iPretty} block=true ellipsis=true />
@@ -97,7 +97,7 @@ let make = (~info) => {
         block=true
       />
     </div>
-  | RequestStatus(resolveStatus, text) => <RequestStatus resolveStatus text />
+  | RequestStatus(resolveStatus, text) => <RequestStatus resolveStatus text size=Text.Xl />
   | ProgressBar({reportedValidators, minimumValidators, requestValidators}) =>
     <ProgressBar reportedValidators minimumValidators requestValidators />
   | Float(value, digits) => <Text value={value->Format.fPretty(~digits?)} />
@@ -137,7 +137,7 @@ let make = (~info) => {
   | Validator(address, moniker, identity) =>
     <ValidatorMonikerLink validatorAddress=address moniker size=Text.Body2 identity width={#px(230)} />
   | PubKey(publicKey) => <PubKeyRender alignLeft=true pubKey=publicKey display=#block />
-  | TxHash(txHash, width) => <TxLink txHash width size=Text.Body1 />
+  | TxHash(txHash, width) => <TxLink txHash width size=Text.Xl />
   | BlockHash(hash) =>
     <Text
       value={hash->Hash.toHex(~upper=true)}

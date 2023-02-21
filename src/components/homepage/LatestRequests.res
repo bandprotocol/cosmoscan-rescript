@@ -19,11 +19,11 @@ module Styles = {
 module RenderBody = {
   @react.component
   let make = (~requestSub: Sub.variant<RequestSub.t>) => {
-    <TBody paddingV=#px(18)>
+    <TBody paddingV=#px(16)>
       <Row alignItems=Row.Center>
         <Col col=Col.Three>
           {switch (requestSub) {
-           | Data({id}) => <TypeID.Request id />
+           | Data({id}) => <TypeID.Request size=Text.Body1 id />
            | _ => <LoadingCensorBar width=60 height=15 />
            }}
         </Col>
@@ -31,7 +31,7 @@ module RenderBody = {
           {switch (requestSub) {
            | Data({oracleScript: {oracleScriptID, name}}) =>
              <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
-               <TypeID.OracleScript id=oracleScriptID details=name />
+               <TypeID.OracleScript id=oracleScriptID details=name size=Text.Body1 />
              </div>
            | _ => <LoadingCensorBar width=150 height=15 />
            }}
@@ -44,7 +44,7 @@ module RenderBody = {
                let requestedCount = requestedValidators->Array.length;
 
                <div className={CssHelper.flexBox()}>
-                 <Text value=j`$reportedCount of $requestedCount` />
+                 <Text value=j`$reportedCount of $requestedCount` size=Text.Body1  />
                  <HSpacing size=#px(16) />
                  <RequestStatus resolveStatus />
                </div>;

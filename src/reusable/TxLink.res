@@ -16,7 +16,7 @@ let make = (~txHash: Hash.t, ~width: int, ~size=Text.Body2, ~weight=Text.Medium)
   <Link className={Styles.withWidth(width, theme)} route={Route.TxIndexPage(txHash)}>
     <Text
       block=true
-      code=true
+      mono=true
       spacing={Text.Em(0.02)}
       value={txHash->Hash.toHex(~upper=true)}
       weight

@@ -3,23 +3,23 @@ module Styles = {
 
   let statusImg = style(. [width(#px(20)), marginTop(#px(-3))]);
   let textMRight = style(. [marginRight(#px(6))]);
-  let headingContainer = style(. [marginBottom(#px(16))]);
+  let headingContainer = style(. [marginTop(#px(40)), marginBottom(#px(16))]);
 };
 
 module RenderBody = {
   @react.component
   let make = (~txSub: Sub.variant<TxSub.t>) => {
-    <TBody paddingV=#px(17)>
+    <TBody paddingV=#px(16)>
       <Row alignItems=Row.Center>
         <Col col=Col.Four>
           {switch (txSub) {
-           | Data({txHash}) => <TxLink txHash width=110 weight=Text.Regular />
+           | Data({txHash}) => <TxLink txHash width=110 size=Text.Body1 weight=Text.Regular />
            | _ => <LoadingCensorBar width=60 height=15 />
            }}
         </Col>
         <Col col=Col.Three>
           {switch (txSub) {
-           | Data({blockHeight}) => <TypeID.Block id=blockHeight />
+           | Data({blockHeight}) => <TypeID.Block id=blockHeight size=Text.Body1 />
            | _ => <LoadingCensorBar width=50 height=15 />
            }}
         </Col>

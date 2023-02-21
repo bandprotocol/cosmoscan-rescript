@@ -51,7 +51,7 @@ module Styles = {
 
 module ComponentCreator = (RawID: ID.IDSig) => {
   @react.component
-  let make = (~id, ~position=Text, ~primary=false, ~weight=Text.Regular, ~details="") => {
+  let make = (~id, ~position=Text, ~size=?, ~primary=false, ~weight=Text.Regular, ~details="") => {
     let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
 
     <Link
@@ -60,7 +60,10 @@ module ComponentCreator = (RawID: ID.IDSig) => {
       <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
         <Text
           value={id -> RawID.toString}
-          size={position -> fontSize}
+          size={switch size {
+            | Some(s) => s
+            | None => position -> fontSize
+          }}
           weight
           height={position -> lineHeight}
           nowrap=true
@@ -71,7 +74,16 @@ module ComponentCreator = (RawID: ID.IDSig) => {
         {
           details != "" ? <>
             <HSpacing size=Spacing.sm />
-            <Text value=details ellipsis=true />
+            <Text 
+              value=details
+              size={switch size {
+                | Some(s) => s
+                | None => position -> fontSize
+              }}
+              weight=Text.Regular
+              color=theme.neutral_900
+              ellipsis=true 
+            />
           </> : React.null
         }
       </div>

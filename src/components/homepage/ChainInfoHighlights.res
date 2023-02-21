@@ -437,7 +437,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                   <div className=Styles.pb>
                     <Text value="BAND Bonded" size=Text.Body1 weight=Text.Regular />
                   </div>
-                  <div className=CssHelper.flexBox()>
+                  <div className=CssHelper.flexBox(~align=#flexEnd, ())>
                     <div className=Styles.mr2>
                       <Text 
                         value={
