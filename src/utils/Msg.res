@@ -1,6 +1,3 @@
-// for handling the empty value
-let getDefaultValue = value => value->Belt.Option.getWithDefault("")
-
 module Send = {
   type t = {
     fromAddress: Address.t,
@@ -20,12 +17,14 @@ module Send = {
 
 module CreateDataSource = {
   type t = {
+    // User message fields
     owner: Address.t,
     name: string,
     executable: JsBuffer.t,
     treasury: Address.t,
     fee: list<Coin.t>,
     sender: Address.t,
+    // Success only fields
     id: option<ID.DataSource.t>,
   }
 
@@ -45,6 +44,7 @@ module CreateDataSource = {
 
 module Request = {
   type t = {
+    // User message fields
     oracleScriptID: ID.OracleScript.t,
     calldata: JsBuffer.t,
     askCount: int,
@@ -53,6 +53,7 @@ module Request = {
     executeGas: int,
     feeLimit: list<Coin.t>,
     sender: Address.t,
+    // Success only fields
     id: option<ID.Request.t>,
     oracleScriptName: option<string>,
     schema: option<string>,
@@ -134,15 +135,8 @@ let decodeMsg = json => {
       }
 
     | "/oracle.v1.MsgRequestData" => {
-        Js.log("DDDDDD")
-        let op = json->decode(Request.decode)
-        switch op {
-        | Ok(msg) => (RequestMsg(msg), msg.sender)
-        | Error(err) => {
-            Js.log(err)
-            (UnknownMsg, Address.Address(""))
-          }
-        }
+        let msg = json->mustDecode(Request.decode)
+        (RequestMsg(msg), msg.sender)
       }
 
     | _ => (UnknownMsg, Address.Address(""))
