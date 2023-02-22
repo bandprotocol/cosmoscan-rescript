@@ -90,14 +90,6 @@ type t = {
   isIBC: bool,
 }
 
-let isIBC = msg =>
-  switch msg {
-  | SendMsg(_)
-  | CreateDataSourceMsg(_)
-  | RequestMsg(_)
-  | UnknownMsg => false
-  }
-
 type msg_cat_t =
   | TokenMsg
   | ValidatorMsg
@@ -121,26 +113,26 @@ let getBadge = msg => {
 }
 
 let decodeMsg = json => {
-  let (decoded, sender) = {
+  let (decoded, sender, isIBC) = {
     open JsonUtils.Decode
     switch json->mustGet("type", string) {
     | "/cosmos.bank.v1beta1.MsgSend" => {
         let msg = json->mustDecode(Send.decode)
-        (SendMsg(msg), msg.fromAddress)
+        (SendMsg(msg), msg.fromAddress, false)
       }
 
     | "/oracle.v1.MsgCreateDataSource" => {
         let msg = json->mustDecode(CreateDataSource.decode)
-        (CreateDataSourceMsg(msg), msg.sender)
+        (CreateDataSourceMsg(msg), msg.sender, false)
       }
 
     | "/oracle.v1.MsgRequestData" => {
         let msg = json->mustDecode(Request.decode)
-        (RequestMsg(msg), msg.sender)
+        (RequestMsg(msg), msg.sender, false)
       }
 
-    | _ => (UnknownMsg, Address.Address(""))
+    | _ => (UnknownMsg, Address.Address(""), false)
     }
   }
-  {raw: json, decoded, sender, isIBC: decoded->isIBC}
+  {raw: json, decoded, sender, isIBC}
 }
