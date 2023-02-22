@@ -13,12 +13,8 @@ module CreateDataSourceMsg = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      {id->Belt.Option.mapWithDefault(React.null, i => {
-        <React.Fragment>
-          <TypeID.DataSource id=i />
-          <Text value=name nowrap=true block=true ellipsis=true />
-        </React.Fragment>
-      })}
+      <TypeID.DataSource id />
+      <Text value=name nowrap=true block=true ellipsis=true />
     </div>
 }
 

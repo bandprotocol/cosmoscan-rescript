@@ -1,6 +1,6 @@
-module CreateDataSourceMsg = {
+module RenderCreateDataSourceMsgSuccess = {
   @react.component
-  let make = (~dataSource: Msg.CreateDataSource.t) => {
+  let make = (~dataSource: Msg.CreateDataSource.t_success) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <Row>
       <Col col=Col.Six mb=24>
@@ -18,13 +18,11 @@ module CreateDataSourceMsg = {
           value="Name" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
         />
         <div className={CssHelper.flexBox()}>
-          {dataSource.id->Belt.Option.mapWithDefault(React.null, id => {
-            <React.Fragment>
-              <TypeID.DataSource position=TypeID.Subtitle id />
-              <HSpacing size=Spacing.sm />
-            </React.Fragment>
-          })}
-          <Text value=dataSource.name size=Text.Body1 />
+          <React.Fragment>
+            <TypeID.DataSource position=TypeID.Subtitle id=dataSource.id />
+            <HSpacing size=Spacing.sm />
+          </React.Fragment>
+          <Text value={dataSource.name} size=Text.Body1 />
         </div>
       </Col>
       <Col col=Col.Six mbSm=24>
@@ -44,6 +42,59 @@ module CreateDataSourceMsg = {
         <AmountRender coins=dataSource.fee />
       </Col>
     </Row>
+  }
+}
+
+module RenderCreateDataSourceMsgFailure = {
+  @react.component
+  let make = (~dataSource: Msg.CreateDataSource.t_base) => {
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    <Row>
+      <Col col=Col.Six mb=24>
+        <Heading
+          value="Owner"
+          size=Heading.H4
+          weight=Heading.Regular
+          marginBottom=8
+          color=theme.neutral_600
+        />
+        <AddressRender position=AddressRender.Subtitle address=dataSource.owner />
+      </Col>
+      <Col col=Col.Six mb=24>
+        <Heading
+          value="Name" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
+        />
+        <div className={CssHelper.flexBox()}>
+          <Text value="-" size=Text.Body1 />
+        </div>
+      </Col>
+      <Col col=Col.Six mbSm=24>
+        <Heading
+          value="Treasury"
+          size=Heading.H4
+          weight=Heading.Regular
+          marginBottom=8
+          color=theme.neutral_600
+        />
+        <AddressRender position=AddressRender.Subtitle address=dataSource.treasury />
+      </Col>
+      <Col col=Col.Six>
+        <Heading
+          value="Fee" size=Heading.H4 weight=Heading.Regular marginBottom=8 color=theme.neutral_600
+        />
+        <AmountRender coins=dataSource.fee />
+      </Col>
+    </Row>
+  }
+}
+module CreateDataSourceMsg = {
+  open Msg
+  @react.component
+  let make = (~dataSource: CreateDataSource.msg_t) => {
+    switch dataSource {
+    | CreateDataSource.Success(dataSource) => <RenderCreateDataSourceMsgSuccess dataSource />
+    | CreateDataSource.Failure(_) => <Text value="fail" />
+    }
   }
 }
 

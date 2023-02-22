@@ -1,3 +1,5 @@
+// let decodeUnit =
+
 module Send = {
   type t = {
     fromAddress: Address.t,
@@ -16,30 +18,41 @@ module Send = {
 }
 
 module CreateDataSource = {
-  type t = {
-    // User message fields
+  type t<'a> = {
     owner: Address.t,
     name: string,
     executable: JsBuffer.t,
     treasury: Address.t,
     fee: list<Coin.t>,
     sender: Address.t,
-    // Success only fields
-    id: option<ID.DataSource.t>,
+    id: 'a,
   }
 
-  let decode = {
+  type t_base = t<unit>
+  type t_success = t<ID.DataSource.t>
+
+  type msg_t =
+    | Success(t_success)
+    | Failure(t_base)
+
+  let decode = idDecoder => {
     open JsonUtils.Decode
     buildObject(json => {
       owner: json.required(list{"msg", "owner"}, address),
       name: json.required(list{"msg", "name"}, string),
-      executable: json.required(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
+      executable: json.required(list{"msg", "executable"}, bufferWithDefault),
       treasury: json.required(list{"msg", "treasury"}, address),
       fee: json.required(list{"msg", "fee"}, list(Coin.decodeCoin)),
       sender: json.required(list{"msg", "sender"}, address),
-      id: json.required(list{"msg", "id"}, option(ID.DataSource.decoder)),
+      // id: idDecoder,
+      id: json->idDecoder,
     })
   }
+  let decodeBase: JsonUtils.Decode.t<t_base> = decode(_ => ())
+  let decodeSuccess: JsonUtils.Decode.t<t_success> = decode(json =>
+    json.required(list{"msg", "id"}, ID.DataSource.decoder)
+  )
+  // let decodeSuccess = decode((list{"msg", "id"}, ID.DataSource.decoder))
 }
 
 module Request = {
@@ -79,7 +92,7 @@ module Request = {
 
 type msg_t =
   | SendMsg(Send.t)
-  | CreateDataSourceMsg(CreateDataSource.t)
+  | CreateDataSourceMsg(CreateDataSource.msg_t)
   | RequestMsg(Request.t)
   | UnknownMsg
 
@@ -112,7 +125,7 @@ let getBadge = msg => {
   }
 }
 
-let decodeMsg = json => {
+let decodeMsg = (json, isSuccess) => {
   let (decoded, sender, isIBC) = {
     open JsonUtils.Decode
     switch json->mustGet("type", string) {
@@ -121,10 +134,36 @@ let decodeMsg = json => {
         (SendMsg(msg), msg.fromAddress, false)
       }
 
-    | "/oracle.v1.MsgCreateDataSource" => {
-        let msg = json->mustDecode(CreateDataSource.decode)
-        (CreateDataSourceMsg(msg), msg.sender, false)
+    | "/oracle.v1.MsgCreateDataSource" =>
+      // let createSuccess = json => {
+      //   let msg = json->mustDecode(CreateDataSource.decodeSuccess)
+      //   (CreateDataSourceMsg(Success(msg)), msg.sender, false)
+      // }
+      // let createFail = json => {
+      //   let msg = json->mustDecode(CreateDataSource.decodeBase)
+      //   (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
+      // }
+
+      switch isSuccess {
+      | true => {
+          let msg = json->mustDecode(CreateDataSource.decodeSuccess)
+          (CreateDataSourceMsg(Success(msg)), msg.sender, false)
+        }
+
+      | false => {
+          let msg = json->mustDecode(CreateDataSource.decodeBase)
+          (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
+        }
       }
+    // isSuccess
+    //   ? {
+    //       let msg = json->mustDecode(CreateDataSource.decodeSuccess)
+    //       (CreateDataSourceMsg(Success(msg)), msg.sender, false)
+    //     }
+    //   : {
+    //       let msg = json->mustDecode(CreateDataSource.decodeBase)
+    //       (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
+    //     }
 
     | "/oracle.v1.MsgRequestData" => {
         let msg = json->mustDecode(Request.decode)

@@ -68,7 +68,7 @@ let toExternal = ({
   timestamp: block.timestamp,
   messages: {
     let msg = messages->Js.Json.decodeArray->Belt.Option.getExn->Belt.List.fromArray
-    msg->Belt.List.map(Msg.decodeMsg)
+    msg->Belt.List.map(each => Msg.decodeMsg(each, success))
   },
   errMsg: errMsg->Belt.Option.getWithDefault(""),
 }
