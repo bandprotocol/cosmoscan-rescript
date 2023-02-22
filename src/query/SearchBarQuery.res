@@ -57,6 +57,15 @@ module DataSourceSearchConfig = %graphql(`
 
 `)
 
+module DataSourceSearchSingleConfig = %graphql(`
+  query DataSourceSearchSingle( $id: Int!) {
+    data_sources_by_pk(id: $id) @ppxAs(type: "DataSourceSearch.t") {
+      id @ppxCustom(module: "GraphQLParserModule.DataSourceID")
+      name
+    }
+  }
+`)
+
 module ProposalSearch = {
   type t = {
     id: ID.Proposal.t,
@@ -277,6 +286,20 @@ let getValidatorMoniker = (~address, ()) => {
   ->Query.map(({validators_by_pk}) => {
     switch validators_by_pk {
     | Some(validator) => Query.resolve(validator)
+    | None => Query.NoData
+    }
+  })
+}
+
+let getDataSourceName = (~id, ()) => {
+  let result = DataSourceSearchSingleConfig.use({
+    id: id,
+  })
+  result
+  ->Query.fromData
+  ->Query.map(({data_sources_by_pk}) => {
+    switch data_sources_by_pk {
+    | Some(dataSource) => Query.resolve(dataSource)
     | None => Query.NoData
     }
   })

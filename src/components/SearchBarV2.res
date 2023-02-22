@@ -15,7 +15,7 @@ module Styles = {
       fontSize(#px(14)),
       color(theme.neutral_900),
       transition("all", ~duration=200, ~timingFunction=#easeInOut, ~delay=0),
-      hover([border(#px(1), #solid, hex("9096A2"))]), //TODO: neutral_500
+      hover([border(#px(1), #solid, theme.neutral_500)]),
       focus([border(#px(1), #solid, theme.primary_600)]),
       outlineStyle(#none),
       background(theme.neutral_000),
@@ -75,16 +75,15 @@ module Styles = {
       ],
     ),
   ])
-  let resultHeading = style(. [
-    padding2(~v=#px(16), ~h=#px(16)),
-    borderTop(#px(1), solid, hex("E5E7EB")),
-  ])
+  let resultHeading = (theme: Theme.t) =>
+    style(. [padding2(~v=#px(16), ~h=#px(16)), borderTop(#px(1), solid, theme.neutral_200)])
   let resultItem = style(. [padding2(~v=#px(0), ~h=#zero)])
 
-  let resultContent = style(. [
-    selector("ul > li", [marginTop(#px(0))]),
-    selector("ul > li:first-child", [borderTop(#zero, solid, hex("E5E7EB"))]),
-  ])
+  let resultContent = (theme: Theme.t) =>
+    style(. [
+      selector("ul > li", [marginTop(#px(0))]),
+      selector("ul > li:first-child", [borderTop(#zero, solid, theme.neutral_200)]),
+    ])
 
   let resultItemFocused = style(. [
     backgroundColor(Css.rgba(16, 18, 20, #num(0.05))),
@@ -209,12 +208,11 @@ module RenderNotFound = {
 module RenderDataSourceWithNameLink = {
   @react.component
   let make = (~id) => {
-    let datasourceName = SearchBarQuery.searchDataSource(~filter=id, ())
-    switch datasourceName {
-    | Data(data) =>
-      let result = data->Belt.Array.get(0)
-      switch result {
-      | Some({id, name}) =>
+    let dataSource = SearchBarQuery.getDataSourceName(~id, ())
+    switch dataSource {
+    | Data(dataInner) =>
+      switch dataInner {
+      | Data({id, name}) =>
         <TypeID.DataSourceLink id={id}>
           <div className={Css.merge(list{CssHelper.flexBox()})}>
             <TypeID.DataSource id={id} position=TypeID.Subtitle />
@@ -222,9 +220,9 @@ module RenderDataSourceWithNameLink = {
             <Heading size=Heading.H4 value=name weight=Heading.Thin />
           </div>
         </TypeID.DataSourceLink>
-      | _ => <RenderNotFound searchTerm={id} />
+      | _ => React.null
       }
-
+    | NoData => <RenderNotFound searchTerm={id} />
     | _ => <LoadingCensorBar width=100 height=20 />
     }
   }
@@ -274,14 +272,14 @@ module RenderSearchResult = {
 
     <div className={Styles.resultInner(theme)}>
       <ul>
-        <div className={Styles.resultContent}>
+        <div className={Styles.resultContent((theme: Theme.t))}>
           {
             let route = Route.search(trimSearchTerm)
             open Route
             switch route {
             | BlockDetailsPage(id) =>
               <>
-                <li className={Styles.resultHeading}>
+                <li className={Styles.resultHeading(theme)}>
                   <Heading
                     size=Heading.H4
                     value="Block"
@@ -298,7 +296,7 @@ module RenderSearchResult = {
               </>
             | RequestIndexPage(id) =>
               <>
-                <li className={Styles.resultHeading}>
+                <li className={Styles.resultHeading(theme)}>
                   <Heading
                     size=Heading.H4
                     value="Requests"
@@ -318,7 +316,7 @@ module RenderSearchResult = {
 
             | DataSourceDetailsPage(id, _) =>
               <>
-                <li className={Styles.resultHeading}>
+                <li className={Styles.resultHeading(theme)}>
                   <Heading
                     size=Heading.H4
                     value="Data Sources"
@@ -329,14 +327,14 @@ module RenderSearchResult = {
                 </li>
                 <li className={Styles.resultItem}>
                   <div className={Styles.innerResultItem}>
-                    <RenderDataSourceWithNameLink id={id->Belt.Int.toString} />
+                    <RenderDataSourceWithNameLink id={id} />
                   </div>
                 </li>
               </>
 
             | OracleScriptDetailsPage(id, _) =>
               <>
-                <li className={Styles.resultHeading}>
+                <li className={Styles.resultHeading(theme)}>
                   <Heading
                     size=Heading.H4
                     value="Oracle Scripts"
@@ -356,7 +354,7 @@ module RenderSearchResult = {
               switch trimSearchTerm->Address.fromBech32Opt {
               | Some(address) =>
                 <>
-                  <li className={Styles.resultHeading}>
+                  <li className={Styles.resultHeading(theme)}>
                     <Heading
                       size=Heading.H4
                       value="Address"
@@ -377,7 +375,7 @@ module RenderSearchResult = {
               switch trimSearchTerm->Address.fromBech32Opt {
               | Some(address) =>
                 <>
-                  <li className={Styles.resultHeading}>
+                  <li className={Styles.resultHeading(theme)}>
                     <Heading
                       size=Heading.H4
                       value="Address"
@@ -396,7 +394,7 @@ module RenderSearchResult = {
               }
             | TxIndexPage(_) =>
               <>
-                <li className={Styles.resultHeading}>
+                <li className={Styles.resultHeading(theme)}>
                   <Heading
                     size=Heading.H4
                     value="Transaction"
@@ -421,7 +419,7 @@ module RenderSearchResult = {
                   | 0 => React.null
                   | _ =>
                     <>
-                      <li className={Styles.resultHeading}>
+                      <li className={Styles.resultHeading(theme)}>
                         <Heading
                           size=Heading.H4
                           value="Blocks"
@@ -445,7 +443,7 @@ module RenderSearchResult = {
                   | 0 => React.null
                   | _ =>
                     <>
-                      <li className={Styles.resultHeading}>
+                      <li className={Styles.resultHeading(theme)}>
                         <Heading
                           size=Heading.H4
                           value="Requests"
@@ -469,7 +467,7 @@ module RenderSearchResult = {
                   | 0 => React.null
                   | _ =>
                     <>
-                      <li className={Styles.resultHeading}>
+                      <li className={Styles.resultHeading(theme)}>
                         <Heading
                           size=Heading.H4
                           value="Oracle Scripts"
@@ -499,7 +497,7 @@ module RenderSearchResult = {
                   | 0 => React.null
                   | _ =>
                     <>
-                      <li className={Styles.resultHeading}>
+                      <li className={Styles.resultHeading(theme)}>
                         <Heading
                           size=Heading.H4
                           value="Data Sources"
@@ -529,7 +527,7 @@ module RenderSearchResult = {
                   | 0 => React.null
                   | _ =>
                     <>
-                      <li className={Styles.resultHeading}>
+                      <li className={Styles.resultHeading(theme)}>
                         <Heading
                           size=Heading.H4
                           value="Proposals"
