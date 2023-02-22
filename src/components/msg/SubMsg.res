@@ -60,12 +60,9 @@ let make = (~msg: Msg.t) => {
     <MsgFront name=badge.name fromAddress={msg.sender} />
     {switch msg.decoded {
     | SendMsg({toAddress, amount}) => <TokenMsg.SendMsg toAddress amount />
-    | CreateDataSourceMsg(msg) => {
-        open Msg.CreateDataSource
-        switch msg {
-        | Success({id, name}) => <OracleMsg.CreateDataSourceMsg id name />
-        | _ => React.null
-        }
+    | CreateDataSourceMsg(msg) => switch msg {
+      | Msg.CreateDataSource.Success(m) => <OracleMsg.CreateDataSourceMsg.Success msg=m />
+      | Msg.CreateDataSource.Failure(f) => <OracleMsg.CreateDataSourceMsg.Failure msg=f />
       }
 
     | RequestMsg({id, oracleScriptID, oracleScriptName}) =>

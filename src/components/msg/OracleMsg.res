@@ -5,18 +5,57 @@ module Styles = {
 }
 
 module CreateDataSourceMsg = {
-  @react.component
-  let make = (~id, ~name) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
-      <TypeID.DataSource id />
-      <Text value=name nowrap=true block=true ellipsis=true />
-    </div>
+  module Outer = {
+    @react.component
+    let make = (~msg: Msg.CreateDataSource.t<'a>, ~children) =>
+      <div
+        className={CssJs.merge(. [
+          CssHelper.flexBox(~wrap=#nowrap, ()),
+          CssHelper.overflowHidden,
+          Styles.msgContainer,
+        ])}>
+        children
+        <Text value={msg.name} nowrap=true block=true ellipsis=true />
+      </div>
+  }
+  module Success = {
+    @react.component
+    let make = (~msg) =>
+      <Outer msg>
+        <TypeID.DataSource id=msg.id />
+      </Outer>
+  }
+
+  module Failure = {
+    @react.component
+    let make = (~msg) =>
+      <Outer msg>
+        <div />
+      </Outer>
+  }
 }
+
+// module CreateDataSourceMsg = {
+//   // @react.component
+//   let factory = (~msg: Msg.CreateDataSource.t<'a>, ~renderID) =>
+//     <div
+//       className={CssJs.merge(. [
+//         CssHelper.flexBox(~wrap=#nowrap, ()),
+//         CssHelper.overflowHidden,
+//         Styles.msgContainer,
+//       ])}>
+//       {renderID}
+//       <Text value=msg.name nowrap=true block=true ellipsis=true />
+//     </div>
+
+//   module ID = {
+//     @react.component
+//     let make = (~id) => <TypeID.DataSource id />
+//   }
+
+//   @react.component
+//   let make = (~msg) => factory(~msg, <ID id=msg.id />)
+// }
 
 module EditDataSourceMsg = {
   @react.component
