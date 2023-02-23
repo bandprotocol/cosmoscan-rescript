@@ -4,7 +4,11 @@ let make = () => {
   // will remove later
   // let requestsByTxHash = RequestSub.Mini.getListByTxHash("45b9e63e8c5fab1085d1361a6f723c04ba40f2be770968012685f35d8292a49b" -> Hash.fromHex);
   // let requestsByDs = RequestSub.Mini.getListByDataSource(1 -> ID.DataSource.fromInt, ~page=1, ~pageSize=5);
-
+  let (_, dispatchModal) = React.useContext(ModalContext.context);
+  React.useEffect0(_ => {
+    Syncing->OpenModal->dispatchModal
+    None
+  })
   <Section>
     <div className=CssHelper.container id="proposalsSection">
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>

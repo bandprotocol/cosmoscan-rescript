@@ -114,7 +114,7 @@ let make = () => {
         | SubmitTx(_) => "SubmitTx"->React.string
         | QRCode(_) => "QRCode"->React.string
         | IBCPacketError(_) => "Connect"->React.string
-        | Syncing => "Sync"->React.string
+        | Syncing => <SyncingModal />
         }}
       </div>
     </div>
