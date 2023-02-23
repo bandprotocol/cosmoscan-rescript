@@ -33,44 +33,46 @@ let make = (~blockSub: Sub.variant<BlockSub.t>) => {
   let setTab = index => setTabIndex(_ => index)
 
   switch (blockSub) {
-  | Data({requests}) when requests->Belt.Array.length !== 0 =>
-    let onChainRequests =
+  | Data({requests}) => requests->Belt.Array.length !== 0 ?
+    {
+      let onChainRequests =
       requests->Belt.Array.keepMap(({id, isIBC}) => !isIBC ? Some(id) : None)
-    let ibcRequests = requests->Belt.Array.keepMap(({id, isIBC}) => isIBC ? Some(id) : None)
-    let onChain = onChainRequests->Belt.Array.length
-    let ibc = ibcRequests->Belt.Array.length
-    let showRequests = {
-      switch (tabIndex) {
-      | 0 => onChainRequests
-      | 1 => ibcRequests
-      | _ =>
-        Js.log("Please handle every case on Resolve Requests.")
-        []
+      let ibcRequests = requests->Belt.Array.keepMap(({id, isIBC}) => isIBC ? Some(id) : None)
+      let onChain = onChainRequests->Belt.Array.length
+      let ibc = ibcRequests->Belt.Array.length
+      let showRequests = {
+        switch (tabIndex) {
+        | 0 => onChainRequests
+        | 1 => ibcRequests
+        | _ =>
+          Js.log("Please handle every case on Resolve Requests.")
+          []
+        }
       }
-    }
 
-    <Row marginBottom=24>
-      <Col>
-        <InfoContainer>
-          <Heading value="Resolved Requests" size=Heading.H4 />
-          <div className={CssHelper.mt(~size=16, ())}>
-            <Text
-              value="Resolved requests are requests that were successfully processed, failed, or timed out by BandChain in this block."
-            />
-          </div>
-          <Tab.State tabs=[j`On Chain ($onChain)`, j`IBC ($ibc)`] tabIndex setTab>
-            {showRequests->Belt.Array.length === 0
-               ? <div className=Styles.emptyContainer>
-                   <Text value="There is no resolved request." />
-                 </div>
-               : <div className=Styles.container>
-                   <Text value="Request ID" size=Text.Caption transform=Text.Uppercase />
-                   <RequestsList requests=showRequests />
-                 </div>}
-          </Tab.State>
-        </InfoContainer>
-      </Col>
-    </Row>
-  | Data(_) | Error(_) | Loading | NoData => React.null
+      <Row marginBottom=24>
+        <Col>
+          <InfoContainer>
+            <Heading value="Resolved Requests" size=Heading.H4 />
+            <div className={CssHelper.mt(~size=16, ())}>
+              <Text
+                value="Resolved requests are requests that were successfully processed, failed, or timed out by BandChain in this block."
+              />
+            </div>
+            <Tab.State tabs=[j`On Chain ($onChain)`, j`IBC ($ibc)`] tabIndex setTab>
+              {showRequests->Belt.Array.length === 0
+                ? <div className=Styles.emptyContainer>
+                    <Text value="There is no resolved request." />
+                  </div>
+                : <div className=Styles.container>
+                    <Text value="Request ID" size=Text.Caption transform=Text.Uppercase />
+                    <RequestsList requests=showRequests />
+                  </div>}
+            </Tab.State>
+          </InfoContainer>
+        </Col>
+      </Row>
+    } : React.null
+  | Error(_) | Loading | NoData => React.null
   }
 }

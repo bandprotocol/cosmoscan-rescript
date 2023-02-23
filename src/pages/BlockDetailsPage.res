@@ -202,7 +202,7 @@ let make = (~height) => {
         </Row>
         <ResolvedRequest blockSub />
         {switch ibcTxsSub {
-          | Data(ibcTxs) when ibcTxs->Belt.Array.length !== 0 =>
+          | Data(ibcTxs) => ibcTxs->Belt.Array.length !== 0 ?
             <Row marginBottom=24>
               <Col>
                 <Table>
@@ -212,8 +212,8 @@ let make = (~height) => {
                   <BlockIndexTxsTable txsSub=ibcTxsSub />
                 </Table>
               </Col>
-            </Row>
-          | Data(_) | Error(_) | Loading | NoData => React.null
+            </Row> : React.null
+          | Error(_) | Loading | NoData => React.null
          }}
         <Table>
           <Heading value="Transactions" size=Heading.H4 marginBottom=32 marginTop=32 />

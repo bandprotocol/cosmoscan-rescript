@@ -348,8 +348,7 @@ let make = () => {
       <div className=CssHelper.mobileSpacing>
         <Heading value="All Oracle Scripts" size=Heading.H2 marginBottom=40 marginBottomSm=24 />
         {switch mostRequestedOracleScriptSub {
-        | Data(oracleScripts) if oracleScripts->Belt.Array.length === 0 => React.null
-        | Data(oracleScripts) =>
+        | Data(oracleScripts) => oracleScripts->Belt.Array.length !== 0 ?
           <>
             <Heading
               value="Most Requested" size=Heading.H3 marginBottom=16 color={theme.neutral_600}
@@ -366,7 +365,7 @@ let make = () => {
               )
               ->React.array}
             </Row>
-          </>
+          </> : React.null
         | _ =>
           <>
             <Heading value="Most Requested" size=Heading.H4 marginBottom=16 />
@@ -450,8 +449,36 @@ let make = () => {
                 </Row>
               </THead>}
           {switch allSub {
-          | Data((oracleScripts, _)) if oracleScripts->Belt.Array.length === 0 =>
-            <EmptyContainer>
+          | Data((oracleScripts, oracleScriptsCount)) => oracleScripts->Belt.Array.length !== 0 ?
+            {
+              let pageCount = Page.getPageCount(oracleScriptsCount, pageSize)
+              <>
+                {oracleScripts
+                ->sorting(sortedBy)
+                ->Belt.Array.mapWithIndex((i, e) =>
+                  isMobile
+                    ? <RenderBodyMobile
+                        key={e.id->ID.OracleScript.toString}
+                        reserveIndex=i
+                        oracleScriptSub={Sub.resolve(e)}
+                        statsSub
+                      />
+                    : <RenderBody
+                        key={e.id->ID.OracleScript.toString}
+                        reserveIndex=i
+                        oracleScriptSub={Sub.resolve(e)}
+                        statsSub
+                      />
+                )
+                ->React.array}
+                {isMobile
+                  ? React.null
+                  : <Pagination
+                      currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+                    />}
+              </>
+            }
+            : <EmptyContainer>
               <img
                 src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
                 className=Styles.noDataImage
@@ -465,33 +492,6 @@ let make = () => {
                 color={theme.neutral_600}
               />
             </EmptyContainer>
-          | Data((oracleScripts, oracleScriptsCount)) =>
-            let pageCount = Page.getPageCount(oracleScriptsCount, pageSize)
-            <>
-              {oracleScripts
-              ->sorting(sortedBy)
-              ->Belt.Array.mapWithIndex((i, e) =>
-                isMobile
-                  ? <RenderBodyMobile
-                      key={e.id->ID.OracleScript.toString}
-                      reserveIndex=i
-                      oracleScriptSub={Sub.resolve(e)}
-                      statsSub
-                    />
-                  : <RenderBody
-                      key={e.id->ID.OracleScript.toString}
-                      reserveIndex=i
-                      oracleScriptSub={Sub.resolve(e)}
-                      statsSub
-                    />
-              )
-              ->React.array}
-              {isMobile
-                ? React.null
-                : <Pagination
-                    currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
-                  />}
-            </>
           | _ =>
             <div className=Styles.tbodyContainer>
               {Belt.Array.makeBy(10, i =>
