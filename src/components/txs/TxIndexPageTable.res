@@ -23,10 +23,10 @@ let renderUnknownMessage = () =>
   </Col>
 
 let renderBody = (msg: Msg.t) =>
-  switch msg.decoded {
-  | SendMsg(send) => <IndexTokenMsg.SendMsg send />
-  | RequestMsg(request) => <IndexOracleMsg.RequestMsg request />
-  | CreateDataSourceMsg(dataSource) => <RenderMsgDetails.CreateDataSourceMsg msg={dataSource} />
+  // switch msg.decoded {
+  // | SendMsg(send) => <IndexTokenMsg.SendMsg send />
+  // | RequestMsg(request) => <IndexOracleMsg.RequestMsg request />
+  // | CreateDataSourceMsg(dataSource) => <RenderMsgDetails.CreateDataSourceMsg msg={dataSource} />
 
   // | DelegateMsgSuccess(delegation) => <IndexTokenMsg.DelegateMsg delegation />
   // | DelegateMsgFail(delegation) => <IndexTokenMsg.DelegateFailMsg delegation />
@@ -106,8 +106,9 @@ let renderBody = (msg: Msg.t) =>
   // | TimeoutMsg(packet) => <IndexIBCPacketMsg.Timeout packet />
   // | TimeoutOnCloseMsg(packet) => <IndexIBCPacketMsg.TimeoutOnClose packet />
   // | TransferMsg(msg) => <IndexIBCTransferMsg.Transfer msg />
-  | UnknownMsg => React.null
-  }
+  // | UnknownMsg => React.null
+  // }
+  <RenderMsgDetails contents={msg.decoded->RenderMsgDetails.getContent} />
 
 module MsgDetailCard = {
   @react.component

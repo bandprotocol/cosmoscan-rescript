@@ -26,14 +26,15 @@ module CreateDataSource = {
     id: 'a,
   }
 
-  type t_base = t<unit>
-  type t_success = t<ID.DataSource.t>
+  type base_t = t<unit>
+  type failed_t = t<unit>
+  type success_t = t<ID.DataSource.t>
 
   type msg_t =
-    | Success(t_success)
-    | Failure(t_base)
+    | Success(success_t)
+    | Failure(failed_t)
 
-  let decodeUnit = idDecoder => {
+  let decodeFactory = idDecoder => {
     open JsonUtils.Decode
     buildObject(json => {
       owner: json.required(list{"msg", "owner"}, address),
@@ -45,11 +46,10 @@ module CreateDataSource = {
       id: json->idDecoder,
     })
   }
-  let decodeBase: JsonUtils.Decode.t<t_base> = decodeUnit(_ => ())
-  let decodeSuccess: JsonUtils.Decode.t<t_success> = decodeUnit(json =>
+  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => ())
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = decodeFactory(json =>
     json.required(list{"msg", "id"}, ID.DataSource.decoder)
   )
-  // let decodeSuccess = decode((list{"msg", "id"}, ID.DataSource.decoder))
 }
 
 module Request = {
@@ -148,7 +148,7 @@ let decodeMsg = (json, isSuccess) => {
         }
 
       | false => {
-          let msg = json->mustDecode(CreateDataSource.decodeBase)
+          let msg = json->mustDecode(CreateDataSource.decodeFail)
           (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
         }
       }
