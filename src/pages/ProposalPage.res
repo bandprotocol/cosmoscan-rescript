@@ -15,7 +15,7 @@ let make = () => {
       <Row>
         {switch proposalsSub {
         | Data(proposals) =>
-          proposals->Belt.Array.size > 0
+          proposals->Belt.Array.length > 0
             ? proposals
               ->Belt.Array.mapWithIndex((i, proposal) => {
                 <ProposalCard

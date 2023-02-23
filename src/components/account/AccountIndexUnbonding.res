@@ -181,7 +181,7 @@ let make = (~address) => {
           </Row>
         </THead>}
     {switch unbondingListSub {
-    | Data(unbondingList) => unbondingList->Belt.Array.size > 0 ?
+    | Data(unbondingList) => unbondingList->Belt.Array.length > 0 ?
       unbondingList
       ->Belt.Array.mapWithIndex((i, e) =>
         isMobile

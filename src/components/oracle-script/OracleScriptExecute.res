@@ -296,7 +296,7 @@ module ExecutionPart = {
     let (_, dispatchModal) = React.useContext(ModalContext.context)
     let trackingSub = TrackingSub.use()
     let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
-    let numParams = paramsInput->Belt.Array.size
+    let numParams = paramsInput->Belt.Array.length
 
     let validatorCount = ValidatorSub.countByActive(true)
 

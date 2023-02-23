@@ -144,7 +144,7 @@ let make = (~operatorAddress) => {
 
   switch dataQuery {
   | Data(data) =>
-    let show = data->Belt.Array.size > 5
+    let show = data->Belt.Array.length > 5
 
     <div className=Styles.container>
       <canvas id="historicalBonded" className={Styles.chart(show)} />
