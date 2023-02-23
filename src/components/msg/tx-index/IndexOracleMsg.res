@@ -1,20 +1,34 @@
 module RenderCreateDataSourceMsg = {
+  type value_t =
+    | ValueAddress(Address.t)
+    | Address(Address.t)
+  // | Validator(Address.t, moniker, identity)
+
+  let renderValue = v => {
+    switch v {
+    | ValueAddress(address) => <AddressRender position=AddressRender.Subtitle address />
+    | _ => React.null
+    }
+  }
+
+  module RenderColumn = {
+    @react.component
+    let make = (~title, ~value) => {
+      <Col col=Col.Six mb=24>
+        <Heading value={title} size=Heading.H4 weight=Heading.Regular marginBottom=8 />
+        {value->renderValue}
+      </Col>
+    }
+  }
+
   module Outer = {
     @react.component
-    let make = (~msg: Msg.CreateDataSource.t<'a>, ~children) => {
+    let make = (~msg: Msg.CreateDataSource.t<'a>, ~children1, ~children2) => {
       let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
       <Row>
-        <Col col=Col.Six mb=24>
-          <Heading
-            value="Owner"
-            size=Heading.H4
-            weight=Heading.Regular
-            marginBottom=8
-            color=theme.neutral_600
-          />
-          <AddressRender position=AddressRender.Subtitle address={msg.owner} />
-        </Col>
-        {children}
+        <RenderColumn title="Owner" value={ValueAddress(msg.owner)} />
+        // {children1}
+        // {children2}
         <Col col=Col.Six mbSm=24>
           <Heading
             value="Treasury"
@@ -41,8 +55,9 @@ module RenderCreateDataSourceMsg = {
   module RenderSuccess = {
     @react.component
     let make = (~msg: Msg.CreateDataSource.t<'a>, ~theme: Theme.t) => {
-      <Outer msg>
-        <Col col=Col.Six mb=24>
+      <Outer
+        msg
+        children1={<Col col=Col.Six mb=24>
           <Heading
             value="Name"
             size=Heading.H4
@@ -55,16 +70,18 @@ module RenderCreateDataSourceMsg = {
             <HSpacing size=Spacing.sm />
             <Text value={msg.name} size=Text.Body1 />
           </div>
-        </Col>
-      </Outer>
+        </Col>}
+        children2={<div />}
+      />
     }
   }
 
   module RenderFail = {
     @react.component
     let make = (~msg, ~theme: Theme.t) => {
-      <Outer msg>
-        <Col col=Col.Six mb=24>
+      <Outer
+        msg
+        children1={<Col col=Col.Six mb=24>
           <Heading
             value="Name"
             size=Heading.H4
@@ -75,8 +92,9 @@ module RenderCreateDataSourceMsg = {
           <div className={CssHelper.flexBox()}>
             <Text value="-" size=Text.Body1 />
           </div>
-        </Col>
-      </Outer>
+        </Col>}
+        children2={React.null}
+      />
     }
   }
 }

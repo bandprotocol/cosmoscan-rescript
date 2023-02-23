@@ -1,5 +1,3 @@
-// let decodeUnit =
-
 module Send = {
   type t = {
     fromAddress: Address.t,
@@ -35,7 +33,7 @@ module CreateDataSource = {
     | Success(t_success)
     | Failure(t_base)
 
-  let decode = idDecoder => {
+  let decodeUnit = idDecoder => {
     open JsonUtils.Decode
     buildObject(json => {
       owner: json.required(list{"msg", "owner"}, address),
@@ -44,12 +42,11 @@ module CreateDataSource = {
       treasury: json.required(list{"msg", "treasury"}, address),
       fee: json.required(list{"msg", "fee"}, list(Coin.decodeCoin)),
       sender: json.required(list{"msg", "sender"}, address),
-      // id: idDecoder,
       id: json->idDecoder,
     })
   }
-  let decodeBase: JsonUtils.Decode.t<t_base> = decode(_ => ())
-  let decodeSuccess: JsonUtils.Decode.t<t_success> = decode(json =>
+  let decodeBase: JsonUtils.Decode.t<t_base> = decodeUnit(_ => ())
+  let decodeSuccess: JsonUtils.Decode.t<t_success> = decodeUnit(json =>
     json.required(list{"msg", "id"}, ID.DataSource.decoder)
   )
   // let decodeSuccess = decode((list{"msg", "id"}, ID.DataSource.decoder))
@@ -155,16 +152,6 @@ let decodeMsg = (json, isSuccess) => {
           (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
         }
       }
-    // isSuccess
-    //   ? {
-    //       let msg = json->mustDecode(CreateDataSource.decodeSuccess)
-    //       (CreateDataSourceMsg(Success(msg)), msg.sender, false)
-    //     }
-    //   : {
-    //       let msg = json->mustDecode(CreateDataSource.decodeBase)
-    //       (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
-    //     }
-
     | "/oracle.v1.MsgRequestData" => {
         let msg = json->mustDecode(Request.decode)
         (RequestMsg(msg), msg.sender, false)

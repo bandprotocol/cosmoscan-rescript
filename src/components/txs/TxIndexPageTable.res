@@ -26,7 +26,8 @@ let renderBody = (msg: Msg.t) =>
   switch msg.decoded {
   | SendMsg(send) => <IndexTokenMsg.SendMsg send />
   | RequestMsg(request) => <IndexOracleMsg.RequestMsg request />
-  | CreateDataSourceMsg(dataSource) => <IndexOracleMsg.CreateDataSourceMsg dataSource />
+  | CreateDataSourceMsg(dataSource) => <RenderMsgDetails.CreateDataSourceMsg msg={dataSource} />
+
   // | DelegateMsgSuccess(delegation) => <IndexTokenMsg.DelegateMsg delegation />
   // | DelegateMsgFail(delegation) => <IndexTokenMsg.DelegateFailMsg delegation />
   // | UndelegateMsgSuccess(undelegation) => <IndexTokenMsg.UndelegateMsg undelegation />
