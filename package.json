@@ -54,7 +54,7 @@
     "moment": "^2.29.1",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "obi.js": "1.0.2",
-    "qrcode.react": "^1.0.1",
+    "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
     "react-countup": "4.3.3",
     "react-dom": "^18.2.0",

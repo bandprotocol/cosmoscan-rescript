@@ -1,7 +1,2 @@
-@obj external makeProps: (~value: string, ~size: int, unit) => _ = ""
-
-@module
-external make: React.component<{
-  "value": string,
-  "size": int,
-}> = "qrcode.react"
+ @module("qrcode.react") @react.component
+ external make: (~value: string, ~size: int) => React.element = "QRCodeCanvas"
