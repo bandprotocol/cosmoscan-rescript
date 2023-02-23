@@ -186,7 +186,7 @@ let toExternal = ({
     endTotalNoWithVetoPercent: noWithVetoVote /. totalVote *. 100.,
     endTotalAbstain: abstainVote /. 1e6,
     endTotalAbstainPercent: abstainVote /. totalVote *. 100.,
-    endTotalVote: totalVote,
+    endTotalVote: totalVote /. 1e6,
     totalBondedTokens: total_bonded_tokens -> Belt.Option.map(d => d /. 1e6) ,
     totalDeposit,
   }
