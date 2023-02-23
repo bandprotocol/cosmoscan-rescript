@@ -43,6 +43,7 @@
 
 // IBC
 @module("./tx-ibc-icon.svg") external ibcIcon: string = "default"
+@module("./unknown-chain.svg") external unknownChain: string = "default"
 
 // ICON
 @module("./ethereum.svg") external ethereumIcon: string = "default"
