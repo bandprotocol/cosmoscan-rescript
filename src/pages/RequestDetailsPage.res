@@ -5,7 +5,7 @@ module Styles = {
     style(. [
       paddingTop(#px(50)),
       minHeight(#px(450)),
-      backgroundColor(theme.secondaryBg),
+      backgroundColor(theme.neutral_100),
       borderRadius(#px(4)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(0, 0, 0, #num(0.1)))),
     ]);
@@ -27,14 +27,14 @@ module Styles = {
     style(. [
       display(#flex),
       padding2(~v=#px(4), ~h=#px(16)),
-      background(theme.baseBlue),
+      background(theme.primary_600),
       borderRadius(#px(10)),
       marginLeft(#px(8)),
     ]);
-  let reasonSection =
+  let reasonSection = (theme: Theme.t) =>
     style(. [
       padding2(~v=#px(24), ~h=#px(40)),
-      border(#px(1), solid, Theme.failColor),
+      border(#px(1), solid, theme.error_600),
       borderRadius(#px(12)),
       marginTop(#px(40)),
       display(#flex),
@@ -53,14 +53,14 @@ module ValidatorReportStatus = {
         Styles.validatorReportStatus,
       })}>
       {switch (isReport, resolveStatus) {
-       | (true, _) => <Icon name="fas fa-check-circle" color={theme.successColor} />
-       | (false, _) => <Icon name="fas fa-times-circle" color={theme.failColor} />
+       | (true, _) => <Icon name="fas fa-check-circle" color={theme.success_600} />
+       | (false, _) => <Icon name="fas fa-times-circle" color={theme.error_600} />
        }}
       <HSpacing size=Spacing.sm />
       <ValidatorMonikerLink
         validatorAddress=operatorAddress
         moniker
-        size=Text.Md
+        size=Text.Body2
         width={#px(150)}
       />
     </div>;
@@ -79,7 +79,7 @@ module KVTableContainer = {
               value="KEY"
               size=Heading.H5
               weight=Heading.Medium
-              color={theme.textSecondary}
+              color={theme.neutral_600}
             />
           </Col>
           <Col col=Col.Nine>
@@ -87,7 +87,7 @@ module KVTableContainer = {
               value="VALUE"
               size=Heading.H5
               weight=Heading.Medium
-              color={theme.textSecondary}
+              color={theme.neutral_600}
             />
           </Col>
         </Row>
@@ -153,12 +153,12 @@ module KVTableContainer = {
                  <TBody key={fieldName ++ fieldValue}>
                    <Row alignItems=Row.Center minHeight={#px(30)}>
                      <Col col=Col.Three>
-                       <Text value=fieldName color={theme.textSecondary} weight=Text.Thin />
+                       <Text value=fieldName color={theme.neutral_600} weight=Text.Thin />
                      </Col>
                      <Col col=Col.Nine>
                        <Text
                          value=fieldValue
-                         color={theme.textSecondary}
+                         color={theme.neutral_600}
                          weight=Text.Thin
                          breakAll=true
                        />
@@ -180,7 +180,7 @@ module KVTableContainer = {
           value="Schema not found"
           align=Heading.Center
           weight=Heading.Regular
-          color={theme.textSecondary}
+          color={theme.neutral_600}
         />
       </EmptyContainer>
     };
@@ -213,14 +213,14 @@ let make = (~reqID) => {
             />
           </div>
           <VSpacing size=Spacing.xxl />
-          <Text value="Request ID not found." size=Text.Lg color={theme.textSecondary} />
+          <Text value="Request ID not found." size=Text.Body1 color={theme.neutral_600} />
           <VSpacing size=Spacing.lg />
           <Link className=Styles.linkToHome route=Route.HomePage>
             <Text
               value="Back to Homepage"
               weight=Text.Bold
-              size=Text.Md
-              color={theme.textSecondary}
+              size=Text.Body2
+              color={theme.neutral_600}
             />
             <HSpacing size=Spacing.md />
             <img alt="Right Arrow Icon" src=Images.rightArrow className=Styles.rightArrow />
@@ -260,7 +260,7 @@ let make = (~reqID) => {
                     value="Oracle Scripts"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -269,7 +269,7 @@ let make = (~reqID) => {
                      <div className={CssHelper.flexBox()}>
                        <TypeID.OracleScript id=oracleScriptID position=TypeID.Subtitle />
                        <HSpacing size=Spacing.sm />
-                       <Text value=name size=Text.Lg />
+                       <Text value=name size=Text.Body1 />
                      </div>
                    | _ => <LoadingCensorBar width=200 height=15 />
                    }}
@@ -281,7 +281,7 @@ let make = (~reqID) => {
                     value="Sender"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -304,7 +304,7 @@ let make = (~reqID) => {
                     value="TX Hash"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -324,7 +324,7 @@ let make = (~reqID) => {
                     value="Tx Fee"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -338,8 +338,8 @@ let make = (~reqID) => {
                            (gasFee -> Coin.getBandAmountFromCoins -> Format.fPretty(~digits=6))
                            ++ " BAND"
                          }
-                         size=Text.Lg
-                         color={theme.textSecondary}
+                         size=Text.Body1
+                         color={theme.neutral_600}
                        />
                      | None => <Text value="Syncing" />
                      }
@@ -353,7 +353,7 @@ let make = (~reqID) => {
                     value="Prepare Gas"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -362,8 +362,8 @@ let make = (~reqID) => {
                      <Text
                        block=true
                        value={prepareGas -> Belt.Int.toString}
-                       size=Text.Lg
-                       color={theme.textSecondary}
+                       size=Text.Body1
+                       color={theme.neutral_600}
                      />
                    | _ => <LoadingCensorBar width=200 height=15 />
                    }}
@@ -375,7 +375,7 @@ let make = (~reqID) => {
                     value="Execute Gas"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -384,8 +384,8 @@ let make = (~reqID) => {
                      <Text
                        block=true
                        value={executeGas -> Belt.Int.toString}
-                       size=Text.Lg
-                       color={theme.textSecondary}
+                       size=Text.Body1
+                       color={theme.neutral_600}
                      />
                    | _ => <LoadingCensorBar width=200 height=15 />
                    }}
@@ -397,7 +397,7 @@ let make = (~reqID) => {
                     value="Fee Limit"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -409,8 +409,8 @@ let make = (~reqID) => {
                          (feeLimit -> Coin.getBandAmountFromCoins -> Format.fPretty(~digits=6))
                          ++ " BAND"
                        }
-                       size=Text.Lg
-                       color={theme.textSecondary}
+                       size=Text.Body1
+                       color={theme.neutral_600}
                      />
                    | _ => <LoadingCensorBar width=200 height=15 />
                    }}
@@ -422,7 +422,7 @@ let make = (~reqID) => {
                     value="Data Sources Fee"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -438,8 +438,8 @@ let make = (~reqID) => {
                        value={
                          (feeUsed_ -> Format.fPretty(~digits=6)) ++ " BAND " ++ {j`($usedRatio)`}
                        }
-                       size=Text.Lg
-                       color={theme.textSecondary}
+                       size=Text.Body1
+                       color={theme.neutral_600}
                      />;
                    | _ => <LoadingCensorBar width=200 height=15 />
                    }}
@@ -452,7 +452,7 @@ let make = (~reqID) => {
                     value="Request at Block"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Four>
@@ -460,7 +460,7 @@ let make = (~reqID) => {
                    | Data({transactionOpt}) =>
                      switch (transactionOpt) {
                      | Some({blockHeight}) => <TypeID.Block id=blockHeight />
-                     | None => <Text value="Genesis" size=Text.Lg />
+                     | None => <Text value="Genesis" size=Text.Body1 />
                      }
                    | _ => <LoadingCensorBar width=200 height=15 />
                    }}
@@ -472,7 +472,7 @@ let make = (~reqID) => {
                     value="Report Status"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Four>
@@ -493,7 +493,7 @@ let make = (~reqID) => {
                     value="Resolve Status"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -505,9 +505,9 @@ let make = (~reqID) => {
                         | Some(height) =>
                           <>
                             <HSpacing size=Spacing.md />
-                            <Text value=" (" block=true size=Text.Lg color={theme.textPrimary} />
+                            <Text value=" (" block=true size=Text.Body1 color={theme.neutral_900} />
                             <TypeID.Block id=height />
-                            <Text value=")" block=true size=Text.Lg color={theme.textPrimary} />
+                            <Text value=")" block=true size=Text.Body1 color={theme.neutral_900} />
                           </>
                         | None => React.null
                         }}
@@ -522,7 +522,7 @@ let make = (~reqID) => {
                     value="Request to"
                     size=Heading.H4
                     weight=Heading.Thin
-                    color={theme.textSecondary}
+                    color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
@@ -559,10 +559,10 @@ let make = (~reqID) => {
                | Data({reason}) =>
                  switch (reason) {
                  | Some(reason') when reason' !== "" =>
-                   <div className=Styles.reasonSection>
+                   <div className=Styles.reasonSection(theme)>
                      <img alt="Fail Icon" src=Images.fail />
                      <HSpacing size=Spacing.md />
-                     <Text value=reason' color={theme.textPrimary} />
+                     <Text value=reason' color={theme.neutral_900} />
                    </div>
                  | _ => React.null
                  }
@@ -634,7 +634,7 @@ let make = (~reqID) => {
                        value="Waiting for result"
                        align=Heading.Center
                        weight=Heading.Regular
-                       color={theme.textSecondary}
+                       color={theme.neutral_600}
                      />
                    </EmptyContainer>
                  | (_, _) =>
@@ -649,7 +649,7 @@ let make = (~reqID) => {
                        value="This request hasn't resolved"
                        align=Heading.Center
                        weight=Heading.Regular
-                       color={theme.textSecondary}
+                       color={theme.neutral_600}
                      />
                    </EmptyContainer>
                  }
@@ -669,7 +669,7 @@ let make = (~reqID) => {
                   <div className={CssHelper.flexBox()}>
                     <Heading value="What is proof ?" size=Heading.H5 />
                     <HSpacing size=Spacing.sm />
-                    <Icon name="far fa-external-link-alt" color={theme.textPrimary} />
+                    <Icon name="far fa-external-link-alt" color={theme.neutral_900} />
                   </div>
                 </AbsoluteLink>
               </div>
@@ -686,7 +686,7 @@ let make = (~reqID) => {
                        value="Waiting for result"
                        align=Heading.Center
                        weight=Heading.Regular
-                       color={theme.textSecondary}
+                       color={theme.neutral_600}
                      />
                    </EmptyContainer>
                  | _ =>
@@ -701,7 +701,7 @@ let make = (~reqID) => {
                        value="This request hasn't resolved"
                        align=Heading.Center
                        weight=Heading.Regular
-                       color={theme.textSecondary}
+                       color={theme.neutral_600}
                      />
                    </EmptyContainer>
                  }
@@ -726,7 +726,7 @@ let make = (~reqID) => {
                              value="EXTERNAL ID"
                              size=Heading.H5
                              weight=Heading.Regular
-                             color={theme.textSecondary}
+                             color={theme.neutral_600}
                            />
                          </Col>
                          <Col col=Col.Two>
@@ -734,7 +734,7 @@ let make = (~reqID) => {
                              value="FEE"
                              size=Heading.H5
                              weight=Heading.Regular
-                             color={theme.textSecondary}
+                             color={theme.neutral_600}
                            />
                          </Col>
                          <Col col=Col.Four>
@@ -742,7 +742,7 @@ let make = (~reqID) => {
                              value="DATA SOURCE"
                              size=Heading.H5
                              weight=Heading.Regular
-                             color={theme.textSecondary}
+                             color={theme.neutral_600}
                            />
                          </Col>
                          <Col col=Col.Four>
@@ -751,7 +751,7 @@ let make = (~reqID) => {
                                value="PARAM"
                                size=Heading.H5
                                weight=Heading.Regular
-                               color={theme.textSecondary}
+                               color={theme.neutral_600}
                              />
                            </div>
                          </Col>
@@ -781,27 +781,27 @@ let make = (~reqID) => {
                                <Col col=Col.Two>
                                  <Text
                                    value=externalID
-                                   color={theme.textSecondary}
+                                   color={theme.neutral_600}
                                    weight=Text.Thin
                                  />
                                </Col>
                                <Col col=Col.Two>
                                  <div className={CssHelper.flexBox()}>
-                                   <AmountRender coins=list{fee} color=theme.textPrimary />
+                                   <AmountRender coins=list{fee} color=theme.neutral_900 />
                                  </div>
                                </Col>
                                <Col col=Col.Four>
                                  <div className={CssHelper.flexBox()}>
                                    <TypeID.DataSource id=dataSourceID position=TypeID.Text />
                                    <HSpacing size=Spacing.sm />
-                                   <Text value=name color={theme.textSecondary} weight=Text.Thin />
+                                   <Text value=name color={theme.neutral_600} weight=Text.Thin />
                                  </div>
                                </Col>
                                <Col col=Col.Four>
                                  <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
                                    <Text
                                      value={calldata->JsBuffer.toUTF8}
-                                     color={theme.textSecondary}
+                                     color={theme.neutral_600}
                                      weight=Text.Thin
                                      align=Text.Right
                                      breakAll=true
