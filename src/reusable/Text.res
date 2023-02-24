@@ -128,7 +128,7 @@ module Styles = {
     }
   )
 
-  let code = style(. [fontFamilies([#custom("Roboto Mono"), #monospace]), paddingBottom(#em(0.1))])
+  let code = style(. [fontFamilies([#custom("Roboto Mono"), #monospace])])
 
   let special = style(. [fontFamilies([#custom("Lexend Exa"), #monospace])])
 

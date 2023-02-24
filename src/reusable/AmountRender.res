@@ -23,13 +23,17 @@ let make = (~coins, ~pos=Msg) => {
       />
     | _ =>
       <Text
-        value={coins->Coin.getBandAmountFromCoins->Format.fPretty} block=true nowrap=true code=true
+        value={coins->Coin.getBandAmountFromCoins->Format.fPretty}
+        block=true
+        nowrap=true
+        code=true
+        size=Text.Body1
       />
     }}
     <HSpacing size=Spacing.sm />
     {switch pos {
-    | Msg => <Text value="BAND" weight=Text.Regular nowrap=true block=true />
-    | TxIndex => <Text value="BAND" weight=Text.Regular nowrap=true block=true />
+    | Msg => <Text size=Text.Body1 value="BAND" weight=Text.Regular nowrap=true block=true />
+    | TxIndex => <Text size=Text.Body1 value="BAND" weight=Text.Regular nowrap=true block=true />
     | Fee => React.null
     }}
   </div>

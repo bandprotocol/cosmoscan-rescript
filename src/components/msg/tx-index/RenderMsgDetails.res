@@ -1,23 +1,56 @@
+module Calldata = {
+  @react.component
+  let make = (~schema, ~calldata) => {
+    let failed =
+      <Text
+        value="Could not decode calldata."
+        spacing=Text.Em(0.02)
+        nowrap=true
+        ellipsis=true
+        code=true
+        block=true
+        size=Text.Body1
+      />
+    <>
+      <div className={Css.merge(list{CssHelper.flexBox(~justify=#flexEnd, ()), CssHelper.mb()})}>
+        <CopyButton
+          data={calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
+        />
+      </div>
+      {Obi.decode(schema, "input", calldata)->Belt.Option.mapWithDefault(failed, calldataKVs =>
+        <KVTable
+          rows={calldataKVs->Belt.Array.map(({fieldName, fieldValue}) => [
+            KVTable.Value(fieldName),
+            KVTable.Value(fieldValue),
+          ])}
+        />
+      )}
+    </>
+  }
+}
+
 type content_inner_t =
   | PlainText(string)
   | Address(Address.t)
   | ValidatorAddress(Address.t)
-  | Calldata(JsBuffer.t)
+  | Calldata(string, JsBuffer.t)
   | Coin(Belt.List.t<Coin.t>)
-  | ID(React.element)
+  | ID(React.element) // TODO: refactor not to receive react.element
 
 type content_t = {
   title: string,
   content: content_inner_t,
+  order: int,
 }
 
 let renderValue = v => {
   switch v {
   | Address(address) => <AddressRender position=AddressRender.Subtitle address />
   | ValidatorAddress(address) => <AddressRender position=AddressRender.Subtitle address />
-  | PlainText(content) => <Text value={content} />
+  | PlainText(content) => <Text value={content} size=Text.Body1 />
   | Coin(amount) => <AmountRender coins={amount} />
   | ID(element) => element
+  | Calldata(schema, data) => <Calldata schema calldata=data />
   | _ => React.null
   }
 }
@@ -25,9 +58,9 @@ let renderValue = v => {
 module CreateDataSource = {
   let factory = (msg: Msg.CreateDataSource.t<'a>, firsts) =>
     firsts->Belt.Array.concat([
-      {title: "Owner", content: Address(msg.owner)},
-      {title: "Treasury", content: Address(msg.treasury)},
-      {title: "Fee", content: Coin(msg.fee)},
+      {title: "Owner", content: Address(msg.owner), order: 2},
+      {title: "Treasury", content: Address(msg.treasury), order: 3},
+      {title: "Fee", content: Coin(msg.fee), order: 4},
     ])
 
   let success = (msg: Msg.CreateDataSource.success_t) =>
@@ -41,6 +74,7 @@ module CreateDataSource = {
             <Text value={msg.name} size=Text.Body1 />
           </div>,
         ),
+        order: 1,
       },
     ])
 
@@ -49,19 +83,52 @@ module CreateDataSource = {
       {
         title: "Name",
         content: PlainText(msg.name),
+        order: 1,
       },
     ])
 }
 
 module Request = {
   let factory = (msg: Msg.Request.t<'a, 'b, 'c>, firsts) =>
-    firsts->Belt.Array.concat([{title: "Owner", content: Address(msg.sender)}])
+    firsts->Belt.Array.concat([
+      {
+        title: "Owner",
+        content: Address(msg.sender),
+        order: 3,
+      },
+      {
+        title: "Fee Limit",
+        content: Coin(msg.feeLimit),
+        order: 4,
+      },
+      {
+        title: "Prepare Gas",
+        content: PlainText(msg.prepareGas->Belt.Int.toString),
+        order: 5,
+      },
+      {
+        title: "Execute Gas",
+        content: PlainText(msg.executeGas->Belt.Int.toString),
+        order: 6,
+      },
+      {
+        title: "Request Validator Count",
+        content: PlainText(msg.askCount->Belt.Int.toString),
+        order: 7,
+      },
+      {
+        title: "Sufficient Validator Count",
+        content: PlainText(msg.minCount->Belt.Int.toString),
+        order: 8,
+      },
+    ])
 
   let success = (msg: Msg.Request.success_t) =>
     msg->factory([
       {
         title: "Request ID",
         content: ID(<TypeID.Request position=TypeID.Subtitle id={msg.id} />),
+        order: 1,
       },
       {
         title: "Oracle Script ID",
@@ -72,6 +139,12 @@ module Request = {
             <Text value={msg.oracleScriptName} size=Text.Body1 />
           </div>,
         ),
+        order: 2,
+      },
+      {
+        title: "Calldata",
+        content: Calldata(msg.schema, msg.calldata),
+        order: 9,
       },
     ])
 
@@ -101,9 +174,10 @@ let make = (~contents: array<content_t>) => {
 
   {
     contents
+    ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
     ->Belt.Array.mapWithIndex((i, content) => {
       <Row key={i->Belt.Int.toString}>
-        <Col col=Col.Four mb=24>
+        <Col col=Col.Three mb=24>
           <Heading
             value={content.title}
             size=Heading.H4
@@ -112,7 +186,7 @@ let make = (~contents: array<content_t>) => {
             color=theme.neutral_600
           />
         </Col>
-        <Col col=Col.Eight mb=24 key={i->Belt.Int.toString}> {renderValue(content.content)} </Col>
+        <Col col=Col.Nine mb=24 key={i->Belt.Int.toString}> {renderValue(content.content)} </Col>
       </Row>
     })
     ->React.array

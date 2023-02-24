@@ -75,7 +75,7 @@ module Request = {
     | Success(success_t)
     | Failure(failed_t)
 
-  let decodeFactory = (decoderID, decoderString, decoderString) => {
+  let decodeFactory = (decoderID, decoderString, decoderSchema) => {
     open JsonUtils.Decode
     buildObject(json => {
       oracleScriptID: json.required(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
@@ -88,7 +88,7 @@ module Request = {
       sender: json.required(list{"msg", "sender"}, address),
       id: json->decoderID,
       oracleScriptName: json->decoderString,
-      schema: json->decoderString,
+      schema: json->decoderSchema,
     })
   }
 
@@ -159,7 +159,8 @@ let decodeMsg = (json, isSuccess) => {
           (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
         }
       }
-    | "/oracle.v1.MsgRequestData" => // let msg = json->mustDecode(Request.decode)
+    | "/oracle.v1.MsgRequestData" =>
+      // let msg = json->mustDecode(Request.decode)
       // (RequestMsg(msg), msg.sender, false)
       switch isSuccess {
       | true => {

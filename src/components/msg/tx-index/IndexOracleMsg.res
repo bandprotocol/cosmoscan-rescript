@@ -1,3 +1,9 @@
+/*
+ *
+ * * This file will never be used, move to RenderMsgDetails.res
+ *
+ */
+
 module RenderCreateDataSourceMsg = {
   type value_t =
     | ValueAddress(Address.t)
