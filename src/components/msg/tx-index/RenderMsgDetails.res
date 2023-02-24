@@ -53,6 +53,31 @@ module CreateDataSource = {
     ])
 }
 
+module Request = {
+  let factory = (msg: Msg.Request.t<'a, 'b, 'c>, firsts) =>
+    firsts->Belt.Array.concat([{title: "Owner", content: Address(msg.sender)}])
+
+  let success = (msg: Msg.Request.success_t) =>
+    msg->factory([
+      {
+        title: "Request ID",
+        content: ID(<TypeID.Request position=TypeID.Subtitle id={msg.id} />),
+      },
+      {
+        title: "Oracle Script ID",
+        content: ID(
+          <div className={CssHelper.flexBox()}>
+            <TypeID.OracleScript position=TypeID.Subtitle id={msg.oracleScriptID} />
+            <HSpacing size=Spacing.sm />
+            <Text value={msg.oracleScriptName} size=Text.Body1 />
+          </div>,
+        ),
+      },
+    ])
+
+  let failed = (msg: Msg.Request.failed_t) => msg->factory([])
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -60,7 +85,11 @@ let getContent = msg => {
     | Msg.CreateDataSource.Success(innerData) => CreateDataSource.success(innerData)
     | Msg.CreateDataSource.Failure(innerData) => CreateDataSource.failed(innerData)
     }
-  | Msg.RequestMsg(m) => []
+  | Msg.RequestMsg(m) =>
+    switch m {
+    | Msg.Request.Success(innerData) => Request.success(innerData)
+    | Msg.Request.Failure(innerData) => Request.failed(innerData)
+    }
   | Msg.SendMsg(_) => []
   | Msg.UnknownMsg => []
   }

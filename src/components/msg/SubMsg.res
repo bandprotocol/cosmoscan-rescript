@@ -60,13 +60,18 @@ let make = (~msg: Msg.t) => {
     <MsgFront name=badge.name fromAddress={msg.sender} />
     {switch msg.decoded {
     | SendMsg({toAddress, amount}) => <TokenMsg.SendMsg toAddress amount />
-    | CreateDataSourceMsg(msg) => switch msg {
+    | CreateDataSourceMsg(msg) =>
+      switch msg {
       | Msg.CreateDataSource.Success(m) => <OracleMsg.CreateDataSourceMsg.Success msg=m />
       | Msg.CreateDataSource.Failure(f) => <OracleMsg.CreateDataSourceMsg.Failure msg=f />
       }
 
-    | RequestMsg({id, oracleScriptID, oracleScriptName}) =>
-      <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
+    | RequestMsg(msg) =>
+      switch msg {
+      | Msg.Request.Success(m) => <OracleMsg.RequestMsg.Success msg=m />
+      | Msg.Request.Failure(f) => <OracleMsg.RequestMsg.Failure msg=f />
+      }
+    // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />
     // | DelegateMsgSuccess({amount}) => <TokenMsg.DelegateMsg amount />

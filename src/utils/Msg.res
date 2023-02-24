@@ -53,8 +53,7 @@ module CreateDataSource = {
 }
 
 module Request = {
-  type t = {
-    // User message fields
+  type t<'a, 'b, 'c> = {
     oracleScriptID: ID.OracleScript.t,
     calldata: JsBuffer.t,
     askCount: int,
@@ -63,13 +62,20 @@ module Request = {
     executeGas: int,
     feeLimit: list<Coin.t>,
     sender: Address.t,
-    // Success only fields
-    id: option<ID.Request.t>,
-    oracleScriptName: option<string>,
-    schema: option<string>,
+    id: 'a,
+    oracleScriptName: 'b,
+    schema: 'c,
   }
 
-  let decode = {
+  type base_t = t<unit, unit, unit>
+  type failed_t = t<unit, unit, unit>
+  type success_t = t<ID.Request.t, string, string>
+
+  type msg_t =
+    | Success(success_t)
+    | Failure(failed_t)
+
+  let decodeFactory = (decoderID, decoderString, decoderString) => {
     open JsonUtils.Decode
     buildObject(json => {
       oracleScriptID: json.required(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
@@ -80,17 +86,27 @@ module Request = {
       executeGas: json.required(list{"msg", "execute_gas"}, int),
       feeLimit: json.required(list{"msg", "fee_limit"}, list(Coin.decodeCoin)),
       sender: json.required(list{"msg", "sender"}, address),
-      id: json.optional(list{"msg", "id"}, ID.Request.decoder),
-      oracleScriptName: json.optional(list{"msg", "name"}, string),
-      schema: json.optional(list{"msg", "schema"}, string),
+      id: json->decoderID,
+      oracleScriptName: json->decoderString,
+      schema: json->decoderString,
     })
+  }
+
+  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => (), _ => ())
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(
+      json => json.required(list{"msg", "id"}, ID.Request.decoder),
+      json => json.required(list{"msg", "name"}, string),
+      json => json.required(list{"msg", "schema"}, string),
+    )
   }
 }
 
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.msg_t)
-  | RequestMsg(Request.t)
+  | RequestMsg(Request.msg_t)
   | UnknownMsg
 
 type t = {
@@ -132,15 +148,6 @@ let decodeMsg = (json, isSuccess) => {
       }
 
     | "/oracle.v1.MsgCreateDataSource" =>
-      // let createSuccess = json => {
-      //   let msg = json->mustDecode(CreateDataSource.decodeSuccess)
-      //   (CreateDataSourceMsg(Success(msg)), msg.sender, false)
-      // }
-      // let createFail = json => {
-      //   let msg = json->mustDecode(CreateDataSource.decodeBase)
-      //   (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
-      // }
-
       switch isSuccess {
       | true => {
           let msg = json->mustDecode(CreateDataSource.decodeSuccess)
@@ -152,9 +159,18 @@ let decodeMsg = (json, isSuccess) => {
           (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
         }
       }
-    | "/oracle.v1.MsgRequestData" => {
-        let msg = json->mustDecode(Request.decode)
-        (RequestMsg(msg), msg.sender, false)
+    | "/oracle.v1.MsgRequestData" => // let msg = json->mustDecode(Request.decode)
+      // (RequestMsg(msg), msg.sender, false)
+      switch isSuccess {
+      | true => {
+          let msg = json->mustDecode(Request.decodeSuccess)
+          (RequestMsg(Success(msg)), msg.sender, false)
+        }
+
+      | false => {
+          let msg = json->mustDecode(Request.decodeFail)
+          (RequestMsg(Failure(msg)), msg.sender, false)
+        }
       }
 
     | _ => (UnknownMsg, Address.Address(""), false)

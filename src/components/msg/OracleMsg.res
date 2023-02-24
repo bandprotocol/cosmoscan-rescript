@@ -35,28 +35,6 @@ module CreateDataSourceMsg = {
   }
 }
 
-// module CreateDataSourceMsg = {
-//   // @react.component
-//   let factory = (~msg: Msg.CreateDataSource.t<'a>, ~renderID) =>
-//     <div
-//       className={CssJs.merge(. [
-//         CssHelper.flexBox(~wrap=#nowrap, ()),
-//         CssHelper.overflowHidden,
-//         Styles.msgContainer,
-//       ])}>
-//       {renderID}
-//       <Text value=msg.name nowrap=true block=true ellipsis=true />
-//     </div>
-
-//   module ID = {
-//     @react.component
-//     let make = (~id) => <TypeID.DataSource id />
-//   }
-
-//   @react.component
-//   let make = (~msg) => factory(~msg, <ID id=msg.id />)
-// }
-
 module EditDataSourceMsg = {
   @react.component
   let make = (~id, ~name) =>
@@ -104,23 +82,36 @@ module EditOracleScriptMsg = {
 }
 
 module RequestMsg = {
-  @react.component
-  let make = (~id, ~oracleScriptID, ~oracleScriptName) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
-      <React.Fragment>
-        {id->Belt.Option.mapWithDefault(React.null, i => <TypeID.Request id=i />)}
+  module Outer = {
+    @react.component
+    let make = (~msg: Msg.Request.t<'a, 'b, 'c>, ~children) =>
+      <div
+        className={CssJs.merge(. [
+          CssHelper.flexBox(~wrap=#nowrap, ()),
+          CssHelper.overflowHidden,
+          Styles.msgContainer,
+        ])}>
+        children
+      </div>
+  }
+  module Success = {
+    @react.component
+    let make = (~msg) =>
+      <Outer msg>
+        <TypeID.Request id={msg.id} />
         <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
-        <TypeID.OracleScript id=oracleScriptID />
-        {oracleScriptName->Belt.Option.mapWithDefault(React.null, name =>
-          <Text value=name nowrap=true block=true ellipsis=true />
-        )}
-      </React.Fragment>
-    </div>
+        <TypeID.OracleScript id=msg.oracleScriptID />
+        <Text value={msg.oracleScriptName} nowrap=true block=true ellipsis=true />
+      </Outer>
+  }
+
+  module Failure = {
+    @react.component
+    let make = (~msg) =>
+      <Outer msg>
+        <div />
+      </Outer>
+  }
 }
 
 module ReportMsg = {

@@ -344,113 +344,114 @@ module RequestMsg = {
     }
   }
   @react.component
-  let make = (~request: Msg.Request.t) => {
+  let make = (~request: Msg.Request.msg_t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    <Row>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Owner"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <AddressRender position=AddressRender.Subtitle address=request.sender />
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Request ID"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        {request.id->Belt.Option.mapWithDefault(<Text value="-" />, id =>
-          <TypeID.Request position=TypeID.Subtitle id />
-        )}
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Oracle Script"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <div className={CssHelper.flexBox()}>
-          <TypeID.OracleScript position=TypeID.Subtitle id=request.oracleScriptID />
-          <HSpacing size=Spacing.sm />
-          {request.oracleScriptName->Belt.Option.mapWithDefault(<Text value="-" />, name =>
-            <Text value=name size=Text.Body1 />
-          )}
-        </div>
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Fee Limit"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color={theme.neutral_600}
-        />
-        <AmountRender coins={request.feeLimit} pos=AmountRender.TxIndex />
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Prepare Gas"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value={request.prepareGas->Belt.Int.toString} size=Text.Body1 />
-      </Col>
-      <Col col=Col.Six mb=24>
-        <Heading
-          value="Execute Gas"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value={request.executeGas->Belt.Int.toString} size=Text.Body1 />
-      </Col>
-      <Col mb=24>
-        <div
-          className={Css.merge(list{
-            CssHelper.flexBox(~justify=#spaceBetween, ()),
-            CssHelper.mb(),
-          })}>
-          <Heading
-            value="Calldata" size=Heading.H4 weight=Heading.Regular color=theme.neutral_600
-          />
-          <CopyButton
-            data={request.calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
-          />
-        </div>
-        <Calldata schema=request.schema calldata=request.calldata />
-      </Col>
-      <Col col=Col.Six mbSm=24>
-        <Heading
-          value="Request Validator Count"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value={request.askCount->Belt.Int.toString} size=Text.Body1 />
-      </Col>
-      <Col col=Col.Six>
-        <Heading
-          value="Sufficient Validator Count"
-          size=Heading.H4
-          weight=Heading.Regular
-          marginBottom=8
-          color=theme.neutral_600
-        />
-        <Text value={request.minCount->Belt.Int.toString} size=Text.Body1 />
-      </Col>
-    </Row>
+    <div />
+    // <Row>
+    //   <Col col=Col.Six mb=24>
+    //     <Heading
+    //       value="Owner"
+    //       size=Heading.H4
+    //       weight=Heading.Regular
+    //       marginBottom=8
+    //       color=theme.neutral_600
+    //     />
+    //     <AddressRender position=AddressRender.Subtitle address=request.sender />
+    //   </Col>
+    //   <Col col=Col.Six mb=24>
+    //     <Heading
+    //       value="Request ID"
+    //       size=Heading.H4
+    //       weight=Heading.Regular
+    //       marginBottom=8
+    //       color=theme.neutral_600
+    //     />
+    //     {request.id->Belt.Option.mapWithDefault(<Text value="-" />, id =>
+    //       <TypeID.Request position=TypeID.Subtitle id />
+    //     )}
+    //   </Col>
+    //   <Col col=Col.Six mb=24>
+    //     <Heading
+    //       value="Oracle Script"
+    //       size=Heading.H4
+    //       weight=Heading.Regular
+    //       marginBottom=8
+    //       color=theme.neutral_600
+    //     />
+    //     <div className={CssHelper.flexBox()}>
+    //       <TypeID.OracleScript position=TypeID.Subtitle id=request.oracleScriptID />
+    //       <HSpacing size=Spacing.sm />
+    //       {request.oracleScriptName->Belt.Option.mapWithDefault(<Text value="-" />, name =>
+    //         <Text value=name size=Text.Body1 />
+    //       )}
+    //     </div>
+    //   </Col>
+    //   <Col col=Col.Six mb=24>
+    //     <Heading
+    //       value="Fee Limit"
+    //       size=Heading.H4
+    //       weight=Heading.Regular
+    //       marginBottom=8
+    //       color={theme.neutral_600}
+    //     />
+    //     <AmountRender coins={request.feeLimit} pos=AmountRender.TxIndex />
+    //   </Col>
+    //   <Col col=Col.Six mb=24>
+    //     <Heading
+    //       value="Prepare Gas"
+    //       size=Heading.H4
+    //       weight=Heading.Regular
+    //       marginBottom=8
+    //       color=theme.neutral_600
+    //     />
+    //     <Text value={request.prepareGas->Belt.Int.toString} size=Text.Body1 />
+    //   </Col>
+    //   <Col col=Col.Six mb=24>
+    //     <Heading
+    //       value="Execute Gas"
+    //       size=Heading.H4
+    //       weight=Heading.Regular
+    //       marginBottom=8
+    //       color=theme.neutral_600
+    //     />
+    //     <Text value={request.executeGas->Belt.Int.toString} size=Text.Body1 />
+    //   </Col>
+    //   <Col mb=24>
+    //     <div
+    //       className={Css.merge(list{
+    //         CssHelper.flexBox(~justify=#spaceBetween, ()),
+    //         CssHelper.mb(),
+    //       })}>
+    //       <Heading
+    //         value="Calldata" size=Heading.H4 weight=Heading.Regular color=theme.neutral_600
+    //       />
+    //       <CopyButton
+    //         data={request.calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
+    //       />
+    //     </div>
+    //     <Calldata schema=request.schema calldata=request.calldata />
+    //   </Col>
+    //   <Col col=Col.Six mbSm=24>
+    //     <Heading
+    //       value="Request Validator Count"
+    //       size=Heading.H4
+    //       weight=Heading.Regular
+    //       marginBottom=8
+    //       color=theme.neutral_600
+    //     />
+    //     <Text value={request.askCount->Belt.Int.toString} size=Text.Body1 />
+    //   </Col>
+    //   <Col col=Col.Six>
+    //     <Heading
+    //       value="Sufficient Validator Count"
+    //       size=Heading.H4
+    //       weight=Heading.Regular
+    //       marginBottom=8
+    //       color=theme.neutral_600
+    //     />
+    //     <Text value={request.minCount->Belt.Int.toString} size=Text.Body1 />
+    //   </Col>
+    // </Row>
   }
 }
 
