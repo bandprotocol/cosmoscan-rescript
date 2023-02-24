@@ -58,8 +58,12 @@ let toExternal = ({
   schema,
   sourceCodeURL,
   timestamp: {
-    let tx = txOpt->Belt.Option.getExn
-    Some(tx.block.timestamp)
+    // let tx = txOpt->Belt.Option.getExn
+    // Some(tx.block.timestamp)
+    switch txOpt {
+    | Some(tx) => Some(tx.block.timestamp)
+    | None => None
+    }
   },
   relatedDataSources: relatedDataSources
   ->Belt.Array.map(({dataSource}) => dataSource)

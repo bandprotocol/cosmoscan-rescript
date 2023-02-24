@@ -116,15 +116,16 @@ type t = {
 type tx_response_t = {
   txHash: Hash.t,
   code: int,
+  success: bool,
 }
 
-let decode_tx_response = {
-  open JsonUtils.Decode
-  object(fields => {
-    txHash: fields.required(. "txhash", hashFromHex),
-    code: fields.optional(. "code", int)->Belt.Option.getWithDefault(0),
-  })
-}
+// let decode_tx_response = {
+//   open JsonUtils.Decode
+//   object(fields => {
+//     txHash: fields.required(. "txhash", hashFromHex),
+//     code: fields.optional(. "code", int)->Belt.Option.getWithDefault(0),
+//   })
+// }
 
 type response_t =
   | Tx(tx_response_t)
@@ -185,7 +186,7 @@ let sortAndStringify: raw_tx_t => string = %raw(`
   }
 `)
 
-let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
+let createMsg = (~sender, ~msg: msg_input_t, ()): msg_payload_t => {
   let msgType = switch msg {
   | Send(_) => "cosmos-sdk/MsgSend"
   | Delegate(_) => "cosmos-sdk/MsgDelegate"
@@ -273,20 +274,40 @@ let createMsg = (sender, msg: msg_input_t): msg_payload_t => {
   {type_: msgType, value: msgValue}
 }
 
-let createRawTx = (~address, ~msgs, ~chainID, ~feeAmount, ~gas, ~memo, ()) =>
-  getAccountInfo(address)->Promise.then(accountInfo => {
-    Promise.resolve({
-      msgs: msgs->Belt.Array.map(createMsg(address)),
-      chain_id: chainID,
-      fee: {
-        amount: [{amount: feeAmount, denom: "uband"}],
-        gas,
-      },
-      memo,
-      account_number: accountInfo.accountNumber->Belt.Int.toString,
-      sequence: accountInfo.sequence->Belt.Int.toString,
-    })
-  })
+let createRawTx = async (~address, ~msgs, ~chainID, ~feeAmount, ~gas, ~memo, ()) => {
+  let accountInfo = await getAccountInfo(address)
+  let accountNumber = accountInfo.accountNumber->Belt.Int.toString
+  let sequence = accountInfo.sequence->Belt.Int.toString
+
+  let fee = {
+    amount: [{amount: feeAmount, denom: "uband"}],
+    gas,
+  }
+
+  let rawTx = {
+    account_number: accountNumber,
+    chain_id: chainID,
+    fee,
+    memo,
+    msgs,
+    sequence,
+  }
+  rawTx
+
+  // getAccountInfo(address)->Promise.then(accountInfo => {
+  //   Promise.resolve({
+  //     msgs: msgs->Belt.Array.map(createMsg(address)),
+  //     chain_id: chainID,
+  //     fee: {
+  //       amount: [{amount: feeAmount, denom: "uband"}],
+  //       gas,
+  //     },
+  //     memo,
+  //     account_number: accountInfo.accountNumber->Belt.Int.toString,
+  //     sequence: accountInfo.sequence->Belt.Int.toString,
+  //   })
+  // })
+}
 
 let createSignedTx = (~signature, ~pubKey, ~tx: raw_tx_t, ~mode, ()) => {
   let newPubKey = "eb5ae98721" ++ pubKey->PubKey.toHex->JsBuffer.hexToBase64
@@ -310,14 +331,52 @@ let createSignedTx = (~signature, ~pubKey, ~tx: raw_tx_t, ~mode, ()) => {
   {mode, tx: signedTx}
 }
 
-let broadcast = signedTx => {
+// let broadcast = signedTx => {
+//   /* TODO: FIX THIS MESS */
+//   let convert: t => 'a = %raw(`
+//     function(data) {return {...data};}
+//   `)
+
+//   Axios.post(Env.rpc ++ "/txs", convert(signedTx))->Promise.then(rawResponse => {
+//     let response = rawResponse["data"]
+//     Promise.resolve(Tx(response->JsonUtils.Decode.mustDecode(decode_tx_response)))
+//   })
+// }
+
+let broadcast = async signedTx => {
   /* TODO: FIX THIS MESS */
-  let convert: t => 'a = %raw(`
+  let convert: t => Js.t<'a> = %raw(`
     function(data) {return {...data};}
   `)
 
-  Axios.post(Env.rpc ++ "/txs", convert(signedTx))->Promise.then(rawResponse => {
-    let response = rawResponse["data"]
-    Promise.resolve(Tx(response->JsonUtils.Decode.mustDecode(decode_tx_response)))
-  })
+  let rawResponse = await Axios.post(Env.rpc ++ "/txs", convert(signedTx))
+  let response = rawResponse["data"]
+
+  let result = {
+    open JsonUtils.Decode
+    response->mustDecode({
+      object(fields => {
+        txHash: fields.required(. "txhash", string)->Hash.fromHex,
+        code: fields.optional(. "code", int)->Belt.Option.getWithDefault(_, 0),
+        success: fields.optional(. "code", int)->Belt.Option.mapWithDefault(_, true, code =>
+          code == 0
+        ),
+      })
+    })
+  }
+  Tx(result)
+  // let txHash = response.hash->Hash.fromHex
+  // let code = response.code->Belt.Option.getWithDefault(_, 0)
+  // let success = response.code->Belt.Option.mapWithDefault(_, true, code => code == 0)
+  // Tx({txHash, code, success})
+  // Tx({
+  //   open JsonUtils.Decode
+  //   object(fields => {
+  //     txHash: fields.required(. "txhash", string)->Hash.fromHex,
+  //     code: fields.optional(. "code", int)->Belt.Option.getWithDefault(_, 0),
+  //     success: fields.optional(. "code", int)->Belt.Option.mapWithDefault(_, true, code =>
+  //       code == 0
+  //     ),
+  //   })
+  // })
 }
