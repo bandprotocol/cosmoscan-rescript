@@ -153,10 +153,6 @@ let make = () => {
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  let coin = BandChainJS.Coin.create()
-  coin->BandChainJS.Coin.setDenom("uband")
-  coin->BandChainJS.Coin.setAmount(0.->Belt.Float.toString)
-
   switch accountOpt {
   | Some({address}) =>
     <div className={Css.merge(list{CssHelper.flexBox(~justify=#flexEnd, ()), Styles.container})}>

@@ -7,7 +7,7 @@ module Styles = {
       backgroundColor(theme.neutral_000),
       border(#px(1), #solid, theme.neutral_200),
       marginRight(#px(16)),
-      borderRadius(#px(4)),
+      borderRadius(#px(8)),
       width(#percent(100.)),
       height(#px(50)),
       display(#flex),

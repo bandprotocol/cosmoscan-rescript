@@ -9,7 +9,7 @@ module Styles = {
       height(#px(37)),
       paddingLeft(#px(16)),
       paddingRight(#px(9)),
-      borderRadius(#px(4)),
+      borderRadius(#px(8)),
       fontSize(#px(14)),
       fontWeight(#light),
       border(#px(1), #solid, theme.neutral_200),

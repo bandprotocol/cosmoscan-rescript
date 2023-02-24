@@ -20,11 +20,12 @@ module Styles = {
 
   let button = (active, theme: Theme.t) =>
     style(. [
-      border(#px(1), #solid, active ? theme.neutral_600 : theme.neutral_200),
-      borderRadius(#px(4)),
+      // border(#px(2), #solid, active ? theme.neutral_600 : theme.neutral_200),
+      borderRadius(#px(8)),
       cursor(#pointer),
       backgroundColor(theme.neutral_000),
-      hover([border(#px(1), #solid, theme.neutral_600)]),
+      hover([selector("> div", [border(#px(2), #solid, theme.neutral_600)])]),
+      selector("> div", [border(#px(2), #solid, active ? theme.neutral_600 : theme.neutral_200)]),
     ])
 
   let backButton = (theme: Theme.t) =>

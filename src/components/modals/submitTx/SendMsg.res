@@ -13,41 +13,41 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
   })
   let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
 
-  // React.useEffect2(_ => {
-  //   let msgsOpt = {
-  //     let toAddressValue = {
-  //       switch toAddress.value {
-  //       | Some(address) => address
-  //       | None => Address.Address("")
-  //       }
-  //     }
+  React.useEffect2(_ => {
+    let msgsOpt = {
+      let toAddressValue = {
+        switch toAddress.value {
+        | Some(address) => address
+        | None => Address.Address("")
+        }
+      }
 
-  //     let amountValue = amount.value->Belt.Option.getWithDefault(0.)
+      let amountValue = amount.value->Belt.Option.getWithDefault(0.)
 
-  //     let coin = BandChainJS.Coin.create()
-  //     coin->BandChainJS.Coin.setDenom("uband")
-  //     coin->BandChainJS.Coin.setAmount(amountValue->Belt.Float.toString)
+      let coin = BandChainJS.Coin.create()
+      coin->BandChainJS.Coin.setDenom("uband")
+      coin->BandChainJS.Coin.setAmount(amountValue->Belt.Float.toString)
 
-  //     switch targetChain {
-  //     | IBCConnectionQuery.BAND => Some([TxCreator2.Send(toAddressValue, [coin])])
-  //     | IBC({channel}) =>
-  //       Some([
-  //         TxCreator2.IBCTransfer({
-  //           sourcePort: "transfer",
-  //           sourceChannel: channel,
-  //           receiver: toAddress.text, // Hack: use text instead
-  //           token: coin,
-  //           timeoutTimestamp: (MomentRe.momentNow()
-  //           ->MomentRe.Moment.defaultUtc
-  //           ->MomentRe.Moment.toUnix
-  //           ->float_of_int +. 600.) *. 1e9, // add 10 mins
-  //         }),
-  //       ])
-  //     }
-  //   }
-  //   setMsgsOpt(_ => msgsOpt)
-  //   None
-  // }, (toAddress, amount))
+      switch targetChain {
+      | IBCConnectionQuery.BAND => Some([TxCreator2.Send(toAddressValue, [coin])])
+      | IBC({channel}) =>
+        Some([
+          TxCreator2.IBCTransfer({
+            sourcePort: "transfer",
+            sourceChannel: channel,
+            receiver: toAddress.text, // Hack: use text instead
+            token: coin,
+            timeoutTimestamp: (MomentRe.momentNow()
+            ->MomentRe.Moment.defaultUtc
+            ->MomentRe.Moment.toUnix
+            ->float_of_int +. 600.) *. 1e9, // add 10 mins
+          }),
+        ])
+      }
+    }
+    setMsgsOpt(_ => msgsOpt)
+    None
+  }, (toAddress, amount))
 
   <>
     <Heading size=Heading.H5 value="Available Balance" marginBottom=8 />
