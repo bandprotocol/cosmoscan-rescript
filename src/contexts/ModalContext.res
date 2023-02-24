@@ -1,6 +1,7 @@
 type modal_t =
   | Connect(string)
   | SubmitTx(SubmitMsg.t)
+  | ChainSelector(IBCConnectionQuery.target_chain_t)
   | QRCode(Address.t)
   | IBCPacketError(string)
   | Syncing

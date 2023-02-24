@@ -13,48 +13,41 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
   })
   let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
 
-  React.useEffect2(_ => {
-    let msgsOpt = {
-      let toAddressValue = {
-        switch toAddress.value {
-        | Some(address) => address
-        | None => Address.Address("")
-        }
-      }
+  // React.useEffect2(_ => {
+  //   let msgsOpt = {
+  //     let toAddressValue = {
+  //       switch toAddress.value {
+  //       | Some(address) => address
+  //       | None => Address.Address("")
+  //       }
+  //     }
 
-      // let amountValue = {
-      //     switch amount.value {
-      //     | Some(amount') => amount'
-      //     | None => 0.
-      //     }
-      // }
+  //     let amountValue = amount.value->Belt.Option.getWithDefault(0.)
 
-      let amountValue = amount.value->Belt.Option.getWithDefault(0.)
+  //     let coin = BandChainJS.Coin.create()
+  //     coin->BandChainJS.Coin.setDenom("uband")
+  //     coin->BandChainJS.Coin.setAmount(amountValue->Belt.Float.toString)
 
-      let coin = BandChainJS.Coin.create()
-      coin->BandChainJS.Coin.setDenom("uband")
-      coin->BandChainJS.Coin.setAmount(amountValue->Js.Float.toString)
-
-      switch targetChain {
-      | IBCConnectionQuery.BAND => Some([TxCreator2.Send(toAddressValue, [coin])])
-      | IBC({channel}) =>
-        Some([
-          TxCreator2.IBCTransfer({
-            sourcePort: "transfer",
-            sourceChannel: channel,
-            receiver: toAddress.text, // Hack: use text instead
-            token: coin,
-            timeoutTimestamp: (MomentRe.momentNow()
-            ->MomentRe.Moment.defaultUtc
-            ->MomentRe.Moment.toUnix
-            ->float_of_int +. 600.) *. 1e9, // add 10 mins
-          }),
-        ])
-      }
-    }
-    setMsgsOpt(_ => msgsOpt)
-    None
-  }, (toAddress, amount))
+  //     switch targetChain {
+  //     | IBCConnectionQuery.BAND => Some([TxCreator2.Send(toAddressValue, [coin])])
+  //     | IBC({channel}) =>
+  //       Some([
+  //         TxCreator2.IBCTransfer({
+  //           sourcePort: "transfer",
+  //           sourceChannel: channel,
+  //           receiver: toAddress.text, // Hack: use text instead
+  //           token: coin,
+  //           timeoutTimestamp: (MomentRe.momentNow()
+  //           ->MomentRe.Moment.defaultUtc
+  //           ->MomentRe.Moment.toUnix
+  //           ->float_of_int +. 600.) *. 1e9, // add 10 mins
+  //         }),
+  //       ])
+  //     }
+  //   }
+  //   setMsgsOpt(_ => msgsOpt)
+  //   None
+  // }, (toAddress, amount))
 
   <>
     <Heading size=Heading.H5 value="Available Balance" marginBottom=8 />
@@ -62,9 +55,7 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
       {switch accountSub {
       | Data({balance}) =>
         <div>
-          <Text
-            value={balance |> Coin.getBandAmountFromCoins |> Format.fPretty(~digits=6)} code=true
-          />
+          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
           <Text value=" BAND" />
         </div>
       | _ => <LoadingCensorBar width=150 height=18 />
@@ -76,7 +67,7 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
       inputData=toAddress
       setInputData=setToAddress
       parse={switch targetChain {
-      | IBCConnectionQuery.BAND => Parse.bandAddress
+      | IBCConnectionQuery.BAND => Parse.address
       | IBC(_) => Parse.notBandAddress
       }}
       msg="Recipient Address"
@@ -91,13 +82,13 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
     {switch accountSub {
     | Data({balance}) =>
       //  TODO: hard-coded tx fee
-      let maxValInUband = (balance |> Coin.getUBandAmountFromCoins) -. 5000.
+      let maxValInUband = balance->Coin.getUBandAmountFromCoins -. 5000.
       <EnhanceTxInput
         width=300
         inputData=amount
         setInputData=setAmount
         parse={Parse.getBandAmount(maxValInUband)}
-        maxValue={maxValInUband /. 1e6 |> Js.Float.toString}
+        maxValue={(maxValInUband /. 1e6)->Js.Float.toString}
         msg="Send Amount (BAND)"
         inputType="number"
         code=true

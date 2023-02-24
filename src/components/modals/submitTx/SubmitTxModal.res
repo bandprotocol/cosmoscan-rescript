@@ -1,6 +1,5 @@
 module Styles = {
   open CssJs
-
   let container = style(. [
     flexDirection(#column),
     width(#px(468)),
@@ -13,34 +12,11 @@ module Styles = {
 
   let disable = isActive => style(. [display(isActive ? #flex : #none)])
 
-  let selectWrapper = style(. [
-    display(#flex),
-    flexDirection(#row),
-    padding2(~v=#px(3), ~h=#px(8)),
-    position(#static),
-    width(#px(130)),
-    height(#px(30)),
-    left(#zero),
-    top(#px(32)),
-    background(rgba(255, 255, 255, #num(1.))),
-    borderRadius(#px(100)),
-    boxShadow(Shadow.box(~x=#zero, ~y=#px(4), ~blur=#px(4), rgba(0, 0, 0, #num(0.1)))),
-    float(#left),
-    fontSize(#px(14)),
-  ])
-
-  let selectContent = style(. [
-    background(rgba(255, 255, 255, #num(1.))),
-    border(#px(0), #solid, #transparent),
-    width(#px(135)),
-    focus([outlineColor(Theme.white)]),
-  ])
-
   let nextBtn = style(. [width(#percent(100.)), marginTop(#px(24))])
 
   let info = style(. [display(#flex), justifyContent(#spaceBetween), alignItems(#center)])
   let toggle = style(. [cursor(#pointer), zIndex(100)])
-  let advancedOptions = (show, theme: Theme.t) => {
+  let advancedOptions = (show, theme: Theme.t) =>
     style(. [
       marginTop(#px(10)),
       transition(~duration=200, "all"),
@@ -48,7 +24,6 @@ module Styles = {
       opacity(show ? 1. : 0.),
       overflow(#hidden),
     ])
-  }
 
   let listContainer = style(. [width(#percent(100.)), marginBottom(#px(7))])
 }
@@ -100,13 +75,14 @@ module SubmitTxStep = {
       {switch msg {
       | SubmitMsg.Send(receiver, targetChain) =>
         <SendMsg address={account.address} receiver setMsgsOpt targetChain />
-      | Delegate(validator) => <DelegateMsg address={account.address} validator setMsgsOpt />
-      | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
-      | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
-      | WithdrawReward(validator) =>
-        <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
-      | Reinvest(validator, amount) => <ReinvestMsg validator setMsgsOpt amount />
-      | Vote(proposalID, proposalName) => <VoteMsg proposalID proposalName setMsgsOpt />
+      // | Delegate(validator) => <DelegateMsg address={account.address} validator setMsgsOpt />
+      // | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
+      // | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
+      // | WithdrawReward(validator) =>
+      //   <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
+      // | Reinvest(validator, amount) => <ReinvestMsg validator setMsgsOpt amount />
+      // | Vote(proposalID, proposalName) => <VoteMsg proposalID proposalName setMsgsOpt />
+      | _ => React.null
       }}
       <EnhanceTxInput
         width=300
@@ -121,15 +97,15 @@ module SubmitTxStep = {
       />
       <div
         onClick={_ => setShow(prev => !prev)}
-        className={Css.merge([CssHelper.flexBox(~justify=#center, ()), Styles.toggle])}>
+        className={Css.merge(list{CssHelper.flexBox(~justify=#center, ()), Styles.toggle})}>
         <Text
           block=true
           value={show ? "Hide Advanced Options" : "Show Advanced Options"}
           weight=Text.Semibold
-          color={theme.textPrimary}
+          color={theme.neutral_900}
         />
         <HSpacing size=Spacing.xs />
-        <Icon name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.textSecondary} />
+        <Icon name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.neutral_600} />
       </div>
       <div className={Styles.advancedOptions(show, theme)}>
         <ValueInput
@@ -141,7 +117,9 @@ module SubmitTxStep = {
             ? {
                 <div>
                   <Text
-                    value="Gas limit must be at least 300,000" size=Text.Sm color=Theme.failColor
+                    value="Gas limit must be at least 300,000"
+                    size=Text.Caption
+                    color=theme.error_600
                   />
                 </div>
               }
@@ -154,7 +132,7 @@ module SubmitTxStep = {
       </div>
       <SeperatedLine />
       <div className=Styles.info>
-        <Text value="Transaction Fee" size=Text.Md weight=Text.Medium nowrap=true block=true />
+        <Text value="Transaction Fee" size=Text.Body2 weight=Text.Medium nowrap=true block=true />
         <Text value="0.005 BAND" />
       </div>
       <div id="nextButtonContainer">
@@ -173,12 +151,7 @@ module SubmitTxStep = {
                 }
               }
 
-              let msgs = {
-                switch msgsOpt {
-                | Some(x) => x
-                | None => None
-                }
-              }
+              let msgs = msgsOpt->Belt.Option.getWithDefault(_, [])
 
               Some(
                 TxCreator2.createRawTx(
@@ -198,17 +171,15 @@ module SubmitTxStep = {
                 ),
               )
             }
-            let _ = async rawTxOpt => {
-              // | Some(rawTxPromise) =>
-              // let%Promise rawTx = rawTxPromise;
-              // setRawTx(_ => Some(rawTx));
-              // Promise.ret();
-              // | None => {
-              //     open Webapi.Dom
-              //     window->window.alert("Invalid Messages")
-              //     Promise.ret()
-              //   }
-            }
+            let _ = async () =>
+              switch rawTxOpt {
+              | Some(rawTxPromise) =>
+                let rawTx = await rawTxPromise
+                setRawTx(_ => Some(rawTx))
+              | None =>
+                open Webapi.Dom
+                window->Window.alert("invalid messages")
+              }
           }}>
           {"Next"->React.string}
         </Button>
@@ -217,7 +188,30 @@ module SubmitTxStep = {
   }
 }
 
+module CreateTxFlow = {
+  @react.component
+  let make = (~account, ~msg) => {
+    let (rawTx, setRawTx) = React.useState(_ => None)
+
+    <>
+      <SubmitTxStep account setRawTx isActive={rawTx->Belt.Option.isNone} msg />
+      {switch rawTx {
+      | None => React.null
+      | Some(rawTx') => <PreviewJsonStep rawTx=rawTx' onBack={_ => setRawTx(_ => None)} account />
+      }}
+    </>
+  }
+}
+
 @react.component
-let make = () => {
-  <div> {"Submit Msg"->React.string} </div>
+let make = (~msg) => {
+  let (account, _) = React.useContext(AccountContext.context)
+
+  switch account {
+  | Some(account') => <CreateTxFlow account=account' msg />
+  | None =>
+    <div className=Styles.container>
+      <Text value="Please sign in" size=Text.Body1 />
+    </div>
+  }
 }
