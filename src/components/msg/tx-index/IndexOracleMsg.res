@@ -107,7 +107,7 @@ module RenderCreateDataSourceMsg = {
 
 module RenderDataSourceMsgOuter = {
   @react.component
-  let make = (~msg: Msg.CreateDataSource.msg_t) => {
+  let make = (~msg: Msg.CreateDataSource.decoded_t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     switch msg {
@@ -208,7 +208,7 @@ module RenderDataSourceMsgOuter = {
 // }
 module CreateDataSourceMsg = {
   @react.component
-  let make = (~dataSource: Msg.CreateDataSource.msg_t) => {
+  let make = (~dataSource: Msg.CreateDataSource.decoded_t) => {
     <RenderDataSourceMsgOuter msg=dataSource />
   }
 }
@@ -350,7 +350,7 @@ module RequestMsg = {
     }
   }
   @react.component
-  let make = (~request: Msg.Request.msg_t) => {
+  let make = (~request: Msg.Request.decoded_t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div />
     // <Row>

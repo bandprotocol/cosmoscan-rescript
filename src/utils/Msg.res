@@ -26,11 +26,11 @@ module CreateDataSource = {
     id: 'a,
   }
 
-  type base_t = t<unit>
+  type input_t = t<unit>
   type failed_t = t<unit>
   type success_t = t<ID.DataSource.t>
 
-  type msg_t =
+  type decoded_t =
     | Success(success_t)
     | Failure(failed_t)
 
@@ -67,11 +67,11 @@ module Request = {
     schema: 'c,
   }
 
-  type base_t = t<unit, unit, unit>
+  type input_t = t<unit, unit, unit>
   type failed_t = t<unit, unit, unit>
   type success_t = t<ID.Request.t, string, string>
 
-  type msg_t =
+  type decoded_t =
     | Success(success_t)
     | Failure(failed_t)
 
@@ -105,8 +105,8 @@ module Request = {
 
 type msg_t =
   | SendMsg(Send.t)
-  | CreateDataSourceMsg(CreateDataSource.msg_t)
-  | RequestMsg(Request.msg_t)
+  | CreateDataSourceMsg(CreateDataSource.decoded_t)
+  | RequestMsg(Request.decoded_t)
   | UnknownMsg
 
 type t = {
@@ -148,31 +148,29 @@ let decodeMsg = (json, isSuccess) => {
       }
 
     | "/oracle.v1.MsgCreateDataSource" =>
-      switch isSuccess {
-      | true => {
-          let msg = json->mustDecode(CreateDataSource.decodeSuccess)
-          (CreateDataSourceMsg(Success(msg)), msg.sender, false)
-        }
+      isSuccess
+        ? {
+            let msg = json->mustDecode(CreateDataSource.decodeSuccess)
+            (CreateDataSourceMsg(Success(msg)), msg.sender, false)
+          }
+        : {
+            let msg = json->mustDecode(CreateDataSource.decodeFail)
+            (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
+          }
 
-      | false => {
-          let msg = json->mustDecode(CreateDataSource.decodeFail)
-          (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
-        }
-      }
     | "/oracle.v1.MsgRequestData" =>
-      // let msg = json->mustDecode(Request.decode)
-      // (RequestMsg(msg), msg.sender, false)
-      switch isSuccess {
-      | true => {
-          let msg = json->mustDecode(Request.decodeSuccess)
-          (RequestMsg(Success(msg)), msg.sender, false)
-        }
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Request.decodeSuccess)
+            (RequestMsg(Success(msg)), msg.sender, false)
+          }
+        : {
+            let msg = json->mustDecode(Request.decodeFail)
+            (RequestMsg(Failure(msg)), msg.sender, false)
+          }
 
-      | false => {
-          let msg = json->mustDecode(Request.decodeFail)
-          (RequestMsg(Failure(msg)), msg.sender, false)
-        }
-      }
+    // let msg = json->mustDecode(Request.decode)
+    // (RequestMsg(msg), msg.sender, false)
 
     | _ => (UnknownMsg, Address.Address(""), false)
     }
