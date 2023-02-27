@@ -66,6 +66,15 @@ module DataSourceSearchSingleConfig = %graphql(`
   }
 `)
 
+module OracleScriptSearchSingleConfig = %graphql(`
+  query OracleScriptSearchSingle( $id: Int!) {
+    oracle_scripts_by_pk(id: $id) @ppxAs(type: "OracleScriptSearch.t") {
+      id @ppxCustom(module: "GraphQLParserModule.OracleScriptID")
+      name
+    }
+  }
+`)
+
 module ProposalSearch = {
   type t = {
     id: ID.Proposal.t,
@@ -300,6 +309,20 @@ let getDataSourceName = (~id, ()) => {
   ->Query.map(({data_sources_by_pk}) => {
     switch data_sources_by_pk {
     | Some(dataSource) => Query.resolve(dataSource)
+    | None => Query.NoData
+    }
+  })
+}
+
+let getOracleScriptName = (~id, ()) => {
+  let result = OracleScriptSearchSingleConfig.use({
+    id: id,
+  })
+  result
+  ->Query.fromData
+  ->Query.map(({oracle_scripts_by_pk}) => {
+    switch oracle_scripts_by_pk {
+    | Some(os) => Query.resolve(os)
     | None => Query.NoData
     }
   })

@@ -27,7 +27,7 @@ module Styles = {
 
   let iconContainer = style(. [
     position(#absolute),
-    right(#px(10)),
+    right(#px(16)),
     top(#percent(50.)),
     transform(#translateY(#percent(-50.))),
   ])
@@ -81,8 +81,8 @@ module Styles = {
 
   let resultContent = (theme: Theme.t) =>
     style(. [
-      selector("ul > li", [marginTop(#px(0))]),
-      selector("ul > li:first-child", [borderTop(#zero, solid, theme.neutral_200)]),
+      selector("> li", [marginTop(#px(0))]),
+      selector("> li:first-child", [borderTop(#zero, solid, theme.neutral_200)]),
     ])
 
   let resultItemFocused = style(. [
@@ -231,12 +231,11 @@ module RenderDataSourceWithNameLink = {
 module RenderOracleScriptWithNameLink = {
   @react.component
   let make = (~id) => {
-    let osName = SearchBarQuery.searchOracleScript(~filter=id, ())
+    let osName = SearchBarQuery.getOracleScriptName(~id, ())
     switch osName {
     | Data(data) =>
-      let result = data->Belt.Array.get(0)
-      switch result {
-      | Some({id, name}) =>
+      switch data {
+      | Data({id, name}) =>
         <TypeID.OracleScriptLink id={id}>
           <div className={Css.merge(list{CssHelper.flexBox()})}>
             <TypeID.OracleScript id={id} position=TypeID.Subtitle />
@@ -271,299 +270,295 @@ module RenderSearchResult = {
     let len = trimSearchTerm->String.length
 
     <div className={Styles.resultInner(theme)}>
-      <ul>
-        <div className={Styles.resultContent((theme: Theme.t))}>
-          {
-            let route = Route.search(trimSearchTerm)
-            open Route
-            switch route {
-            | BlockDetailsPage(id) =>
-              <>
-                <li className={Styles.resultHeading(theme)}>
-                  <Heading
-                    size=Heading.H4
-                    value="Block"
-                    align=Heading.Left
-                    weight=Heading.Semibold
-                    color={theme.neutral_600}
-                  />
-                </li>
-                <li className={Styles.resultItem}>
-                  <div className={Styles.innerResultItem}>
-                    <TypeID.Block id={id->ID.Block.fromInt} position=TypeID.Subtitle block=true />
-                  </div>
-                </li>
-              </>
-            | RequestIndexPage(id) =>
-              <>
-                <li className={Styles.resultHeading(theme)}>
-                  <Heading
-                    size=Heading.H4
-                    value="Requests"
-                    align=Heading.Left
-                    weight=Heading.Semibold
-                    color={theme.neutral_600}
-                  />
-                </li>
-                <li className={Styles.resultItem}>
-                  <div className={Styles.innerResultItem}>
-                    <TypeID.Request
-                      id={id->ID.Request.fromInt} position=TypeID.Subtitle block=true
-                    />
-                  </div>
-                </li>
-              </>
-
-            | DataSourceDetailsPage(id, _) =>
-              <>
-                <li className={Styles.resultHeading(theme)}>
-                  <Heading
-                    size=Heading.H4
-                    value="Data Sources"
-                    align=Heading.Left
-                    weight=Heading.Semibold
-                    color={theme.neutral_600}
-                  />
-                </li>
-                <li className={Styles.resultItem}>
-                  <div className={Styles.innerResultItem}>
-                    <RenderDataSourceWithNameLink id={id} />
-                  </div>
-                </li>
-              </>
-
-            | OracleScriptDetailsPage(id, _) =>
-              <>
-                <li className={Styles.resultHeading(theme)}>
-                  <Heading
-                    size=Heading.H4
-                    value="Oracle Scripts"
-                    align=Heading.Left
-                    weight=Heading.Semibold
-                    color={theme.neutral_600}
-                  />
-                </li>
-                <li className={Styles.resultItem}>
-                  <div className={Styles.innerResultItem}>
-                    <RenderOracleScriptWithNameLink id={id->Belt.Int.toString} />
-                  </div>
-                </li>
-              </>
-
-            | ValidatorDetailsPage(_, _) =>
-              switch trimSearchTerm->Address.fromBech32Opt {
-              | Some(address) =>
-                <>
-                  <li className={Styles.resultHeading(theme)}>
-                    <Heading
-                      size=Heading.H4
-                      value="Address"
-                      align=Heading.Left
-                      weight=Heading.Semibold
-                      color={theme.neutral_600}
-                    />
-                  </li>
-                  <li className={Styles.resultItem}>
-                    <div className={Styles.innerResultItem}>
-                      <RenderMonikerLink validatorAddress={address} />
-                    </div>
-                  </li>
-                </>
-              | None => <RenderNotFound searchTerm=trimSearchTerm />
-              }
-            | AccountIndexPage(_, _) =>
-              switch trimSearchTerm->Address.fromBech32Opt {
-              | Some(address) =>
-                <>
-                  <li className={Styles.resultHeading(theme)}>
-                    <Heading
-                      size=Heading.H4
-                      value="Address"
-                      align=Heading.Left
-                      weight=Heading.Semibold
-                      color={theme.neutral_600}
-                    />
-                  </li>
-                  <li className={Styles.resultItem}>
-                    <div className={Styles.innerResultItem}>
-                      <AddressRender address={address} position=AddressRender.Subtitle />
-                    </div>
-                  </li>
-                </>
-              | None => <RenderNotFound searchTerm=trimSearchTerm />
-              }
-            | TxIndexPage(_) =>
-              <>
-                <li className={Styles.resultHeading(theme)}>
-                  <Heading
-                    size=Heading.H4
-                    value="Transaction"
-                    align=Heading.Left
-                    weight=Heading.Semibold
-                    color={theme.neutral_600}
-                  />
-                </li>
-                <li className={Styles.resultItem}>
-                  <div className={Styles.innerResultItem}>
-                    <TxLink txHash={trimSearchTerm->Hash.fromHex} width=800 size=Text.Body2 />
-                  </div>
-                </li>
-              </>
-            | _ =>
-              switch (results, resultLength) {
-              | (Data(_), 0) => <RenderNotFound searchTerm=trimSearchTerm />
-
-              | (Data(blocks, requests, os, ds, proposals), _) =>
-                <>
-                  {switch blocks->Belt.Array.length {
-                  | 0 => React.null
-                  | _ =>
-                    <>
-                      <li className={Styles.resultHeading(theme)}>
-                        <Heading
-                          size=Heading.H4
-                          value="Blocks"
-                          align=Heading.Left
-                          weight=Heading.Semibold
-                          color={theme.neutral_600}
-                        />
-                      </li>
-                      {blocks
-                      ->Belt.Array.mapWithIndex((i, result) => {
-                        <li className={Styles.resultItem} key={i->Belt.Int.toString}>
-                          <div className={Styles.innerResultItem}>
-                            <TypeID.Block id=result.height position=TypeID.Subtitle block=true />
-                          </div>
-                        </li>
-                      })
-                      ->React.array}
-                    </>
-                  }}
-                  {switch requests->Belt.Array.length {
-                  | 0 => React.null
-                  | _ =>
-                    <>
-                      <li className={Styles.resultHeading(theme)}>
-                        <Heading
-                          size=Heading.H4
-                          value="Requests"
-                          align=Heading.Left
-                          weight=Heading.Semibold
-                          color={theme.neutral_600}
-                        />
-                      </li>
-                      {requests
-                      ->Belt.Array.mapWithIndex((i, result) => {
-                        <li className={Styles.resultItem} key={i->Belt.Int.toString}>
-                          <div className={Styles.innerResultItem}>
-                            <TypeID.Request id=result.id position=TypeID.Subtitle block=true />
-                          </div>
-                        </li>
-                      })
-                      ->React.array}
-                    </>
-                  }}
-                  {switch os->Belt.Array.length {
-                  | 0 => React.null
-                  | _ =>
-                    <>
-                      <li className={Styles.resultHeading(theme)}>
-                        <Heading
-                          size=Heading.H4
-                          value="Oracle Scripts"
-                          align=Heading.Left
-                          weight=Heading.Semibold
-                          color={theme.neutral_600}
-                        />
-                      </li>
-                      {os
-                      ->Belt.Array.mapWithIndex((i, result) => {
-                        <li className={Styles.resultItem} key={i->Belt.Int.toString}>
-                          <div className={Styles.innerResultItem}>
-                            <TypeID.OracleScriptLink id={result.id}>
-                              <div className={Css.merge(list{CssHelper.flexBox()})}>
-                                <TypeID.OracleScript id={result.id} position=TypeID.Subtitle />
-                                <HSpacing size=Spacing.sm />
-                                <HighLightText title={result.name} searchTerm=trimSearchTerm />
-                              </div>
-                            </TypeID.OracleScriptLink>
-                          </div>
-                        </li>
-                      })
-                      ->React.array}
-                    </>
-                  }}
-                  {switch ds->Belt.Array.length {
-                  | 0 => React.null
-                  | _ =>
-                    <>
-                      <li className={Styles.resultHeading(theme)}>
-                        <Heading
-                          size=Heading.H4
-                          value="Data Sources"
-                          align=Heading.Left
-                          weight=Heading.Semibold
-                          color={theme.neutral_600}
-                        />
-                      </li>
-                      {ds
-                      ->Belt.Array.mapWithIndex((i, result) => {
-                        <li className={Styles.resultItem} key={i->Belt.Int.toString}>
-                          <div className={Styles.innerResultItem}>
-                            <TypeID.DataSourceLink id={result.id}>
-                              <div className={Css.merge(list{CssHelper.flexBox()})}>
-                                <TypeID.DataSource id={result.id} position=TypeID.Subtitle />
-                                <HSpacing size=Spacing.sm />
-                                <HighLightText title={result.name} searchTerm=trimSearchTerm />
-                              </div>
-                            </TypeID.DataSourceLink>
-                          </div>
-                        </li>
-                      })
-                      ->React.array}
-                    </>
-                  }}
-                  {switch proposals->Belt.Array.length {
-                  | 0 => React.null
-                  | _ =>
-                    <>
-                      <li className={Styles.resultHeading(theme)}>
-                        <Heading
-                          size=Heading.H4
-                          value="Proposals"
-                          align=Heading.Left
-                          weight=Heading.Semibold
-                          color={theme.neutral_600}
-                        />
-                      </li>
-                      {proposals
-                      ->Belt.Array.mapWithIndex((i, result) => {
-                        <li className={Styles.resultItem} key={i->Belt.Int.toString}>
-                          <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
-                            <TypeID.ProposalLink id={result.id}>
-                              <div className={Css.merge(list{CssHelper.flexBox()})}>
-                                <TypeID.Proposal id={result.id} position=TypeID.Subtitle />
-                                <HSpacing size=Spacing.sm />
-                                <HighLightText title={result.title} searchTerm=trimSearchTerm />
-                              </div>
-                            </TypeID.ProposalLink>
-                          </div>
-                        </li>
-                      })
-                      ->React.array}
-                    </>
-                  }}
-                </>
-
-              | (Loading, _) =>
-                <div className={Styles.resultNotFound}>
-                  <LoadingCensorBar width=100 height=20 />
+      <ul className={Styles.resultContent((theme: Theme.t))}>
+        {
+          let route = Route.search(trimSearchTerm)
+          open Route
+          switch route {
+          | BlockDetailsPage(id) =>
+            <>
+              <li className={Styles.resultHeading(theme)}>
+                <Heading
+                  size=Heading.H4
+                  value="Block"
+                  align=Heading.Left
+                  weight=Heading.Semibold
+                  color={theme.neutral_600}
+                />
+              </li>
+              <li className={Styles.resultItem}>
+                <div className={Styles.innerResultItem}>
+                  <TypeID.Block id={id->ID.Block.fromInt} position=TypeID.Subtitle block=true />
                 </div>
-              | _ => <RenderNotFound searchTerm=trimSearchTerm />
-              }
+              </li>
+            </>
+          | RequestIndexPage(id) =>
+            <>
+              <li className={Styles.resultHeading(theme)}>
+                <Heading
+                  size=Heading.H4
+                  value="Requests"
+                  align=Heading.Left
+                  weight=Heading.Semibold
+                  color={theme.neutral_600}
+                />
+              </li>
+              <li className={Styles.resultItem}>
+                <div className={Styles.innerResultItem}>
+                  <TypeID.Request id={id->ID.Request.fromInt} position=TypeID.Subtitle block=true />
+                </div>
+              </li>
+            </>
+
+          | DataSourceDetailsPage(id, _) =>
+            <>
+              <li className={Styles.resultHeading(theme)}>
+                <Heading
+                  size=Heading.H4
+                  value="Data Sources"
+                  align=Heading.Left
+                  weight=Heading.Semibold
+                  color={theme.neutral_600}
+                />
+              </li>
+              <li className={Styles.resultItem}>
+                <div className={Styles.innerResultItem}>
+                  <RenderDataSourceWithNameLink id={id} />
+                </div>
+              </li>
+            </>
+
+          | OracleScriptDetailsPage(id, _) =>
+            <>
+              <li className={Styles.resultHeading(theme)}>
+                <Heading
+                  size=Heading.H4
+                  value="Oracle Scripts"
+                  align=Heading.Left
+                  weight=Heading.Semibold
+                  color={theme.neutral_600}
+                />
+              </li>
+              <li className={Styles.resultItem}>
+                <div className={Styles.innerResultItem}>
+                  <RenderOracleScriptWithNameLink id={id} />
+                </div>
+              </li>
+            </>
+
+          | ValidatorDetailsPage(_, _) =>
+            switch trimSearchTerm->Address.fromBech32Opt {
+            | Some(address) =>
+              <>
+                <li className={Styles.resultHeading(theme)}>
+                  <Heading
+                    size=Heading.H4
+                    value="Address"
+                    align=Heading.Left
+                    weight=Heading.Semibold
+                    color={theme.neutral_600}
+                  />
+                </li>
+                <li className={Styles.resultItem}>
+                  <div className={Styles.innerResultItem}>
+                    <RenderMonikerLink validatorAddress={address} />
+                  </div>
+                </li>
+              </>
+            | None => <RenderNotFound searchTerm=trimSearchTerm />
+            }
+          | AccountIndexPage(_, _) =>
+            switch trimSearchTerm->Address.fromBech32Opt {
+            | Some(address) =>
+              <>
+                <li className={Styles.resultHeading(theme)}>
+                  <Heading
+                    size=Heading.H4
+                    value="Address"
+                    align=Heading.Left
+                    weight=Heading.Semibold
+                    color={theme.neutral_600}
+                  />
+                </li>
+                <li className={Styles.resultItem}>
+                  <div className={Styles.innerResultItem}>
+                    <AddressRender address={address} position=AddressRender.Subtitle />
+                  </div>
+                </li>
+              </>
+            | None => <RenderNotFound searchTerm=trimSearchTerm />
+            }
+          | TxIndexPage(_) =>
+            <>
+              <li className={Styles.resultHeading(theme)}>
+                <Heading
+                  size=Heading.H4
+                  value="Transaction"
+                  align=Heading.Left
+                  weight=Heading.Semibold
+                  color={theme.neutral_600}
+                />
+              </li>
+              <li className={Styles.resultItem}>
+                <div className={Styles.innerResultItem}>
+                  <TxLink txHash={trimSearchTerm->Hash.fromHex} width=800 size=Text.Body2 />
+                </div>
+              </li>
+            </>
+          | _ =>
+            switch (results, resultLength) {
+            | (Data(_), 0) => <RenderNotFound searchTerm=trimSearchTerm />
+
+            | (Data(blocks, requests, os, ds, proposals), _) =>
+              <>
+                {switch blocks->Belt.Array.length {
+                | 0 => React.null
+                | _ =>
+                  <>
+                    <li className={Styles.resultHeading(theme)}>
+                      <Heading
+                        size=Heading.H4
+                        value="Blocks"
+                        align=Heading.Left
+                        weight=Heading.Semibold
+                        color={theme.neutral_600}
+                      />
+                    </li>
+                    {blocks
+                    ->Belt.Array.mapWithIndex((i, result) => {
+                      <li className={Styles.resultItem} key={i->Belt.Int.toString}>
+                        <div className={Styles.innerResultItem}>
+                          <TypeID.Block id=result.height position=TypeID.Subtitle block=true />
+                        </div>
+                      </li>
+                    })
+                    ->React.array}
+                  </>
+                }}
+                {switch requests->Belt.Array.length {
+                | 0 => React.null
+                | _ =>
+                  <>
+                    <li className={Styles.resultHeading(theme)}>
+                      <Heading
+                        size=Heading.H4
+                        value="Requests"
+                        align=Heading.Left
+                        weight=Heading.Semibold
+                        color={theme.neutral_600}
+                      />
+                    </li>
+                    {requests
+                    ->Belt.Array.mapWithIndex((i, result) => {
+                      <li className={Styles.resultItem} key={i->Belt.Int.toString}>
+                        <div className={Styles.innerResultItem}>
+                          <TypeID.Request id=result.id position=TypeID.Subtitle block=true />
+                        </div>
+                      </li>
+                    })
+                    ->React.array}
+                  </>
+                }}
+                {switch os->Belt.Array.length {
+                | 0 => React.null
+                | _ =>
+                  <>
+                    <li className={Styles.resultHeading(theme)}>
+                      <Heading
+                        size=Heading.H4
+                        value="Oracle Scripts"
+                        align=Heading.Left
+                        weight=Heading.Semibold
+                        color={theme.neutral_600}
+                      />
+                    </li>
+                    {os
+                    ->Belt.Array.mapWithIndex((i, result) => {
+                      <li className={Styles.resultItem} key={i->Belt.Int.toString}>
+                        <div className={Styles.innerResultItem}>
+                          <TypeID.OracleScriptLink id={result.id}>
+                            <div className={Css.merge(list{CssHelper.flexBox()})}>
+                              <TypeID.OracleScript id={result.id} position=TypeID.Subtitle />
+                              <HSpacing size=Spacing.sm />
+                              <HighLightText title={result.name} searchTerm=trimSearchTerm />
+                            </div>
+                          </TypeID.OracleScriptLink>
+                        </div>
+                      </li>
+                    })
+                    ->React.array}
+                  </>
+                }}
+                {switch ds->Belt.Array.length {
+                | 0 => React.null
+                | _ =>
+                  <>
+                    <li className={Styles.resultHeading(theme)}>
+                      <Heading
+                        size=Heading.H4
+                        value="Data Sources"
+                        align=Heading.Left
+                        weight=Heading.Semibold
+                        color={theme.neutral_600}
+                      />
+                    </li>
+                    {ds
+                    ->Belt.Array.mapWithIndex((i, result) => {
+                      <li className={Styles.resultItem} key={i->Belt.Int.toString}>
+                        <div className={Styles.innerResultItem}>
+                          <TypeID.DataSourceLink id={result.id}>
+                            <div className={Css.merge(list{CssHelper.flexBox()})}>
+                              <TypeID.DataSource id={result.id} position=TypeID.Subtitle />
+                              <HSpacing size=Spacing.sm />
+                              <HighLightText title={result.name} searchTerm=trimSearchTerm />
+                            </div>
+                          </TypeID.DataSourceLink>
+                        </div>
+                      </li>
+                    })
+                    ->React.array}
+                  </>
+                }}
+                {switch proposals->Belt.Array.length {
+                | 0 => React.null
+                | _ =>
+                  <>
+                    <li className={Styles.resultHeading(theme)}>
+                      <Heading
+                        size=Heading.H4
+                        value="Proposals"
+                        align=Heading.Left
+                        weight=Heading.Semibold
+                        color={theme.neutral_600}
+                      />
+                    </li>
+                    {proposals
+                    ->Belt.Array.mapWithIndex((i, result) => {
+                      <li className={Styles.resultItem} key={i->Belt.Int.toString}>
+                        <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
+                          <TypeID.ProposalLink id={result.id}>
+                            <div className={Css.merge(list{CssHelper.flexBox()})}>
+                              <TypeID.Proposal id={result.id} position=TypeID.Subtitle />
+                              <HSpacing size=Spacing.sm />
+                              <HighLightText title={result.title} searchTerm=trimSearchTerm />
+                            </div>
+                          </TypeID.ProposalLink>
+                        </div>
+                      </li>
+                    })
+                    ->React.array}
+                  </>
+                }}
+              </>
+
+            | (Loading, _) =>
+              <div className={Styles.resultNotFound}>
+                <LoadingCensorBar width=100 height=20 />
+              </div>
+            | _ => <RenderNotFound searchTerm=trimSearchTerm />
             }
           }
-        </div>
+        }
       </ul>
     </div>
   }
@@ -697,12 +692,6 @@ let make = () => {
   let handleKeyDown = (event, ()) => {
     let nextIndexCount = 0
     switch ReactEvent.Keyboard.key(event) {
-    // | "ArrowUp" =>
-    //   dispatch(ArrowPressed(Up))
-    //   ReactEvent.Keyboard.preventDefault(event)
-    // | "ArrowDown" =>
-    //   dispatch(ArrowPressed(Down))
-    //   ReactEvent.Keyboard.preventDefault(event)
     | "Enter" =>
       dispatch(ChangeSearchTerm(""))
       setIsSearching(_ => false)
