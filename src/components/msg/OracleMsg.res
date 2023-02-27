@@ -52,17 +52,34 @@ module EditDataSourceMsg = {
 }
 
 module CreateOracleScriptMsg = {
-  @react.component
-  let make = (~id, ~name) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
-      <TypeID.OracleScript id />
-      <Text value=name nowrap=true block=true ellipsis=true />
-    </div>
+  module Outer = {
+    @react.component
+    let make = (~msg: Msg.CreateOracleScript.t<'a>, ~children) =>
+      <div
+        className={CssJs.merge(. [
+          CssHelper.flexBox(~wrap=#nowrap, ()),
+          CssHelper.overflowHidden,
+          Styles.msgContainer,
+        ])}>
+        children
+        <Text value={msg.name} nowrap=true block=true ellipsis=true />
+      </div>
+  }
+  module Success = {
+    @react.component
+    let make = (~msg) =>
+      <Outer msg>
+        <TypeID.OracleScript id=msg.id />
+      </Outer>
+  }
+
+  module Failure = {
+    @react.component
+    let make = (~msg) =>
+      <Outer msg>
+        <div />
+      </Outer>
+  }
 }
 
 module EditOracleScriptMsg = {

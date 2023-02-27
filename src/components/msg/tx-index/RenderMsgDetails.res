@@ -182,6 +182,35 @@ module EditDataSource = {
   ]
 }
 
+module CreateOracleScript = {
+  let factory = (msg: Msg.CreateOracleScript.t<'a>, firsts) =>
+    firsts->Belt.Array.concat([{title: "Owner", content: Address(msg.owner), order: 2}])
+
+  let success = (msg: Msg.CreateOracleScript.success_t) =>
+    msg->factory([
+      {
+        title: "ID",
+        content: ID(
+          <div className={CssHelper.flexBox()}>
+            <TypeID.OracleScript position=TypeID.Subtitle id={msg.id} />
+            <HSpacing size=Spacing.sm />
+            <Text value={msg.name} size=Text.Body1 />
+          </div>,
+        ),
+        order: 1,
+      },
+    ])
+
+  let failed = (msg: Msg.CreateOracleScript.failed_t) =>
+    msg->factory([
+      {
+        title: "Name",
+        content: PlainText(msg.name),
+        order: 1,
+      },
+    ])
+}
+
 module Send = {
   let factory = (msg: Msg.Send.t) => [
     {
@@ -210,6 +239,11 @@ let getContent = msg => {
     | Msg.CreateDataSource.Failure(innerData) => CreateDataSource.failed(innerData)
     }
   | Msg.EditDataSourceMsg(innerData) => EditDataSource.factory(innerData)
+  | Msg.CreateOracleScriptMsg(m) =>
+    switch m {
+    | Msg.CreateOracleScript.Success(innerData) => CreateOracleScript.success(innerData)
+    | Msg.CreateOracleScript.Failure(innerData) => CreateOracleScript.failed(innerData)
+    }
   | Msg.RequestMsg(m) =>
     switch m {
     | Msg.Request.Success(innerData) => Request.success(innerData)

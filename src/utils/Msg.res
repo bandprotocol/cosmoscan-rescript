@@ -76,6 +76,38 @@ module EditDataSource = {
   }
 }
 
+module CreateOracleScript = {
+  type t<'a> = {
+    owner: Address.t,
+    name: string,
+    code: JsBuffer.t,
+    sender: Address.t,
+    id: 'a,
+  }
+
+  type failed_t = t<unit>
+  type success_t = t<ID.OracleScript.t>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(failed_t)
+
+  let decodeFactory = idDecoder => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      owner: json.required(list{"msg", "owner"}, string)->Address.fromBech32,
+      name: json.required(list{"msg", "name"}, string),
+      code: json.required(list{"msg", "code"}, string)->JsBuffer.fromBase64,
+      sender: json.required(list{"msg", "sender"}, string)->Address.fromBech32,
+      id: json->idDecoder,
+    })
+  }
+  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => ())
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = decodeFactory(json =>
+    json.required(list{"msg", "id"}, ID.OracleScript.decoder)
+  )
+}
+
 module Request = {
   type t<'a, 'b, 'c> = {
     oracleScriptID: ID.OracleScript.t,
@@ -130,6 +162,7 @@ type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
   | EditDataSourceMsg(EditDataSource.t)
+  | CreateOracleScriptMsg(CreateOracleScript.decoded_t)
   | RequestMsg(Request.decoded_t)
   | UnknownMsg
 
@@ -158,6 +191,7 @@ let getBadge = msg => {
   | SendMsg(_) => {name: "Send", category: TokenMsg}
   | CreateDataSourceMsg(_) => {name: "Create Data Source", category: OracleMsg}
   | EditDataSourceMsg(_) => {name: "Edit Data Source", category: OracleMsg}
+  | CreateOracleScriptMsg(_) => {name: "Create Oracle Script", category: OracleMsg}
   | RequestMsg(_) => {name: "Request", category: OracleMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
@@ -186,6 +220,16 @@ let decodeMsg = (json, isSuccess) => {
     | "/oracle.v1.MsgEditDataSource" =>
       let msg = json->mustDecode(EditDataSource.decode)
       (EditDataSourceMsg(msg), msg.sender, false)
+    | "/oracle.v1.MsgCreateOracleScript" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(CreateOracleScript.decodeSuccess)
+            (CreateOracleScriptMsg(Success(msg)), msg.sender, false)
+          }
+        : {
+            let msg = json->mustDecode(CreateOracleScript.decodeFail)
+            (CreateOracleScriptMsg(Failure(msg)), msg.sender, false)
+          }
 
     | "/oracle.v1.MsgRequestData" =>
       isSuccess
