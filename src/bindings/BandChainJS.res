@@ -7,7 +7,7 @@ module Client = {
 
   @module("@bandprotocol/bandchain.js") @new external create: string => t = "Client"
   @send
-  external getReferenceData: (t, array<string>) => promise<array<reference_data_t>> =
+  external getReferenceData: (t, array<string>, int, int) => promise<array<reference_data_t>> =
     "getReferenceData"
   @send external sendTxBlockMode: (t, JsBuffer.t) => Js.Promise.t<'a> = "sendTxBlockMode"
   @send external sendTxSyncMode: (t, JsBuffer.t) => Js.Promise.t<'a> = "sendTxSyncMode"
@@ -17,47 +17,61 @@ module Address = {
   type t
 
   @module("@bandprotocol/bandchain.js") @scope(("Wallet", "Address"))
-  @val external fromHex: string => t = "fromHex";
+  @val external fromHex: string => t = "fromHex"
 
-  @send external toAccBech32: t => string = "toAccBech32";
+  @send external toAccBech32: t => string = "toAccBech32"
+  @send external toHex: t => string = "toHex"
 }
 
 module PubKey = {
   type t
 
   @module("@bandprotocol/bandchain.js") @scope(("Wallet", "PublicKey"))
-  @val external fromHex: string => t = "fromHex";
+  @val external fromHex: string => t = "fromHex"
 
-  @send external toHex: t => string = "toHex";
-  @send external toBech32: string => string = "toBech32";
-  @send external toAddress: (t) => Address.t = "toAddress";
+  @send external toHex: t => string = "toHex"
+  @send external toBech32: (t, string) => string = "toBech32"
+  @send external toAddress: (t) => Address.t = "toAddress"
+  @send external toAccBech32: t => string = "toAccBech32"
 }
 
 module PrivateKey = {
   type t
 
   @module("@bandprotocol/bandchain.js") @scope(("Wallet", "PrivateKey"))
-  @val external fromMnemonic: (string, string) => t = "fromMnemonic";
+  @val external fromMnemonic: (string, string) => t = "fromMnemonic"
 
-  @send external sign: (t, array<int>) => JsBuffer.t = "sign";
-  @send external toHex: (t) => string = "toHex";
-  @send external toPubkey: (t) => PubKey.t = "toPubkey";
+  @send external sign: (t, array<int>) => JsBuffer.t = "sign"
+  @send external toHex: (t) => string = "toHex"
+  @send external toPubkey: (t) => PubKey.t = "toPubkey"
 }
 
 module Coin = {
-  type t;
+  type t
 
   @module("@bandprotocol/bandchain.js") @new external create: () => t = "Coin"
-  @send external setDenom: (t, string) => unit = "setDenom";
-  @send external setAmount: (t, string) => unit = "setAmount";
-};
+  @send external getDenom: t => string = "getDenom"
+  @send external setDenom: (t, string) => unit = "setDenom"
+  @send external getAmount: t => string = "getAmount"
+  @send external setAmount: (t, string) => unit = "setAmount"
+}
 
 module Fee = {
-  type t;
+  type t
 
   @module("@bandprotocol/bandchain.js") @new external create: () => t = "Fee"
-  @send external setAmountList: (t, array<Coin.t>) => unit = "setAmountList";
-  @send external setGasLimit: (t, int) => unit = "setGasLimit";
+  @send external setAmountList: (t, array<Coin.t>) => unit = "setAmountList"
+  @send external getAmountList: t => array<Coin.t> = "getAmountList"
+
+  @send external setGasLimit: (t, int) => unit = "setGasLimit"
+  @send external getGasLimit: t => int = "getGasLimit"
+
+  @send external setPayer: (t, string) => unit = "setPayer"
+  @send external getPayer: t => string = "getPayer"
+
+  @send external setGranter: (t, string) => unit = "setGranter"
+  @send external getGranter: t => string = "getGranter"
+
 }
 
 module Message = {
@@ -66,42 +80,58 @@ module Message = {
   module MsgSend = {
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (string, string, array<Coin.t>) => t = "MsgSend"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
   }
 
   module MsgDelegate = {
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (string, string, Coin.t) => t = "MsgDelegate"
+    
+    @send external toJSON: t => Js.Json.t = "toJSON"
   }
 
   module MsgUndelegate = {
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (string, string, Coin.t) => t = "MsgUndelegate"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
   }
 
   module MsgRedelegate = {
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (string, string, string, Coin.t) => t = "MsgBeginRedelegate"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
   }
 
   module MsgWithdrawReward = {
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (string, string) => t = "MsgWithdrawDelegatorReward"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
   }
 
   module MsgVote = {
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (int, string, int) => t = "MsgVote"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
   }
 
   module MsgRequest = {
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (int, JsBuffer.t, int, int, string, string, array<Coin.t>, option<int>, option<int>) =>
     t = "MsgRequestData"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
   }
 
   module MsgTransfer = {
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (string, string, string, string, Coin.t, float) => t = "MsgTransfer"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
   }
 }
 

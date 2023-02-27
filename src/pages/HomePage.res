@@ -9,11 +9,14 @@ let make = () => {
     open BandChainJS
 
     let mnemo = "mule way gather advance quote endorse boat liquid kite mad cart"
-    let privKey = PrivateKey.fromMnemonic("aa", "m/44'/494'/0'/0/0")
+    let privKey = PrivateKey.fromMnemonic(mnemo, "m/44'/494'/0'/0/0")
     let pub = privKey -> PrivateKey.toPubkey 
     let address = pub -> PubKey.toAddress -> Address.toAccBech32
 
     Js.log(address)
+    Js.log(pub -> PubKey.toHex)
+    Js.log(pub -> PubKey.toAddress -> Address.toHex -> PubKey.fromHex -> PubKey.toHex)
+    // Js.log("0212de71dbfc3b2f6580751d6d5a9fe8c98e2eb6b399045ea08c164505ddd45b66" -> Address.fromHex)
 
     let client = Client.create(Env.grpc)
     let obi = Obi.create("{symbols:[string],multiplier:u64}/{rates:[u64]}")
@@ -25,6 +28,8 @@ let make = () => {
     let coin = Coin.create()
     coin -> Coin.setDenom("uband")
     coin -> Coin.setAmount("1000000")
+
+    Js.log(coin->Coin.getDenom)
 
     let feeCoin = Coin.create()
     feeCoin -> Coin.setDenom("uband")
@@ -42,6 +47,14 @@ let make = () => {
       Some(50000),
       Some(200000),
     )
+
+    let sendMsg = Message.MsgSend.create(
+      "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
+      "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
+      [coin],
+    )
+
+    Js.log(sendMsg->Message.MsgSend.toJSON)
 
     let fee = Fee.create()
     fee -> Fee.setAmountList([feeCoin])
@@ -65,10 +78,20 @@ let make = () => {
     Js.log(response)
   }
 
+  let jest = async () => {
+    open BandChainJS
+
+    let client = Client.create(Env.grpc)
+    let obj = await client->Client.getReferenceData(["BTC/USD"], 3, 4) 
+    Js.log(obj)
+    // let obj = client->Client.getReferenceData(["BTC/USD"]) 
+  }
+
   <Section>
     <div className=CssHelper.container id="proposalsSection">
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
       <Button onClick={_ => doSmth() -> ignore}>{ "Do something" -> React.string}</Button>
+      <Button onClick={_ => jest() -> ignore}>{ "Jeest" -> React.string}</Button>
         // <Col col=Col.Twelve>
         //   {
         //     switch requestsByDs {
