@@ -261,7 +261,7 @@ let make = () => {
                 </Row>
               </THead>}
           {switch allSub {
-          | Data((dataSources, dataSourcesCount)) => dataSources->Belt.Array.length != 0 ?
+          | Data((dataSources, dataSourcesCount)) => dataSources->Belt.Array.length > 0 ?
             {
               let pageCount = Page.getPageCount(dataSourcesCount, pageSize)
               <>

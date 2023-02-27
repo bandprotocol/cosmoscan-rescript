@@ -348,7 +348,7 @@ let make = () => {
       <div className=CssHelper.mobileSpacing>
         <Heading value="All Oracle Scripts" size=Heading.H2 marginBottom=40 marginBottomSm=24 />
         {switch mostRequestedOracleScriptSub {
-        | Data(oracleScripts) => oracleScripts->Belt.Array.length !== 0 ?
+        | Data(oracleScripts) => oracleScripts->Belt.Array.length > 0 ?
           <>
             <Heading
               value="Most Requested" size=Heading.H3 marginBottom=16 color={theme.neutral_600}
@@ -449,7 +449,7 @@ let make = () => {
                 </Row>
               </THead>}
           {switch allSub {
-          | Data((oracleScripts, oracleScriptsCount)) => oracleScripts->Belt.Array.length !== 0 ?
+          | Data((oracleScripts, oracleScriptsCount)) => oracleScripts->Belt.Array.length > 0 ?
             {
               let pageCount = Page.getPageCount(oracleScriptsCount, pageSize)
               <>

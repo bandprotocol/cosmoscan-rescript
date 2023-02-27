@@ -33,7 +33,7 @@ let make = (~blockSub: Sub.variant<BlockSub.t>) => {
   let setTab = index => setTabIndex(_ => index)
 
   switch (blockSub) {
-  | Data({requests}) => requests->Belt.Array.length !== 0 ?
+  | Data({requests}) => requests->Belt.Array.length > 0 ?
     {
       let onChainRequests =
       requests->Belt.Array.keepMap(({id, isIBC}) => !isIBC ? Some(id) : None)
