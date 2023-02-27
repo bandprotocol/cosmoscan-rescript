@@ -65,7 +65,7 @@ let make = (~msg: Msg.t) => {
       | Msg.CreateDataSource.Success(m) => <OracleMsg.CreateDataSourceMsg.Success msg=m />
       | Msg.CreateDataSource.Failure(f) => <OracleMsg.CreateDataSourceMsg.Failure msg=f />
       }
-
+    | EditDataSourceMsg(msg) => <OracleMsg.EditDataSourceMsg id=msg.id name=msg.name />
     | RequestMsg(msg) =>
       switch msg {
       | Msg.Request.Success(m) => <OracleMsg.RequestMsg.Success msg=m />

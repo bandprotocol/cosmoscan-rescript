@@ -51,6 +51,31 @@ module CreateDataSource = {
   )
 }
 
+module EditDataSource = {
+  type t = {
+    id: ID.DataSource.t,
+    owner: Address.t,
+    name: string,
+    executable: JsBuffer.t,
+    treasury: Address.t,
+    fee: list<Coin.t>,
+    sender: Address.t,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      id: json.required(list{"msg", "data_source_id"}, ID.DataSource.decoder),
+      owner: json.required(list{"msg", "owner"}, string)->Address.fromBech32,
+      name: json.required(list{"msg", "name"}, string),
+      executable: json.required(list{"msg", "executable"}, string)->JsBuffer.fromBase64,
+      treasury: json.required(list{"msg", "treasury"}, string)->Address.fromBech32,
+      fee: json.required(list{"msg", "fee"}, list(Coin.decodeCoin)),
+      sender: json.required(list{"msg", "sender"}, string)->Address.fromBech32,
+    })
+  }
+}
+
 module Request = {
   type t<'a, 'b, 'c> = {
     oracleScriptID: ID.OracleScript.t,
@@ -104,6 +129,7 @@ module Request = {
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
+  | EditDataSourceMsg(EditDataSource.t)
   | RequestMsg(Request.decoded_t)
   | UnknownMsg
 
@@ -131,6 +157,7 @@ let getBadge = msg => {
   switch msg {
   | SendMsg(_) => {name: "Send", category: TokenMsg}
   | CreateDataSourceMsg(_) => {name: "Create Data Source", category: OracleMsg}
+  | EditDataSourceMsg(_) => {name: "Edit Data Source", category: OracleMsg}
   | RequestMsg(_) => {name: "Request", category: OracleMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
@@ -156,6 +183,10 @@ let decodeMsg = (json, isSuccess) => {
             (CreateDataSourceMsg(Failure(msg)), msg.sender, false)
           }
 
+    | "/oracle.v1.MsgEditDataSource" =>
+      let msg = json->mustDecode(EditDataSource.decode)
+      (EditDataSourceMsg(msg), msg.sender, false)
+
     | "/oracle.v1.MsgRequestData" =>
       isSuccess
         ? {
@@ -166,9 +197,6 @@ let decodeMsg = (json, isSuccess) => {
             let msg = json->mustDecode(Request.decodeFail)
             (RequestMsg(Failure(msg)), msg.sender, false)
           }
-
-    // let msg = json->mustDecode(Request.decode)
-    // (RequestMsg(msg), msg.sender, false)
 
     | _ => (UnknownMsg, Address.Address(""), false)
     }

@@ -151,6 +151,57 @@ module Request = {
   let failed = (msg: Msg.Request.failed_t) => msg->factory([])
 }
 
+module EditDataSource = {
+  let factory = (msg: Msg.EditDataSource.t) => [
+    {
+      title: "Name",
+      content: ID(
+        <div className={CssHelper.flexBox()}>
+          <TypeID.DataSource position=TypeID.Subtitle id={msg.id} />
+          <HSpacing size=Spacing.sm />
+          <Text value={msg.name} size=Text.Body1 />
+        </div>,
+      ),
+      order: 1,
+    },
+    {
+      title: "Owner",
+      content: Address(msg.owner),
+      order: 2,
+    },
+    {
+      title: "Treasury",
+      content: Address(msg.treasury),
+      order: 3,
+    },
+    {
+      title: "Fee",
+      content: Coin(msg.fee),
+      order: 4,
+    },
+  ]
+}
+
+module Send = {
+  let factory = (msg: Msg.Send.t) => [
+    {
+      title: "From",
+      content: Address(msg.fromAddress),
+      order: 1,
+    },
+    {
+      title: "To",
+      content: Address(msg.toAddress),
+      order: 2,
+    },
+    {
+      title: "Amount",
+      content: Coin(msg.amount),
+      order: 5,
+    },
+  ]
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -158,12 +209,13 @@ let getContent = msg => {
     | Msg.CreateDataSource.Success(innerData) => CreateDataSource.success(innerData)
     | Msg.CreateDataSource.Failure(innerData) => CreateDataSource.failed(innerData)
     }
+  | Msg.EditDataSourceMsg(innerData) => EditDataSource.factory(innerData)
   | Msg.RequestMsg(m) =>
     switch m {
     | Msg.Request.Success(innerData) => Request.success(innerData)
     | Msg.Request.Failure(innerData) => Request.failed(innerData)
     }
-  | Msg.SendMsg(_) => []
+  | Msg.SendMsg(innerData) => Send.factory(innerData)
   | Msg.UnknownMsg => []
   }
 }
