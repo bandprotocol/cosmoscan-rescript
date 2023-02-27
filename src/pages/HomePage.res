@@ -48,13 +48,16 @@ let make = () => {
       Some(200000),
     )
 
-    let sendMsg = Message.MsgSend.create(
-      "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
-      "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
-      [coin],
+    let sendMsg = Message.MsgTransfer.create(
+      "transfer",
+      "channel-25",
+      "band13eznuehmqzd3r84fkxu8wklxl22r2qfmtlth8c",
+      "cosmos15d4apf20449ajvwycq8ruaypt7v6d34522frnd",
+      coin,
+      1677512323000.
     )
 
-    Js.log(sendMsg->Message.MsgSend.toJSON)
+    Js.log(sendMsg->Message.MsgTransfer.toJSON->Js.Json.stringifyAny)
 
     let fee = Fee.create()
     fee -> Fee.setAmountList([feeCoin])

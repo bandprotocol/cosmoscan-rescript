@@ -114,3 +114,172 @@ describe("Expect BandChainJS Fee Module binding work correctly", () => {
     })->toEqual("band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj")
   )
 })
+
+describe("Expect BandChainJS Message Module binding work correctly", () => {
+  test("MsgSend", () =>
+    expect({
+      let coin = Coin.create()
+      coin -> Coin.setDenom("uband")
+      coin -> Coin.setAmount("1000000")
+
+      Message.MsgSend.create(
+        "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
+        "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu",
+        [coin],
+      )
+      -> Message.MsgSend.toJSON
+      -> Js.Json.stringifyAny
+    })->toEqual((
+      Some(`{"type":"cosmos-sdk/MsgSend","value":{"from_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","to_address":"band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu","amount":[{"denom":"uband","amount":"1000000"}]}}`)
+    ))
+  )
+
+  test("MsgDelegate", () =>
+    expect({
+      let coin = Coin.create()
+      coin -> Coin.setDenom("uband")
+      coin -> Coin.setAmount("1000000")
+
+      Message.MsgDelegate.create(
+        "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
+        "band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8",
+        coin,
+      )
+      -> Message.MsgDelegate.toJSON
+      -> Js.Json.stringifyAny
+    })->toEqual((
+      Some(`{"type":"cosmos-sdk/MsgDelegate","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_address":"band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8","amount":{"denom":"uband","amount":"1000000"}}}`)
+    ))
+  )
+
+  test("MsgUndelegate", () =>
+    expect({
+      let coin = Coin.create()
+      coin -> Coin.setDenom("uband")
+      coin -> Coin.setAmount("1000000")
+
+      Message.MsgUndelegate.create(
+        "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
+        "band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8",
+        coin,
+      )
+      -> Message.MsgUndelegate.toJSON
+      -> Js.Json.stringifyAny
+    })->toEqual((
+      Some(`{"type":"cosmos-sdk/MsgUndelegate","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_address":"band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8","amount":{"denom":"uband","amount":"1000000"}}}`)
+    ))
+  )
+
+  test("MsgRedelegate", () =>
+    expect({
+      let coin = Coin.create()
+      coin -> Coin.setDenom("uband")
+      coin -> Coin.setAmount("1000000")
+
+      Message.MsgRedelegate.create(
+        "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
+        "band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8",
+        "band1ntwzz6tlvpy52tf5urr7jz6lvk2402sksntxuw",
+        coin,
+      )
+      -> Message.MsgRedelegate.toJSON
+      -> Js.Json.stringifyAny
+    })->toEqual((
+      Some(`{"type":"cosmos-sdk/MsgBeginRedelegate","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_src_address":"band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8","validator_dst_address":"band1ntwzz6tlvpy52tf5urr7jz6lvk2402sksntxuw","amount":{"denom":"uband","amount":"1000000"}}}`)
+    ))
+  )
+
+  test("MsgWithdrawReward", () =>
+    expect({
+      let coin = Coin.create()
+      coin -> Coin.setDenom("uband")
+      coin -> Coin.setAmount("1000000")
+
+      Message.MsgWithdrawReward.create(
+        "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
+        "band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8",
+      )
+      -> Message.MsgWithdrawReward.toJSON
+      -> Js.Json.stringifyAny
+    })->toEqual((
+      Some(`{"type":"cosmos-sdk/MsgWithdrawDelegationReward","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_address":"band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8"}}`)
+    ))
+  )
+
+  test("MsgVote", () =>
+    expect({
+      let coin = Coin.create()
+      coin -> Coin.setDenom("uband")
+      coin -> Coin.setAmount("1000000")
+
+      Message.MsgVote.create(
+        2,
+        "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
+        1
+      )
+      -> Message.MsgVote.toJSON
+      -> Js.Json.stringifyAny
+    })->toEqual((
+      Some(`{"type":"cosmos-sdk/MsgVote","value":{"proposal_id":"2","voter":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","option":1}}`)
+    ))
+  )
+
+  test("MsgRequest", () =>
+    expect({
+      let mnemo = "mule way gather advance quote endorse boat liquid kite mad cart"
+      let privKey = PrivateKey.fromMnemonic(mnemo, "m/44'/494'/0'/0/0")
+      let pub = privKey -> PrivateKey.toPubkey 
+      let address = pub -> PubKey.toAddress -> Address.toAccBech32
+
+      let obi = Obi.create("{symbols:[string],multiplier:u64}/{rates:[u64]}")
+      let calldata =  Obi.encodeInput(obi, `{ "symbols": ["ETH"], "multiplier": 100 }` -> Js.Json.parseExn)
+
+      let coin = Coin.create()
+      coin -> Coin.setDenom("uband")
+      coin -> Coin.setAmount("1000000")
+
+      let feeCoin = Coin.create()
+      feeCoin -> Coin.setDenom("uband")
+      feeCoin -> Coin.setAmount("10000")
+
+      Message.MsgRequest.create(
+        37,
+        calldata,
+        4,
+        3,
+        "BandProtocol",
+        address,
+        [coin],
+        Some(50000),
+        Some(200000),
+      )
+      -> Message.MsgRequest.toJSON
+      -> Js.Json.stringifyAny
+    })->toEqual((
+      Some(`{"type":"oracle/Request","value":{"ask_count":"4","calldata":"AAAAAQAAAANFVEgAAAAAAAAAZA==","oracle_script_id":"37","min_count":"3","client_id":"BandProtocol","sender":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","fee_limit":[{"denom":"uband","amount":"1000000"}],"prepare_gas":"50000","execute_gas":"200000"}}`)
+    ))
+  )
+
+  test("MsgTransfer", () =>
+    expect({
+      let coin = Coin.create()
+      coin -> Coin.setDenom("uband")
+      coin -> Coin.setAmount("1000000")
+
+      Message.MsgTransfer.create(
+        "transfer",
+        "channel-25",
+        "band13eznuehmqzd3r84fkxu8wklxl22r2qfmtlth8c",
+        "cosmos15d4apf20449ajvwycq8ruaypt7v6d34522frnd",
+        coin,
+        1677512323000. // mock timeoutTimestamp
+      )
+      -> Message.MsgTransfer.toJSON
+      -> Js.Json.stringifyAny
+    })->toEqual((
+      Some(`{"type":"cosmos-sdk/MsgTransfer","value":{"source_port":"transfer","source_channel":"channel-25","sender":"band13eznuehmqzd3r84fkxu8wklxl22r2qfmtlth8c","receiver":"cosmos15d4apf20449ajvwycq8ruaypt7v6d34522frnd","token":{"denom":"uband","amount":"1000000"},"timeout_height":{},"timeout_timestamp":"1677512323000"}}`)
+    ))
+  )
+
+  
+})

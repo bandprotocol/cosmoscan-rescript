@@ -87,7 +87,7 @@ module Message = {
   module MsgDelegate = {
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (string, string, Coin.t) => t = "MsgDelegate"
-    
+
     @send external toJSON: t => Js.Json.t = "toJSON"
   }
 
@@ -113,6 +113,8 @@ module Message = {
   }
 
   module MsgVote = {
+    // TODO: make Variant for VoteOptionMap
+    // (proposalId: number, voter: string, option: VoteOptionMap[keyof VoteOptionMap],)
     @module("@bandprotocol/bandchain.js") @scope("Message") 
     @new external create: (int, string, int) => t = "MsgVote"
 
