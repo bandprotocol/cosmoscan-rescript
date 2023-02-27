@@ -78,6 +78,7 @@ let make = (~msg: Msg.t) => {
       | Msg.Request.Success(m) => <OracleMsg.RequestMsg.Success msg=m />
       | Msg.Request.Failure(f) => <OracleMsg.RequestMsg.Failure msg=f />
       }
+    | ReportMsg(msg) => <OracleMsg.ReportMsg requestID=msg.requestID />
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />

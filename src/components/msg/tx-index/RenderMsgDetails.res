@@ -36,6 +36,7 @@ type content_inner_t =
   | Calldata(string, JsBuffer.t)
   | Coin(Belt.List.t<Coin.t>)
   | ID(React.element) // TODO: refactor not to receive react.element
+  | RawReports(Belt.List.t<Msg.RawDataReport.t>)
 
 type content_t = {
   title: string,
@@ -51,7 +52,17 @@ let renderValue = v => {
   | Coin(amount) => <AmountRender coins={amount} />
   | ID(element) => element
   | Calldata(schema, data) => <Calldata schema calldata=data />
-  | _ => React.null
+  | RawReports(data) =>
+    <KVTable
+      headers=["External Id", "Exit Code", "Value"]
+      rows={data
+      ->Belt.List.toArray
+      ->Belt.Array.map(rawReport => [
+        KVTable.Value(rawReport.externalDataID->string_of_int),
+        KVTable.Value(rawReport.exitCode->string_of_int),
+        KVTable.Value(rawReport.data->JsBuffer.toUTF8),
+      ])}
+    />
   }
 }
 
@@ -252,6 +263,26 @@ module Send = {
   ]
 }
 
+module Report = {
+  let factory = (msg: Msg.Report.t) => [
+    {
+      title: "Request ID",
+      content: ID(<TypeID.Request position=TypeID.Subtitle id={msg.requestID} />),
+      order: 1,
+    },
+    {
+      title: "Reporter",
+      content: Address(msg.reporter),
+      order: 2,
+    },
+    {
+      title: "Raw Data Report",
+      content: RawReports(msg.rawReports),
+      order: 5,
+    },
+  ]
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -273,6 +304,7 @@ let getContent = msg => {
     | Msg.Request.Failure(innerData) => Request.failed(innerData)
     }
   | Msg.SendMsg(innerData) => Send.factory(innerData)
+  | Msg.ReportMsg(innerData) => Report.factory(innerData)
   | Msg.UnknownMsg => []
   }
 }

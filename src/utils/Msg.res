@@ -179,6 +179,42 @@ module Request = {
   }
 }
 
+module RawDataReport = {
+  type t = {
+    externalDataID: int,
+    exitCode: int,
+    data: JsBuffer.t,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      externalDataID: json.required(list{"msg", "external_id"}, int),
+      exitCode: json.required(list{"msg", "exit_code"}, int),
+      data: json.required(list{"msg", "data"}, bufferWithDefault),
+    })
+  }
+}
+
+module Report = {
+  type t = {
+    requestID: ID.Request.t,
+    rawReports: list<RawDataReport.t>,
+    validator: Address.t,
+    reporter: Address.t,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      requestID: json.required(list{"msg", "request_id"}, ID.Request.decoder),
+      rawReports: json.required(list{"msg", "raw_reports"}, list(RawDataReport.decode)),
+      validator: json.required(list{"msg", "validator"}, string)->Address.fromBech32,
+      reporter: json.required(list{"msg", "reporter"}, string)->Address.fromBech32,
+    })
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -186,6 +222,7 @@ type msg_t =
   | CreateOracleScriptMsg(CreateOracleScript.decoded_t)
   | EditOracleScriptMsg(EditOracleScript.t)
   | RequestMsg(Request.decoded_t)
+  | ReportMsg(Report.t)
   | UnknownMsg
 
 type t = {
@@ -216,6 +253,7 @@ let getBadge = msg => {
   | CreateOracleScriptMsg(_) => {name: "Create Oracle Script", category: OracleMsg}
   | EditOracleScriptMsg(_) => {name: "Edit Oracle Script", category: OracleMsg}
   | RequestMsg(_) => {name: "Request", category: OracleMsg}
+  | ReportMsg(_) => {name: "Report", category: OracleMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -269,6 +307,9 @@ let decodeMsg = (json, isSuccess) => {
             (RequestMsg(Failure(msg)), msg.sender, false)
           }
 
+    | "/oracle.v1.MsgReportData" =>
+      let msg = json->mustDecode(Report.decode)
+      (ReportMsg(msg), msg.reporter, false)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }
