@@ -108,6 +108,27 @@ module CreateOracleScript = {
   )
 }
 
+module EditOracleScript = {
+  type t = {
+    id: ID.OracleScript.t,
+    owner: Address.t,
+    name: string,
+    code: JsBuffer.t,
+    sender: Address.t,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      id: json.required(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
+      owner: json.required(list{"msg", "owner"}, string)->Address.fromBech32,
+      name: json.required(list{"msg", "name"}, string),
+      code: json.required(list{"msg", "code"}, string)->JsBuffer.fromBase64,
+      sender: json.required(list{"msg", "sender"}, string)->Address.fromBech32,
+    })
+  }
+}
+
 module Request = {
   type t<'a, 'b, 'c> = {
     oracleScriptID: ID.OracleScript.t,
@@ -163,6 +184,7 @@ type msg_t =
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
   | EditDataSourceMsg(EditDataSource.t)
   | CreateOracleScriptMsg(CreateOracleScript.decoded_t)
+  | EditOracleScriptMsg(EditOracleScript.t)
   | RequestMsg(Request.decoded_t)
   | UnknownMsg
 
@@ -192,6 +214,7 @@ let getBadge = msg => {
   | CreateDataSourceMsg(_) => {name: "Create Data Source", category: OracleMsg}
   | EditDataSourceMsg(_) => {name: "Edit Data Source", category: OracleMsg}
   | CreateOracleScriptMsg(_) => {name: "Create Oracle Script", category: OracleMsg}
+  | EditOracleScriptMsg(_) => {name: "Edit Oracle Script", category: OracleMsg}
   | RequestMsg(_) => {name: "Request", category: OracleMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
@@ -230,6 +253,10 @@ let decodeMsg = (json, isSuccess) => {
             let msg = json->mustDecode(CreateOracleScript.decodeFail)
             (CreateOracleScriptMsg(Failure(msg)), msg.sender, false)
           }
+
+    | "/oracle.v1.MsgEditOracleScript" =>
+      let msg = json->mustDecode(EditOracleScript.decode)
+      (EditOracleScriptMsg(msg), msg.sender, false)
 
     | "/oracle.v1.MsgRequestData" =>
       isSuccess

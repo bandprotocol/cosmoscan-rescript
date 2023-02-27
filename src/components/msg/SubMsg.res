@@ -71,6 +71,7 @@ let make = (~msg: Msg.t) => {
       | Msg.CreateOracleScript.Success(m) => <OracleMsg.CreateOracleScriptMsg.Success msg=m />
       | Msg.CreateOracleScript.Failure(f) => <OracleMsg.CreateOracleScriptMsg.Failure msg=f />
       }
+    | EditOracleScriptMsg(msg) => <OracleMsg.EditOracleScriptMsg id=msg.id name=msg.name />
 
     | RequestMsg(msg) =>
       switch msg {
