@@ -26,7 +26,6 @@ module CreateDataSource = {
     id: 'a,
   }
 
-  type input_t = t<unit>
   type failed_t = t<unit>
   type success_t = t<ID.DataSource.t>
 
@@ -67,7 +66,6 @@ module Request = {
     schema: 'c,
   }
 
-  type input_t = t<unit, unit, unit>
   type failed_t = t<unit, unit, unit>
   type success_t = t<ID.Request.t, string, string>
 
