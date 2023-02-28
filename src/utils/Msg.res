@@ -215,6 +215,25 @@ module Report = {
   }
 }
 
+module Grant = {
+  type t = {
+    validator: Address.t,
+    reporter: Address.t,
+    url: string,
+    expiration: MomentRe.Moment.t,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      validator: json.required(list{"msg", "granter"}, string)->Address.fromBech32,
+      reporter: json.required(list{"msg", "grantee"}, string)->Address.fromBech32,
+      url: json.required(list{"msg", "url"}, string),
+      expiration: json.required(list{"msg", "grant", "expiration"}, GraphQLParser.timestampDecode),
+    })
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -223,6 +242,7 @@ type msg_t =
   | EditOracleScriptMsg(EditOracleScript.t)
   | RequestMsg(Request.decoded_t)
   | ReportMsg(Report.t)
+  | GrantMsg(Grant.t)
   | UnknownMsg
 
 type t = {
@@ -254,6 +274,7 @@ let getBadge = msg => {
   | EditOracleScriptMsg(_) => {name: "Edit Oracle Script", category: OracleMsg}
   | RequestMsg(_) => {name: "Request", category: OracleMsg}
   | ReportMsg(_) => {name: "Report", category: OracleMsg}
+  | GrantMsg(_) => {name: "Grant", category: ValidatorMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -310,6 +331,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/oracle.v1.MsgReportData" =>
       let msg = json->mustDecode(Report.decode)
       (ReportMsg(msg), msg.reporter, false)
+    | "/cosmos.authz.v1beta1.MsgGrant" =>
+      let msg = json->mustDecode(Grant.decode)
+      (GrantMsg(msg), msg.validator, false)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }

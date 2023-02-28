@@ -66,10 +66,17 @@ let toExternal = ({
   sender,
   memo,
   timestamp: block.timestamp,
-  messages: {
-    let msg = messages->Js.Json.decodeArray->Belt.Option.getExn->Belt.List.fromArray
-    msg->Belt.List.map(each => Msg.decodeMsg(each, success))
+  messages: // let msg = messages->Js.Json.decodeArray->Belt.Option.getExn->Belt.List.fromArray
+
+  {
+    let msg = messages->Js.Json.decodeArray
+    switch msg {
+    | Some(msg) => msg->Belt.List.fromArray
+    | None => []->Belt.List.fromArray
+    }->Belt.List.map(each => Msg.decodeMsg(each, success))
   },
+  // msg->Belt.List.map(each => Msg.decodeMsg(each, success))
+
   errMsg: errMsg->Belt.Option.getWithDefault(""),
 }
 
@@ -196,7 +203,7 @@ let getList = (~page, ~pageSize, ()) => {
   result->Sub.fromData->Sub.map(({transactions}) => transactions->Belt.Array.map(toExternal))
 }
 
-let getListBySender = (sender, ~page, ~pageSize) => {
+let getListBySender = (~sender, ~page, ~pageSize) => {
   let offset = (page - 1) * pageSize
   let result = MultiBySenderConfig.use({
     limit: pageSize,

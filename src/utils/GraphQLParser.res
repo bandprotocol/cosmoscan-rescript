@@ -43,6 +43,9 @@ let timeNS =
     (n /. 1e6)->MomentRe.momentWithTimestampMS->MomentRe.Moment.defaultUtc
   )
 
+let timestampDecode =
+  JsonUtils.Decode.string->JsonUtils.Decode.map((. s) => s->MomentRe.momentUtcDefaultFormat)
+
 let timestampOpt = Belt.Option.map(_, timestamp)
 
 let timestampWithDefault = jsonOpt =>
@@ -84,21 +87,44 @@ let coinWithDefault = jsonOpt => {
   ->Coin.newUBANDFromAmount
 }
 
-let coins = str =>
+let coins = str => {
   str
   ->Js.String2.split(",")
   ->Belt.List.fromArray
-  ->Belt.List.keepMap(_, coin =>
-    if coin == "" {
+  ->Belt.List.keepMap(_, coin => {
+    if coin === "" {
       None
     } else {
-      let result = Js.Re.exec_(coinRegEx, coin)->Belt.Option.getExn->Js.Re.captures
-      Some({
-        Coin.denom: result[2]->Js.Nullable.toOption->Belt.Option.getExn,
-        amount: result[1]->Js.Nullable.toOption->Belt.Option.getExn->float_of_string,
-      })
+      let result = Js.Re.exec_(coinRegEx, coin)
+      switch result {
+      | None => None
+      | Some(x) =>
+        let re = x->Js.Re.captures
+        Some({
+          Coin.denom: {
+            switch re[2]->Js.Nullable.toOption {
+            | None => ""
+            | Some(x) => x
+            }
+          },
+          amount: {
+            switch re[1]->Js.Nullable.toOption {
+            | None => 0.
+            | Some(x) => x->float_of_string
+            }
+          },
+        })
+      }
     }
-  )
+  })
+
+  // let result = Js.Re.exec_(coinRegEx, coin)->Belt.Option.getExn->Js.Re.captures
+
+  // Some({
+  //   Coin.denom: result[2]->Js.Nullable.toOption->Belt.Option.getExn,
+  //   amount: result[1]->Js.Nullable.toOption->Belt.Option.getExn->float_of_string,
+  // })
+}
 
 let addressExn = jsonOpt => jsonOpt->Belt.Option.getExn->Address.fromBech32
 let addressOpt = jsonOpt => jsonOpt->Belt.Option.map(_, Address.fromBech32)

@@ -65,7 +65,20 @@ module SetWithdrawAddress = {
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <Text value=j` to ` size=Text.Body2 nowrap=true block=true />
+      <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
       <AddressRender address=withdrawAddress />
+    </div>
+}
+
+module Grant = {
+  @react.component
+  let make = (~reporter) =>
+    <div
+      className={CssJs.merge(. [
+        CssHelper.flexBox(~wrap=#nowrap, ()),
+        CssHelper.overflowHidden,
+        Styles.msgContainer,
+      ])}>
+      <AddressRender address=reporter />
     </div>
 }

@@ -37,6 +37,7 @@ type content_inner_t =
   | Coin(Belt.List.t<Coin.t>)
   | ID(React.element) // TODO: refactor not to receive react.element
   | RawReports(Belt.List.t<Msg.RawDataReport.t>)
+  | Timestamp(MomentRe.Moment.t)
 
 type content_t = {
   title: string,
@@ -63,6 +64,7 @@ let renderValue = v => {
         KVTable.Value(rawReport.data->JsBuffer.toUTF8),
       ])}
     />
+  | Timestamp(timestamp) => <Timestamp time={timestamp} size=Text.Body1 />
   }
 }
 
@@ -283,28 +285,54 @@ module Report = {
   ]
 }
 
+module Grant = {
+  let factory = (msg: Msg.Grant.t) => [
+    {
+      title: "Granter",
+      content: Address(msg.validator),
+      order: 1,
+    },
+    {
+      title: "Grantee",
+      content: Address(msg.reporter),
+      order: 2,
+    },
+    {
+      title: "Authorization URL",
+      content: PlainText(msg.url),
+      order: 5,
+    },
+    {
+      title: "Expiration Date",
+      content: Timestamp(msg.expiration),
+      order: 5,
+    },
+  ]
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
     switch m {
-    | Msg.CreateDataSource.Success(innerData) => CreateDataSource.success(innerData)
-    | Msg.CreateDataSource.Failure(innerData) => CreateDataSource.failed(innerData)
+    | Msg.CreateDataSource.Success(data) => CreateDataSource.success(data)
+    | Msg.CreateDataSource.Failure(data) => CreateDataSource.failed(data)
     }
-  | Msg.EditDataSourceMsg(innerData) => EditDataSource.factory(innerData)
+  | Msg.EditDataSourceMsg(data) => EditDataSource.factory(data)
 
   | Msg.CreateOracleScriptMsg(m) =>
     switch m {
-    | Msg.CreateOracleScript.Success(innerData) => CreateOracleScript.success(innerData)
-    | Msg.CreateOracleScript.Failure(innerData) => CreateOracleScript.failed(innerData)
+    | Msg.CreateOracleScript.Success(data) => CreateOracleScript.success(data)
+    | Msg.CreateOracleScript.Failure(data) => CreateOracleScript.failed(data)
     }
-  | Msg.EditOracleScriptMsg(innerData) => EditOracleScript.factory(innerData)
+  | Msg.EditOracleScriptMsg(data) => EditOracleScript.factory(data)
   | Msg.RequestMsg(m) =>
     switch m {
-    | Msg.Request.Success(innerData) => Request.success(innerData)
-    | Msg.Request.Failure(innerData) => Request.failed(innerData)
+    | Msg.Request.Success(data) => Request.success(data)
+    | Msg.Request.Failure(data) => Request.failed(data)
     }
-  | Msg.SendMsg(innerData) => Send.factory(innerData)
-  | Msg.ReportMsg(innerData) => Report.factory(innerData)
+  | Msg.SendMsg(data) => Send.factory(data)
+  | Msg.ReportMsg(data) => Report.factory(data)
+  | Msg.GrantMsg(data) => Grant.factory(data)
   | Msg.UnknownMsg => []
   }
 }
