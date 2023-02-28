@@ -163,7 +163,11 @@ let make = (~info) => {
         value={"(" ++ votingPercent->Format.fPercent(~digits=2) ++ ")"} weight=Text.Thin block=true
       />
     </div>
-  | Status(status) => <img src={status ? Images.success : Images.fail} className=Styles.logo />
+  | Status(status) => <img 
+      src={status ? Images.success : Images.fail} 
+      alt={status ? "Success" : "Failed"}
+      className=Styles.logo 
+    />
 
   // Special case for uptime to have loading state inside.
   | Uptime(uptimeOpt) =>

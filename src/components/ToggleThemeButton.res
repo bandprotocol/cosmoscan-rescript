@@ -35,7 +35,7 @@ let make = () => {
     className={Styles.button(isDarkMode, theme)}
     onClick={_ => toggle()}>
     {isDarkMode
-      ? <img src=Images.sunIcon className=Styles.icon />
+      ? <img src=Images.sunIcon alt="Sun Icon" className=Styles.icon />
       : <Icon name="fal fa-moon" size=14 color=theme.white />}
   </button>
 }
