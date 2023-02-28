@@ -280,6 +280,52 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
       Some(`{"type":"cosmos-sdk/MsgTransfer","value":{"source_port":"transfer","source_channel":"channel-25","sender":"band13eznuehmqzd3r84fkxu8wklxl22r2qfmtlth8c","receiver":"cosmos15d4apf20449ajvwycq8ruaypt7v6d34522frnd","token":{"denom":"uband","amount":"1000000"},"timeout_height":{},"timeout_timestamp":"1677512323000"}}`)
     ))
   )
+})
 
-  
+describe("Expect BandChainJS Transaction Module binding work correctly", () => {
+  testPromise("create Address fromhex and call toHex", async () => {
+    let mnemo = "mule way gather advance quote endorse boat liquid kite mad cart"
+    let privKey = PrivateKey.fromMnemonic(mnemo, "m/44'/494'/0'/0/0")
+    let pub = privKey -> PrivateKey.toPubkey 
+    let address = pub -> PubKey.toAddress -> Address.toAccBech32
+
+    let coin = Coin.create()
+    coin -> Coin.setDenom("uband")
+    coin -> Coin.setAmount("1000000")
+
+    let feeCoin = Coin.create()
+    feeCoin -> Coin.setDenom("uband")
+    feeCoin -> Coin.setAmount("10000")
+
+    let fee = Fee.create()
+    fee -> Fee.setAmountList([feeCoin])
+    fee -> Fee.setGasLimit(1000000)
+
+    let sendMsg = Message.MsgSend.create(
+      address,
+      "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu",
+      [coin],
+    )
+
+    let client = Client.create("https://laozi-testnet6.bandchain.org/grpc-web")
+    let account = await client->Client.getAccount(address)
+    let chainID = await client->Client.getChainId
+
+    let txn = Transaction.create()
+    txn -> Transaction.withMessages(sendMsg)
+    txn -> Transaction.withAccountNum(account.accountNumber)
+    txn -> Transaction.withSequence(account.sequence)
+    txn -> Transaction.withChainId(chainID)
+    txn -> Transaction.withFee(fee)
+
+    let signDoc = txn -> Transaction.getSignDoc(pub)
+    let signature = privKey -> PrivateKey.sign(signDoc)
+
+    let signedTx = txn->Transaction.getTxData(signature, pub, 1)
+    let prom = client->Client.sendTxBlockMode(signedTx)
+    ->Promise.then(_ => Promise.resolve(pass))
+    ->Promise.catch(_ => Promise.resolve(fail("")))
+
+    await prom
+  })
 })

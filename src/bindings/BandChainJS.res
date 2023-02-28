@@ -1,3 +1,9 @@
+type baseAccount = {
+  address: string,
+  accountNumber: int,
+  sequence: int,
+}
+
 module Client = {
   type t
   type reference_data_t = {
@@ -9,8 +15,10 @@ module Client = {
   @send
   external getReferenceData: (t, array<string>, int, int) => promise<array<reference_data_t>> =
     "getReferenceData"
-  @send external sendTxBlockMode: (t, JsBuffer.t) => Js.Promise.t<'a> = "sendTxBlockMode"
-  @send external sendTxSyncMode: (t, JsBuffer.t) => Js.Promise.t<'a> = "sendTxSyncMode"
+  @send external getAccount: (t, string) => promise<baseAccount> = "getAccount"
+  @send external getChainId: t => promise<string> = "getChainId"
+  @send external sendTxBlockMode: (t, array<int>) => promise<'a> = "sendTxBlockMode"
+  @send external sendTxSyncMode: (t, array<int>) => promise<'a> = "sendTxSyncMode"
 }
 
 module Address = {
@@ -143,13 +151,13 @@ module Transaction = {
   @module("@bandprotocol/bandchain.js") @new external create: () => transaction_t = "Transaction"
   @send external withMessages: (transaction_t, Message.t) => unit = "withMessages"
   @send external withChainId: (transaction_t, string) => unit = "withChainId"
-  @send external withSender: (transaction_t, Client.t, string) => Js.Promise.t<transaction_t> = "withSender"
+  @send external withSender: (transaction_t, Client.t, string) => Js.Promise.t<unit> = "withSender"
   @send external withAccountNum: (transaction_t, int) => unit = "withAccountNum"
   @send external withSequence: (transaction_t, int) => unit = "withSequence"
   @send external withFee: (transaction_t, Fee.t) => unit = "withFee"
   @send external withMemo: (transaction_t, string) => unit = "withMemo"
   @send external getSignDoc: (transaction_t, PubKey.t) => array<int> = "getSignDoc"
-  @send external getTxData: (transaction_t, JsBuffer.t, PubKey.t, int) => JsBuffer.t = "getTxData"
+  @send external getTxData: (transaction_t, JsBuffer.t, PubKey.t, int) => array<int>  = "getTxData"
   @send external getSignMessage: transaction_t => JsBuffer.t = "getSignMessage"
 }
 
