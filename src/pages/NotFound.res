@@ -33,7 +33,9 @@ let make = () => {
       <div className={Styles.pageContainer(theme)}>
         <div className={CssHelper.flexBox()}>
           <img
-            src={isDarkMode ? Images.noOracleDark : Images.noOracleLight} className=Styles.logo
+            src={isDarkMode ? Images.noOracleDark : Images.noOracleLight} 
+            alt="Not Found"
+            className=Styles.logo
           />
         </div>
         <VSpacing size=Spacing.xxl />
