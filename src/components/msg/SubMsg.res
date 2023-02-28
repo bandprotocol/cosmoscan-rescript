@@ -80,7 +80,8 @@ let make = (~msg: Msg.t) => {
       }
     | ReportMsg(msg) => <OracleMsg.ReportMsg requestID=msg.requestID />
     | GrantMsg(msg) => <ValidatorMsg.Grant reporter=msg.validator />
-    | ReportMsg(msg) => <ValidatorMsg.Revoke reporter=msg.validator />
+    | RevokeMsg(msg) => <ValidatorMsg.Revoke reporter=msg.validator />
+    | RevokeAllowanceMsg(msg) => <ValidatorMsg.RevokeAllowance granter=msg.granter />
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />

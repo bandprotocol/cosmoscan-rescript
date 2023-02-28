@@ -219,7 +219,7 @@ module Grant = {
   type t = {
     validator: Address.t,
     reporter: Address.t,
-    url: string,
+    url: option<string>,
     expiration: MomentRe.Moment.t,
   }
 
@@ -228,7 +228,7 @@ module Grant = {
     buildObject(json => {
       validator: json.required(list{"msg", "granter"}, string)->Address.fromBech32,
       reporter: json.required(list{"msg", "grantee"}, string)->Address.fromBech32,
-      url: json.required(list{"msg", "url"}, string),
+      url: json.optional(list{"msg", "url"}, string),
       expiration: json.required(list{"msg", "grant", "expiration"}, GraphQLParser.timeString),
     })
   }
@@ -251,6 +251,21 @@ module Revoke = {
   }
 }
 
+module RevokeAllowance = {
+  type t = {
+    granter: Address.t,
+    grantee: Address.t,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      granter: json.required(list{"msg", "granter"}, string)->Address.fromBech32,
+      grantee: json.required(list{"msg", "grantee"}, string)->Address.fromBech32,
+    })
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -261,6 +276,7 @@ type msg_t =
   | ReportMsg(Report.t)
   | GrantMsg(Grant.t)
   | RevokeMsg(Revoke.t)
+  | RevokeAllowanceMsg(RevokeAllowance.t)
   | UnknownMsg
 
 type t = {
@@ -294,6 +310,7 @@ let getBadge = msg => {
   | ReportMsg(_) => {name: "Report", category: OracleMsg}
   | GrantMsg(_) => {name: "Grant", category: ValidatorMsg}
   | RevokeMsg(_) => {name: "Revoke", category: ValidatorMsg}
+  | RevokeAllowanceMsg(_) => {name: "Revoke Allowance", category: ValidatorMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -356,6 +373,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/cosmos.authz.v1beta1.MsgRevoke" =>
       let msg = json->mustDecode(Revoke.decode)
       (RevokeMsg(msg), msg.validator, false)
+    | "/cosmos.feegrant.v1beta1.MsgRevokeAllowance" =>
+      let msg = json->mustDecode(RevokeAllowance.decode)
+      (RevokeAllowanceMsg(msg), msg.granter, false)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }

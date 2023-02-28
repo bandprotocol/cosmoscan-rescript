@@ -4,94 +4,76 @@ module Styles = {
   let msgContainer = style(. [selector("> * + *", [marginLeft(#px(5))])])
 }
 
+module BadgeWrapper = {
+  @react.component
+  let make = (~children) =>
+    <div
+      className={CssJs.merge(. [CssHelper.flexBox(~align=#center, ()), CssHelper.overflowHidden])}>
+      {children}
+    </div>
+}
+
 module CreateValidator = {
   @react.component
   let make = (~moniker) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
+    <BadgeWrapper>
       <Text value=moniker size=Text.Body2 nowrap=true block=true />
-    </div>
+    </BadgeWrapper>
 }
 
 module EditValidator = {
   @react.component
   let make = (~moniker) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
+    <BadgeWrapper>
       <Text value=moniker size=Text.Body2 nowrap=true block=true />
-    </div>
+    </BadgeWrapper>
 }
 
 module AddReporter = {
   @react.component
   let make = (~reporter) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
+    <BadgeWrapper>
       <AddressRender address=reporter />
-    </div>
+    </BadgeWrapper>
 }
 
 module RemoveReporter = {
   @react.component
   let make = (~reporter) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
+    <BadgeWrapper>
       <AddressRender address=reporter />
-    </div>
+    </BadgeWrapper>
 }
 
 module SetWithdrawAddress = {
   @react.component
   let make = (~withdrawAddress) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
+    <BadgeWrapper>
       <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
       <AddressRender address=withdrawAddress />
-    </div>
+    </BadgeWrapper>
 }
 
 module Grant = {
   @react.component
   let make = (~reporter) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
+    <BadgeWrapper>
       <AddressRender address=reporter />
-    </div>
+    </BadgeWrapper>
 }
 
 module Revoke = {
   @react.component
   let make = (~reporter) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
+    <BadgeWrapper>
       <AddressRender address=reporter />
-    </div>
+    </BadgeWrapper>
+}
+
+module RevokeAllowance = {
+  @react.component
+  let make = (~granter) =>
+    <BadgeWrapper>
+      <AddressRender address=granter />
+    </BadgeWrapper>
 }

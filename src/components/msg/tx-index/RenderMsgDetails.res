@@ -299,7 +299,12 @@ module Grant = {
     },
     {
       title: "Authorization URL",
-      content: PlainText(msg.url),
+      content: PlainText({
+        switch msg.url {
+        | Some(url) => url
+        | None => "-"
+        }
+      }),
       order: 4,
     },
     {
@@ -330,6 +335,21 @@ module Revoke = {
   ]
 }
 
+module RevokeAllowance = {
+  let factory = (msg: Msg.RevokeAllowance.t) => [
+    {
+      title: "Granter",
+      content: Address(msg.granter),
+      order: 1,
+    },
+    {
+      title: "Grantee",
+      content: Address(msg.grantee),
+      order: 2,
+    },
+  ]
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -354,6 +374,7 @@ let getContent = msg => {
   | Msg.ReportMsg(data) => Report.factory(data)
   | Msg.GrantMsg(data) => Grant.factory(data)
   | Msg.RevokeMsg(data) => Revoke.factory(data)
+  | Msg.RevokeAllowanceMsg(data) => RevokeAllowance.factory(data)
   | Msg.UnknownMsg => []
   }
 }
