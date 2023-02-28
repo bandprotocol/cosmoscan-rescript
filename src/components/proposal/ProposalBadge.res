@@ -12,6 +12,7 @@ let getBadgeText = x =>
         | Voting => "Voting Period"
         | Passed => "Passed"
         | Rejected => "Rejected"
+        | Inactive => "Inactive"
         | Failed => "Failed";
     }
 
@@ -21,6 +22,7 @@ let getBadgeColor = (theme: Theme.t, x) =>
         | Voting => theme.primary_600
         | Passed => theme.success_600
         | Rejected
+        | Inactive
         | Failed => theme.error_600;
     }
 

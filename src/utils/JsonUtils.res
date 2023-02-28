@@ -21,6 +21,13 @@ module Decode = {
   }
 
   let mustDecode = (json, decoder) => json->decode(decoder)->Belt.Result.getExn
+  let mustDecodeOpt = (jsonOpt, decoder) => jsonOpt->(x => switch x {
+    | Some(x) => x->decode(decoder)->(res => switch res {
+      | Ok(data) => Some(data)
+      | Error(_) => None
+    })
+    | None => None
+  })
 
   type fd_type = {at: 'a. (list<string>, t<'a>) => 'a}
 

@@ -47,7 +47,7 @@ module DesktopRender = {
             <div className={CssHelper.flexBox(~align=#center, ())}>
               <LinkToHome>
                 <div className={CssHelper.flexBox(~align=#center, ())}>
-                  <img src=Images.bandLogo className=Styles.bandLogo />
+                  <img src=Images.bandLogo alt="band-logo" className=Styles.bandLogo />
                   <div>
                     <Text
                       value="BANDCHAIN"
@@ -106,7 +106,7 @@ module MobileRender = {
           <div className={CssHelper.flexBox(~align=#flexEnd, ())}>
             <LinkToHome>
               <img
-                src=Images.bandLogo className={Css.merge(list{Styles.bandLogo, Styles.blockImage})}
+                src=Images.bandLogo alt="band-logo" className={Css.merge(list{Styles.bandLogo, Styles.blockImage})}
               />
             </LinkToHome>
             <HSpacing size=Spacing.sm />

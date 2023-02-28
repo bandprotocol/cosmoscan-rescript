@@ -17,6 +17,7 @@ module Placeholder = {
   let make = (~moniker, ~width, ~widthSm) =>
     <img
       src={`https://ui-avatars.com/api/?rounded=true&size=128&name=${moniker}&color=230F81&background=C2B6F7`}
+      alt={moniker ++ " Avatar"}
       className={CssJs.merge(. [Styles.avatar(width), Styles.avatarSm(widthSm)])}
     />
 }
@@ -33,7 +34,9 @@ module Keybase = {
       | Some(url) =>
         Some(
           <img
-            src=url className={CssJs.merge(. [Styles.avatar(width), Styles.avatarSm(widthSm)])}
+            src=url 
+            alt={moniker ++ " Avatar"}
+            className={CssJs.merge(. [Styles.avatar(width), Styles.avatarSm(widthSm)])}
           />,
         )
       | None =>

@@ -455,11 +455,11 @@ let make = () => {
               <img
                 src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
                 className=Styles.noDataImage
-                alt="No Oracle Script"
+                alt="No OracleScript"
               />
               <Heading
                 size=Heading.H4
-                value="No Oracle Script"
+                value="No OracleScript"
                 align=Heading.Center
                 weight=Heading.Regular
                 color={theme.neutral_600}
