@@ -82,3 +82,16 @@ module Grant = {
       <AddressRender address=reporter />
     </div>
 }
+
+module Revoke = {
+  @react.component
+  let make = (~reporter) =>
+    <div
+      className={CssJs.merge(. [
+        CssHelper.flexBox(~wrap=#nowrap, ()),
+        CssHelper.overflowHidden,
+        Styles.msgContainer,
+      ])}>
+      <AddressRender address=reporter />
+    </div>
+}

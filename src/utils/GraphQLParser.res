@@ -43,7 +43,7 @@ let timeNS =
     (n /. 1e6)->MomentRe.momentWithTimestampMS->MomentRe.Moment.defaultUtc
   )
 
-let timestampDecode =
+let timeString =
   JsonUtils.Decode.string->JsonUtils.Decode.map((. s) => s->MomentRe.momentUtcDefaultFormat)
 
 let timestampOpt = Belt.Option.map(_, timestamp)

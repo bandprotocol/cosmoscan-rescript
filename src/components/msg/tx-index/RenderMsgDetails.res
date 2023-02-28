@@ -300,12 +300,32 @@ module Grant = {
     {
       title: "Authorization URL",
       content: PlainText(msg.url),
-      order: 5,
+      order: 4,
     },
     {
       title: "Expiration Date",
       content: Timestamp(msg.expiration),
       order: 5,
+    },
+  ]
+}
+
+module Revoke = {
+  let factory = (msg: Msg.Revoke.t) => [
+    {
+      title: "Granter",
+      content: Address(msg.validator),
+      order: 1,
+    },
+    {
+      title: "Grantee",
+      content: Address(msg.reporter),
+      order: 2,
+    },
+    {
+      title: "Message Type URL",
+      content: PlainText(msg.msgTypeUrl),
+      order: 3,
     },
   ]
 }
@@ -333,6 +353,7 @@ let getContent = msg => {
   | Msg.SendMsg(data) => Send.factory(data)
   | Msg.ReportMsg(data) => Report.factory(data)
   | Msg.GrantMsg(data) => Grant.factory(data)
+  | Msg.RevokeMsg(data) => Revoke.factory(data)
   | Msg.UnknownMsg => []
   }
 }

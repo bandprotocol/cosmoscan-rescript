@@ -229,7 +229,24 @@ module Grant = {
       validator: json.required(list{"msg", "granter"}, string)->Address.fromBech32,
       reporter: json.required(list{"msg", "grantee"}, string)->Address.fromBech32,
       url: json.required(list{"msg", "url"}, string),
-      expiration: json.required(list{"msg", "grant", "expiration"}, GraphQLParser.timestampDecode),
+      expiration: json.required(list{"msg", "grant", "expiration"}, GraphQLParser.timeString),
+    })
+  }
+}
+
+module Revoke = {
+  type t = {
+    validator: Address.t,
+    reporter: Address.t,
+    msgTypeUrl: string,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      validator: json.required(list{"msg", "granter"}, string)->Address.fromBech32,
+      reporter: json.required(list{"msg", "grantee"}, string)->Address.fromBech32,
+      msgTypeUrl: json.required(list{"msg", "msg_type_url"}, string),
     })
   }
 }
@@ -243,6 +260,7 @@ type msg_t =
   | RequestMsg(Request.decoded_t)
   | ReportMsg(Report.t)
   | GrantMsg(Grant.t)
+  | RevokeMsg(Revoke.t)
   | UnknownMsg
 
 type t = {
@@ -275,6 +293,7 @@ let getBadge = msg => {
   | RequestMsg(_) => {name: "Request", category: OracleMsg}
   | ReportMsg(_) => {name: "Report", category: OracleMsg}
   | GrantMsg(_) => {name: "Grant", category: ValidatorMsg}
+  | RevokeMsg(_) => {name: "Revoke", category: ValidatorMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -334,6 +353,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/cosmos.authz.v1beta1.MsgGrant" =>
       let msg = json->mustDecode(Grant.decode)
       (GrantMsg(msg), msg.validator, false)
+    | "/cosmos.authz.v1beta1.MsgRevoke" =>
+      let msg = json->mustDecode(Revoke.decode)
+      (RevokeMsg(msg), msg.validator, false)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }
