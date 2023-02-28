@@ -111,7 +111,8 @@ let make = () => {
         {switch //TODO: Will patch the modal component later
         modal {
         | Connect(chainID) => <ConnectModal chainID />
-        | SubmitTx(_) => "SubmitTx"->React.string
+        | SubmitTx(msg) => <SubmitTxModal msg />
+        | ChainSelector(targetChain) => <ChainSelectorModal targetChain />
         | QRCode(address) => <QRCodeModal address />
         | IBCPacketError(_) => "Connect"->React.string
         | Syncing => "Sync"->React.string
