@@ -6,7 +6,7 @@ module Styles = {
       backgroundColor(isDarkMode ? theme.neutral_100 : theme.white),
       borderRadius(#px(10)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
-      padding(#px(16)),
+      padding2(~v=#px(16), ~h=#px(24)),
       border(#px(1), #solid, theme.neutral_100),
     ])
 
@@ -33,14 +33,16 @@ module Styles = {
   ])
   let packetInnerColumn = style(. [
     minWidth(#px(120)),
-    marginLeft(#px(8)),
-    marginRight(#px(8)),
+    // marginLeft(#px(8)),
+    // marginRight(#px(8)),
     textAlign(#center),
+    selector("p", [textAlign(#center)]),
   ])
 
   let largeColumn = style(. [minWidth(#px(245))])
-  let smallColumn = style(. [minWidth(#px(80))])
+  let smallColumn = style(. [minWidth(#px(120))])
   let leftAlign = style(. [textAlign(#left)])
+  let rightAlign = style(. [textAlign(#right)])
   let packetMobileItem = (theme: Theme.t) =>
     style(. [
       selector("> div", [borderBottom(#px(1), #solid, theme.neutral_200)]), // TODO: change to theme color
@@ -101,50 +103,11 @@ module MobilePacketItem = {
       </div>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
-          <Text value="Counterparty Chain ID" size=Text.Body2 weight=Text.Semibold />
+          <Text value="Packet Type" size=Text.Body2 weight=Text.Semibold />
         </div>
         <div>
           {switch packetSub {
-          | Data({counterPartyChainID}) => <Text value={counterPartyChainID} />
-          | _ => <LoadingCensorBar width=110 height=20 radius=50 />
-          }}
-        </div>
-      </div>
-      <div className={Css.merge(list{Styles.packetInnerMobile})}>
-        <div>
-          <Text value="Port & Channel" size=Text.Body2 weight=Text.Semibold />
-        </div>
-        <div>
-          {switch packetSub {
-          | Data({srcPort, srcChannel, dstPort, dstChannel}) =>
-            <div className={Css.merge(list{Styles.portChannelWrapper})}>
-              <div
-                className={
-                  open CssJs
-                  Css.merge(list{Styles.channelSource, style(. [width(#px(80))])})
-                }>
-                <Text value={srcPort} />
-                <br />
-                <Text value={srcChannel} color={theme.primary_600} weight={Text.Semibold} />
-              </div>
-              <div
-                className={
-                  open CssJs
-                  Css.merge(list{style(. [marginLeft(#px(8))])})
-                }>
-                <Icon name="far fa-arrow-right" color={theme.neutral_600} />
-              </div>
-              <div
-                className={
-                  open CssJs
-                  Css.merge(list{Styles.channelDest, style(. [width(#px(80))])})
-                }>
-                <Text value={dstPort} />
-                <br />
-                <Text value={dstChannel} color={theme.primary_600} weight={Text.Semibold} />
-              </div>
-            </div>
-
+          | Data({packetType}) => <MsgBadge name={packetType->IBCQuery.getPacketTypeText} />
           | _ => <LoadingCensorBar width=110 height=20 radius=50 />
           }}
         </div>
@@ -156,17 +119,6 @@ module MobilePacketItem = {
         <div>
           {switch packetSub {
           | Data({sequence}) => <Text value={sequence->Belt.Int.toString} />
-          | _ => <LoadingCensorBar width=110 height=20 radius=50 />
-          }}
-        </div>
-      </div>
-      <div className={Css.merge(list{Styles.packetInnerMobile})}>
-        <div>
-          <Text value="Packet Type" size=Text.Body2 weight=Text.Semibold />
-        </div>
-        <div>
-          {switch packetSub {
-          | Data({packetType}) => <MsgBadge name={packetType->IBCQuery.getPacketTypeText} />
           | _ => <LoadingCensorBar width=110 height=20 radius=50 />
           }}
         </div>
@@ -187,10 +139,15 @@ module MobilePacketItem = {
 
                     switch acknowledgement.data {
                     | Request({requestID: requestIDOpt}) =>
-                      let requestID = requestIDOpt->Belt.Option.getExn
-                      Some(
-                        <TypeID.Request id={requestID->ID.Request.fromInt} position=TypeID.Text />,
-                      )
+                      switch requestIDOpt {
+                      | None => Some(<Text value="-" />)
+                      | Some(requestID) =>
+                        Some(
+                          <TypeID.Request
+                            id={requestID->ID.Request.fromInt} position=TypeID.Text
+                          />,
+                        )
+                      }
                     | _ => None
                     }
                   }->Belt.Option.getWithDefault(React.null)}
@@ -231,10 +188,14 @@ module MobilePacketItem = {
               | Pending => <img alt="Pending Icon" src=Images.pending />
               | Fail =>
                 <div
-                  className={Css.merge(list{CssHelper.flexBox(), Styles.failText})}
+                  className={Css.merge(list{
+                    CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ()),
+                    Styles.failText,
+                  })}
                   // onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
                   onClick={_ => Js.log("Show Error")}>
-                  <Text value="View Error Message" color=theme.error_600 />
+                  <Text value="View Error" color=theme.error_600 />
+                  <HSpacing size=Spacing.sm />
                   <img alt="Fail Icon" src=Images.fail />
                 </div>
               }
@@ -275,32 +236,12 @@ module DesktopPacketItem = {
           }}
         </div>
         <div className=Styles.packetInnerColumn>
-          {switch packetSub {
-          | Data({counterPartyChainID}) => <Text value={counterPartyChainID} />
-          | _ => <LoadingCensorBar width=110 height=20 radius=50 />
-          }}
-        </div>
-        <div className={Css.merge(list{Styles.packetInnerColumn, Styles.largeColumn})}>
-          {switch packetSub {
-          | Data({srcPort, srcChannel, dstPort, dstChannel}) =>
-            <div className={Css.merge(list{Styles.portChannelWrapper, Styles.packetInnerColumn})}>
-              <div className=Styles.channelSource>
-                <Text value={srcPort} />
-                <br />
-                <Text value={srcChannel} color={theme.primary_600} weight={Text.Semibold} />
-              </div>
-              <div>
-                <img alt="arrow" src={isDarkMode ? Images.longArrowDark : Images.longArrowLight} />
-              </div>
-              <div className=Styles.channelDest>
-                <Text value={dstPort} />
-                <br />
-                <Text value={dstChannel} color={theme.primary_600} weight={Text.Semibold} />
-              </div>
-            </div>
-
-          | _ => <LoadingCensorBar width=110 height=20 radius=50 />
-          }}
+          <div className=Styles.badgeContainer>
+            {switch packetSub {
+            | Data({packetType}) => <MsgBadge name={packetType->IBCQuery.getPacketTypeText} />
+            | _ => <LoadingCensorBar width=110 height=20 radius=50 />
+            }}
+          </div>
         </div>
         {switch isTablet {
         | true => React.null
@@ -313,14 +254,6 @@ module DesktopPacketItem = {
           </div>
         }}
         <div className=Styles.packetInnerColumn>
-          <div className=Styles.badgeContainer>
-            {switch packetSub {
-            | Data({packetType}) => <MsgBadge name={packetType->IBCQuery.getPacketTypeText} />
-            | _ => <LoadingCensorBar width=110 height=20 radius=50 />
-            }}
-          </div>
-        </div>
-        <div className=Styles.packetInnerColumn>
           {switch packetSub {
           | Data({packetType, acknowledgement: acknowledgementOpt, data}) =>
             <>
@@ -328,15 +261,18 @@ module DesktopPacketItem = {
               | OracleRequest =>
                 {
                   let acknowledgement = acknowledgementOpt->Belt.Option.getExn
-
                   switch acknowledgement.data {
                   | Request({requestID: requestIDOpt}) =>
-                    let requestID = requestIDOpt->Belt.Option.getExn
-                    Some(<TypeID.Request id={requestID->ID.Request.fromInt} position=TypeID.Text />)
+                    switch requestIDOpt {
+                    | Some(requestID) =>
+                      Some(
+                        <TypeID.Request id={requestID->ID.Request.fromInt} position=TypeID.Text />,
+                      )
+                    | None => Some(<Text value="-" align={Center} />)
+                    }
                   | _ => None
                   }
                 }->Belt.Option.getWithDefault(React.null)
-
               | OracleResponse =>
                 switch data {
                 | Response(response) =>
@@ -354,6 +290,12 @@ module DesktopPacketItem = {
           }}
         </div>
         <div className={Css.merge(list{Styles.packetInnerColumn, Styles.smallColumn})}>
+          {switch packetSub {
+          | Data({timestamp}) => <TimeAgos time=timestamp size=Text.Body2 weight=Text.Thin />
+          | _ => <LoadingCensorBar width=110 height=20 radius=50 />
+          }}
+        </div>
+        <div className={Css.merge(list{Styles.packetInnerColumn, Styles.rightAlign})}>
           {switch packetSub {
           | Data({acknowledgement, packetType, data}) =>
             switch packetType {
@@ -379,10 +321,14 @@ module DesktopPacketItem = {
                 | Pending => <img alt="Pending Icon" src=Images.pending />
                 | Fail =>
                   <div
-                    className={Css.merge(list{CssHelper.flexBox(), Styles.failText})}
+                    className={Css.merge(list{
+                      CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ()),
+                      Styles.failText,
+                    })}
                     // onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
                     onClick={_ => Js.log("Show Error")}>
-                    <Text value="View Error Message" color=theme.error_600 />
+                    <Text value="View Error" color=theme.error_600 />
+                    <HSpacing size=#px(8) />
                     <img alt="Fail Icon" src=Images.fail />
                   </div>
                 }

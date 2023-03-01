@@ -29,7 +29,7 @@ module Styles = {
 }
 
 @react.component
-let make = (~chainID, ~channel, ~port, ~sequence) => {
+let make = (~chainID, ~channel, ~port) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let isMobile = Media.isMobile()
   let isTablet = Media.isTablet()
@@ -37,7 +37,7 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
   let (page, setPage) = React.useState(_ => 1)
   let (packetType, setPacketType) = React.useState(_ => "All")
 
-  let packetCountSub = IBCSub.outgoingCount()
+  let packetCountSub = IBCSub.outgoingCount(~port, ~channel, ~packetType, ())
   let pageSize = 5
 
   let packetsSub = IBCQuery.getList(
@@ -52,7 +52,6 @@ let make = (~chainID, ~channel, ~port, ~sequence) => {
     },
     ~port,
     ~channel,
-    ~sequence,
     ~chainID,
     (),
   )

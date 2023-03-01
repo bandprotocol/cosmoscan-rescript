@@ -89,7 +89,7 @@ let make = (
 
   let (inputPage, setInputPage) = React.useState(_ => "1")
 
-  if pageCount > 1 {
+  if pageCount >= 1 {
     <div className=Styles.container>
       <div className=Styles.innerContainer>
         <ClickableSymbol

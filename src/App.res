@@ -52,7 +52,7 @@ let make = () => {
       | ProposalDetailsPage(proposalID) =>
         <ProposalDetailsPage proposalID=ID.Proposal.ID(proposalID) />
       | RelayersHomepage => <RelayersHomepage />
-      | IBCTxPage => <IBCHomePage />
+      | IBCTxPage => <ChannelPage channel="channel-1" port="oracle" />
       | NotFound => <NotFound />
       }}
     </div>

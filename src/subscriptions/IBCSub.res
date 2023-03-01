@@ -7,8 +7,8 @@ module PacketsAggregate = {
 }
 
 module IncomingPacketsCountConfig = %graphql(`
-    subscription IncomingPacketsCount {
-        incoming_packets_aggregate @ppxAs(type: "PacketsAggregate.internal_t") {
+    subscription IncomingPacketsCount ($port: String!, $channel: String!, $packetType: String!, $packetTypeIsNull: Boolean!) {
+        incoming_packets_aggregate (where: { dst_port: { _eq: $port }, dst_channel: { _eq: $channel }, type: {_is_null: $packetTypeIsNull, _ilike: $packetType} } ) @ppxAs(type: "PacketsAggregate.internal_t") {
             aggregate @ppxAs(type: "PacketsAggregate.aggregate_t"){
                 count
             }
@@ -17,8 +17,8 @@ module IncomingPacketsCountConfig = %graphql(`
 `)
 
 module OutgoingPacketsCountConfig = %graphql(`
-    subscription OutgoingPacketsCount {
-        outgoing_packets_aggregate @ppxAs(type: "PacketsAggregate.internal_t") {
+    subscription OutgoingPacketsCount ($port: String!, $channel: String!, $packetType: String!, $packetTypeIsNull: Boolean!) {
+        outgoing_packets_aggregate (where: { src_port: { _eq: $port }, src_channel: { _eq: $channel }, type: {_is_null: $packetTypeIsNull, _ilike: $packetType} } ) @ppxAs(type: "PacketsAggregate.internal_t") {
             aggregate @ppxAs(type: "PacketsAggregate.aggregate_t"){
                 count
             }
@@ -26,29 +26,65 @@ module OutgoingPacketsCountConfig = %graphql(`
     }
 `)
 
-let count = () => {
-  let incomingPacketsSub = IncomingPacketsCountConfig.use()
-  let outgoingPacketsSub = OutgoingPacketsCountConfig.use()
+// let count = () => {
+//   let incomingPacketsSub = IncomingPacketsCountConfig.use()
+//   let outgoingPacketsSub = OutgoingPacketsCountConfig.use()
 
-  let totalIncoming = {
-    switch incomingPacketsSub.data {
-    | Some({incoming_packets_aggregate: {aggregate: Some({count})}}) => count
-    | _ => 0
+//   let totalIncoming = {
+//     switch incomingPacketsSub.data {
+//     | Some({incoming_packets_aggregate: {aggregate: Some({count})}}) => count
+//     | _ => 0
+//     }
+//   }
+
+//   let totalOutgoing = {
+//     switch outgoingPacketsSub.data {
+//     | Some({outgoing_packets_aggregate: {aggregate: Some({count})}}) => count
+//     | _ => 0
+//     }
+//   }
+//   let total = totalIncoming + totalOutgoing
+//   total
+// }
+
+let incomingCount = (~port, ~channel, ~packetType, ()) => {
+  let packetTypeIsNull = {
+    switch packetType {
+    | "Unknown" => Some(true)
+    | _ => None
     }
   }
 
-  let totalOutgoing = {
-    switch outgoingPacketsSub.data {
-    | Some({outgoing_packets_aggregate: {aggregate: Some({count})}}) => count
-    | _ => 0
+  let packetTypeKeyword = {
+    switch packetType {
+    | "Oracle Request" => Some("oracle_request")
+    | "Oracle Response" => Some("oracle response")
+    | "Fungible Token" => Some("fungible_token")
+    | "Interchain Account" => Some("interchain_account")
+    | _ => None
+    // | _ => raise(Not_found)
     }
   }
-  let total = totalIncoming + totalOutgoing
-  total
-}
 
-let incomingCount = () => {
-  let result = IncomingPacketsCountConfig.use()
+  let result = IncomingPacketsCountConfig.use({
+    port,
+    channel,
+    packetType: {
+      switch packetTypeKeyword {
+      | Some("oracle_request") => "oracle_request"
+      | Some("oracle response") => "oracle response"
+      | Some("fungible_token") => "fungible_token"
+      | Some("interchain_account") => "interchain_account"
+      | _ => "%%"
+      }
+    },
+    packetTypeIsNull: {
+      switch packetTypeIsNull {
+      | Some(true) => true
+      | _ => false
+      }
+    },
+  })
   result
   ->Sub.fromData
   ->Sub.map(x =>
@@ -56,8 +92,44 @@ let incomingCount = () => {
   )
 }
 
-let outgoingCount = () => {
-  let result = OutgoingPacketsCountConfig.use()
+let outgoingCount = (~port, ~channel, ~packetType, ()) => {
+  let packetTypeIsNull = {
+    switch packetType {
+    | "Unknown" => Some(true)
+    | _ => None
+    }
+  }
+
+  let packetTypeKeyword = {
+    switch packetType {
+    | "Oracle Request" => Some("oracle_request")
+    | "Oracle Response" => Some("oracle response")
+    | "Fungible Token" => Some("fungible_token")
+    | "Interchain Account" => Some("interchain_account")
+    | _ => None
+    // | _ => raise(Not_found)
+    }
+  }
+
+  let result = OutgoingPacketsCountConfig.use({
+    port,
+    channel,
+    packetType: {
+      switch packetTypeKeyword {
+      | Some("oracle_request") => "oracle_request"
+      | Some("oracle response") => "oracle response"
+      | Some("fungible_token") => "fungible_token"
+      | Some("interchain_account") => "interchain_account"
+      | _ => "%%"
+      }
+    },
+    packetTypeIsNull: {
+      switch packetTypeIsNull {
+      | Some(true) => true
+      | _ => false
+      }
+    },
+  })
 
   result
   ->Sub.fromData

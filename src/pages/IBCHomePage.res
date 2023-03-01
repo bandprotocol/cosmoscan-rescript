@@ -153,7 +153,7 @@ let make = () => {
   let incomingCount = IBCSub.incomingCount()
   let outgoingCount = IBCSub.outgoingCount()
 
-  let countSub = Sub.all2(incomingCount, outgoingCount)
+  // let countSub = Sub.all2(incomingCount, outgoingCount)
 
   let (packetType, setPacketType) = React.useState(_ => "")
   let (packetPort, setPacketPort) = React.useState(_ => "")
@@ -203,16 +203,16 @@ let make = () => {
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
         <Col col=Col.Twelve>
           <Heading value="IBC Transactions" size=Heading.H2 marginBottom=16 marginBottomSm=8 />
-          {switch countSub {
-          | Data(incoming, outgoing) =>
-            <Heading
-              value={(incoming + outgoing)->Format.iPretty ++ " In total"}
-              size=Heading.H3
-              weight=Heading.Thin
-              color=theme.neutral_600
-            />
-          | _ => <LoadingCensorBar width=120 height=21 />
-          }}
+          // {switch countSub {
+          // | Data(incoming, outgoing) =>
+          //   <Heading
+          //     value={(incoming + outgoing)->Format.iPretty ++ " In total"}
+          //     size=Heading.H3
+          //     weight=Heading.Thin
+          //     color=theme.neutral_600
+          //   />
+          // | _ => <LoadingCensorBar width=120 height=21 />
+          // }}
         </Col>
       </Row>
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
@@ -302,12 +302,8 @@ let make = () => {
           </div>
         </Col>
       </Row>
-      <IncomingSection
-        chainID channel=packetChannel sequence={packetSequence->Belt.Int.fromString} port=packetPort
-      />
-      <OutgoingSection
-        chainID channel=packetChannel sequence={packetSequence->Belt.Int.fromString} port=packetPort
-      />
+      <IncomingSection chainID channel=packetChannel port=packetPort />
+      <OutgoingSection chainID channel=packetChannel port=packetPort />
     </div>
   </Section>
 }
