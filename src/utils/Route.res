@@ -38,7 +38,8 @@ type t =
   | ValidatorDetailsPage(Address.t, validator_tab_t)
   | ProposalPage
   | ProposalDetailsPage(int)
-  | IBCHomePage
+  | RelayersHomepage
+  | IBCTxPage
 
 let fromUrl = (url: RescriptReactRouter.url) =>
   // TODO: We'll handle the NotFound case for Datasources and Oraclescript later
@@ -108,7 +109,8 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     }
   | (list{"proposals"}, _) => ProposalPage
   | (list{"proposal", proposalID}, _) => ProposalDetailsPage(proposalID->Parse.mustParseInt)
-  | (list{"ibcs"}, _) => IBCHomePage
+  | (list{"relayers"}, _) => RelayersHomepage
+  | (list{"ibcs"}, _) => IBCTxPage
   | (list{}, _) => HomePage
   | (_, _) => NotFound
   }
@@ -175,7 +177,8 @@ let toString = route =>
 
   | ProposalPage => "/proposals"
   | ProposalDetailsPage(proposalID) => `/proposal/${proposalID->Belt.Int.toString}`
-  | IBCHomePage => "/ibcs"
+  | RelayersHomepage => "/relayers"
+  | IBCTxPage => "/ibcs"
   | HomePage => "/"
   | NotFound => "/notfound"
   }

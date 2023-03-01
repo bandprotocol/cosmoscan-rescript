@@ -64,9 +64,7 @@ module RenderMobile = {
         width(#percent(100.)),
         padding2(~v=#px(18), ~h=#zero),
         textAlign(#center),
-        boxShadow(
-          Shadow.box(~inset=true, ~x=#zero, ~y=#px(-1), ~blur=#px(0), theme.neutral_100),
-        ),
+        boxShadow(Shadow.box(~inset=true, ~x=#zero, ~y=#px(-1), ~blur=#px(0), theme.neutral_100)),
       ])
 
     let menuContainer = style(. [
@@ -139,7 +137,7 @@ let make = () => {
     ("Data Sources", DataSourcePage),
     ("Oracle Scripts", OracleScriptPage),
     ("Requests", RequestHomePage),
-    ("IBCs", IBCHomePage),
+    ("IBCs", RelayersHomepage),
   }
 
   Media.isMobile() ? <RenderMobile routes /> : <RenderDesktop routes />
