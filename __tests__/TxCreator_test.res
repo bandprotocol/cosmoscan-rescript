@@ -1,3 +1,14 @@
+open Jest
+
+open TxCreator
+
+open PubKey
+
+open Expect
+
+let pubKey = PubKey("eb5ae9872103a54ffaa84c8f2f798782de8b962a84784e288487a747813a0857243a60e2ba33")
+let signature = "CHdU7pVFBLl4GqWvMNlyOh5fdoOagkf3MSf5UfY7DzAEzVX2YOUZpbEKuBDDvEGDTc3u0Pl42zE04GLpSfQzOw"
+
 describe("expect TxCreator to give the correct message", () => {
   test("should be able to create correct message for MsgSend", () =>
     expect({
