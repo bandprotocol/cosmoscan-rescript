@@ -48,3 +48,12 @@ let hexToOperatorBech32 = hexstr => hexstr->fromHex->toOperatorBech32
 let hexToBech32 = hexstr => hexstr->fromHex->toBech32
 
 let isEqual = (Address(hexstr1), Address(hexst2)) => hexstr1 == hexst2
+
+let fromBech32OptNotBandPrefix = bech32str => {
+  let decodedOpt = bech32str->Bech32.decodeOpt
+
+  switch decodedOpt {
+  | Some(address) => Some(Address(address->Bech32.wordsGet->Bech32.fromWords->JsBuffer.arrayToHex))
+  | None => None
+  }
+}

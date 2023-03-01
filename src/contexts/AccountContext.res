@@ -15,6 +15,7 @@ type send_request_t = {
   feeLimit: int,
   prepareGas: int,
   executeGas: int,
+  gaslimit: string,
 }
 
 type a =
@@ -41,6 +42,7 @@ let reducer = (state, action) =>
       feeLimit,
       prepareGas,
       executeGas,
+      gaslimit,
     }) =>
     switch state {
     | Some({address, wallet, pubKey, chainID}) =>
@@ -61,8 +63,18 @@ let reducer = (state, action) =>
             ),
           ],
           ~chainID,
-          ~gas="700000",
-          ~feeAmount="0",
+          ~gas={
+            switch (gaslimit->Belt.Int.fromString) {
+            | Some(gasOpt) => gasOpt
+            | _ => 1000000
+            };
+          },
+          ~feeAmount={
+            switch (int_of_string_opt(gaslimit)) {
+            | Some(gasOpt) => Js.Float.toString(float_of_int(gasOpt) *. 0.0025)
+            | _ => "2500"
+            };
+          },
           ~memo="send via scan",
           (),
         )->Promise.then(rawTx => {

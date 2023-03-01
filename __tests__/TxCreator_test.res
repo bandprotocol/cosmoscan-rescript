@@ -28,7 +28,7 @@ describe("expect TxCreator to give the correct message", () => {
         ],
         fee: {
           amount: [{amount: "10000", denom: "uband"}],
-          gas: "1000000",
+          gas: 1000000,
         },
         memo: "",
         signatures: [
@@ -52,7 +52,7 @@ describe("expect TxCreator to give the correct message", () => {
         ~tx={
           fee: {
             amount: [{amount: "10000", denom: "uband"}],
-            gas: "1000000",
+            gas: 1000000,
           },
           memo: "",
           chain_id: "bandchain",
@@ -99,7 +99,7 @@ describe("expect TxCreator to give the correct message", () => {
         ],
         fee: {
           amount: [{amount: "10000", denom: "uband"}],
-          gas: "1000000",
+          gas: 1000000,
         },
         memo: "",
         signatures: [
@@ -123,7 +123,7 @@ describe("expect TxCreator to give the correct message", () => {
         ~tx={
           fee: {
             amount: [{amount: "10000", denom: "uband"}],
-            gas: "1000000",
+            gas: 1000000,
           },
           memo: "",
           chain_id: "bandchain",
