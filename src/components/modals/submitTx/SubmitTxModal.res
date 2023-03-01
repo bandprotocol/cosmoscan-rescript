@@ -77,7 +77,7 @@ module SubmitTxStep = {
         <SendMsg address={account.address} receiver setMsgsOpt targetChain />
       | Delegate(validator) => <DelegateMsg address={account.address} validator setMsgsOpt />
       | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
-      // | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
+      | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
       // | WithdrawReward(validator) =>
       //   <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
       // | Reinvest(validator, amount) => <ReinvestMsg validator setMsgsOpt amount />
