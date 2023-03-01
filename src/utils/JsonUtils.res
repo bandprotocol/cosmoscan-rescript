@@ -13,6 +13,8 @@ module Decode = {
   let bufferFromHex = string->map((. a) => JsBuffer.fromHex(a))
   let bufferFromBase64 = string->map((. a) => JsBuffer.fromBase64(a))
 
+  let stringOrInt = oneOf([int, string->map((. a) => a->int_of_string)])
+
   let rec at = (fields, decoder) => {
     switch fields {
     | list{} => decoder

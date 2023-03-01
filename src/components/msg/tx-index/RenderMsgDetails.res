@@ -38,6 +38,7 @@ type content_inner_t =
   | ID(React.element) // TODO: refactor not to receive react.element
   | RawReports(Belt.List.t<Msg.RawDataReport.t>)
   | Timestamp(MomentRe.Moment.t)
+  | ValidatorLink(Address.t, string, string)
 
 type content_t = {
   title: string,
@@ -48,7 +49,8 @@ type content_t = {
 let renderValue = v => {
   switch v {
   | Address(address) => <AddressRender position=AddressRender.Subtitle address />
-  | ValidatorAddress(address) => <AddressRender position=AddressRender.Subtitle address />
+  | ValidatorAddress(address) =>
+    <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
   | PlainText(content) => <Text value={content} size=Text.Body1 />
   | Coin(amount) => <AmountRender coins={amount} />
   | ID(element) => element
@@ -65,6 +67,15 @@ let renderValue = v => {
       ])}
     />
   | Timestamp(timestamp) => <Timestamp time={timestamp} size=Text.Body1 />
+  | ValidatorLink(address, moniker, identity) =>
+    <ValidatorMonikerLink
+      validatorAddress={address}
+      moniker={moniker}
+      identity={identity}
+      width={#percent(100.)}
+      avatarWidth=20
+      size=Text.Body1
+    />
   }
 }
 
@@ -350,6 +361,122 @@ module RevokeAllowance = {
   ]
 }
 
+module CreateValidator = {
+  let factory = (msg: Msg.CreateValidator.t) => [
+    {
+      title: "Moniker",
+      content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
+      order: 1,
+    },
+    {
+      title: "Identity",
+      content: PlainText(msg.identity),
+      order: 2,
+    },
+    {
+      title: "Commission Rate",
+      content: PlainText(
+        (msg.commissionRate *. 100.)->Js.Float.toFixedWithPrecision(~digits=4) ++ "%",
+      ),
+      order: 3,
+    },
+    {
+      title: "Commission Max Rate",
+      content: PlainText(
+        (msg.commissionMaxRate *. 100.)->Js.Float.toFixedWithPrecision(~digits=4) ++ "%",
+      ),
+      order: 4,
+    },
+    {
+      title: "Commission Max Change",
+      content: PlainText(
+        (msg.commissionMaxChange *. 100.)->Js.Float.toFixedWithPrecision(~digits=4) ++ "%",
+      ),
+      order: 5,
+    },
+    {
+      title: "Delegator Address",
+      content: Address(msg.delegatorAddress),
+      order: 6,
+    },
+    {
+      title: "Validator Address",
+      content: ValidatorAddress(msg.validatorAddress),
+      order: 7,
+    },
+    {
+      title: "Min Self Delegation",
+      content: Coin(list{msg.minSelfDelegation}),
+      order: 8,
+    },
+    {
+      title: "Self Delegation",
+      content: Coin(list{msg.selfDelegation}),
+      order: 9,
+    },
+    {
+      title: "Details",
+      content: PlainText(msg.details),
+      order: 10,
+    },
+    {
+      title: "Website",
+      content: PlainText(msg.website),
+      order: 11,
+    },
+  ]
+}
+
+module EditValidator = {
+  let factory = (msg: Msg.EditValidator.t) => [
+    {
+      title: "Moniker",
+      content: PlainText(msg.moniker == Config.doNotModify ? "Unchanged" : msg.moniker),
+      order: 1,
+    },
+    {
+      title: "Identity",
+      content: PlainText(msg.identity == Config.doNotModify ? "Unchanged" : msg.identity),
+      order: 2,
+    },
+    {
+      title: "Commission Rate",
+      content: PlainText(
+        switch msg.commissionRate {
+        | Some(rate) => (rate *. 100.)->Js.Float.toFixedWithPrecision(~digits=4) ++ "%"
+        | None => "Unchanged"
+        },
+      ),
+      order: 3,
+    },
+    {
+      title: "Validator Address",
+      content: ValidatorAddress(msg.sender),
+      order: 4,
+    },
+    {
+      title: "Min Self Delegation",
+      content: {
+        switch msg.minSelfDelegation {
+        | Some(minSelfDelegation') => Coin(list{minSelfDelegation'})
+        | None => PlainText("Unchanged")
+        }
+      },
+      order: 5,
+    },
+    {
+      title: "Details",
+      content: PlainText(msg.details == Config.doNotModify ? "Unchanged" : msg.details),
+      order: 6,
+    },
+    {
+      title: "Website",
+      content: PlainText(msg.website == Config.doNotModify ? "Unchanged" : msg.website),
+      order: 7,
+    },
+  ]
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -375,6 +502,8 @@ let getContent = msg => {
   | Msg.GrantMsg(data) => Grant.factory(data)
   | Msg.RevokeMsg(data) => Revoke.factory(data)
   | Msg.RevokeAllowanceMsg(data) => RevokeAllowance.factory(data)
+  | Msg.CreateValidatorMsg(data) => CreateValidator.factory(data)
+  | Msg.EditValidatorMsg(data) => EditValidator.factory(data)
   | Msg.UnknownMsg => []
   }
 }
@@ -387,8 +516,8 @@ let make = (~contents: array<content_t>) => {
     contents
     ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
     ->Belt.Array.mapWithIndex((i, content) => {
-      <Row key={i->Belt.Int.toString}>
-        <Col col=Col.Three mb=24>
+      <Row key={i->Belt.Int.toString} marginBottom=0 marginBottomSm=24>
+        <Col col=Col.Four mb=16 mbSm=8>
           <Heading
             value={content.title}
             size=Heading.H4
@@ -397,7 +526,9 @@ let make = (~contents: array<content_t>) => {
             color=theme.neutral_600
           />
         </Col>
-        <Col col=Col.Nine mb=24 key={i->Belt.Int.toString}> {renderValue(content.content)} </Col>
+        <Col col=Col.Eight mb=16 mbSm=8 key={i->Belt.Int.toString}>
+          {renderValue(content.content)}
+        </Col>
       </Row>
     })
     ->React.array

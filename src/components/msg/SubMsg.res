@@ -82,6 +82,9 @@ let make = (~msg: Msg.t) => {
     | GrantMsg(msg) => <ValidatorMsg.Grant reporter=msg.validator />
     | RevokeMsg(msg) => <ValidatorMsg.Revoke reporter=msg.validator />
     | RevokeAllowanceMsg(msg) => <ValidatorMsg.RevokeAllowance granter=msg.granter />
+    | CreateValidatorMsg({moniker})
+    | EditValidatorMsg({moniker}) =>
+      <ValidatorMsg.Validator moniker />
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />

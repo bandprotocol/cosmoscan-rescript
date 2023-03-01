@@ -13,15 +13,7 @@ module BadgeWrapper = {
     </div>
 }
 
-module CreateValidator = {
-  @react.component
-  let make = (~moniker) =>
-    <BadgeWrapper>
-      <Text value=moniker size=Text.Body2 nowrap=true block=true />
-    </BadgeWrapper>
-}
-
-module EditValidator = {
+module Validator = {
   @react.component
   let make = (~moniker) =>
     <BadgeWrapper>
