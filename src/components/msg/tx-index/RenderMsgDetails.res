@@ -511,6 +511,149 @@ module Delegate = {
     ])
 }
 
+module Undelegate = {
+  let factory = (msg: Msg.Undelegate.t<'a, 'b>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Delegator Address",
+        content: Address(msg.delegatorAddress),
+        order: 1,
+      },
+      {
+        title: "Amount",
+        content: CoinList(list{msg.amount}),
+        order: 3,
+      },
+    ])
+
+  let success = (msg: Msg.Undelegate.success_t) =>
+    msg->factory([
+      {
+        title: "Validator",
+        content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
+        order: 2,
+      },
+    ])
+
+  let failed = (msg: Msg.Undelegate.failed_t) =>
+    msg->factory([
+      {
+        title: "Validator Address",
+        content: ValidatorAddress(msg.validatorAddress),
+        order: 2,
+      },
+    ])
+}
+
+module Redelegate = {
+  let factory = (msg: Msg.Redelegate.t<'a, 'b, 'c, 'd>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Delegator Address",
+        content: Address(msg.delegatorAddress),
+        order: 1,
+      },
+      {
+        title: "Amount",
+        content: CoinList(list{msg.amount}),
+        order: 4,
+      },
+    ])
+
+  let success = (msg: Msg.Redelegate.success_t) =>
+    msg->factory([
+      {
+        title: "Source Validator Address",
+        content: ValidatorLink(msg.validatorSourceAddress, msg.monikerSource, msg.identitySource),
+        order: 2,
+      },
+      {
+        title: "Destination Validator Address",
+        content: ValidatorLink(
+          msg.validatorDestinationAddress,
+          msg.monikerDestination,
+          msg.identityDestination,
+        ),
+        order: 3,
+      },
+    ])
+
+  let failed = (msg: Msg.Redelegate.failed_t) =>
+    msg->factory([
+      {
+        title: "Source Validator",
+        content: ValidatorAddress(msg.validatorSourceAddress),
+        order: 2,
+      },
+      {
+        title: "Destination Validator",
+        content: ValidatorAddress(msg.validatorDestinationAddress),
+        order: 3,
+      },
+    ])
+}
+
+module WithdrawReward = {
+  let factory = (msg: Msg.WithdrawReward.t<'a, 'b, 'c>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Delegator Address",
+        content: Address(msg.delegatorAddress),
+        order: 1,
+      },
+    ])
+
+  let success = (msg: Msg.WithdrawReward.success_t) =>
+    msg->factory([
+      {
+        title: "Validator Address",
+        content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
+        order: 2,
+      },
+      {
+        title: "Amount",
+        content: CoinList(msg.amount),
+        order: 3,
+      },
+    ])
+
+  let failed = (msg: Msg.WithdrawReward.failed_t) =>
+    msg->factory([
+      {
+        title: "Validator Address",
+        content: ValidatorAddress(msg.validatorAddress),
+        order: 2,
+      },
+    ])
+}
+
+module WithdrawCommission = {
+  let factory = (msg: Msg.WithdrawCommission.t<'a, 'b, 'c>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Validator Address",
+        content: ValidatorAddress(msg.validatorAddress),
+        order: 1,
+      },
+    ])
+
+  let success = (msg: Msg.WithdrawCommission.success_t) =>
+    msg->factory([
+      {
+        title: "Validator Address",
+        content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
+        order: 2,
+      },
+      {
+        title: "Amount",
+        content: CoinList(msg.amount),
+        order: 3,
+      },
+    ])
+
+  let failed = (msg: Msg.WithdrawCommission.failed_t) => msg->factory([])
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -543,6 +686,27 @@ let getContent = msg => {
     | Msg.Delegate.Success(data) => Delegate.success(data)
     | Msg.Delegate.Failure(data) => Delegate.failed(data)
     }
+  | Msg.UndelegateMsg(m) =>
+    switch m {
+    | Msg.Undelegate.Success(data) => Undelegate.success(data)
+    | Msg.Undelegate.Failure(data) => Undelegate.failed(data)
+    }
+  | Msg.RedelegateMsg(m) =>
+    switch m {
+    | Msg.Redelegate.Success(data) => Redelegate.success(data)
+    | Msg.Redelegate.Failure(data) => Redelegate.failed(data)
+    }
+  | Msg.WithdrawRewardMsg(m) =>
+    switch m {
+    | Msg.WithdrawReward.Success(data) => WithdrawReward.success(data)
+    | Msg.WithdrawReward.Failure(data) => WithdrawReward.failed(data)
+    }
+  | Msg.WithdrawCommissionMsg(m) =>
+    switch m {
+    | Msg.WithdrawCommission.Success(data) => WithdrawCommission.success(data)
+    | Msg.WithdrawCommission.Failure(data) => WithdrawCommission.failed(data)
+    }
+
   | Msg.UnknownMsg => []
   }
 }

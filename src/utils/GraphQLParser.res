@@ -87,6 +87,10 @@ let coinWithDefault = jsonOpt => {
   ->Coin.newUBANDFromAmount
 }
 
+let coinStr = str => {
+  str->float_of_string->Coin.newUBANDFromAmount
+}
+
 let coins = str => {
   str
   ->Js.String2.split(",")

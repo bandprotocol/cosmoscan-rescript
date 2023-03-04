@@ -69,11 +69,3 @@ module RevokeAllowance = {
       <AddressRender address=granter />
     </BadgeWrapper>
 }
-
-module Delegate = {
-  @react.component
-  let make = (~delegatorAddress) =>
-    <BadgeWrapper>
-      <AddressRender address=delegatorAddress />
-    </BadgeWrapper>
-}

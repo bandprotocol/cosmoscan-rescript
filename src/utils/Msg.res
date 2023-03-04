@@ -454,6 +454,164 @@ module Delegate = {
   }
 }
 
+module Undelegate = {
+  type t<'a, 'b> = {
+    validatorAddress: Address.t,
+    delegatorAddress: Address.t,
+    amount: Coin.t,
+    moniker: 'a,
+    identity: 'b,
+  }
+
+  type failed_t = t<unit, unit>
+  type success_t = t<string, string>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(failed_t)
+
+  let decodeFactory = (monikerDecoder, identityDecoder) => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, string)->Address.fromBech32,
+      validatorAddress: json.required(list{"msg", "validator_address"}, string)->Address.fromBech32,
+      amount: json.required(list{"msg", "amount"}, Coin.decodeCoin),
+      moniker: json->monikerDecoder,
+      identity: json->identityDecoder,
+    })
+  }
+  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => ())
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(
+      json => json.required(list{"msg", "moniker"}, string),
+      json => json.required(list{"msg", "identity"}, string),
+    )
+  }
+}
+
+module Redelegate = {
+  type t<'a, 'b, 'c, 'd> = {
+    validatorSourceAddress: Address.t,
+    validatorDestinationAddress: Address.t,
+    delegatorAddress: Address.t,
+    amount: Coin.t,
+    monikerSource: 'a,
+    monikerDestination: 'b,
+    identitySource: 'c,
+    identityDestination: 'd,
+  }
+
+  type failed_t = t<unit, unit, unit, unit>
+  type success_t = t<string, string, string, string>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(failed_t)
+
+  let decodeFactory = (monikerSourceD, monikerDestD, identityD, identityDestD) => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      validatorSourceAddress: json.required(
+        list{"msg", "validator_src_address"},
+        string,
+      )->Address.fromBech32,
+      validatorDestinationAddress: json.required(
+        list{"msg", "validator_dst_address"},
+        string,
+      )->Address.fromBech32,
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, string)->Address.fromBech32,
+      amount: json.required(list{"msg", "amount"}, Coin.decodeCoin),
+      monikerSource: json->monikerSourceD,
+      monikerDestination: json->monikerDestD,
+      identitySource: json->identityD,
+      identityDestination: json->identityDestD,
+    })
+  }
+  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => (), _ => (), _ => ())
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(
+      json => json.required(list{"msg", "val_src_moniker"}, string),
+      json => json.required(list{"msg", "val_dst_moniker"}, string),
+      json => json.required(list{"msg", "val_src_identity"}, string),
+      json => json.required(list{"msg", "val_dst_identity"}, string),
+    )
+  }
+}
+
+module WithdrawReward = {
+  type t<'a, 'b, 'c> = {
+    validatorAddress: Address.t,
+    delegatorAddress: Address.t,
+    amount: 'a,
+    moniker: 'b,
+    identity: 'c,
+  }
+
+  type failed_t = t<unit, unit, unit>
+  type success_t = t<list<Coin.t>, string, string>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(failed_t)
+
+  let decodeFactory = (amountD, monikerD, identityD) => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      validatorAddress: json.required(list{"msg", "validator_address"}, string)->Address.fromBech32,
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, string)->Address.fromBech32,
+      amount: json->amountD,
+      moniker: json->monikerD,
+      identity: json->identityD,
+    })
+  }
+  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => (), _ => ())
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(
+      json => json.required(list{"msg", "reward_amount"}, string)->GraphQLParser.coins,
+      json => json.required(list{"msg", "moniker"}, string),
+      json => json.required(list{"msg", "identity"}, string),
+    )
+  }
+}
+
+module WithdrawCommission = {
+  type t<'a, 'b, 'c> = {
+    validatorAddress: Address.t,
+    amount: 'a,
+    moniker: 'b,
+    identity: 'c,
+  }
+
+  type failed_t = t<unit, unit, unit>
+  type success_t = t<list<Coin.t>, string, string>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(failed_t)
+
+  let decodeFactory = (amountD, monikerD, identityD) => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      validatorAddress: json.required(list{"msg", "validator_address"}, string)->Address.fromBech32,
+      amount: json->amountD,
+      moniker: json->monikerD,
+      identity: json->identityD,
+    })
+  }
+  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => (), _ => ())
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(
+      json => json.required(list{"msg", "commission_amount"}, string)->GraphQLParser.coins,
+      json => json.required(list{"msg", "moniker"}, string),
+      json => json.required(list{"msg", "identity"}, string),
+    )
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -468,6 +626,10 @@ type msg_t =
   | CreateValidatorMsg(CreateValidator.t)
   | EditValidatorMsg(EditValidator.t)
   | DelegateMsg(Delegate.decoded_t)
+  | UndelegateMsg(Undelegate.decoded_t)
+  | RedelegateMsg(Redelegate.decoded_t)
+  | WithdrawRewardMsg(WithdrawReward.decoded_t)
+  | WithdrawCommissionMsg(WithdrawCommission.decoded_t)
   | UnknownMsg
 
 type t = {
@@ -504,7 +666,11 @@ let getBadge = msg => {
   | RevokeAllowanceMsg(_) => {name: "Revoke Allowance", category: ValidatorMsg}
   | CreateValidatorMsg(_) => {name: "Create Validator", category: ValidatorMsg}
   | EditValidatorMsg(_) => {name: "Edit Validator", category: ValidatorMsg}
-  | DelegateMsg(_) => {name: "Delegate", category: ValidatorMsg}
+  | DelegateMsg(_) => {name: "Delegate", category: TokenMsg}
+  | UndelegateMsg(_) => {name: "Undelegate", category: TokenMsg}
+  | RedelegateMsg(_) => {name: "Redelegate", category: TokenMsg}
+  | WithdrawRewardMsg(_) => {name: "Withdraw Reward", category: TokenMsg}
+  | WithdrawCommissionMsg(_) => {name: "Withdraw Commission", category: TokenMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -588,6 +754,50 @@ let decodeMsg = (json, isSuccess) => {
         : {
             let msg = json->mustDecode(Delegate.decodeFail)
             (DelegateMsg(Failure(msg)), msg.delegatorAddress, false)
+          }
+
+    | "/cosmos.staking.v1beta1.MsgUndelegate" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Undelegate.decodeSuccess)
+            (UndelegateMsg(Success(msg)), msg.delegatorAddress, false)
+          }
+        : {
+            let msg = json->mustDecode(Undelegate.decodeFail)
+            (UndelegateMsg(Failure(msg)), msg.delegatorAddress, false)
+          }
+
+    | "/cosmos.staking.v1beta1.MsgBeginRedelegate" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Redelegate.decodeSuccess)
+            (RedelegateMsg(Success(msg)), msg.delegatorAddress, false)
+          }
+        : {
+            let msg = json->mustDecode(Redelegate.decodeFail)
+            (RedelegateMsg(Failure(msg)), msg.delegatorAddress, false)
+          }
+
+    | "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(WithdrawReward.decodeSuccess)
+            (WithdrawRewardMsg(Success(msg)), msg.delegatorAddress, false)
+          }
+        : {
+            let msg = json->mustDecode(WithdrawReward.decodeFail)
+            (WithdrawRewardMsg(Failure(msg)), msg.delegatorAddress, false)
+          }
+
+    | "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(WithdrawCommission.decodeSuccess)
+            (WithdrawCommissionMsg(Success(msg)), msg.validatorAddress, false)
+          }
+        : {
+            let msg = json->mustDecode(WithdrawCommission.decodeFail)
+            (WithdrawCommissionMsg(Failure(msg)), msg.validatorAddress, false)
           }
 
     | _ => (UnknownMsg, Address.Address(""), false)

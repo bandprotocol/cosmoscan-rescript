@@ -87,8 +87,28 @@ let make = (~msg: Msg.t) => {
       <ValidatorMsg.Validator moniker />
     | DelegateMsg(msg) =>
       switch msg {
-      | Msg.Delegate.Success(m) => <ValidatorMsg.Delegate delegatorAddress=m.delegatorAddress />
-      | Msg.Delegate.Failure(f) => <ValidatorMsg.Delegate delegatorAddress=f.delegatorAddress />
+      | Msg.Delegate.Success(m) => <TokenMsg.DelegateMsg coin={m.amount} />
+      | Msg.Delegate.Failure(f) => <TokenMsg.DelegateMsg coin={f.amount} />
+      }
+    | UndelegateMsg(msg) =>
+      switch msg {
+      | Msg.Undelegate.Success(m) => <TokenMsg.DelegateMsg coin={m.amount} />
+      | Msg.Undelegate.Failure(f) => <TokenMsg.DelegateMsg coin={f.amount} />
+      }
+    | RedelegateMsg(msg) =>
+      switch msg {
+      | Msg.Redelegate.Success(m) => <TokenMsg.RedelegateMsg amount={m.amount} />
+      | Msg.Redelegate.Failure(f) => <TokenMsg.RedelegateMsg amount={f.amount} />
+      }
+    | WithdrawRewardMsg(msg) =>
+      switch msg {
+      | Msg.WithdrawReward.Success(m) => <TokenMsg.WithdrawRewardMsg amount={m.amount} />
+      | Msg.WithdrawReward.Failure(f) => React.null
+      }
+    | WithdrawCommissionMsg(msg) =>
+      switch msg {
+      | Msg.WithdrawCommission.Success(m) => <TokenMsg.WithdrawCommissionMsg amount={m.amount} />
+      | Msg.WithdrawCommission.Failure(f) => React.null
       }
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />

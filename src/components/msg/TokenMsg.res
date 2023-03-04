@@ -4,114 +4,79 @@ module Styles = {
   let msgContainer = style(. [selector("> * + *", [marginLeft(#px(5))])])
 }
 
-module SendMsg = {
+module BadgeWrapper = {
   @react.component
-  let make = (~toAddress, ~amount) =>
+  let make = (~children) =>
     <div
       className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
+        CssHelper.flexBox(~align=#center, ()),
         CssHelper.overflowHidden,
         Styles.msgContainer,
       ])}>
-      <AmountRender coins=amount />
+      {children}
+    </div>
+}
+
+module SendMsg = {
+  @react.component
+  let make = (~toAddress, ~amount) =>
+    <BadgeWrapper>
+      <AmountRender coins=amount size={Body2} />
       <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
       <AddressRender address=toAddress />
-    </div>
+    </BadgeWrapper>
 }
 
 module ReceiveMsg = {
   @react.component
   let make = (~fromAddress, ~amount) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
-      <AmountRender coins=amount />
+    <BadgeWrapper>
+      <AmountRender coins=amount size={Body2} />
       <Text value={j` from `} size=Text.Body2 nowrap=true block=true />
       <AddressRender address=fromAddress />
-    </div>
+    </BadgeWrapper>
 }
 
 module MultisendMsg = {
   @react.component
   let make = (~inputs, ~outputs) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
+    <BadgeWrapper>
       <Text value={inputs->Belt.List.length->Belt.Int.toString} weight=Text.Semibold />
       <Text value="Inputs" />
       <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
       <Text value={outputs->Belt.List.length->Belt.Int.toString} weight=Text.Semibold />
       <Text value="Outputs" />
-    </div>
+    </BadgeWrapper>
 }
 
 module DelegateMsg = {
   @react.component
-  let make = (~amount) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
-      <AmountRender coins=list{amount} />
-    </div>
-}
-
-module UndelegateMsg = {
-  @react.component
-  let make = (~amount) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
-      <AmountRender coins=list{amount} />
-    </div>
+  let make = (~coin) =>
+    <BadgeWrapper>
+      <AmountRender coins=list{coin} size={Body2} />
+    </BadgeWrapper>
 }
 
 module RedelegateMsg = {
   @react.component
   let make = (~amount) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
-      <AmountRender coins=list{amount} />
-    </div>
+    <BadgeWrapper>
+      <AmountRender coins=list{amount} size={Body2} />
+    </BadgeWrapper>
 }
 
 module WithdrawRewardMsg = {
   @react.component
   let make = (~amount) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
-      <AmountRender coins=amount />
-    </div>
+    <BadgeWrapper>
+      <AmountRender coins={amount} size={Body2} />
+    </BadgeWrapper>
 }
 
 module WithdrawCommissionMsg = {
   @react.component
   let make = (~amount) =>
-    <div
-      className={CssJs.merge(. [
-        CssHelper.flexBox(~wrap=#nowrap, ()),
-        CssHelper.overflowHidden,
-        Styles.msgContainer,
-      ])}>
-      <AmountRender coins=amount />
-    </div>
+    <BadgeWrapper>
+      <AmountRender coins=amount size={Body2} />
+    </BadgeWrapper>
 }
