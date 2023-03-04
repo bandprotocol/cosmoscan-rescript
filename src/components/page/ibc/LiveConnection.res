@@ -437,7 +437,14 @@ let make = (~counterpartyChainID, ~state) => {
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
   let isMobile = Media.isMobile()
   let (page, setPage) = React.useState(_ => 1)
-  let pageSize = 10
+  let pageSize = 2
+
+  let connectionCountSub = ConnectionSub.getCount(
+    ~counterpartyChainID,
+    ~connectionID=searchTerm,
+    (),
+  )
+
   let conntectionsSub = ConnectionSub.getList(
     ~counterpartyChainID,
     ~connectionID=searchTerm,
@@ -491,11 +498,16 @@ let make = (~counterpartyChainID, ~state) => {
           : <ConnectionListDesktop key={i->Belt.Int.toString} connectionSub=NoData />
       )->React.array
     }}
-    // {switch connectionCountSub {
-    // | Data(connectionCount) =>
-    //   let pageCount = Page.getPageCount(connectionCount, pageSize)
-    //   <Pagination currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)} />
-    // | _ => React.null
-    // }}
+    {switch connectionCountSub {
+    | Data(connectionCount) =>
+      let pageCount = Page.getPageCount(connectionCount, pageSize)
+      <Pagination2
+        currentPage=page
+        pageCount
+        onPageChange={newPage => setPage(_ => newPage)}
+        onChangeCurrentPage={newPage => setPage(_ => newPage)}
+      />
+    | _ => React.null
+    }}
   </>
 }

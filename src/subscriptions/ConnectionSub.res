@@ -210,7 +210,7 @@ let getList = (~counterpartyChainID, ~connectionID, ~page, ~pageSize, ~state: bo
   result->Sub.fromData->Sub.map(internal => internal.connections->Belt.Array.map(toExternal))
 }
 
-let getCount = (~counterpartyChainID, ~connectionID) => {
+let getCount = (~counterpartyChainID, ~connectionID, ()) => {
   let result = ConnectionCountConfig.use({
     chainID: counterpartyChainID !== "" ? counterpartyChainID : "%%",
     connectionID: j`%$connectionID%`,
