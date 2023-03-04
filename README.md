@@ -15,6 +15,6 @@ RPC_URL=https://laozi-testnet6.bandchain.org/api GRAPHQL_URL=graphql-lt6.bandcha
 
 # MAINNET
 # (in another tab) Run the development server
-RPC_URL=https://rpc.laozi1.bandchain.org GRAPHQL_URL=graphql-lm.bandchain.org/v1/graphql LAMBDA_URL=https://asia-southeast1-testnet-instances.cloudfunctions.net/executer-cosmoscan GRPC=https://laozi1.bandchain.org/grpc-web yarn server
+RPC_URL=https://laozi1.bandchain.org/api GRAPHQL_URL=graphql-lm.bandchain.org/v1/graphql LAMBDA_URL=https://asia-southeast1-testnet-instances.cloudfunctions.net/executer-cosmoscan GRPC=https://laozi1.bandchain.org/grpc-web yarn server
 
 ```

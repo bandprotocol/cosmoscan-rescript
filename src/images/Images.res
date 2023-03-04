@@ -44,8 +44,10 @@
 // IBC
 @module("./tx-ibc-icon.svg") external ibcIcon: string = "default"
 @module("./unknown-chain.svg") external unknownChain: string = "default"
-@module("./line-ibc-light.svg") external connectionArrowLight: string = "default"
-@module("./line-ibc-dark.svg") external connectionArrowDark: string = "default"
+@module("./line-circle-dark.svg") external connectionArrowLight: string = "default"
+@module("./line-circle-light.svg") external connectionArrowDark: string = "default"
+@module("./line-ibc-small-light.svg") external connectionArrowSmallLight: string = "default"
+@module("./line-ibc-small-dark.svg") external connectionArrowSmallDark: string = "default"
 
 // ICON
 @module("./ethereum.svg") external ethereumIcon: string = "default"

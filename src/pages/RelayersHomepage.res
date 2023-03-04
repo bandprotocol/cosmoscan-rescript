@@ -1,13 +1,5 @@
 module Styles = {
   open CssJs
-  let withWidth = (w, theme: Theme.t, fullHash) =>
-    style(. [
-      display(fullHash ? #flex : #inlineBlock),
-      maxWidth(px(w)),
-      cursor(pointer),
-      selector("> span:hover", [color(theme.primary_600)]),
-      selector("> span", [transition(~duration=200, "all")]),
-    ])
 
   let relayerItem = (theme: Theme.t, isDarkMode) =>
     style(. [
@@ -20,29 +12,68 @@ module Styles = {
       marginBottom(#px(24)),
     ])
 
-  let relayerTitleWrapper = (theme: Theme.t, isDarkMode) => style(. [padding(#px(24))])
+  let relayerTitleWrapper = (theme: Theme.t, isDarkMode) =>
+    style(. [padding(#px(24)), Media.mobile([padding(#px(16))])])
   let chainLogo = style(. [width(#px(24)), height(#px(24)), objectFit(#cover)])
-  let relayerDetailsWrapper = (theme: Theme.t, isDarkMode) =>
-    style(. [padding2(~v=#px(24), ~h=#px(24))])
+  let relayerDetailsWrapper = (theme: Theme.t, isDarkMode, isOpen) =>
+    style(. [
+      overflowY(isOpen ? #auto : #hidden),
+      transition(~duration=200, "all"),
+      maxHeight(isOpen ? #px(4000) : #zero),
+      padding2(~v=#px(isOpen ? 24 : 0), ~h=#px(24)),
+      Media.mobile([padding2(~v=#px(isOpen ? 2 : 0), ~h=#px(16))]),
+    ])
+
+  let toggleButton = {
+    style(. [
+      display(#flex),
+      width(#percent(100.)),
+      justifyContent(#center),
+      alignItems(#center),
+      cursor(#pointer),
+      padding2(~v=#px(10), ~h=#zero),
+    ])
+  }
+
+  let toggleChannelButton = style(. [display(#inlineBlock)])
 }
 
 module RelayerCard = {
   @react.component
-  let make = (~chainID: IBCFilterSub.filter_counterparty_t, ()) => {
+  let make = (~chainID: IBCFilterSub.filter_counterparty_t, ~channelState, ()) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    let (show, setShow) = React.useState(_ => false)
+
+    let toggle = () => setShow(prev => !prev)
 
     <div className={Styles.relayerItem(theme, isDarkMode)}>
       <div
         className={Css.merge(list{
-          CssHelper.flexBox(~justify=#flexStart, ~align=#center, ()),
+          CssHelper.flexBox(~justify=#spaceBetween, ~align=#center, ()),
           Styles.relayerTitleWrapper(theme, isDarkMode),
+          "chain",
         })}>
-        <Avatar moniker={chainID.chainID} identity={chainID.chainID} width=40 />
-        <HSpacing size=Spacing.lg />
-        <Heading size={H3} value={chainID.chainID} weight={Semibold} />
+        <div
+          className={Css.merge(list{CssHelper.flexBox(~justify=#flexStart, ~align=#center, ())})}>
+          <Avatar moniker={chainID.chainID} identity={chainID.chainID} width=40 />
+          <HSpacing size=Spacing.lg />
+          <Heading size={H3} value={chainID.chainID} weight={Semibold} />
+        </div>
+        <div>
+          <div className=Styles.toggleButton onClick={_ => toggle()}>
+            <Text
+              value={show ? "Hide Channels" : "Show Channels"}
+              color={theme.neutral_600}
+              weight={Semibold}
+            />
+            <HSpacing size=Spacing.sm />
+            <Icon name={show ? "fas fa-angle-up" : "fas fa-angle-down"} color={theme.neutral_600} />
+          </div>
+        </div>
       </div>
-      <div className={Styles.relayerDetailsWrapper(theme, isDarkMode)}>
-        <LiveConnection counterpartyChainID={chainID.chainID} />
+      <div className={Styles.relayerDetailsWrapper(theme, isDarkMode, show)}>
+        <LiveConnection counterpartyChainID={chainID.chainID} state=channelState />
       </div>
     </div>
   }
@@ -52,6 +83,13 @@ module RelayerCard = {
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
+  let (showActive, setShowActive) = React.useState(() => true)
+
+  let (searchTerm, setSearchTerm) = React.useState(_ => "")
+  // React.useEffect1(() => {
+  //   setPage(_ => 1)
+  //   None
+  // }, [searchTerm])
   let chainIDFilterSub = IBCFilterSub.getChainFilterList()
 
   <Section ptSm=32 pbSm=32>
@@ -63,17 +101,32 @@ let make = () => {
             size=Text.Body1
             value="Acts as a bridge, forwarding transactions and messages between networks and ensuring the proper format and adherence to IBC protocols."
           />
-          <div className={Css.merge(list{CssHelper.flexBox()})}>
-            <Text size=Text.Body1 value="View" />
+        </Col>
+      </Row>
+      <Row marginTop=24 marginBottom=24 marginBottomSm={24}>
+        <Col col=Col.Twelve>
+          <SearchInput placeholder="Search relayer" onChange=setSearchTerm maxWidth=370 />
+        </Col>
+      </Row>
+      <Row marginTop=24 marginBottom=24 marginBottomSm={24}>
+        <Col col=Col.Twelve>
+          <div
+            className={CssHelper.flexBox(~justify=#flexStart, ~align=#center, ~direction=#row, ())}>
+            <div
+              className={Styles.toggleChannelButton}
+              onClick={_ => {
+                setShowActive(prev => !prev)
+              }}>
+              <ToggleSwitch isChecked=showActive />
+            </div>
             <HSpacing size=Spacing.sm />
-            <Link route=Route.IBCTxPage className="">
-              <Text
-                size=Text.Body1
-                weight=Text.Semibold
-                value="IBC Transactions"
-                color={theme.primary_600}
-              />
-            </Link>
+            <Text value="Show only open channel" color={theme.neutral_900} />
+            <HSpacing size=Spacing.sm />
+            <CTooltip
+              tooltipPlacementSm=CTooltip.BottomRight
+              tooltipText="Show only the active channels that are currently being managed by the IBC relayer">
+              <Icon name="fal fa-info-circle" size=12 color={theme.neutral_600} />
+            </CTooltip>
           </div>
         </Col>
       </Row>
@@ -82,9 +135,22 @@ let make = () => {
           {switch chainIDFilterSub {
           | Data(chainIDList) =>
             <div>
-              {Belt.Array.mapWithIndex(chainIDList, (i, chainID) => {
-                <RelayerCard chainID key={i->Belt.Int.toString} />
-              })->React.array}
+              {
+                let filteredRelayers =
+                  searchTerm->Js.String2.length == 0
+                    ? chainIDList
+                    : chainIDList->Belt.Array.keep(relayer => {
+                        relayer.chainID->Js.String2.toLowerCase->Js.String2.includes(searchTerm)
+                      })
+
+                filteredRelayers
+                ->Belt.Array.mapWithIndex((i, channel) => {
+                  <RelayerCard
+                    chainID=channel channelState={showActive} key={i->Belt.Int.toString}
+                  />
+                })
+                ->React.array
+              }
             </div>
 
           | _ => <LoadingCensorBar width=285 height=37 radius=8 />

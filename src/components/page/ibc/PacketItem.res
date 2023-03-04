@@ -8,6 +8,7 @@ module Styles = {
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
       padding2(~v=#px(16), ~h=#px(24)),
       border(#px(1), #solid, theme.neutral_100),
+      Media.smallMobile([padding2(~v=#px(16), ~h=#px(16))]),
     ])
 
   let cardContainer = style(. [position(#relative), selector(" > div + div", [marginTop(#px(12))])])
@@ -43,9 +44,12 @@ module Styles = {
   let smallColumn = style(. [minWidth(#px(120))])
   let leftAlign = style(. [textAlign(#left)])
   let rightAlign = style(. [textAlign(#right)])
-  let packetMobileItem = (theme: Theme.t) =>
+  let packetMobileItem = (theme: Theme.t, isDarkMode) =>
     style(. [
-      selector("> div", [borderBottom(#px(1), #solid, theme.neutral_200)]), // TODO: change to theme color
+      selector(
+        "> div",
+        [borderBottom(#px(1), #solid, isDarkMode ? theme.neutral_400 : theme.neutral_200)],
+      ), // TODO: change to theme color
       selector("> div:last-child", [borderBottom(#zero, solid, #transparent)]),
     ])
   let packetInnerMobile = style(. [
@@ -59,6 +63,54 @@ module Styles = {
   ])
 }
 
+module ResolveStatus = {
+  @react.component
+  let make = (~packet: IBCQuery.t) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    <div>
+      {switch packet {
+      | {acknowledgement, packetType, data} =>
+        switch packetType {
+        | OracleResponse =>
+          switch data {
+          | Response(response) =>
+            switch response.resolveStatus {
+            | IBCQuery.OracleResponseData.Success => <img alt="Success Icon" src=Images.success />
+            | Fail => <img alt="Fail Icon" src=Images.fail />
+            | _ => React.null
+            }
+          | _ => React.null
+          }
+
+        | OracleRequest
+        | FungibleToken
+        | _ =>
+          switch acknowledgement {
+          | Some({status, reason}) =>
+            switch status {
+            | Success => <img alt="Success Icon" src=Images.success />
+            | Pending => <img alt="Pending Icon" src=Images.pending />
+            | Fail =>
+              <div
+                className={Css.merge(list{
+                  CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ()),
+                  Styles.failText,
+                })}
+                // onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
+                onClick={_ => Js.log("Show Error")}>
+                <Text value="View Error" color=theme.error_600 />
+                <HSpacing size=#px(8) />
+                <img alt="Fail Icon" src=Images.fail />
+              </div>
+            }
+          | _ => React.null
+          }
+        }
+      }}
+    </div>
+  }
+}
+
 module MobilePacketItem = {
   // Module contents
   @react.component
@@ -67,7 +119,7 @@ module MobilePacketItem = {
     <div
       className={Css.merge(list{
         Styles.paperStyle(theme, isDarkMode),
-        Styles.packetMobileItem(theme),
+        Styles.packetMobileItem(theme, isDarkMode),
       })}>
       <div className={Css.merge(list{Styles.packetInnerMobile})}>
         <div>
@@ -178,32 +230,11 @@ module MobilePacketItem = {
         <div>
           <Text value="Status" size=Text.Body2 weight=Text.Semibold />
         </div>
-        <div>
-          {switch packetSub {
-          | Data({acknowledgement}) =>
-            switch acknowledgement {
-            | Some({status, reason}) =>
-              switch status {
-              | Success => <img alt="Success Icon" src=Images.success />
-              | Pending => <img alt="Pending Icon" src=Images.pending />
-              | Fail =>
-                <div
-                  className={Css.merge(list{
-                    CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ()),
-                    Styles.failText,
-                  })}
-                  // onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
-                  onClick={_ => Js.log("Show Error")}>
-                  <Text value="View Error" color=theme.error_600 />
-                  <HSpacing size=Spacing.sm />
-                  <img alt="Fail Icon" src=Images.fail />
-                </div>
-              }
-            | _ => React.null
-            }
-          | _ => React.null
-          }}
-        </div>
+        {switch packetSub {
+        | Data(packet) => <ResolveStatus packet />
+        | Loading => <LoadingCensorBar width=40 height=40 radius=100 />
+        | _ => React.null
+        }}
       </div>
     </div>
   }
@@ -297,45 +328,9 @@ module DesktopPacketItem = {
         </div>
         <div className={Css.merge(list{Styles.packetInnerColumn, Styles.rightAlign})}>
           {switch packetSub {
-          | Data({acknowledgement, packetType, data}) =>
-            switch packetType {
-            | OracleResponse =>
-              switch data {
-              | Response(response) =>
-                switch response.resolveStatus {
-                | IBCQuery.OracleResponseData.Success =>
-                  <img alt="Success Icon" src=Images.success />
-                | Fail => <img alt="Fail Icon" src=Images.fail />
-                | _ => React.null
-                }
-              | _ => React.null
-              }
-
-            | OracleRequest
-            | FungibleToken
-            | _ =>
-              switch acknowledgement {
-              | Some({status, reason}) =>
-                switch status {
-                | Success => <img alt="Success Icon" src=Images.success />
-                | Pending => <img alt="Pending Icon" src=Images.pending />
-                | Fail =>
-                  <div
-                    className={Css.merge(list{
-                      CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ()),
-                      Styles.failText,
-                    })}
-                    // onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
-                    onClick={_ => Js.log("Show Error")}>
-                    <Text value="View Error" color=theme.error_600 />
-                    <HSpacing size=#px(8) />
-                    <img alt="Fail Icon" src=Images.fail />
-                  </div>
-                }
-              | _ => React.null
-              }
-            }
-          | _ => <LoadingCensorBar width=110 height=20 radius=50 />
+          | Data(packet) => <ResolveStatus packet />
+          | Loading => <LoadingCensorBar width=40 height=40 radius=100 />
+          | _ => React.null
           }}
         </div>
       </div>

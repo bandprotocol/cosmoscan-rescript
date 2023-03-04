@@ -7,9 +7,9 @@ type t =
 
 let getBreakpoint = size =>
   switch size {
-  | Sm => 370
-  | Md => 768
-  | Lg => 1024
+  | Sm => 767
+  | Md => 1024
+  | Lg => 1365
   }
 
 let query = (size, styles) => {

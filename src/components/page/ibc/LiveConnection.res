@@ -1,368 +1,449 @@
 module Styles = {
   open CssJs
 
-  let greenDot = style(. [
-    width(#px(8)),
-    height(#px(8)),
-    borderRadius(#percent(50.)),
-    background(#hex("5FD3C8")),
-    marginRight(#px(8)),
-  ])
   let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
+
+  let divider = (theme: Theme.t) =>
+    style(. [
+      height(#px(1)),
+      background(theme.neutral_400),
+      width(#percent(100.)),
+      marginTop(#px(16)),
+      marginBottom(#px(16)),
+    ])
+
+  let listContainer = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      padding2(~v=#px(20), ~h=#px(32)),
+      background(isDarkMode ? theme.neutral_200 : theme.neutral_100),
+      borderRadius(#px(12)),
+      marginBottom(#px(8)),
+      overflow(#hidden),
+      Media.mobile([padding2(~v=#px(16), ~h=#px(16)), borderRadius(#px(8))]),
+    ])
+
+  let channelWrapper = style(. [selector("> div:last-child:after", [background(#none)])])
 }
 
 module ConnectionListDesktop = {
-  module Styles = {
-    open CssJs
+  module ChannelItem = {
+    module Styles = {
+      open CssJs
 
-    let listContainer = (theme: Theme.t) =>
-      style(. [
-        padding2(~v=#px(20), ~h=#px(32)),
-        background(theme.neutral_100),
-        borderRadius(#px(12)),
-        marginBottom(#px(8)),
-        overflow(#hidden),
-      ])
-
-    let toggleButton = {
-      style(. [
-        display(#flex),
-        alignItems(#center),
-        cursor(#pointer),
-        padding2(~v=#px(10), ~h=#zero),
-      ])
+      let channelSource = style(. [textAlign(#left)])
+      let channelDest = style(. [textAlign(#right), Media.mobile([textAlign(#left)])])
+      let channelItem = (theme: Theme.t) =>
+        style(. [
+          padding2(~v=#px(16), ~h=#zero),
+          cursor(#pointer),
+          borderRadius(#px(4)),
+          position(#relative),
+          hover([background(theme.neutral_200)]),
+          after([
+            contentRule(#text("")),
+            display(#block),
+            width(#percent(100.)),
+            height(#px(1)),
+            background(theme.neutral_200),
+            position(#absolute),
+            bottom(#zero),
+            left(#zero),
+            // borderTop(#px(1), solid, theme.neutral_200),
+          ]),
+        ])
     }
+    @react.component
+    let make = (~chain, ~channel: ConnectionSub.external_channel_t, ~index: int) => {
+      let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-    let portChannelWrapper = style(. [
-      display(#flex),
-      flexDirection(#row),
-      justifyContent(#spaceBetween),
-      alignItems(#center),
-      marginBottom(#px(8)),
-      selector(":last-child", [marginBottom(#zero)]),
-    ])
-
-    let channelSource = style(. [textAlign(#left)])
-    let channelDest = style(. [
-      textAlign(#right),
-      //   marginLeft(#px(8)),
-      Media.mobile([textAlign(#left)]),
-    ])
+      <div className={Styles.channelItem(theme)}>
+        <Link
+          className="channel-link"
+          route={Route.ChannelDetailsPage(chain, channel.port, channel.channelID)}>
+          <Row alignItems=Row.Center>
+            <Col col=Col.One>
+              <div className={CssHelper.flexBox(~justify=#flexStart, ())}>
+                <Text value={"#" ++ string_of_int(index + 1)} />
+              </div>
+            </Col>
+            <Col col=Col.Four>
+              <Row alignItems=Row.Center>
+                <Col col=Col.Four>
+                  {
+                    let port = Ellipsis.format(~text=channel.port, ~limit=25, ())
+                    <Text
+                      value={port} nowrap=true ellipsis=true block=true color={theme.neutral_900}
+                    />
+                  }
+                  <Text
+                    value={channel.channelID} color={theme.primary_600} weight={Text.Semibold}
+                  />
+                </Col>
+                <Col col=Col.Four>
+                  <div className={CssHelper.flexBox(~justify=#center, ())}>
+                    <img
+                      alt="arrow"
+                      src={isDarkMode ? Images.connectionArrowLight : Images.connectionArrowDark}
+                      className="img-fluid"
+                    />
+                  </div>
+                </Col>
+                <Col col=Col.Four>
+                  {
+                    let port = Ellipsis.format(~text=channel.counterpartyPort, ~limit=25, ())
+                    <Text
+                      value={port} nowrap=true ellipsis=true block=true color={theme.neutral_900}
+                    />
+                  }
+                  <Text
+                    value={channel.counterpartyChannelID}
+                    color={theme.primary_600}
+                    weight={Text.Semibold}
+                  />
+                </Col>
+              </Row>
+            </Col>
+            <Col col=Col.One offset=Col.One>
+              <div className={CssHelper.flexBox(~justify=#center, ~align=#center, ())}>
+                <Text
+                  value={channel.totalPacketsCount->Format.iPretty}
+                  color={theme.neutral_900}
+                  code=true
+                />
+              </div>
+            </Col>
+            <Col col=Col.Two>
+              <div className={CssHelper.flexBox(~justify=#center, ~align=#center, ())}>
+                {switch channel.latestTx {
+                | Some(time) =>
+                  <TimeAgos time={time} size=Text.Body2 color={theme.neutral_900} code=true />
+                | None => <Text value="N/A" color={theme.neutral_900} />
+                }}
+              </div>
+            </Col>
+            <Col col=Col.Two>
+              <div className={CssHelper.flexBox(~justify=#center, ~align=#center, ())}>
+                <Text value=channel.order color={theme.neutral_900} />
+              </div>
+            </Col>
+            <Col col=Col.One>
+              <div className={CssHelper.flexBox(~justify=#center, ())}>
+                {switch channel.state {
+                | Open => <img alt="Success Icon" src=Images.success />
+                | _ => <img alt="Fail Icon" src=Images.fail />
+                }}
+              </div>
+            </Col>
+          </Row>
+        </Link>
+      </div>
+    }
   }
 
   @react.component
-  let make = (~connectionSub: Sub.variant<ConnectionSub.internal_t>) => {
+  let make = (~connectionSub: Sub.variant<ConnectionSub.t>) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-    let (show, setShow) = React.useState(_ => false)
 
-    let toggle = () => setShow(prev => !prev)
-
-    <div className={Styles.listContainer(theme)}>
+    <div className={Styles.listContainer(theme, isDarkMode)}>
       <Row alignItems=Row.Center>
-        <Col col=Col.Two>
+        <Col col=Col.Four>
           {switch connectionSub {
           | Data({connectionID}) =>
             <div className={CssHelper.flexBox()}>
-              <Text value=connectionID color={theme.neutral_900} />
+              <Text value="Connection ID:" />
+              <HSpacing size=Spacing.sm />
+              <Text value=connectionID color={theme.neutral_900} code=true weight={Semibold} />
             </div>
           | _ => <LoadingCensorBar width=80 height=15 />
           }}
         </Col>
-        <Col col=Col.Ten>
+        <Col col=Col.Four>
+          {switch connectionSub {
+          | Data({clientID}) =>
+            <div className={CssHelper.flexBox()}>
+              <Text value="Client ID:" />
+              <HSpacing size=Spacing.sm />
+              <Text value=clientID color={theme.neutral_900} code=true weight={Semibold} />
+            </div>
+          | _ => <LoadingCensorBar width=80 height=15 />
+          }}
+        </Col>
+        <Col col=Col.Four>
+          {switch connectionSub {
+          | Data({counterpartyClientID}) =>
+            <div className={CssHelper.flexBox()}>
+              <Text value="Counterparty Client ID:" />
+              <HSpacing size=Spacing.sm />
+              <Text
+                value=counterpartyClientID color={theme.neutral_900} code=true weight={Semibold}
+              />
+            </div>
+          | _ => <LoadingCensorBar width=80 height=15 />
+          }}
+        </Col>
+      </Row>
+      <Row>
+        <Col col=Col.Twelve>
+          <div className={Styles.divider(theme)} />
+        </Col>
+      </Row>
+      <Row alignItems=Row.Center>
+        <Col col=Col.Twelve>
           <Row alignItems=Row.Center>
             <Col col=Col.Twelve>
               {switch connectionSub {
-              | Data({channels, clientID, counterpartyClientID}) =>
-                channels
-                ->Belt.Array.mapWithIndex((i, channel) =>
-                  <Row alignItems=Row.Center marginBottom=8>
-                    <Col col=Col.Four>
-                      <div
-                        className={Css.merge(list{Styles.portChannelWrapper})}
-                        key={i->Belt.Int.toString}>
-                        <div
-                          className={
-                            open CssJs
-                            Css.merge(list{Styles.channelSource, style(. [width(#px(80))])})
-                          }>
-                          <Text value={channel.port} color={theme.neutral_900} />
-                          <Text
-                            value={channel.channelID}
-                            color={theme.primary_600}
-                            weight={Text.Semibold}
+              | Data({counterpartyChainID, channels}) =>
+                channels->Belt.Array.length > 0
+                  ? <>
+                      <Row alignItems=Row.Center marginBottom=8>
+                        <Col col=Col.One>
+                          <Text value="No." color=theme.neutral_600 />
+                        </Col>
+                        <Col col=Col.Four>
+                          <Text value="Port & Channel" color=theme.neutral_600 align={Center} />
+                        </Col>
+                        <Col col=Col.One offset=Col.One>
+                          <Text value="Transactions" color=theme.neutral_600 align={Center} />
+                        </Col>
+                        <Col col=Col.Two>
+                          <Text value="Last Update" color=theme.neutral_600 align={Center} />
+                        </Col>
+                        <Col col=Col.Two>
+                          <Text value="Order" color=theme.neutral_600 align={Center} />
+                        </Col>
+                        <Col col=Col.One>
+                          <Text value="State" color=theme.neutral_600 align={Center} />
+                        </Col>
+                      </Row>
+                      <div className={Styles.channelWrapper}>
+                        {channels
+                        ->Belt.Array.mapWithIndex((i, channel) =>
+                          <ChannelItem
+                            chain=counterpartyChainID
+                            channel={channel}
+                            index={i}
+                            key={i->Belt.Int.toString}
                           />
-                        </div>
-                        <div
-                          className={
-                            open CssJs
-                            Css.merge(list{style(. [width(#px(42))])})
-                          }>
-                          <img
-                            alt="arrow"
-                            src={isDarkMode
-                              ? Images.connectionArrowLight
-                              : Images.connectionArrowDark}
-                            className="img-fluid"
-                          />
-                        </div>
-                        <div
-                          className={
-                            open CssJs
-                            Css.merge(list{Styles.channelDest, style(. [width(#px(100))])})
-                          }>
-                          <Text
-                            value={channel.counterpartyPort}
-                            nowrap=true
-                            ellipsis=true
-                            block=true
-                            color={theme.neutral_900}
-                          />
-                          <Text
-                            value={channel.counterpartyChannelID}
-                            color={theme.primary_600}
-                            weight={Text.Semibold}
-                          />
-                        </div>
+                        )
+                        ->React.array}
                       </div>
-                    </Col>
-                    <Col col=Col.Two>
-                      <div className={CssHelper.flexBox()}>
-                        <Text value=clientID color={theme.neutral_900} />
-                      </div>
-                    </Col>
-                    <Col col=Col.Three>
-                      <div className={CssHelper.flexBox()}>
-                        <Text value=counterpartyClientID color={theme.neutral_900} />
-                      </div>
-                    </Col>
-                    <Col col=Col.One>
-                      <div className={CssHelper.flexBox()}>
-                        <Text value=channel.order color={theme.neutral_900} />
-                      </div>
-                    </Col>
-                    <Col col=Col.Two>
-                      <div className={CssHelper.flexBox(~justify=#center, ())}>
-                        {switch channel.state {
-                        | Open => <img alt="Success Icon" src=Images.success />
-                        | _ => <img alt="Fail Icon" src=Images.fail />
-                        }}
-                      </div>
-                    </Col>
-                  </Row>
-                )
-                ->React.array
+                    </>
+                  : React.null
               | _ => <LoadingCensorBar width=80 height=15 />
               }}
             </Col>
-            // <Col col=Col.Two>
-            //   {switch connectionSub {
-            //   | Data({clientID, channels}) =>
-            //     channels
-            //     ->Belt.Array.mapWithIndex((i, _) => {
-            //       <div className={CssHelper.flexBox()} key={i->Belt.Int.toString}>
-            //         <Text value=clientID color={theme.neutral_900} />
-            //       </div>
-            //     })
-            //     ->React.array
-            //   // <div className={CssHelper.flexBox()}>
-            //   //   <Text value=clientID color={theme.neutral_900} />
-            //   // </div>
-            //   | _ => <LoadingCensorBar width=80 height=15 />
-            //   }}
-            // </Col>
-            // <Col col=Col.Two>
-            //   {switch connectionSub {
-            //   | Data({channels, counterpartyClientID}) =>
-            //     // <div className={CssHelper.flexBox()}>
-            //     //   <Text value=counterpartyClientID color={theme.neutral_900} />
-            //     // </div>
-            //     channels
-            //     ->Belt.Array.mapWithIndex((i, _) => {
-            //       <div className={CssHelper.flexBox()} key={i->Belt.Int.toString}>
-            //         <Text value=counterpartyClientID color={theme.neutral_900} />
-            //       </div>
-            //     })
-            //     ->React.array
-            //   | _ => <LoadingCensorBar width=80 height=15 />
-            //   }}
-            // </Col>
-            // <Col col=Col.One>
-            //   {switch connectionSub {
-            //   | Data({channels}) =>
-            //     channels
-            //     ->Belt.Array.mapWithIndex((i, channel) => {
-            //       <div className={CssHelper.flexBox()} key={i->Belt.Int.toString}>
-            //         <Text value=channel.order color={theme.neutral_900} />
-            //       </div>
-            //     })
-            //     ->React.array
-            //   | _ => <LoadingCensorBar width=80 height=15 />
-            //   }}
-            // </Col>
           </Row>
         </Col>
-        // <Col col=Col.Three>
-        //   <div className={CssHelper.flexBox(~justify=#flexEnd, ())} onClick={_ => toggle()}>
-        //     <div className=Styles.toggleButton>
-        //       <Text value={show ? "Hide Channels" : "Show Channels"} color={theme.neutral_900} />
-        //       <HSpacing size=Spacing.sm />
-        //       <Icon
-        //         name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.neutral_600}
-        //       />
-        //     </div>
-        //   </div>
-        // </Col>
       </Row>
-      //   {switch connectionSub {
-      //   | Data({channels}) => <ChannelTable channels show />
-      //   | _ => React.null
-      //   }}
     </div>
   }
 }
 
-module ConnectionListMobile = {
-  module Styles = {
-    open CssJs
-
-    let root = style(. [
-      marginBottom(#px(8)),
-      Media.mobile([padding4(~top=#px(22), ~left=#px(16), ~right=#px(16), ~bottom=#px(5))]),
-    ])
-
-    let cardContainer = style(. [
-      position(#relative),
-      selector("> div + div", [marginTop(#px(12))]),
-    ])
-
-    let labelWrapper = style(. [
-      display(#flex),
-      flexDirection(#column),
-      flexGrow(0.),
-      flexShrink(0.),
-      flexBasis(#percent(30.)),
-      paddingRight(#px(10)),
-    ])
-
-    let valueWrapper = style(. [
-      display(#flex),
-      flexDirection(#column),
-      flexGrow(0.),
-      flexShrink(0.),
-      flexBasis(#percent(70.)),
-      selector("i", [margin2(~v=#zero, ~h=#px(8))]),
-    ])
-
-    let toggleButton = {
-      style(. [
-        display(#flex),
-        width(#percent(100.)),
-        justifyContent(#center),
-        alignItems(#center),
-        cursor(#pointer),
-        padding2(~v=#px(10), ~h=#zero),
-        marginTop(#px(11)),
-      ])
-    }
-  }
-
+module ChannelItemMobile = {
   @react.component
-  let make = (~connectionSub: Sub.variant<ConnectionSub.internal_t>) => {
+  let make = (~chain, ~channel: ConnectionSub.external_channel_t, ~index: int, ()) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-    let (show, setShow) = React.useState(_ => false)
 
-    let toggle = () => setShow(prev => !prev)
+    <Link
+      className="channel-link"
+      route={Route.ChannelDetailsPage(chain, channel.port, channel.channelID)}>
+      <Row alignItems=Row.Center>
+        <Col colSm=Col.Five>
+          {
+            let port = Ellipsis.format(~text=channel.port, ~limit=25, ())
+            <Text
+              value={port}
+              nowrap=true
+              ellipsis=true
+              block=true
+              color={theme.neutral_900}
+              size=Text.Xl
+            />
+          }
+          <VSpacing size=Spacing.xs />
+          <Text
+            size=Text.Xxl value={channel.channelID} color={theme.primary_600} weight={Text.Semibold}
+          />
+        </Col>
+        <Col colSm=Col.Two>
+          <div className={CssHelper.flexBox(~justify=#center, ())}>
+            <img
+              alt="arrow"
+              src={isDarkMode ? Images.connectionArrowSmallLight : Images.connectionArrowSmallDark}
+              className="img-fluid"
+            />
+          </div>
+        </Col>
+        <Col colSm=Col.Five>
+          {
+            let port = Ellipsis.format(~text=channel.counterpartyPort, ~limit=25, ())
+            <Text
+              value={port}
+              nowrap=true
+              ellipsis=true
+              block=true
+              color={theme.neutral_900}
+              size=Text.Xl
+            />
+          }
+          <VSpacing size=Spacing.xs />
+          <Text
+            value={channel.counterpartyChannelID}
+            color={theme.primary_600}
+            weight={Text.Semibold}
+            size=Text.Xxl
+          />
+        </Col>
+      </Row>
+      <Row marginTopSm=10>
+        <Col colSm=Col.Six mbSm=10>
+          <Text value="Transactions" color=theme.neutral_600 size={Body1} />
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          <Text
+            size={Body1}
+            value={channel.totalPacketsCount->Format.iPretty}
+            color={theme.neutral_900}
+            code=true
+          />
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          <Text size={Body1} value="Last Update" color=theme.neutral_600 />
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          {switch channel.latestTx {
+          | Some(time) =>
+            <TimeAgos time={time} size=Text.Body1 color={theme.neutral_900} code=true />
+          | None => <Text value="N/A" color={theme.neutral_900} />
+          }}
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          <Text size={Body1} value="Order" color=theme.neutral_600 />
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          <Text size={Body1} value={channel.order} color={theme.neutral_900} code=true />
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          <Text size={Body1} value="State" color=theme.neutral_600 />
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          {switch channel.state {
+          | Open => <img alt="Success Icon" src=Images.success width="16" height="16" />
+          | _ => <img alt="Fail Icon" src=Images.fail width="16" height="16" />
+          }}
+        </Col>
+      </Row>
+    </Link>
+  }
+}
+module ConnectionListMobile = {
+  @react.component
+  let make = (~connectionSub: Sub.variant<ConnectionSub.t>) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-    <InfoContainer style=Styles.root>
-      <div className=Styles.cardContainer>
-        <div className={CssHelper.flexBox(~align=#center, ())}>
-          <div className=Styles.labelWrapper>
+    <div className={Styles.listContainer(theme, isDarkMode)}>
+      <Row alignItems=Row.Center>
+        <Col colSm=Col.Six mbSm=10>
+          <Text value="Connection ID:" size=Text.Body1 />
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          {switch connectionSub {
+          | Data({connectionID}) =>
             <Text
-              value="Connection" size=Text.Body2 transform=Text.Uppercase weight=Text.Semibold
+              size=Text.Body1
+              value=connectionID
+              color={theme.neutral_900}
+              code=true
+              weight={Semibold}
             />
-          </div>
-          <div className=Styles.valueWrapper>
-            {switch connectionSub {
-            | Data({connectionID}) => <Text value=connectionID color={theme.neutral_900} />
-            | _ => <LoadingCensorBar width=60 height=15 />
-            }}
-          </div>
-        </div>
-        <div className={CssHelper.flexBox(~align=#flexStart, ())}>
-          <div className=Styles.labelWrapper>
+          | _ => <LoadingCensorBar width=80 height=15 />
+          }}
+        </Col>
+      </Row>
+      <Row alignItems=Row.Center>
+        <Col colSm=Col.Six mbSm=10>
+          <Text size=Text.Body1 value="Client ID:" />
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          {switch connectionSub {
+          | Data({clientID}) =>
             <Text
-              value="Counterparty Chain ID"
-              size=Text.Body2
-              transform=Text.Uppercase
-              weight=Text.Semibold
+              size=Text.Body1 value=clientID color={theme.neutral_900} code=true weight={Semibold}
             />
-          </div>
-          <div className=Styles.valueWrapper>
-            {switch connectionSub {
-            | Data({counterpartyChainID}) =>
-              <Text value=counterpartyChainID color={theme.neutral_600} />
-            | _ => <LoadingCensorBar width=60 height=15 />
-            }}
-          </div>
-        </div>
-        <div className={CssHelper.flexBox(~align=#center, ())}>
-          <div className=Styles.labelWrapper>
-            <Text value="Client ID" size=Text.Body2 transform=Text.Uppercase weight=Text.Semibold />
-          </div>
-          <div className=Styles.valueWrapper>
-            {switch connectionSub {
-            | Data({clientID}) => <Text value=clientID color={theme.neutral_600} />
-            | _ => <LoadingCensorBar width=60 height=15 />
-            }}
-          </div>
-        </div>
-        <div className={CssHelper.flexBox(~align=#flexStart, ())}>
-          <div className=Styles.labelWrapper>
+          | _ => <LoadingCensorBar width=80 height=15 />
+          }}
+        </Col>
+      </Row>
+      <Row alignItems=Row.Center>
+        <Col colSm=Col.Six mbSm=10>
+          <Text size=Text.Body1 value="Counterparty Client ID:" />
+        </Col>
+        <Col colSm=Col.Six mbSm=10>
+          {switch connectionSub {
+          | Data({counterpartyClientID}) =>
             <Text
-              value="Counterparty Client ID"
-              size=Text.Body2
-              transform=Text.Uppercase
-              weight=Text.Semibold
+              size=Text.Body1
+              value=counterpartyClientID
+              color={theme.neutral_900}
+              code=true
+              weight={Semibold}
             />
-          </div>
-          <div className=Styles.valueWrapper>
-            {switch connectionSub {
-            | Data({counterpartyClientID}) =>
-              <Text value=counterpartyClientID color={theme.neutral_600} />
-            | _ => <LoadingCensorBar width=60 height=15 />
-            }}
-          </div>
-        </div>
-      </div>
-      //   {switch connectionSub {
-      //   | Data({channels}) => <ChannelTable channels show />
-      //   | _ => React.null
-      //   }}
-      //   <div className=Styles.toggleButton onClick={_ => toggle()}>
-      //     <Text value={show ? "Hide Channels" : "Show Channels"} color={theme.neutral_900} />
-      //     <HSpacing size=Spacing.sm />
-      //     <Icon name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.neutral_600} />
-      //   </div>
-    </InfoContainer>
+          | _ => <LoadingCensorBar width=80 height=15 />
+          }}
+        </Col>
+      </Row>
+      <Row>
+        <Col col=Col.Twelve>
+          <div className={Styles.divider(theme)} />
+        </Col>
+      </Row>
+      <Row alignItems=Row.Center>
+        <Col col=Col.Twelve>
+          <Row alignItems=Row.Center>
+            <Col col=Col.Twelve>
+              {switch connectionSub {
+              | Data({counterpartyChainID, channels}) =>
+                channels->Belt.Array.length > 0
+                  ? <>
+                      <div className={Styles.channelWrapper}>
+                        {channels
+                        ->Belt.Array.mapWithIndex((i, channel) => <>
+                          <ChannelItemMobile
+                            chain=counterpartyChainID
+                            channel={channel}
+                            index={i}
+                            key={i->Belt.Int.toString}
+                          />
+                          {i === channels->Belt.Array.length - 1
+                            ? React.null
+                            : <div className={Styles.divider(theme)} />}
+                        </>)
+                        ->React.array}
+                      </div>
+                    </>
+                  : React.null
+              | _ => <LoadingCensorBar width=80 height=15 />
+              }}
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    </div>
   }
 }
 
 @react.component
-let make = (~counterpartyChainID) => {
+let make = (~counterpartyChainID, ~state) => {
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
   let isMobile = Media.isMobile()
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 10
-  //   let connectionCountSub = ConnectionSub.getCount(
-  //     ~counterpartyChainID,
-  //     ~connectionID=searchTerm,
-  //     (),
-  //   )
   let conntectionsSub = ConnectionSub.getList(
     ~counterpartyChainID,
     ~connectionID=searchTerm,
     ~pageSize,
     ~page,
+    ~state,
     (),
   )
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
@@ -373,63 +454,8 @@ let make = (~counterpartyChainID) => {
   }, [searchTerm, counterpartyChainID])
 
   <>
-    // <Row alignItems=Row.Center marginTop=80 marginTopSm=36>
-    //   <Col col=Col.Twelve>
-    //     <div className={CssHelper.flexBox()}>
-    //       <div className=Styles.greenDot />
-    //       <Heading value="Live Connection" size=Heading.H2 />
-    //     </div>
-    //   </Col>
-    // </Row>
-    // <Row marginTop=32 marginBottom=32>
-    //   <Col col=Col.Twelve>
-    //     <SearchInput placeholder="Search Connection ID" onChange=setSearchTerm maxWidth=370 />
-    //   </Col>
-    // </Row>
-    // Table Head
-    {!isMobile
-      ? <div className={CssHelper.px(~size=32, ())}>
-          <Row alignItems=Row.Center minHeight={#px(32)}>
-            <Col col=Col.Two>
-              <div className={CssHelper.flexBox()}>
-                <Text value="Connection ID" size=Text.Body2 />
-              </div>
-            </Col>
-            <Col col=Col.Ten>
-              <Row>
-                <Col col=Col.Four>
-                  <div className={CssHelper.flexBox()}>
-                    <Text value="Port & Channel" size=Text.Body2 />
-                  </div>
-                </Col>
-                <Col col=Col.Two>
-                  <div className={CssHelper.flexBox()}>
-                    <Text value="Client ID" size=Text.Body2 />
-                  </div>
-                </Col>
-                <Col col=Col.Three>
-                  <div className={CssHelper.flexBox()}>
-                    <Text value="Counterparty Client ID" size=Text.Body2 />
-                  </div>
-                </Col>
-                <Col col=Col.One>
-                  <div className={CssHelper.flexBox()}>
-                    <Text value="Order" size=Text.Body2 />
-                  </div>
-                </Col>
-                <Col col=Col.Two>
-                  <div className={CssHelper.flexBox(~justify=#center, ())}>
-                    <Text value="State" size=Text.Body2 />
-                  </div>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </div>
-      : React.null}
-    // Table List
     {switch conntectionsSub {
-    | Data(connections) if connections->Belt.Array.length == 0 =>
+    | Data(connections) if connections->Belt.Array.length === 0 =>
       <EmptyContainer>
         <img
           alt="No Connections"
@@ -446,15 +472,17 @@ let make = (~counterpartyChainID) => {
       </EmptyContainer>
     | Data(connections) =>
       connections
-      ->Belt.Array.map(connection =>
-        isMobile
-          ? <ConnectionListMobile
-              key={connection.connectionID} connectionSub={Sub.resolve(connection)}
-            />
-          : <ConnectionListDesktop
-              key={connection.connectionID} connectionSub={Sub.resolve(connection)}
-            />
-      )
+      ->Belt.Array.map(connection => {
+        connection.channels->Belt.Array.length > 0
+          ? isMobile
+              ? <ConnectionListMobile
+                  key={connection.connectionID} connectionSub={Sub.resolve(connection)}
+                />
+              : <ConnectionListDesktop
+                  key={connection.connectionID} connectionSub={Sub.resolve(connection)}
+                />
+          : React.null
+      })
       ->React.array
     | _ =>
       Belt.Array.makeBy(pageSize, i =>

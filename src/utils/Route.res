@@ -39,7 +39,7 @@ type t =
   | ProposalPage
   | ProposalDetailsPage(int)
   | RelayersHomepage
-  | IBCTxPage
+  | ChannelDetailsPage(string, string, string)
 
 let fromUrl = (url: RescriptReactRouter.url) =>
   // TODO: We'll handle the NotFound case for Datasources and Oraclescript later
@@ -110,7 +110,8 @@ let fromUrl = (url: RescriptReactRouter.url) =>
   | (list{"proposals"}, _) => ProposalPage
   | (list{"proposal", proposalID}, _) => ProposalDetailsPage(proposalID->Parse.mustParseInt)
   | (list{"relayers"}, _) => RelayersHomepage
-  | (list{"ibcs"}, _) => IBCTxPage
+  | (list{"relayers", counterparty, port, channelID}, _) =>
+    ChannelDetailsPage(counterparty, port, channelID)
   | (list{}, _) => HomePage
   | (_, _) => NotFound
   }
@@ -178,7 +179,7 @@ let toString = route =>
   | ProposalPage => "/proposals"
   | ProposalDetailsPage(proposalID) => `/proposal/${proposalID->Belt.Int.toString}`
   | RelayersHomepage => "/relayers"
-  | IBCTxPage => "/ibcs"
+  | ChannelDetailsPage(chainID, port, channel) => `/relayers/${chainID}/${port}/${channel}`
   | HomePage => "/"
   | NotFound => "/notfound"
   }
