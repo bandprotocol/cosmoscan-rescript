@@ -418,6 +418,42 @@ module EditValidator = {
   }
 }
 
+module Delegate = {
+  type t<'a, 'b> = {
+    validatorAddress: Address.t,
+    delegatorAddress: Address.t,
+    amount: Coin.t,
+    moniker: 'a,
+    identity: 'b,
+  }
+
+  type failed_t = t<unit, unit>
+  type success_t = t<string, string>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(failed_t)
+
+  let decodeFactory = (monikerDecoder, identityDecoder) => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, string)->Address.fromBech32,
+      validatorAddress: json.required(list{"msg", "validator_address"}, string)->Address.fromBech32,
+      amount: json.required(list{"msg", "amount"}, Coin.decodeCoin),
+      moniker: json->monikerDecoder,
+      identity: json->identityDecoder,
+    })
+  }
+  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => ())
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(
+      json => json.required(list{"msg", "moniker"}, string),
+      json => json.required(list{"msg", "identity"}, string),
+    )
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -431,6 +467,7 @@ type msg_t =
   | RevokeAllowanceMsg(RevokeAllowance.t)
   | CreateValidatorMsg(CreateValidator.t)
   | EditValidatorMsg(EditValidator.t)
+  | DelegateMsg(Delegate.decoded_t)
   | UnknownMsg
 
 type t = {
@@ -467,6 +504,7 @@ let getBadge = msg => {
   | RevokeAllowanceMsg(_) => {name: "Revoke Allowance", category: ValidatorMsg}
   | CreateValidatorMsg(_) => {name: "Create Validator", category: ValidatorMsg}
   | EditValidatorMsg(_) => {name: "Edit Validator", category: ValidatorMsg}
+  | DelegateMsg(_) => {name: "Delegate", category: ValidatorMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -541,6 +579,17 @@ let decodeMsg = (json, isSuccess) => {
     | "/cosmos.staking.v1beta1.MsgEditValidator" =>
       let msg = json->mustDecode(EditValidator.decode)
       (EditValidatorMsg(msg), msg.sender, false)
+    | "/cosmos.staking.v1beta1.MsgDelegate" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Delegate.decodeSuccess)
+            (DelegateMsg(Success(msg)), msg.delegatorAddress, false)
+          }
+        : {
+            let msg = json->mustDecode(Delegate.decodeFail)
+            (DelegateMsg(Failure(msg)), msg.delegatorAddress, false)
+          }
+
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }

@@ -34,7 +34,7 @@ type content_inner_t =
   | Address(Address.t)
   | ValidatorAddress(Address.t)
   | Calldata(string, JsBuffer.t)
-  | Coin(Belt.List.t<Coin.t>)
+  | CoinList(Belt.List.t<Coin.t>)
   | ID(React.element) // TODO: refactor not to receive react.element
   | RawReports(Belt.List.t<Msg.RawDataReport.t>)
   | Timestamp(MomentRe.Moment.t)
@@ -52,7 +52,7 @@ let renderValue = v => {
   | ValidatorAddress(address) =>
     <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
   | PlainText(content) => <Text value={content} size=Text.Body1 />
-  | Coin(amount) => <AmountRender coins={amount} />
+  | CoinList(amount) => <AmountRender coins={amount} />
   | ID(element) => element
   | Calldata(schema, data) => <Calldata schema calldata=data />
   | RawReports(data) =>
@@ -84,7 +84,7 @@ module CreateDataSource = {
     firsts->Belt.Array.concat([
       {title: "Owner", content: Address(msg.owner), order: 2},
       {title: "Treasury", content: Address(msg.treasury), order: 3},
-      {title: "Fee", content: Coin(msg.fee), order: 4},
+      {title: "Fee", content: CoinList(msg.fee), order: 4},
     ])
 
   let success = (msg: Msg.CreateDataSource.success_t) =>
@@ -122,7 +122,7 @@ module Request = {
       },
       {
         title: "Fee Limit",
-        content: Coin(msg.feeLimit),
+        content: CoinList(msg.feeLimit),
         order: 4,
       },
       {
@@ -200,7 +200,7 @@ module EditDataSource = {
     },
     {
       title: "Fee",
-      content: Coin(msg.fee),
+      content: CoinList(msg.fee),
       order: 4,
     },
   ]
@@ -270,7 +270,7 @@ module Send = {
     },
     {
       title: "Amount",
-      content: Coin(msg.amount),
+      content: CoinList(msg.amount),
       order: 5,
     },
   ]
@@ -406,12 +406,12 @@ module CreateValidator = {
     },
     {
       title: "Min Self Delegation",
-      content: Coin(list{msg.minSelfDelegation}),
+      content: CoinList(list{msg.minSelfDelegation}),
       order: 8,
     },
     {
       title: "Self Delegation",
-      content: Coin(list{msg.selfDelegation}),
+      content: CoinList(list{msg.selfDelegation}),
       order: 9,
     },
     {
@@ -458,7 +458,7 @@ module EditValidator = {
       title: "Min Self Delegation",
       content: {
         switch msg.minSelfDelegation {
-        | Some(minSelfDelegation') => Coin(list{minSelfDelegation'})
+        | Some(minSelfDelegation') => CoinList(list{minSelfDelegation'})
         | None => PlainText("Unchanged")
         }
       },
@@ -475,6 +475,40 @@ module EditValidator = {
       order: 7,
     },
   ]
+}
+
+module Delegate = {
+  let factory = (msg: Msg.Delegate.t<'a, 'b>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Delegator Address",
+        content: Address(msg.delegatorAddress),
+        order: 1,
+      },
+      {
+        title: "Amount",
+        content: CoinList(list{msg.amount}),
+        order: 3,
+      },
+    ])
+
+  let success = (msg: Msg.Delegate.success_t) =>
+    msg->factory([
+      {
+        title: "Validator",
+        content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
+        order: 2,
+      },
+    ])
+
+  let failed = (msg: Msg.Delegate.failed_t) =>
+    msg->factory([
+      {
+        title: "Validator Address",
+        content: ValidatorAddress(msg.validatorAddress),
+        order: 2,
+      },
+    ])
 }
 
 let getContent = msg => {
@@ -504,6 +538,11 @@ let getContent = msg => {
   | Msg.RevokeAllowanceMsg(data) => RevokeAllowance.factory(data)
   | Msg.CreateValidatorMsg(data) => CreateValidator.factory(data)
   | Msg.EditValidatorMsg(data) => EditValidator.factory(data)
+  | Msg.DelegateMsg(m) =>
+    switch m {
+    | Msg.Delegate.Success(data) => Delegate.success(data)
+    | Msg.Delegate.Failure(data) => Delegate.failed(data)
+    }
   | Msg.UnknownMsg => []
   }
 }

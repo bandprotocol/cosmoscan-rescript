@@ -85,6 +85,11 @@ let make = (~msg: Msg.t) => {
     | CreateValidatorMsg({moniker})
     | EditValidatorMsg({moniker}) =>
       <ValidatorMsg.Validator moniker />
+    | DelegateMsg(msg) =>
+      switch msg {
+      | Msg.Delegate.Success(m) => <ValidatorMsg.Delegate delegatorAddress=m.delegatorAddress />
+      | Msg.Delegate.Failure(f) => <ValidatorMsg.Delegate delegatorAddress=f.delegatorAddress />
+      }
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />
