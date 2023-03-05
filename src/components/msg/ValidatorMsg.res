@@ -36,16 +36,6 @@ module RemoveReporter = {
       <AddressRender address=reporter />
     </BadgeWrapper>
 }
-
-module SetWithdrawAddress = {
-  @react.component
-  let make = (~withdrawAddress) =>
-    <BadgeWrapper>
-      <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
-      <AddressRender address=withdrawAddress />
-    </BadgeWrapper>
-}
-
 module Grant = {
   @react.component
   let make = (~reporter) =>
@@ -68,4 +58,14 @@ module RevokeAllowance = {
     <BadgeWrapper>
       <AddressRender address=granter />
     </BadgeWrapper>
+}
+
+module SetWithdrawAddress = {
+  @react.component
+  let make = (~withdrawAddress) => {
+    <BadgeWrapper>
+      <Text value={j` to `} size=Text.Body1 nowrap=true block=true />
+      <AddressRender address=withdrawAddress />
+    </BadgeWrapper>
+  }
 }

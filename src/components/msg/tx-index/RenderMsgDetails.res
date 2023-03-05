@@ -39,6 +39,7 @@ type content_inner_t =
   | RawReports(Belt.List.t<Msg.RawDataReport.t>)
   | Timestamp(MomentRe.Moment.t)
   | ValidatorLink(Address.t, string, string)
+  | VoteWeighted(Belt.List.t<Msg.VoteWeighted.option_t>)
 
 type content_t = {
   title: string,
@@ -76,6 +77,31 @@ let renderValue = v => {
       avatarWidth=20
       size=Text.Body1
     />
+  | VoteWeighted(options) =>
+    <>
+      {options
+      ->Belt.List.mapWithIndex((index, {weight, option}) => {
+        let optionCount = options->Belt.List.toArray->Belt_Array.length
+        let mb = index == optionCount ? 0 : 8
+
+        <div
+          key={index->string_of_int ++ weight->Js.Float.toString ++ option}
+          className={CssHelper.flexBox(
+            ~justify=#flexStart,
+            ~align=#center,
+            ~direction=#row,
+            ~wrap=#wrap,
+            (),
+          )}>
+          <Text size=Text.Body1 value=option />
+          <HSpacing size=Spacing.sm />
+          <Text size=Text.Body1 value={weight->Js.Float.toString} />
+          {index == optionCount - 1 ? React.null : <HSpacing size=Spacing.md />}
+        </div>
+      })
+      ->Belt.List.toArray
+      ->React.array}
+    </>
   }
 }
 
@@ -102,7 +128,7 @@ module CreateDataSource = {
       },
     ])
 
-  let failed = (msg: Msg.CreateDataSource.failed_t) =>
+  let failed = (msg: Msg.CreateDataSource.fail_t) =>
     msg->factory([
       {
         title: "Name",
@@ -172,7 +198,7 @@ module Request = {
       },
     ])
 
-  let failed = (msg: Msg.Request.failed_t) => msg->factory([])
+  let failed = (msg: Msg.Request.fail_t) => msg->factory([])
 }
 
 module EditDataSource = {
@@ -225,7 +251,7 @@ module CreateOracleScript = {
       },
     ])
 
-  let failed = (msg: Msg.CreateOracleScript.failed_t) =>
+  let failed = (msg: Msg.CreateOracleScript.fail_t) =>
     msg->factory([
       {
         title: "Name",
@@ -501,7 +527,7 @@ module Delegate = {
       },
     ])
 
-  let failed = (msg: Msg.Delegate.failed_t) =>
+  let failed = (msg: Msg.Delegate.fail_t) =>
     msg->factory([
       {
         title: "Validator Address",
@@ -535,7 +561,7 @@ module Undelegate = {
       },
     ])
 
-  let failed = (msg: Msg.Undelegate.failed_t) =>
+  let failed = (msg: Msg.Undelegate.fail_t) =>
     msg->factory([
       {
         title: "Validator Address",
@@ -578,7 +604,7 @@ module Redelegate = {
       },
     ])
 
-  let failed = (msg: Msg.Redelegate.failed_t) =>
+  let failed = (msg: Msg.Redelegate.fail_t) =>
     msg->factory([
       {
         title: "Source Validator",
@@ -617,7 +643,7 @@ module WithdrawReward = {
       },
     ])
 
-  let failed = (msg: Msg.WithdrawReward.failed_t) =>
+  let failed = (msg: Msg.WithdrawReward.fail_t) =>
     msg->factory([
       {
         title: "Validator Address",
@@ -651,7 +677,178 @@ module WithdrawCommission = {
       },
     ])
 
-  let failed = (msg: Msg.WithdrawCommission.failed_t) => msg->factory([])
+  let failed = (msg: Msg.WithdrawCommission.fail_t) => msg->factory([])
+}
+
+module Unjail = {
+  let factory = (msg: Msg.Unjail.t) => {
+    [
+      {
+        title: "Validator",
+        content: ValidatorAddress(msg.address),
+        order: 1,
+      },
+    ]
+  }
+}
+
+module SetWithdrawAddress = {
+  let factory = (msg: Msg.SetWithdrawAddress.t) => {
+    [
+      {
+        title: "Delegator Address",
+        content: Address(msg.delegatorAddress),
+        order: 1,
+      },
+      {
+        title: "Withdraw Address",
+        content: Address(msg.withdrawAddress),
+        order: 2,
+      },
+    ]
+  }
+}
+
+module SubmitProposal = {
+  let factory = (msg: Msg.SubmitProposal.t<'a>, firsts) =>
+    firsts->Belt.Array.concat([
+      {title: "Proposer", content: Address(msg.proposer), order: 1},
+      {
+        title: "Title",
+        content: PlainText(msg.title),
+        order: 3,
+      },
+      {
+        title: "Deposit Amount",
+        content: CoinList(msg.initialDeposit),
+        order: 4,
+      },
+    ])
+
+  let success = (msg: Msg.SubmitProposal.success_t) =>
+    msg->factory([
+      {
+        title: "Proposal ID",
+        content: ID(
+          <div className={CssHelper.flexBox()}>
+            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+          </div>,
+        ),
+        order: 2,
+      },
+    ])
+
+  let failed = (msg: Msg.SubmitProposal.fail_t) => msg->factory([])
+}
+
+module Deposit = {
+  let factory = (msg: Msg.Deposit.t<'a>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Depositor",
+        content: Address(msg.depositor),
+        order: 1,
+      },
+      {
+        title: "Amount",
+        content: CoinList(msg.amount),
+        order: 4,
+      },
+    ])
+
+  let success = (msg: Msg.Deposit.success_t) =>
+    msg->factory([
+      {
+        title: "Title",
+        content: PlainText(msg.title),
+        order: 2,
+      },
+    ])
+
+  let failed = (msg: Msg.Deposit.fail_t) =>
+    msg->factory([
+      {
+        title: "Proposal ID",
+        content: ID(
+          <div className={CssHelper.flexBox()}>
+            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+          </div>,
+        ),
+        order: 2,
+      },
+    ])
+}
+
+module Vote = {
+  let factory = (msg: Msg.Vote.t<'a>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Voter",
+        content: Address(msg.voterAddress),
+        order: 1,
+      },
+      {
+        title: "Proposal ID",
+        content: ID(
+          <div className={CssHelper.flexBox()}>
+            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+          </div>,
+        ),
+        order: 2,
+      },
+      {
+        title: "Option",
+        content: PlainText(msg.option),
+        order: 4,
+      },
+    ])
+
+  let success = (msg: Msg.Vote.success_t) =>
+    msg->factory([
+      {
+        title: "Title",
+        content: PlainText(msg.title),
+        order: 3,
+      },
+    ])
+
+  let failed = (msg: Msg.Vote.fail_t) => msg->factory([])
+}
+
+module VoteWeighted = {
+  let factory = (msg: Msg.VoteWeighted.t<'a>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Voter",
+        content: Address(msg.voterAddress),
+        order: 1,
+      },
+      {
+        title: "Proposal ID",
+        content: ID(
+          <div className={CssHelper.flexBox()}>
+            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+          </div>,
+        ),
+        order: 2,
+      },
+      {
+        title: "Option/Weight",
+        content: VoteWeighted(msg.options),
+        order: 4,
+      },
+    ])
+
+  let success = (msg: Msg.VoteWeighted.success_t) =>
+    msg->factory([
+      {
+        title: "Title",
+        content: PlainText(msg.title),
+        order: 3,
+      },
+    ])
+
+  let failed = (msg: Msg.VoteWeighted.fail_t) => msg->factory([])
 }
 
 let getContent = msg => {
@@ -705,6 +902,28 @@ let getContent = msg => {
     switch m {
     | Msg.WithdrawCommission.Success(data) => WithdrawCommission.success(data)
     | Msg.WithdrawCommission.Failure(data) => WithdrawCommission.failed(data)
+    }
+  | Msg.UnjailMsg(data) => Unjail.factory(data)
+  | Msg.SetWithdrawAddressMsg(data) => SetWithdrawAddress.factory(data)
+  | Msg.SubmitProposalMsg(m) =>
+    switch m {
+    | Msg.SubmitProposal.Success(data) => SubmitProposal.success(data)
+    | Msg.SubmitProposal.Failure(data) => SubmitProposal.failed(data)
+    }
+  | Msg.DepositMsg(m) =>
+    switch m {
+    | Msg.Deposit.Success(data) => Deposit.success(data)
+    | Msg.Deposit.Failure(data) => Deposit.failed(data)
+    }
+  | Msg.VoteMsg(m) =>
+    switch m {
+    | Msg.Vote.Success(data) => Vote.success(data)
+    | Msg.Vote.Failure(data) => Vote.failed(data)
+    }
+  | Msg.VoteWeightedMsg(m) =>
+    switch m {
+    | Msg.VoteWeighted.Success(data) => VoteWeighted.success(data)
+    | Msg.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
 
   | Msg.UnknownMsg => []

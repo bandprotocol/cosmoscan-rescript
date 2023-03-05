@@ -26,12 +26,12 @@ module CreateDataSource = {
     id: 'a,
   }
 
-  type failed_t = t<unit>
+  type fail_t = t<unit>
   type success_t = t<ID.DataSource.t>
 
   type decoded_t =
     | Success(success_t)
-    | Failure(failed_t)
+    | Failure(fail_t)
 
   let decodeFactory = idDecoder => {
     open JsonUtils.Decode
@@ -45,7 +45,7 @@ module CreateDataSource = {
       id: json->idDecoder,
     })
   }
-  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => ())
+  let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => ())
   let decodeSuccess: JsonUtils.Decode.t<success_t> = decodeFactory(json =>
     json.required(list{"msg", "id"}, ID.DataSource.decoder)
   )
@@ -85,12 +85,12 @@ module CreateOracleScript = {
     id: 'a,
   }
 
-  type failed_t = t<unit>
+  type fail_t = t<unit>
   type success_t = t<ID.OracleScript.t>
 
   type decoded_t =
     | Success(success_t)
-    | Failure(failed_t)
+    | Failure(fail_t)
 
   let decodeFactory = idDecoder => {
     open JsonUtils.Decode
@@ -102,7 +102,7 @@ module CreateOracleScript = {
       id: json->idDecoder,
     })
   }
-  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => ())
+  let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => ())
   let decodeSuccess: JsonUtils.Decode.t<success_t> = decodeFactory(json =>
     json.required(list{"msg", "id"}, ID.OracleScript.decoder)
   )
@@ -144,12 +144,12 @@ module Request = {
     schema: 'c,
   }
 
-  type failed_t = t<unit, unit, unit>
+  type fail_t = t<unit, unit, unit>
   type success_t = t<ID.Request.t, string, string>
 
   type decoded_t =
     | Success(success_t)
-    | Failure(failed_t)
+    | Failure(fail_t)
 
   let decodeFactory = (decoderID, decoderString, decoderSchema) => {
     open JsonUtils.Decode
@@ -168,7 +168,7 @@ module Request = {
     })
   }
 
-  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => (), _ => ())
+  let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => (), _ => (), _ => ())
   let decodeSuccess: JsonUtils.Decode.t<success_t> = {
     open JsonUtils.Decode
     decodeFactory(
@@ -427,12 +427,12 @@ module Delegate = {
     identity: 'b,
   }
 
-  type failed_t = t<unit, unit>
+  type fail_t = t<unit, unit>
   type success_t = t<string, string>
 
   type decoded_t =
     | Success(success_t)
-    | Failure(failed_t)
+    | Failure(fail_t)
 
   let decodeFactory = (monikerDecoder, identityDecoder) => {
     open JsonUtils.Decode
@@ -444,7 +444,7 @@ module Delegate = {
       identity: json->identityDecoder,
     })
   }
-  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => ())
+  let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => (), _ => ())
   let decodeSuccess: JsonUtils.Decode.t<success_t> = {
     open JsonUtils.Decode
     decodeFactory(
@@ -463,12 +463,12 @@ module Undelegate = {
     identity: 'b,
   }
 
-  type failed_t = t<unit, unit>
+  type fail_t = t<unit, unit>
   type success_t = t<string, string>
 
   type decoded_t =
     | Success(success_t)
-    | Failure(failed_t)
+    | Failure(fail_t)
 
   let decodeFactory = (monikerDecoder, identityDecoder) => {
     open JsonUtils.Decode
@@ -480,7 +480,7 @@ module Undelegate = {
       identity: json->identityDecoder,
     })
   }
-  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => ())
+  let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => (), _ => ())
   let decodeSuccess: JsonUtils.Decode.t<success_t> = {
     open JsonUtils.Decode
     decodeFactory(
@@ -502,12 +502,12 @@ module Redelegate = {
     identityDestination: 'd,
   }
 
-  type failed_t = t<unit, unit, unit, unit>
+  type fail_t = t<unit, unit, unit, unit>
   type success_t = t<string, string, string, string>
 
   type decoded_t =
     | Success(success_t)
-    | Failure(failed_t)
+    | Failure(fail_t)
 
   let decodeFactory = (monikerSourceD, monikerDestD, identityD, identityDestD) => {
     open JsonUtils.Decode
@@ -528,7 +528,7 @@ module Redelegate = {
       identityDestination: json->identityDestD,
     })
   }
-  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => (), _ => (), _ => ())
+  let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => (), _ => (), _ => (), _ => ())
   let decodeSuccess: JsonUtils.Decode.t<success_t> = {
     open JsonUtils.Decode
     decodeFactory(
@@ -549,12 +549,12 @@ module WithdrawReward = {
     identity: 'c,
   }
 
-  type failed_t = t<unit, unit, unit>
+  type fail_t = t<unit, unit, unit>
   type success_t = t<list<Coin.t>, string, string>
 
   type decoded_t =
     | Success(success_t)
-    | Failure(failed_t)
+    | Failure(fail_t)
 
   let decodeFactory = (amountD, monikerD, identityD) => {
     open JsonUtils.Decode
@@ -566,7 +566,7 @@ module WithdrawReward = {
       identity: json->identityD,
     })
   }
-  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => (), _ => ())
+  let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => (), _ => (), _ => ())
   let decodeSuccess: JsonUtils.Decode.t<success_t> = {
     open JsonUtils.Decode
     decodeFactory(
@@ -585,12 +585,12 @@ module WithdrawCommission = {
     identity: 'c,
   }
 
-  type failed_t = t<unit, unit, unit>
+  type fail_t = t<unit, unit, unit>
   type success_t = t<list<Coin.t>, string, string>
 
   type decoded_t =
     | Success(success_t)
-    | Failure(failed_t)
+    | Failure(fail_t)
 
   let decodeFactory = (amountD, monikerD, identityD) => {
     open JsonUtils.Decode
@@ -601,7 +601,7 @@ module WithdrawCommission = {
       identity: json->identityD,
     })
   }
-  let decodeFail: JsonUtils.Decode.t<failed_t> = decodeFactory(_ => (), _ => (), _ => ())
+  let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => (), _ => (), _ => ())
   let decodeSuccess: JsonUtils.Decode.t<success_t> = {
     open JsonUtils.Decode
     decodeFactory(
@@ -609,6 +609,212 @@ module WithdrawCommission = {
       json => json.required(list{"msg", "moniker"}, string),
       json => json.required(list{"msg", "identity"}, string),
     )
+  }
+}
+
+module Unjail = {
+  type t = {address: Address.t}
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      address: json.required(list{"msg", "validator_address"}, string)->Address.fromBech32,
+    })
+  }
+}
+
+module SetWithdrawAddress = {
+  type t = {
+    delegatorAddress: Address.t,
+    withdrawAddress: Address.t,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      delegatorAddress: json.required(list{"msg", "delegator_address"}, string)->Address.fromBech32,
+      withdrawAddress: json.required(list{"msg", "withdraw_address"}, string)->Address.fromBech32,
+    })
+  }
+}
+
+module SubmitProposal = {
+  type t<'a> = {
+    proposer: Address.t,
+    title: string,
+    description: string,
+    initialDeposit: list<Coin.t>,
+    proposalID: 'a,
+  }
+
+  type success_t = t<ID.Proposal.t>
+  type fail_t = t<unit>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(fail_t)
+
+  let decodeFactory = proposalIDD => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      proposer: json.required(list{"msg", "proposer"}, string)->Address.fromBech32,
+      title: json.required(list{"msg", "content", "title"}, string),
+      description: json.required(list{"msg", "content", "description"}, string),
+      initialDeposit: json.required(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
+      proposalID: json->proposalIDD,
+    })
+  }
+
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(json => json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder))
+  }
+
+  let decodeFail: JsonUtils.Decode.t<fail_t> = {
+    open JsonUtils.Decode
+    decodeFactory(_ => ())
+  }
+}
+
+module Deposit = {
+  type t<'a> = {
+    depositor: Address.t,
+    proposalID: ID.Proposal.t,
+    amount: list<Coin.t>,
+    title: 'a,
+  }
+
+  type success_t = t<string>
+  type fail_t = t<unit>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(fail_t)
+
+  let decodeFactory = titleD => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      depositor: json.required(list{"msg", "depositor"}, string)->Address.fromBech32,
+      proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      amount: json.required(list{"msg", "amount"}, list(Coin.decodeCoin)),
+      title: json->titleD,
+    })
+  }
+
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(json => json.required(list{"msg", "title"}, string))
+  }
+
+  let decodeFail: JsonUtils.Decode.t<fail_t> = {
+    open JsonUtils.Decode
+    decodeFactory(_ => ())
+  }
+}
+
+module Vote = {
+  exception ParseVoteNotMatch
+  let parse = vote => {
+    switch vote {
+    | 0 => "Unspecified"
+    | 1 => "Yes"
+    | 2 => "Abstain"
+    | 3 => "No"
+    | 4 => "NoWithVeto"
+    | _ => raise(ParseVoteNotMatch)
+    }
+  }
+
+  type t<'a> = {
+    voterAddress: Address.t,
+    proposalID: ID.Proposal.t,
+    option: string,
+    title: 'a,
+  }
+
+  type success_t = t<string>
+  type fail_t = t<unit>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(fail_t)
+
+  let decodeFactory = titleD => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      voterAddress: json.required(list{"msg", "voter"}, string)->Address.fromBech32,
+      proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      option: json.required(list{"msg", "option"}, int)->parse,
+      title: json->titleD,
+    })
+  }
+
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(json => json.required(list{"msg", "title"}, string))
+  }
+
+  let decodeFail: JsonUtils.Decode.t<fail_t> = {
+    open JsonUtils.Decode
+    decodeFactory(_ => ())
+  }
+}
+
+module VoteWeighted = {
+  type option_t = {
+    option: string,
+    weight: float,
+  }
+
+  let intDecoder = {
+    open JsonUtils.Decode
+    int->map((. a) => a)
+  }
+
+  let weightDecoder = {
+    open JsonUtils.Decode
+    string->map((. a) => a->float_of_string)
+  }
+
+  let parse = {
+    open JsonUtils.Decode
+    object(fields => {
+      option: fields.required(. "option", intDecoder)->Vote.parse,
+      weight: fields.required(. "weight", weightDecoder),
+    })
+  }
+
+  type t<'a> = {
+    voterAddress: Address.t,
+    proposalID: ID.Proposal.t,
+    options: list<option_t>,
+    title: 'a,
+  }
+
+  type success_t = t<string>
+  type fail_t = t<unit>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(fail_t)
+
+  let decodeFactory = titleD => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      voterAddress: json.required(list{"msg", "voter"}, string)->Address.fromBech32,
+      proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      options: json.required(list{"msg", "options"}, list(parse)),
+      title: json->titleD,
+    })
+  }
+
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(json => json.required(list{"msg", "title"}, string))
+  }
+
+  let decodeFail: JsonUtils.Decode.t<fail_t> = {
+    open JsonUtils.Decode
+    decodeFactory(_ => ())
   }
 }
 
@@ -630,6 +836,12 @@ type msg_t =
   | RedelegateMsg(Redelegate.decoded_t)
   | WithdrawRewardMsg(WithdrawReward.decoded_t)
   | WithdrawCommissionMsg(WithdrawCommission.decoded_t)
+  | UnjailMsg(Unjail.t)
+  | SetWithdrawAddressMsg(SetWithdrawAddress.t)
+  | SubmitProposalMsg(SubmitProposal.decoded_t)
+  | DepositMsg(Deposit.decoded_t)
+  | VoteMsg(Vote.decoded_t)
+  | VoteWeightedMsg(VoteWeighted.decoded_t)
   | UnknownMsg
 
 type t = {
@@ -671,6 +883,12 @@ let getBadge = msg => {
   | RedelegateMsg(_) => {name: "Redelegate", category: TokenMsg}
   | WithdrawRewardMsg(_) => {name: "Withdraw Reward", category: TokenMsg}
   | WithdrawCommissionMsg(_) => {name: "Withdraw Commission", category: TokenMsg}
+  | UnjailMsg(_) => {name: "Unjail", category: ValidatorMsg}
+  | SetWithdrawAddressMsg(_) => {name: "Set Withdraw Address", category: ValidatorMsg}
+  | SubmitProposalMsg(_) => {name: "Submit Proposal", category: ProposalMsg}
+  | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
+  | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
+  | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -798,6 +1016,56 @@ let decodeMsg = (json, isSuccess) => {
         : {
             let msg = json->mustDecode(WithdrawCommission.decodeFail)
             (WithdrawCommissionMsg(Failure(msg)), msg.validatorAddress, false)
+          }
+
+    | "/cosmos.slashing.v1beta1.MsgUnjail" =>
+      let msg = json->mustDecode(Unjail.decode)
+      (UnjailMsg(msg), msg.address, false)
+    | "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress" =>
+      let msg = json->mustDecode(SetWithdrawAddress.decode)
+      (SetWithdrawAddressMsg(msg), msg.delegatorAddress, false)
+    | "/cosmos.gov.v1beta1.MsgSubmitProposal" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(SubmitProposal.decodeSuccess)
+            (SubmitProposalMsg(Success(msg)), msg.proposer, false)
+          }
+        : {
+            let msg = json->mustDecode(SubmitProposal.decodeFail)
+            (SubmitProposalMsg(Failure(msg)), msg.proposer, false)
+          }
+
+    | "/cosmos.gov.v1beta1.MsgDeposit" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Deposit.decodeSuccess)
+            (DepositMsg(Success(msg)), msg.depositor, false)
+          }
+        : {
+            let msg = json->mustDecode(Deposit.decodeFail)
+            (DepositMsg(Failure(msg)), msg.depositor, false)
+          }
+
+    | "/cosmos.gov.v1beta1.MsgVote" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Vote.decodeSuccess)
+            (VoteMsg(Success(msg)), msg.voterAddress, false)
+          }
+        : {
+            let msg = json->mustDecode(Vote.decodeFail)
+            (VoteMsg(Failure(msg)), msg.voterAddress, false)
+          }
+
+    | "/cosmos.gov.v1beta1.MsgVoteWeighted" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(VoteWeighted.decodeSuccess)
+            (VoteWeightedMsg(Success(msg)), msg.voterAddress, false)
+          }
+        : {
+            let msg = json->mustDecode(VoteWeighted.decodeFail)
+            (VoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
           }
 
     | _ => (UnknownMsg, Address.Address(""), false)

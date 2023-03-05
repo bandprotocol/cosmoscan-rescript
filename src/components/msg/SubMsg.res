@@ -110,6 +110,33 @@ let make = (~msg: Msg.t) => {
       | Msg.WithdrawCommission.Success(m) => <TokenMsg.WithdrawCommissionMsg amount={m.amount} />
       | Msg.WithdrawCommission.Failure(f) => React.null
       }
+    | UnjailMsg(_) => React.null
+    | SetWithdrawAddressMsg(m) =>
+      <ValidatorMsg.SetWithdrawAddress withdrawAddress={m.withdrawAddress} />
+    | SubmitProposalMsg(msg) =>
+      switch msg {
+      | Msg.SubmitProposal.Success(m) =>
+        <ProposalMsg.SubmitProposal.Success proposalID=m.proposalID title=m.title />
+      | Msg.SubmitProposal.Failure(f) => <ProposalMsg.SubmitProposal.Fail title=f.title />
+      }
+    | DepositMsg(msg) =>
+      switch msg {
+      | Msg.Deposit.Success(m) =>
+        <ProposalMsg.Deposit.Success amount={m.amount} proposalID={m.proposalID} title={m.title} />
+      | Msg.Deposit.Failure(f) => <ProposalMsg.Deposit.Fail proposalID={f.proposalID} />
+      }
+    | VoteMsg(msg) =>
+      switch msg {
+      | Msg.Vote.Success(m) =>
+        <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
+      | Msg.Vote.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
+      }
+    | VoteWeightedMsg(msg) =>
+      switch msg {
+      | Msg.VoteWeighted.Success(m) =>
+        <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
+      | Msg.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
+      }
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />
