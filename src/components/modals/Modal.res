@@ -115,7 +115,7 @@ let make = () => {
         | ChainSelector(targetChain) => <ChainSelectorModal targetChain />
         | QRCode(address) => <QRCodeModal address />
         | IBCPacketError(_) => "Connect"->React.string
-        | Syncing => "Sync"->React.string
+        | Syncing => <SyncingModal />
         }}
       </div>
     </div>
