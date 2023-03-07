@@ -851,6 +851,23 @@ module VoteWeighted = {
   let failed = (msg: Msg.VoteWeighted.fail_t) => msg->factory([])
 }
 
+module UpdateClient = {
+  let factory = (msg: Msg.UpdateClient.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.clientID),
+        order: 2,
+      },
+    ]
+  }
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -925,7 +942,7 @@ let getContent = msg => {
     | Msg.VoteWeighted.Success(data) => VoteWeighted.success(data)
     | Msg.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
-
+  | Msg.UpdateClientMsg(data) => UpdateClient.factory(data)
   | Msg.UnknownMsg => []
   }
 }

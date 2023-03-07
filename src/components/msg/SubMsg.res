@@ -137,6 +137,7 @@ let make = (~msg: Msg.t) => {
         <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
       | Msg.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
+    | UpdateClientMsg(msg) => React.null
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />

@@ -675,6 +675,20 @@ module SubmitProposal = {
   }
 }
 
+module UpdateClient = {
+  type t = {
+    signer: Address.t,
+    clientID: string,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string) -> Address.fromBech32,
+      clientID: json.required(list{"msg", "client_id"}, string),
+    })
+  }
+}
+
 module Deposit = {
   type t<'a> = {
     depositor: Address.t,
@@ -842,6 +856,7 @@ type msg_t =
   | DepositMsg(Deposit.decoded_t)
   | VoteMsg(Vote.decoded_t)
   | VoteWeightedMsg(VoteWeighted.decoded_t)
+  | UpdateClientMsg(UpdateClient.t)
   | UnknownMsg
 
 type t = {
@@ -889,6 +904,7 @@ let getBadge = msg => {
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
   | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
+  | UpdateClientMsg(_) => {name: "Update Client", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1067,6 +1083,9 @@ let decodeMsg = (json, isSuccess) => {
             let msg = json->mustDecode(VoteWeighted.decodeFail)
             (VoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
           }
+    | "/ibc.core.client.v1.MsgUpdateClient" =>
+      let msg = json->mustDecode(UpdateClient.decode)
+      (UpdateClientMsg(msg), msg.signer, true)
 
     | _ => (UnknownMsg, Address.Address(""), false)
     }
