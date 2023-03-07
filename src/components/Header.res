@@ -123,17 +123,16 @@ module MobileRender = {
                   value="BANDCHAIN"
                   size=Text.Body2
                   weight=Text.Bold
-                  nowrap=true
                   color=theme.neutral_900
                   spacing=Text.Em(0.05)
+                  block=true
                 />
-                <VSpacing size=Spacing.xs />
                 <Text
                   value="CosmoScan"
-                  nowrap=true
                   size=Text.Caption
                   color=theme.neutral_600
                   spacing=Text.Em(0.03)
+                  block=true
                 />
               </div>
             </LinkToHome>
@@ -153,7 +152,7 @@ module MobileRender = {
       </Row>
       <Row marginTop=20>
         <Col colSm=Col.Twelve>
-          <SearchBar />
+          <SearchBarV2 />
         </Col>
       </Row>
     </header>
