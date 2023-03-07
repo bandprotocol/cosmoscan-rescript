@@ -7,7 +7,7 @@ module Styles = {
       backgroundColor(theme.neutral_000),
       zIndex(3),
       Media.mobile([
-        padding(Spacing.md),
+        padding(#px(16)),
         marginBottom(#zero),
         position(#sticky),
         top(#zero),
@@ -26,7 +26,6 @@ module Styles = {
   let boxShadow = style(. [
     boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.08)))),
     position(#relative),
-    zIndex(4),
   ])
 }
 
@@ -69,12 +68,14 @@ module DesktopRender = {
                   </div>
                 </div>
               </LinkToHome>
-              <div className=Styles.chainIDContainer> <ChainIDBadge /> </div>
+              <div className=Styles.chainIDContainer>
+                <ChainIDBadge />
+              </div>
             </div>
           </Col>
           <Col col=Col.Six>
             <div className={CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ())}>
-              <SearchBar />
+              <SearchBarV2 />
             </div>
           </Col>
         </Row>
@@ -82,10 +83,14 @@ module DesktopRender = {
       <Section bg=theme.neutral_100 pt=0 pb=0 style=Styles.boxShadow>
         <div className=CssHelper.container>
           <Row alignItems=Row.Center>
-            <Col col=Col.Eight> <NavBar /> </Col>
+            <Col col=Col.Eight>
+              <NavBar />
+            </Col>
             <Col col=Col.Four>
               <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                <UserAccount /> <HSpacing size=#px(10) /> <ToggleThemeButton />
+                <UserAccount />
+                <HSpacing size=#px(10) />
+                <ToggleThemeButton />
               </div>
             </Col>
           </Row>
@@ -106,7 +111,9 @@ module MobileRender = {
           <div className={CssHelper.flexBox(~align=#flexEnd, ())}>
             <LinkToHome>
               <img
-                src=Images.bandLogo alt="band-logo" className={Css.merge(list{Styles.bandLogo, Styles.blockImage})}
+                src=Images.bandLogo
+                alt="band-logo"
+                className={Css.merge(list{Styles.bandLogo, Styles.blockImage})}
               />
             </LinkToHome>
             <HSpacing size=Spacing.sm />
@@ -116,17 +123,16 @@ module MobileRender = {
                   value="BANDCHAIN"
                   size=Text.Body2
                   weight=Text.Bold
-                  nowrap=true
                   color=theme.neutral_900
                   spacing=Text.Em(0.05)
+                  block=true
                 />
-                <VSpacing size=Spacing.xs />
                 <Text
                   value="CosmoScan"
-                  nowrap=true
                   size=Text.Caption
                   color=theme.neutral_600
                   spacing=Text.Em(0.03)
+                  block=true
                 />
               </div>
             </LinkToHome>
@@ -134,8 +140,19 @@ module MobileRender = {
         </Col>
         <Col colSm=Col.Six>
           <div className={CssHelper.flexBox(~justify=#flexEnd, ~wrap=#nowrap, ())}>
-            <ChainIDBadge /> <NavBar />
+            <ToggleThemeButton />
+            <NavBar />
           </div>
+        </Col>
+      </Row>
+      <Row marginTop=20>
+        <Col colSm=Col.Twelve>
+          <ChainIDBadge dropdown=true />
+        </Col>
+      </Row>
+      <Row marginTop=20>
+        <Col colSm=Col.Twelve>
+          <SearchBarV2 />
         </Col>
       </Row>
     </header>

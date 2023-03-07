@@ -239,7 +239,7 @@ code {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 12px;
+  padding: 0 16px;
 }
 
 /* Select Input */

@@ -3,9 +3,9 @@ let make = () => {
   let (page, _) = React.useState(_ => 1)
   let pageSize = 10
 
-  let txsSub = TxSub.getList(~pageSize, ~page, ())
+  let txsSub = TxSub.getList(~pageSize, ~page)
 
-  let latestTxsSub = TxSub.getList(~pageSize=1, ~page=1, ())
+  let latestTxsSub = TxSub.getList(~pageSize=1, ~page=1)
   let isMobile = Media.isMobile()
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)

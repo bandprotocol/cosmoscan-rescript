@@ -96,7 +96,7 @@ p {
 }
 
 a {
-  transition: .3s;
+  transition: 0.3s;
 }
 
 h1,
@@ -125,13 +125,11 @@ h5 {
   font-size: 12px;
 }
 
-
 /* List */
 
 ul > li + li {
   margin-top: 8px;
 }
-
 
 input {
   border: 0;
@@ -175,7 +173,7 @@ blockquote:before,
 blockquote:after,
 q:before,
 q:after {
-  content: "";
+  content: '';
   content: none;
 }
 
@@ -194,7 +192,7 @@ a:not(:hover) {
 
 * {
   box-sizing: border-box;
-  transition: color,background-color 200ms;
+  transition: color, background-color 200ms;
 }
 
 html,
@@ -213,20 +211,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-button, input {
+button,
+input {
   font-family: 'Montserrat', sans-serif;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 .container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 12px;
+  padding: 0 16px;
 }
 
 /* Select Input */
