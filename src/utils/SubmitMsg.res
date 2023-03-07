@@ -1,5 +1,5 @@
 type t =
-  | Send(option<Address.t>)
+  | Send(option<Address.t>, IBCConnectionQuery.target_chain_t)
   | Delegate(Address.t)
   | Undelegate(Address.t)
   | Redelegate(Address.t)
@@ -25,6 +25,6 @@ let gasLimit = x =>
   | Undelegate(_)
   | Vote(_)
   | WithdrawReward(_)
-  | Reinvest(_) => 200000
+  | Reinvest(_) => 300000
   | Redelegate(_) => 300000
   }

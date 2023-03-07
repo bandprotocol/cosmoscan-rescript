@@ -34,7 +34,7 @@ let make = (~category: MsgDecoder.msg_cat_t) => {
     | IBCChannelMsg
     | IBCPacketMsg
     | IBCTransferMsg =>
-      <img src=Images.ibcIcon />
+      <img src=Images.ibcIcon alt="IBC Icon" />
     | _ => <Icon name="fal fa-question" color=theme.white size=14 />
     }}
   </div>

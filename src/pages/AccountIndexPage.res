@@ -6,7 +6,7 @@ module Styles = {
 
   let balance = style(. [minWidth(#px(150)), justifyContent(#flexEnd)])
 
-  let infoHeader = (theme: Theme.t) => 
+  let infoHeader = (theme: Theme.t) =>
     style(. [borderBottom(#px(1), #solid, theme.neutral_200), paddingBottom(#px(16))])
 
   let totalBalance = style(. [
@@ -82,7 +82,9 @@ module BalanceDetails = {
                   color=theme.neutral_900
                 />}
             <HSpacing size=Spacing.sm />
-            <Text value="BAND" size=Text.Body1 weight=Text.Thin nowrap=true color=theme.neutral_900 />
+            <Text
+              value="BAND" size=Text.Body1 weight=Text.Thin nowrap=true color=theme.neutral_900
+            />
           </div>
           <VSpacing size=Spacing.xs />
           <div className={CssJs.merge(. [CssHelper.flexBox(), Styles.balance])}>
@@ -103,7 +105,9 @@ module BalanceDetails = {
                   code=true
                 />}
             <HSpacing size=Spacing.sm />
-            <Text value="USD" size=Text.Body2 weight=Text.Thin nowrap=true color=theme.neutral_600 />
+            <Text
+              value="USD" size=Text.Body2 weight=Text.Thin nowrap=true color=theme.neutral_600
+            />
           </div>
         </div>
       </Col>
@@ -185,16 +189,16 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
   let send = chainID =>
     switch accountOpt {
     | Some({address: sender}) =>
-      let openSendModal = () => Some(address)->SubmitMsg.Send->SubmitTx->OpenModal->dispatchModal
-      if sender == address {
-        {
-          open Webapi.Dom
-          window->Window.confirm("Are you sure you want to send tokens to yourself?")
-        }
+      let openSendModal = () =>
+        SubmitMsg.Send(Some(address), IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
+
+      switch sender == address {
+      | true =>
+        open Webapi.Dom
+        window->Window.confirm("Are you sure you want to send tokens to yourself?")
           ? openSendModal()
           : ()
-      } else {
-        openSendModal()
+      | false => openSendModal()
       }
     | None => dispatchModal(OpenModal(Connect(chainID)))
     }

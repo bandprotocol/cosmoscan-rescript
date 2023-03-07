@@ -74,6 +74,7 @@ module CircleSpin = {
       ])}>
       <img
         src={isDarkMode ? Images.loadingCircleDark : Images.loadingCircleLight}
+        alt="Loading Circle Spin"
         className={Styles.loadingCircle(size)}
       />
     </div>

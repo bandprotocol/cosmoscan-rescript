@@ -130,7 +130,8 @@ let make = (~chainID, ~ledgerApp) => {
             let newAccountIndex = ReactEvent.Form.target(event)["value"]->int_of_string
             setAccountIndex(_ => newAccountIndex)
           }}>
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]->Belt.Array.map(index =>
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+          ->Belt.Array.map(index =>
             <option key={index->string_of_int} value={index->string_of_int}>
               {
                 let prefixPath = switch ledgerApp {
@@ -139,7 +140,8 @@ let make = (~chainID, ~ledgerApp) => {
                 (prefixPath ++ index->string_of_int)->React.string
               }
             </option>
-          ) |> React.array}
+          )
+          ->React.array}
         </select>
       </div>
     </div>
@@ -183,7 +185,7 @@ let make = (~chainID, ~ledgerApp) => {
               }
             }
           }}>
-          {"Connect to Ledger" |> React.string}
+          {"Connect to Ledger"->React.string}
         </Button>}
   </div>
 }

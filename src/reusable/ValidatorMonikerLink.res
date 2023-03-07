@@ -6,7 +6,7 @@ module Styles = {
       display(#flex),
       cursor(pointer),
       width(w),
-      alignItems(center),
+      alignItems(#center),
       selector("> span:hover", [color(theme.primary_600)]),
       selector("> span", [transition(~duration=200, "all")]),
     ])
@@ -29,8 +29,10 @@ let make = (
     className={Styles.container(width, theme)}
     route={Route.ValidatorDetailsPage(validatorAddress, Reports)}>
     {switch identity {
-    | Some(identity') => <>
-        <Avatar moniker identity=identity' width=avatarWidth /> <HSpacing size=Spacing.sm />
+    | Some(identity') =>
+      <>
+        <Avatar moniker identity=identity' width=avatarWidth />
+        <HSpacing size=Spacing.sm />
       </>
     | None => React.null
     }}
