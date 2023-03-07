@@ -98,7 +98,11 @@ let make = (~values, ~idx, ~status=?, ~requestStatus=?, ~styles="", ~panels=[]) 
 
   <div className={CssJs.merge(. [Styles.cardContainer(theme), styles])}>
     {switch status {
-    | Some(success) => <img src={success ? Images.success : Images.fail} className=Styles.logo />
+    | Some(success) => <img 
+        src={success ? Images.success : Images.fail} 
+        alt={success ? "Success" : "Failed"}
+        className=Styles.logo 
+      />
     | None => React.null
     }}
     //  TODO: do it later

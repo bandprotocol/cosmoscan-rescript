@@ -18,7 +18,7 @@ let renderUnknownMessage = () =>
   <Col col=Col.Six>
     <div className=Styles.topicContainer>
       <Text value="Unknown Message" size=Text.Caption transform=Text.Uppercase />
-      <img src=Images.fail className=Styles.failIcon />
+      <img src=Images.fail alt="Unknown Message" className=Styles.failIcon />
     </div>
   </Col>
 

@@ -53,7 +53,7 @@ let make = (~id) => {
        switch (reason) {
        | Some(reason') when reason' !== "" =>
          <div className=Styles.reasonSection(theme)>
-           <img alt="Fail Icon" src=Images.fail />
+           <img alt="Request Failed" src=Images.fail />
            <HSpacing size=Spacing.md />
            <Text value=reason' color={theme.neutral_900} />
          </div>
