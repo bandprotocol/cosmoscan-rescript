@@ -18,7 +18,7 @@ module RequestsList = {
     <div className={CssHelper.flexBox()}>
       {requests
        ->Belt.Array.map(request =>
-           <div className=Styles.request key={request |> ID.Request.toString}>
+           <div className=Styles.request key={request -> ID.Request.toString}>
              <TypeID.Request id=request />
            </div>
          )

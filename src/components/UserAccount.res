@@ -16,6 +16,7 @@ module Styles = {
     ])
 
   let logo = style(. [width(#px(12))])
+  let fullWidth = style(. [width(#percent(100.))]);
 
   let profileCard = (show, theme: Theme.t) =>
     style(. [
@@ -46,8 +47,8 @@ module Styles = {
 module ConnectBtn = {
   @react.component
   let make = (~connect) =>
-    <div id="connectButton">
-      <Button variant=Button.Outline px=24 py=8 onClick={_ => connect()}>
+    <div id="connectButton" className={Styles.fullWidth}>
+      <Button variant=Button.Outline px=24 py=8 fullWidth=true onClick={_ => connect()}>
         {"Connect Wallet"->React.string}
       </Button>
     </div>
@@ -192,7 +193,7 @@ let make = () => {
         // log for err details
         Js.Console.log(err)
         <Text value="Invalid Chain ID" />
-      | _ => <LoadingCensorBar width=80 height=18 />
+      | _ => <LoadingCensorBar width=150 height=30 />
       }}
     </div>
   }

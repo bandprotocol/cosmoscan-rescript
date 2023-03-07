@@ -13,12 +13,14 @@ module Styles = {
     ~py=13,
     ~pxSm=px,
     ~pySm=py,
+    ~fullWidth,
     theme: Theme.t,
     isDarkMode,
     (),
   ) => {
     let base = style(. [
       display(#block),
+      width(fullWidth ? #percent(100.) : #auto),
       padding2(~v=#px(py), ~h=#px(px)),
       transition(~duration=200, "all"),
       borderRadius(#px(8)),
@@ -97,15 +99,16 @@ let make = (
   ~fsize=12,
   ~pySm=8,
   ~pxSm=16,
-  ~onClick,
+  ~onClick=_=>(),
   ~style="",
   ~disabled=false,
+  ~fullWidth=false,
 ) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <button
     className={CssJs.merge(. [
-      Styles.btn(~variant, ~px, ~py, ~pxSm, ~pySm, ~fsize, theme, isDarkMode, ()),
+      Styles.btn(~variant, ~px, ~py, ~pxSm, ~pySm, ~fsize, ~fullWidth=fullWidth, theme, isDarkMode, ()),
       CssHelper.flexBox(~align=#center, ~justify=#center, ()),
       style,
     ])}

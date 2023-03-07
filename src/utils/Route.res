@@ -113,6 +113,55 @@ let fromUrl = (url: RescriptReactRouter.url) =>
   | (_, _) => NotFound
   }
 
+let toAbsoluteString = route =>
+  switch route {
+  | DataSourcePage => "/data-sources"
+  | OracleScriptPage => "/oracle-scripts"
+  | TxHomePage => "/txs"
+  | ValidatorsPage => "/validators"
+  | BlockPage => "/blocks"
+  | RequestHomePage => "/requests"
+  | AccountIndexPage(address, AccountDelegations) => {
+      let addressBech32 = address->Address.toBech32
+      `/account/${addressBech32}#delegations`
+    }
+
+  | AccountIndexPage(address, AccountUnbonding) => {
+      let addressBech32 = address->Address.toBech32
+      `/account/${addressBech32}#unbonding`
+    }
+
+  | AccountIndexPage(address, AccountRedelegate) => {
+      let addressBech32 = address->Address.toBech32
+      `/account/${addressBech32}#redelegate`
+    }
+
+  | ValidatorDetailsPage(validatorAddress, Delegators) => {
+      let validatorAddressBech32 = validatorAddress->Address.toOperatorBech32
+      `/validator/${validatorAddressBech32}#delegators`
+    }
+
+  | ValidatorDetailsPage(validatorAddress, Reports) => {
+      let validatorAddressBech32 = validatorAddress->Address.toOperatorBech32
+      `/validator/${validatorAddressBech32}#reports`
+    }
+
+  | ValidatorDetailsPage(validatorAddress, Reporters) => {
+      let validatorAddressBech32 = validatorAddress->Address.toOperatorBech32
+      `/validator/${validatorAddressBech32}#reporters`
+    }
+
+  | ValidatorDetailsPage(validatorAddress, ProposedBlocks) => {
+      let validatorAddressBech32 = validatorAddress->Address.toOperatorBech32
+      `/validator/${validatorAddressBech32}#proposed-blocks`
+    }
+  | ProposalPage => "/proposals"
+  | IBCHomePage => "/ibcs"
+  | HomePage => "/"
+  | NotFound => "/notfound"
+  | _ => "/"
+  }
+
 let toString = route =>
   switch route {
   | DataSourcePage => "/data-sources"

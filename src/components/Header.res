@@ -7,7 +7,7 @@ module Styles = {
       backgroundColor(theme.neutral_000),
       zIndex(3),
       Media.mobile([
-        padding(Spacing.md),
+        padding(#px(16)),
         marginBottom(#zero),
         position(#sticky),
         top(#zero),
@@ -111,7 +111,9 @@ module MobileRender = {
           <div className={CssHelper.flexBox(~align=#flexEnd, ())}>
             <LinkToHome>
               <img
-                src=Images.bandLogo alt="band-logo" className={Css.merge(list{Styles.bandLogo, Styles.blockImage})}
+                src=Images.bandLogo
+                alt="band-logo"
+                className={Css.merge(list{Styles.bandLogo, Styles.blockImage})}
               />
             </LinkToHome>
             <HSpacing size=Spacing.sm />
@@ -139,9 +141,19 @@ module MobileRender = {
         </Col>
         <Col colSm=Col.Six>
           <div className={CssHelper.flexBox(~justify=#flexEnd, ~wrap=#nowrap, ())}>
-            <ChainIDBadge />
+            <ToggleThemeButton />
             <NavBar />
           </div>
+        </Col>
+      </Row>
+      <Row marginTop=20>
+        <Col colSm=Col.Twelve>
+          <ChainIDBadge dropdown=true />
+        </Col>
+      </Row>
+      <Row marginTop=20>
+        <Col colSm=Col.Twelve>
+          <SearchBar />
         </Col>
       </Row>
     </header>
