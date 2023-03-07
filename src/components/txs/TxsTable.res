@@ -120,7 +120,7 @@ let make = (
   <>
     {switch txsSub {
     | Data(txs) =>
-      txs->Belt.Array.size > 0
+      txs->Belt.Array.length > 0
         ? txs
           ->Belt.Array.mapWithIndex((i, e) =>
             isMobile

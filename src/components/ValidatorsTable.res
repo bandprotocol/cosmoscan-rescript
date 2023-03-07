@@ -403,7 +403,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
               Js.String2.includes(searchTerm, validator.moniker->Js.String2.toLowerCase)
             })
       <>
-        {filteredValidator->Belt.Array.size > 0
+        {filteredValidator->Belt.Array.length > 0
           ? filteredValidator
             ->sorting(sortedBy)
             ->Belt.Array.map(e => {

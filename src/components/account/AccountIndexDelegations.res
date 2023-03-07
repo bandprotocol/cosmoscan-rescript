@@ -225,7 +225,7 @@ let make = (~address) => {
         </THead>}
     {switch delegationsSub {
     | Data(delegations) =>
-      delegations->Belt.Array.size > 0
+      delegations->Belt.Array.length > 0
         ? delegations
           ->Belt.Array.mapWithIndex((i, e) =>
             isMobile

@@ -261,8 +261,34 @@ let make = () => {
                 </Row>
               </THead>}
           {switch allSub {
-          | Data((dataSources, _)) if dataSources->Belt.Array.length === 0 =>
-            <EmptyContainer>
+          | Data((dataSources, dataSourcesCount)) => dataSources->Belt.Array.length > 0 ?
+            {
+              let pageCount = Page.getPageCount(dataSourcesCount, pageSize)
+              <>
+                {dataSources
+                ->sorting(sortedBy)
+                ->Belt.Array.mapWithIndex((i, e) =>
+                  isMobile
+                    ? <RenderBodyMobile
+                        key={e.id->ID.DataSource.toString}
+                        reserveIndex=i
+                        dataSourcesSub={Sub.resolve(e)}
+                      />
+                    : <RenderBody
+                        key={e.id->ID.DataSource.toString}
+                        reserveIndex=i
+                        dataSourcesSub={Sub.resolve(e)}
+                      />
+                )
+                ->React.array}
+                {isMobile
+                  ? React.null
+                  : <Pagination
+                      currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+                    />}
+              </>
+            }
+            : <EmptyContainer>
               <img
                 src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
                 className=Styles.noDataImage
@@ -276,31 +302,6 @@ let make = () => {
                 color={theme.neutral_600}
               />
             </EmptyContainer>
-          | Data((dataSources, dataSourcesCount)) =>
-            let pageCount = Page.getPageCount(dataSourcesCount, pageSize)
-            <>
-              {dataSources
-              ->sorting(sortedBy)
-              ->Belt.Array.mapWithIndex((i, e) =>
-                isMobile
-                  ? <RenderBodyMobile
-                      key={e.id->ID.DataSource.toString}
-                      reserveIndex=i
-                      dataSourcesSub={Sub.resolve(e)}
-                    />
-                  : <RenderBody
-                      key={e.id->ID.DataSource.toString}
-                      reserveIndex=i
-                      dataSourcesSub={Sub.resolve(e)}
-                    />
-              )
-              ->React.array}
-              {isMobile
-                ? React.null
-                : <Pagination
-                    currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
-                  />}
-            </>
           | _ =>
             Belt.Array.makeBy(10, i =>
               isMobile
