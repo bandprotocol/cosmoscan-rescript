@@ -51,45 +51,53 @@ module Styles = {
 
 module ComponentCreator = (RawID: ID.IDSig) => {
   @react.component
-  let make = (~id, ~position=Text, ~size=?, ~primary=false, ~weight=Text.Regular, ~details="") => {
-    let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+  let make = (
+    ~id,
+    ~position=Text,
+    ~size=?,
+    ~primary=false,
+    ~weight=Text.Regular,
+    ~details="",
+    ~block=false,
+  ) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <Link
       className={Css.merge(list{Styles.link(theme, details != ""), Styles.pointerEvents(position)})}
-      route={id -> RawID.getRoute}>
+      route={id->RawID.getRoute}>
       <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
         <Text
-          value={id -> RawID.toString}
+          value={id->RawID.toString}
           size={switch size {
-            | Some(s) => s
-            | None => position -> fontSize
+          | Some(s) => s
+          | None => position->fontSize
           }}
           weight
-          height={position -> lineHeight}
+          height={position->lineHeight}
           nowrap=true
           code=true
           block=true
           color=theme.primary_600
         />
-        {
-          details != "" ? <>
-            <HSpacing size=Spacing.sm />
-            <Text 
-              value=details
-              size={switch size {
+        {details != ""
+          ? <>
+              <HSpacing size=Spacing.sm />
+              <Text
+                value=details
+                size={switch size {
                 | Some(s) => s
-                | None => position -> fontSize
-              }}
-              weight=Text.Regular
-              color=theme.neutral_900
-              ellipsis=true 
-            />
-          </> : React.null
-        }
+                | None => position->fontSize
+                }}
+                weight=Text.Regular
+                color=theme.neutral_900
+                ellipsis=true
+              />
+            </>
+          : React.null}
       </div>
-    </Link>;
-  };
-};
+    </Link>
+  }
+}
 
 module PlainLinkCreator = (RawID: ID.IDSig) => {
   @react.component

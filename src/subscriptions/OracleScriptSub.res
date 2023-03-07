@@ -58,14 +58,16 @@ let toExternal = ({
   schema,
   sourceCodeURL,
   timestamp: {
-    let tx = txOpt->Belt.Option.getExn
-    Some(tx.block.timestamp)
+    switch txOpt {
+    | Some({block: {timestamp}}) => Some(timestamp)
+    | None => None
+    }
   },
   relatedDataSources: relatedDataSources
   ->Belt.Array.map(({dataSource}) => dataSource)
   ->Belt.List.fromArray,
   // Note: requestCount can't be nullable value.
-  requestCount: requestStatOpt->Belt.Option.map(({count}) => count)->Belt.Option.getExn,
+  requestCount: requestStatOpt->Belt.Option.map(({count}) => count)->Belt.Option.getWithDefault(0),
 }
 
 module SingleConfig = %graphql(`

@@ -22,6 +22,21 @@ let fromData = result =>
   | {data: None, error: None, loading: false} => NoData
   }
 
+let fromData2 = (
+  result1,
+  result2,
+  f
+) =>
+  switch (result1, result2) {
+  | (Data(data1), Data(data2)) => Data(f(data1, data2))
+  | (Loading, _) => Loading
+  | (_, Loading) => Loading
+  | (Error(e), _) => Error(e)
+  | (_, Error(e)) => Error(e)
+  | (NoData, _) => NoData
+  | (_, NoData) => NoData
+  }
+
 let flatMap = (result, f) =>
   switch result {
   | Data(data) => f(data)
@@ -40,6 +55,21 @@ let map = (result, f) =>
   | Loading => Loading
   | Error(e) => Error(e)
   | NoData => NoData
+  }
+
+let map2 = (
+  result1,
+  result2,
+  f,
+) =>
+  switch (result1, result2) {
+  | (Data(data1), Data(data2)) => Data(f(data1, data2))
+  | (Loading, _) => Loading
+  | (_, Loading) => Loading
+  | (Error(e), _) => Error(e)
+  | (_, Error(e)) => Error(e)
+  | (NoData, _) => NoData
+  | (_, NoData) => NoData
   }
 
 let all2 = (s1, s2) => flatMap(s1, s1' => flatMap(s2, s2' => Data((s1', s2'))))

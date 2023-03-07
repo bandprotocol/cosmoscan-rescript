@@ -23,6 +23,13 @@ let make = () => {
 
   <div className={Styles.container(theme)}>
     <Header />
+    {isMobile
+      ? <Section pt=16 pb=16 ptSm=24 pbSm=24>
+          <div className=CssHelper.container>
+            <SearchBarV2 />
+          </div>
+        </Section>
+      : React.null}
     <div className=Styles.routeContainer>
       {switch currentRoute {
       | HomePage => <HomePage />

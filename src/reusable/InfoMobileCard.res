@@ -79,12 +79,13 @@ let make = (~info) => {
   | Count(value) => <Text value={value->Format.iPretty} size=Text.Body2 />
   | DataSource(id, name) =>
     <div className=Styles.vFlex>
-      <TypeID.DataSource id position=TypeID.MobileCard/>
+      <TypeID.DataSource id position=TypeID.MobileCard />
       <HSpacing size=Spacing.sm />
       <Text value=name ellipsis=true />
     </div>
-  | OracleScript(id, name) => <TypeID.OracleScript id size=Text.Xl position=TypeID.MobileCard details=name/>
-  | RequestID(id) => <TypeID.Request id size=Text.Xl position=TypeID.MobileCard/>
+  | OracleScript(id, name) =>
+    <TypeID.OracleScript id size=Text.Xl position=TypeID.MobileCard details=name />
+  | RequestID(id) => <TypeID.Request id size=Text.Xl position=TypeID.MobileCard />
   | RequestResponse({requestCount, responseTime: responseTimeOpt}) =>
     <div className={CssHelper.flexBox()}>
       <Text value={requestCount->Format.iPretty} block=true ellipsis=true />
@@ -135,7 +136,9 @@ let make = (~info) => {
   | Text(text) => <Text value=text spacing={Text.Em(0.02)} nowrap=true ellipsis=true block=true />
   | Timestamp(time) => <Timestamp time size=Text.Body2 weight=Text.Regular />
   | Validator(address, moniker, identity) =>
-    <ValidatorMonikerLink validatorAddress=address moniker size=Text.Body2 identity width={#px(230)} />
+    <ValidatorMonikerLink
+      validatorAddress=address moniker size=Text.Body2 identity width={#px(230)}
+    />
   | PubKey(publicKey) => <PubKeyRender alignLeft=true pubKey=publicKey display=#block />
   | TxHash(txHash, width) => <TxLink txHash width size=Text.Xl />
   | BlockHash(hash) =>

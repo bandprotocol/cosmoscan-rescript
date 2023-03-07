@@ -49,6 +49,7 @@
 
 // IBC
 @module("./tx-ibc-icon.svg") external ibcIcon: string = "default"
+@module("./unknown-chain.svg") external unknownChain: string = "default"
 
 // ICON
 @module("./ethereum.svg") external ethereumIcon: string = "default"
@@ -56,6 +57,8 @@
 @module("./solidity.svg") external solidityIcon: string = "default"
 @module("./golang.svg") external golangIcon: string = "default"
 @module("./right-arrow.svg") external rightArrow: string = "default"
+@module("./long-arrow-dark.svg") external longArrowDark: string = "default"
+@module("./long-arrow-light.svg") external longArrowLight: string = "default"
 
 // BG
 @module("./not-found-bg.svg") external notFoundBg: string = "default"

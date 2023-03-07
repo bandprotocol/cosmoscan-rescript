@@ -58,7 +58,7 @@ module DisconnectBtn = {
   @react.component
   let make = (~disconnect) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    
+
     <div
       className={Css.merge(list{
         CssHelper.flexBox(~justify=#center, ~align=#center, ()),
@@ -67,7 +67,8 @@ module DisconnectBtn = {
       })}
       onClick={_ => disconnect()}>
       <Text value="Disconnect" weight=Text.Medium color=theme.primary_600 nowrap=true block=true />
-    </div>}
+    </div>
+  }
 }
 
 module FaucetBtn = {
@@ -147,7 +148,7 @@ let make = () => {
     setShow(_ => false)
   }
   let send = () => {
-    None->SubmitMsg.Send->SubmitTx->OpenModal->dispatchModal
+    SubmitMsg.Send(None, IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
     setShow(_ => false)
   }
 

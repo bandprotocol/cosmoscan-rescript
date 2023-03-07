@@ -33,7 +33,7 @@ let flatMap = (result, f) =>
 
 let map = (result, f) =>
   switch result {
-  | Data(data) => Data(data |> f)
+  | Data(data) => Data(data->f)
   | Loading => Loading
   | Error(e) => Error(e)
   | NoData => NoData
@@ -55,3 +55,12 @@ let all5 = (s1, s2, s3, s4, s5) =>
       flatMap(s3, s3' => flatMap(s4, s4' => flatMap(s5, s5' => Data((s1', s2', s3', s4', s5')))))
     )
   )
+
+let sumResults5 = (results: variant<(array<'a>, array<'b>, array<'c>, array<'d>, array<'e>)>) => {
+  let len = switch results {
+  | Data((a, b, c, d, e)) =>
+    Array.length(a) + Array.length(b) + Array.length(c) + Array.length(d) + Array.length(e)
+  | _ => 0
+  }
+  len
+}

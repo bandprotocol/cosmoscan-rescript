@@ -87,7 +87,7 @@ let make = (
         copy ? Styles.mobileWidth : "",
       ])}
       route={isValidator
-        ? Route.ValidatorDetailsPage(address, Route.ProposedBlocks)
+        ? Route.ValidatorDetailsPage(address, Route.Reports)
         : Route.AccountIndexPage(address, Route.AccountDelegations)}>
       <span
         className={CssJs.merge(. [

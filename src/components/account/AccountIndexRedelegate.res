@@ -240,7 +240,9 @@ let make = (~address) => {
           ->React.array
         : <EmptyContainer>
             <img
-              src={isDarkMode ? Images.noDataDark : Images.noDataLight} className=Styles.noDataImage
+              src={isDarkMode ? Images.noDataDark : Images.noDataLight}
+              alt="No Data"
+              className=Styles.noDataImage
             />
             <Heading
               size=Heading.H4

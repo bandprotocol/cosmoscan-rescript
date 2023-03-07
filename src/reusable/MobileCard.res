@@ -74,8 +74,7 @@ module InnerPanel = {
               <div className=Styles.cardItemHeadingLg>
                 <Text key=each value=each size=Text.Body2 />
               </div>
-            | _ =>
-              <Text key=each value=each size=Text.Body2 weight=Text.Semibold />
+            | _ => <Text key=each value=each size=Text.Body2 weight=Text.Semibold />
             }
           })
           ->React.array}
@@ -95,6 +94,20 @@ let make = (~values, ~idx, ~status=?, ~requestStatus=?, ~styles="", ~panels=[]) 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   <div className={CssJs.merge(. [Styles.cardContainer(theme), styles])}>
+    {switch status {
+    | Some(success) =>
+      <img
+        src={success ? Images.success : Images.fail}
+        alt={success ? "Success" : "Failed"}
+        className=Styles.logo
+      />
+    | None => React.null
+    }}
+    //  TODO: do it later
+    // {switch (requestStatus) {
+    //  | Some(resolveStatus) => <RequestStatus resolveStatus style=Styles.logo />
+    //  | None => React.null
+    //  }}
     <InnerPanel values idx />
     {panels->Belt.Array.length > 0
       ? <>
@@ -120,9 +133,7 @@ let make = (~values, ~idx, ~status=?, ~requestStatus=?, ~styles="", ~panels=[]) 
               color={theme.neutral_900}
             />
             <HSpacing size=Spacing.xs />
-            <Icon
-              name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.neutral_600}
-            />
+            <Icon name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.neutral_600} />
           </div>
         </>
       : React.null}
