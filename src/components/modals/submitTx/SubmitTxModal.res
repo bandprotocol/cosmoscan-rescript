@@ -68,21 +68,20 @@ module SubmitTxStep = {
       open EnhanceTxInput
       {text: "", value: Some("")}
     })
-    let (gasInput, setGasInput) = React.useState(_ => string_of_int(gasLimit))
+    let (gasInput, setGasInput) = React.useState(_ => gasLimit->Belt.Int.toString)
 
     <div className={Css.merge(list{Styles.container, Styles.disable(isActive)})}>
       <Heading value={SubmitMsg.toString(msg)} size=Heading.H4 marginBottom=24 />
       {switch msg {
       | SubmitMsg.Send(receiver, targetChain) =>
         <SendMsg address={account.address} receiver setMsgsOpt targetChain />
-      // | Delegate(validator) => <DelegateMsg address={account.address} validator setMsgsOpt />
-      // | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
-      // | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
-      // | WithdrawReward(validator) =>
-      //   <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
-      // | Reinvest(validator, amount) => <ReinvestMsg validator setMsgsOpt amount />
-      // | Vote(proposalID, proposalName) => <VoteMsg proposalID proposalName setMsgsOpt />
-      | _ => React.null
+      | Delegate(validator) => <DelegateMsg address={account.address} validator setMsgsOpt />
+      | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
+      | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
+      | WithdrawReward(validator) =>
+        <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
+      | Reinvest(validator, amount) => <ReinvestMsg validator setMsgsOpt amount />
+      | Vote(proposalID, proposalName) => <VoteMsg proposalID proposalName setMsgsOpt />
       }}
       <EnhanceTxInput
         width=300
@@ -111,7 +110,7 @@ module SubmitTxStep = {
         <ValueInput
           value=gasInput setValue=setGasInput title="Gas Limit" info="(optional)" inputType="number"
         />
-        {switch int_of_string_opt(gasInput) {
+        {switch Belt.Int.fromString(gasInput) {
         | Some(gasInputAmout) =>
           gasInputAmout < gasLimit
             ? {
@@ -138,7 +137,7 @@ module SubmitTxStep = {
       <div id="nextButtonContainer">
         <Button
           style=Styles.nextBtn
-          disabled={switch int_of_string_opt(gasInput) {
+          disabled={switch Belt.Int.fromString(gasInput) {
           | Some(gasOpt) => gasOpt < gasLimit || msgsOpt->Belt.Option.isNone
           | None => msgsOpt->Belt.Option.isNone
           }}
@@ -160,7 +159,7 @@ module SubmitTxStep = {
                   ~chainID=account.chainID,
                   ~feeAmount=fee->Js.Float.toString,
                   ~gas={
-                    switch int_of_string_opt(gasInput) {
+                    switch Belt.Int.fromString(gasInput) {
                     | Some(gasOpt) => gasOpt
                     | None => gasLimit
                     }
