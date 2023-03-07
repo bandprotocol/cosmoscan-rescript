@@ -17,13 +17,6 @@ let get = operatorAddress => {
     operator_address: operatorAddress->Address.toOperatorBech32,
   })
 
-  // switch result {
-  // | {loading: true} => Query.Loading
-  // | {data: Some(data)} => Query.Data(data)
-  // | {error: Some(_error)} => Query.Error(_error)
-  // | _ => Query.NoData
-  // }
-
   let x =
     result
     ->Sub.fromData

@@ -186,35 +186,35 @@ let search = (str: string) => {
   let len = str->String.length
   let capStr = str->String.capitalize_ascii
 
-  switch str->Belt.Int.fromString {
-  | Some(blockID) => Some(BlockDetailsPage(blockID))
-  | None =>
-    if str->Js.String2.startsWith("bandvaloper") {
-      Some(ValidatorDetailsPage(str->Address.fromBech32, Reports))
-    } else if str->Js.String2.startsWith("band") {
-      Some(AccountIndexPage(str->Address.fromBech32, AccountDelegations))
-    } else if len == 64 || (str->Js.String2.startsWith("0x") && len == 66) {
-      Some(TxIndexPage(str->Hash.fromHex))
-    } else if capStr->Js.String2.startsWith("B") {
-      let blockIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
-      blockIDOpt->Belt.Option.map(blockID => BlockDetailsPage(blockID))
-    } else if capStr->Js.String2.startsWith("D") {
-      let dataSourceIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
-      dataSourceIDOpt->Belt.Option.map(dataSourceID => DataSourceDetailsPage(
-        dataSourceID,
-        DataSourceRequests,
-      ))
-    } else if capStr->Js.String2.startsWith("R") {
-      let requestIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
-      requestIDOpt->Belt.Option.map(requestID => RequestIndexPage(requestID))
-    } else if capStr->Js.String2.startsWith("O") {
-      let oracleScriptIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
-      oracleScriptIDOpt->Belt.Option.map(oracleScriptID => OracleScriptDetailsPage(
-        oracleScriptID,
-        OracleScriptRequests,
-      ))
-    } else {
-      None
-    }
+  if str->Js.String2.startsWith("bandvaloper") {
+    Some(ValidatorDetailsPage(str->Address.fromBech32, Reports))
+  } else if str->Js.String2.startsWith("band") {
+    Some(AccountIndexPage(str->Address.fromBech32, AccountDelegations))
+  } else if len == 64 || (str->Js.String2.startsWith("0x") && len == 66) {
+    Some(TxIndexPage(str->Hash.fromHex))
+  } else if capStr->Js.String2.startsWith("B") {
+    let blockIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
+    blockIDOpt->Belt.Option.map(blockID => BlockDetailsPage(blockID))
+  } else if capStr->Js.String2.startsWith("D") {
+    let dataSourceIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
+    dataSourceIDOpt->Belt.Option.map(dataSourceID => DataSourceDetailsPage(
+      dataSourceID,
+      DataSourceRequests,
+    ))
+  } else if capStr->Js.String2.startsWith("R") {
+    let requestIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
+    requestIDOpt->Belt.Option.map(requestID => RequestIndexPage(requestID))
+  } else if capStr->Js.String2.startsWith("O") {
+    let oracleScriptIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
+    oracleScriptIDOpt->Belt.Option.map(oracleScriptID => OracleScriptDetailsPage(
+      oracleScriptID,
+      OracleScriptRequests,
+    ))
+  } else {
+    // switch str->Belt.Int.fromString {
+    // | Some(blockID) => Some(BlockDetailsPage(blockID))
+    // | None => None
+    // }
+    None
   }->Belt.Option.getWithDefault(_, NotFound)
 }

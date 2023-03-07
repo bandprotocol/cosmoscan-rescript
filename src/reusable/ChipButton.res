@@ -1,13 +1,12 @@
 type btn_style_t =
   | Primary
   | Outline
-  | Text
 
 module Styles = {
   open CssJs
 
   let btn = (
-    ~variant=Primary,
+    ~variant: btn_style_t=Primary,
     ~fsize=12,
     ~px=25,
     ~py=13,
@@ -15,6 +14,7 @@ module Styles = {
     ~pySm=py,
     theme: Theme.t,
     isDarkMode,
+    ~isActive=false,
     (),
   ) => {
     let base = style(. [
@@ -36,52 +36,43 @@ module Styles = {
     | Primary =>
       style(. [
         backgroundColor(theme.primary_600),
-        color(Theme.white),
+        color(theme.white),
         border(#px(1), #solid, theme.primary_600),
-        hover([backgroundColor(theme.primary_500)]),
-        active([backgroundColor(theme.primary_800)]),
+        hover([backgroundColor(theme.primary_800)]),
+        active([backgroundColor(theme.primary_600)]),
         disabled([
-          backgroundColor(isDarkMode ? theme.primary_500 : theme.primary_500),
+          backgroundColor(isDarkMode ? theme.primary_800 : theme.primary_500),
           color(Theme.white),
-          borderColor(isDarkMode ? theme.primary_500 : theme.primary_500),
+          borderColor(isDarkMode ? theme.primary_800 : theme.primary_500),
           opacity(0.5),
         ]),
       ])
     | Outline =>
       style(. [
-        backgroundColor(#transparent),
-        color(theme.neutral_900),
-        border(#px(1), #solid, theme.neutral_900),
+        backgroundColor(isActive ? theme.primary_600 : #transparent),
+        color(isActive ? Theme.white : theme.neutral_900),
+        border(#px(1), #solid, theme.primary_600),
         selector("i", [color(theme.neutral_900)]),
         hover([
-          backgroundColor(theme.neutral_900),
+          backgroundColor(theme.primary_600),
           color(isDarkMode ? Theme.black : Theme.white),
           selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
         ]),
-        active([backgroundColor(CssJs.hex("E5E8F7"))]),
+        active([backgroundColor(theme.primary_600)]),
         disabled([
           borderColor(theme.neutral_600),
           color(theme.neutral_600),
           hover([backgroundColor(#transparent)]),
           opacity(0.5),
         ]),
-      ])
-    | Text =>
-      style(. [
-        padding(#zero),
-        backgroundColor(#transparent),
-        color(theme.neutral_900),
-        border(#px(1), #solid, #transparent),
-        selector("i", [color(theme.neutral_900)]),
-        hover([
-          backgroundColor(#transparent),
-          color(theme.primary_600),
-          selector("i", [color(theme.primary_600)]),
-        ]),
-        active([backgroundColor(CssJs.hex("E5E8F7"))]),
-        disabled([color(theme.neutral_600), hover([backgroundColor(#transparent)]), opacity(0.5)]),
-        selector(":focus", [outlineStyle(#none), backgroundColor(#transparent)]),
-        Media.mobile([padding(#zero)]),
+        selector(
+          "&.selected",
+          [
+            backgroundColor(theme.primary_600),
+            color(isDarkMode ? Theme.black : Theme.white),
+            selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
+          ],
+        ),
       ])
     }
     merge(. [base, custom])
@@ -90,24 +81,27 @@ module Styles = {
 
 @react.component
 let make = (
-  ~variant=Primary,
+  ~variant: btn_style_t=Primary,
   ~children,
-  ~py=8,
-  ~px=16,
+  ~py=4,
+  ~px=12,
   ~fsize=12,
-  ~pySm=8,
-  ~pxSm=16,
+  ~pySm=4,
+  ~pxSm=12,
   ~onClick,
   ~style="",
   ~disabled=false,
+  ~className="",
+  ~isActive=false,
 ) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <button
     className={CssJs.merge(. [
-      Styles.btn(~variant, ~px, ~py, ~pxSm, ~pySm, ~fsize, theme, isDarkMode, ()),
+      Styles.btn(~variant, ~px, ~py, ~pxSm, ~pySm, ~fsize, theme, isDarkMode, ~isActive, ()),
       CssHelper.flexBox(~align=#center, ~justify=#center, ()),
       style,
+      className,
     ])}
     onClick
     disabled>
