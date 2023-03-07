@@ -5,7 +5,7 @@ module Styles = {
       display(#flex),
       maxWidth(px(w)),
       cursor(pointer),
-      selector("> span:hover", [color(theme.primary_600)]),
+      selector("> span:hover", [color(theme.primary_800)]),
       selector("> span", [transition(~duration=200, "all")]),
     ])
 }
@@ -16,13 +16,13 @@ let make = (~txHash: Hash.t, ~width: int, ~size=Text.Body2, ~weight=Text.Medium)
   <Link className={Styles.withWidth(width, theme)} route={Route.TxIndexPage(txHash)}>
     <Text
       block=true
-      code=true
+      mono=true
       spacing={Text.Em(0.02)}
       value={txHash->Hash.toHex(~upper=true)}
       weight
       ellipsis=true
       size
-      color={theme.neutral_900}
+      color={theme.primary_600}
     />
   </Link>
 }

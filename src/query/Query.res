@@ -1,4 +1,5 @@
 open ApolloClient__React_Hooks_UseQuery
+open QueryResult
 
 type variant<'a> =
   | Data('a)
@@ -14,15 +15,13 @@ let default = (result, value) =>
   | _ => value
   }
 
-// let fromData = result => {
-//   switch result {
-//   | {loading: true} => Loading
-//   | {data: Some(data)} => Data(data)
-//   | {error: Some(_error)} => Error(_error)
-//   | {data: None, error: None, loading: false} => NoData
-//   | _ => NoData
-//   }
-// }
+let fromData = result =>
+  switch result {
+  | {data: Some(data)} => Data(data)
+  | {error: Some(error)} => Error(error)
+  | {loading: true} => Loading
+  | {data: None, error: None, loading: false} => NoData
+  }
 
 let flatMap = (result, f) =>
   switch result {

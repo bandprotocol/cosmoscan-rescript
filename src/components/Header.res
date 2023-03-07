@@ -7,7 +7,7 @@ module Styles = {
       backgroundColor(theme.neutral_000),
       zIndex(3),
       Media.mobile([
-        padding(Spacing.md),
+        padding(#px(16)),
         marginBottom(#zero),
         position(#sticky),
         top(#zero),
@@ -69,7 +69,9 @@ module DesktopRender = {
                   </div>
                 </div>
               </LinkToHome>
-              <div className=Styles.chainIDContainer> <ChainIDBadge /> </div>
+              <div className=Styles.chainIDContainer> 
+                <ChainIDBadge />
+              </div>
             </div>
           </Col>
           <Col col=Col.Six>
@@ -134,8 +136,19 @@ module MobileRender = {
         </Col>
         <Col colSm=Col.Six>
           <div className={CssHelper.flexBox(~justify=#flexEnd, ~wrap=#nowrap, ())}>
-            <ChainIDBadge /> <NavBar />
+            <ToggleThemeButton /> 
+            <NavBar />
           </div>
+        </Col>
+      </Row>
+      <Row marginTop=20>
+        <Col colSm=Col.Twelve>
+          <ChainIDBadge dropdown=true />
+        </Col>
+      </Row>
+      <Row marginTop=20>
+        <Col colSm=Col.Twelve>
+          <SearchBar />
         </Col>
       </Row>
     </header>
