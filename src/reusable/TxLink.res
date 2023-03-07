@@ -51,7 +51,6 @@ let make = (
       <Link className={Styles.withWidth(width, theme, fullHash)} route={Route.TxIndexPage(txHash)}>
         <Text
           block=true
-          code=true
           spacing={Text.Em(0.02)}
           value={txHash->Hash.toHex(~upper=true)}
           weight
