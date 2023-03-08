@@ -1,6 +1,6 @@
 module SendMsg = {
   @react.component
-  let make = (~send: Msg.Send.t) => {
+  let make = (~send: Msg.Bank.Send.t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <Row>

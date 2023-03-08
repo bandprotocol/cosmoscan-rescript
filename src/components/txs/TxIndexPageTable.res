@@ -34,15 +34,15 @@ let renderBody = (msg: Msg.t) =>
   // | UndelegateMsgFail(undelegation) => <IndexTokenMsg.UndelegateFailMsg undelegation />
   // | RedelegateMsgSuccess(redelegation) => <IndexTokenMsg.RedelegateMsg redelegation />
   // | RedelegateMsgFail(redelegation) => <IndexTokenMsg.RedelegateFailMsg redelegation />
-  // | WithdrawRewardMsgSuccess(withdrawal) => <IndexTokenMsg.WithdrawRewardMsg withdrawal />
-  // | WithdrawRewardMsgFail(withdrawal) => <IndexTokenMsg.WithdrawRewardFailMsg withdrawal />
+  // | WithdrawRewardMsgSuccess(withdrawal) => <IndexTokenMsg.Distribution.WithdrawReward.Msg withdrawal />
+  // | WithdrawRewardMsgFail(withdrawal) => <IndexTokenMsg.Distribution.WithdrawReward.FailMsg withdrawal />
   // | WithdrawCommissionMsgSuccess(withdrawal) => <IndexTokenMsg.WithdrawComissionMsg withdrawal />
   // | WithdrawCommissionMsgFail(withdrawal) => <IndexTokenMsg.WithdrawComissionFailMsg withdrawal />
   // | MultiSendMsgSuccess(tx)
   // | MultiSendMsgFail(tx) =>
   //   <IndexTokenMsg.MultisendMsg tx />
-  // | CreateDataSourceMsgSuccess(dataSource) => <IndexDataMsg.CreateDataSourceMsg dataSource />
-  // | CreateDataSourceMsgFail(dataSource) => <IndexDataMsg.CreateDataSourceFailMsg dataSource />
+  // | CreateDataSourceMsgSuccess(dataSource) => <IndexDataMsg.Oracle.CreateDataSourceMsg dataSource />
+  // | CreateDataSourceMsgFail(dataSource) => <IndexDataMsg.Oracle.CreateDataSourceFailMsg dataSource />
   // | EditDataSourceMsgSuccess(dataSource)
   // | EditDataSourceMsgFail(dataSource) =>
   //   <IndexDataMsg.EditDataSourceMsg dataSource />

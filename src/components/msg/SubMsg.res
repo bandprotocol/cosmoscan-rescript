@@ -62,80 +62,84 @@ let make = (~msg: Msg.t) => {
     | SendMsg({toAddress, amount}) => <TokenMsg.SendMsg toAddress amount />
     | CreateDataSourceMsg(msg) =>
       switch msg {
-      | Msg.CreateDataSource.Success(m) => <OracleMsg.CreateDataSourceMsg.Success msg=m />
-      | Msg.CreateDataSource.Failure(f) => <OracleMsg.CreateDataSourceMsg.Failure msg=f />
+      | Msg.Oracle.CreateDataSource.Success(m) => <OracleMsg.CreateDataSourceMsg.Success msg=m />
+      | Msg.Oracle.CreateDataSource.Failure(f) => <OracleMsg.CreateDataSourceMsg.Failure msg=f />
       }
     | EditDataSourceMsg(msg) => <OracleMsg.EditDataSourceMsg id=msg.id name=msg.name />
     | CreateOracleScriptMsg(msg) =>
       switch msg {
-      | Msg.CreateOracleScript.Success(m) => <OracleMsg.CreateOracleScriptMsg.Success msg=m />
-      | Msg.CreateOracleScript.Failure(f) => <OracleMsg.CreateOracleScriptMsg.Failure msg=f />
+      | Msg.Oracle.CreateOracleScript.Success(m) =>
+        <OracleMsg.CreateOracleScriptMsg.Success msg=m />
+      | Msg.Oracle.CreateOracleScript.Failure(f) =>
+        <OracleMsg.CreateOracleScriptMsg.Failure msg=f />
       }
     | EditOracleScriptMsg(msg) => <OracleMsg.EditOracleScriptMsg id=msg.id name=msg.name />
 
     | RequestMsg(msg) =>
       switch msg {
-      | Msg.Request.Success(m) => <OracleMsg.RequestMsg.Success msg=m />
-      | Msg.Request.Failure(f) => <OracleMsg.RequestMsg.Failure msg=f />
+      | Msg.Oracle.Request.Success(m) => <OracleMsg.RequestMsg.Success msg=m />
+      | Msg.Oracle.Request.Failure(f) => <OracleMsg.RequestMsg.Failure msg=f />
       }
     | ReportMsg(msg) => <OracleMsg.ReportMsg requestID=msg.requestID />
-    | GrantMsg(msg) => <ValidatorMsg.Grant reporter=msg.validator />
+    | GrantMsg(msg) => <ValidatorMsg.Grant reporter=msg.granter />
     | RevokeMsg(msg) => <ValidatorMsg.Revoke reporter=msg.validator />
-    | RevokeAllowanceMsg(msg) => <ValidatorMsg.RevokeAllowance granter=msg.granter />
+    // | RevokeAllowanceMsg(msg) => <ValidatorMsg.RevokeAllowance granter=msg.granter />
     | CreateValidatorMsg({moniker})
     | EditValidatorMsg({moniker}) =>
       <ValidatorMsg.Validator moniker />
     | DelegateMsg(msg) =>
       switch msg {
-      | Msg.Delegate.Success(m) => <TokenMsg.DelegateMsg coin={m.amount} />
-      | Msg.Delegate.Failure(f) => <TokenMsg.DelegateMsg coin={f.amount} />
+      | Msg.Staking.Delegate.Success(m) => <TokenMsg.DelegateMsg coin={m.amount} />
+      | Msg.Staking.Delegate.Failure(f) => <TokenMsg.DelegateMsg coin={f.amount} />
       }
     | UndelegateMsg(msg) =>
       switch msg {
-      | Msg.Undelegate.Success(m) => <TokenMsg.DelegateMsg coin={m.amount} />
-      | Msg.Undelegate.Failure(f) => <TokenMsg.DelegateMsg coin={f.amount} />
+      | Msg.Staking.Undelegate.Success(m) => <TokenMsg.DelegateMsg coin={m.amount} />
+      | Msg.Staking.Undelegate.Failure(f) => <TokenMsg.DelegateMsg coin={f.amount} />
       }
     | RedelegateMsg(msg) =>
       switch msg {
-      | Msg.Redelegate.Success(m) => <TokenMsg.RedelegateMsg amount={m.amount} />
-      | Msg.Redelegate.Failure(f) => <TokenMsg.RedelegateMsg amount={f.amount} />
+      | Msg.Staking.Redelegate.Success(m) => <TokenMsg.RedelegateMsg amount={m.amount} />
+      | Msg.Staking.Redelegate.Failure(f) => <TokenMsg.RedelegateMsg amount={f.amount} />
       }
     | WithdrawRewardMsg(msg) =>
       switch msg {
-      | Msg.WithdrawReward.Success(m) => <TokenMsg.WithdrawRewardMsg amount={m.amount} />
-      | Msg.WithdrawReward.Failure(f) => React.null
+      | Msg.Distribution.WithdrawReward.Success(m) =>
+        <TokenMsg.WithdrawRewardMsg amount={m.amount} />
+      | Msg.Distribution.WithdrawReward.Failure(f) => React.null
       }
     | WithdrawCommissionMsg(msg) =>
       switch msg {
-      | Msg.WithdrawCommission.Success(m) => <TokenMsg.WithdrawCommissionMsg amount={m.amount} />
-      | Msg.WithdrawCommission.Failure(f) => React.null
+      | Msg.Distribution.WithdrawCommission.Success(m) =>
+        <TokenMsg.WithdrawCommissionMsg amount={m.amount} />
+      | Msg.Distribution.WithdrawCommission.Failure(f) => React.null
       }
     | UnjailMsg(_) => React.null
     | SetWithdrawAddressMsg(m) =>
       <ValidatorMsg.SetWithdrawAddress withdrawAddress={m.withdrawAddress} />
     | SubmitProposalMsg(msg) =>
       switch msg {
-      | Msg.SubmitProposal.Success(m) =>
+      | Msg.Gov.SubmitProposal.Success(m) =>
         <ProposalMsg.SubmitProposal.Success proposalID=m.proposalID title=m.title />
-      | Msg.SubmitProposal.Failure(f) => <ProposalMsg.SubmitProposal.Fail title=f.title />
+      | Msg.Gov.SubmitProposal.Failure(f) => <ProposalMsg.SubmitProposal.Fail title=f.title />
       }
     | DepositMsg(msg) =>
       switch msg {
-      | Msg.Deposit.Success(m) =>
+      | Msg.Gov.Deposit.Success(m) =>
         <ProposalMsg.Deposit.Success amount={m.amount} proposalID={m.proposalID} title={m.title} />
-      | Msg.Deposit.Failure(f) => <ProposalMsg.Deposit.Fail proposalID={f.proposalID} />
+      | Msg.Gov.Deposit.Failure(f) => <ProposalMsg.Deposit.Fail proposalID={f.proposalID} />
       }
     | VoteMsg(msg) =>
       switch msg {
-      | Msg.Vote.Success(m) =>
+      | Msg.Gov.Vote.Success(m) =>
         <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
-      | Msg.Vote.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
+      | Msg.Gov.Vote.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
     | VoteWeightedMsg(msg) =>
       switch msg {
-      | Msg.VoteWeighted.Success(m) =>
+      | Msg.Gov.VoteWeighted.Success(m) =>
         <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
-      | Msg.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
+      | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
@@ -143,9 +147,9 @@ let make = (~msg: Msg.t) => {
     // | DelegateMsgSuccess({amount}) => <TokenMsg.DelegateMsg amount />
     // | UndelegateMsgSuccess({amount}) => <TokenMsg.UndelegateMsg amount />
     // | RedelegateMsgSuccess({amount}) => <TokenMsg.RedelegateMsg amount />
-    // | WithdrawRewardMsgSuccess({amount}) => <TokenMsg.WithdrawRewardMsg amount />
+    // | WithdrawRewardMsgSuccess({amount}) => <TokenMsg.Distribution.WithdrawReward.Msg amount />
     // | WithdrawCommissionMsgSuccess({amount}) => <TokenMsg.WithdrawCommissionMsg amount />
-    // | CreateDataSourceMsgSuccess({id, name}) => <DataMsg.CreateDataSourceMsg id name />
+    // | CreateDataSourceMsgSuccess({id, name}) => <DataMsg.Oracle.CreateDataSourceMsg id name />
     // | EditDataSourceMsgSuccess({id, name}) => <DataMsg.EditDataSourceMsg id name />
     // | CreateOracleScriptMsgSuccess({id, name}) => <DataMsg.CreateOracleScriptMsg id name />
     // | EditOracleScriptMsgSuccess({id, name}) => <DataMsg.EditOracleScriptMsg id name />

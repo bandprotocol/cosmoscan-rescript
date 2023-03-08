@@ -36,10 +36,10 @@ type content_inner_t =
   | Calldata(string, JsBuffer.t)
   | CoinList(Belt.List.t<Coin.t>)
   | ID(React.element) // TODO: refactor not to receive react.element
-  | RawReports(Belt.List.t<Msg.RawDataReport.t>)
+  | RawReports(Belt.List.t<Msg.Oracle.RawDataReport.t>)
   | Timestamp(MomentRe.Moment.t)
   | ValidatorLink(Address.t, string, string)
-  | VoteWeighted(Belt.List.t<Msg.VoteWeighted.option_t>)
+  | VoteWeighted(Belt.List.t<Msg.Gov.VoteWeighted.option_t>)
 
 type content_t = {
   title: string,
@@ -106,14 +106,14 @@ let renderValue = v => {
 }
 
 module CreateDataSource = {
-  let factory = (msg: Msg.CreateDataSource.t<'a>, firsts) =>
+  let factory = (msg: Msg.Oracle.CreateDataSource.t<'a>, firsts) =>
     firsts->Belt.Array.concat([
       {title: "Owner", content: Address(msg.owner), order: 2},
       {title: "Treasury", content: Address(msg.treasury), order: 3},
       {title: "Fee", content: CoinList(msg.fee), order: 4},
     ])
 
-  let success = (msg: Msg.CreateDataSource.success_t) =>
+  let success = (msg: Msg.Oracle.CreateDataSource.success_t) =>
     msg->factory([
       {
         title: "ID",
@@ -128,7 +128,7 @@ module CreateDataSource = {
       },
     ])
 
-  let failed = (msg: Msg.CreateDataSource.fail_t) =>
+  let failed = (msg: Msg.Oracle.CreateDataSource.fail_t) =>
     msg->factory([
       {
         title: "Name",
@@ -139,7 +139,7 @@ module CreateDataSource = {
 }
 
 module Request = {
-  let factory = (msg: Msg.Request.t<'a, 'b, 'c>, firsts) =>
+  let factory = (msg: Msg.Oracle.Request.t<'a, 'b, 'c>, firsts) =>
     firsts->Belt.Array.concat([
       {
         title: "Owner",
@@ -173,7 +173,7 @@ module Request = {
       },
     ])
 
-  let success = (msg: Msg.Request.success_t) =>
+  let success = (msg: Msg.Oracle.Request.success_t) =>
     msg->factory([
       {
         title: "Request ID",
@@ -198,11 +198,11 @@ module Request = {
       },
     ])
 
-  let failed = (msg: Msg.Request.fail_t) => msg->factory([])
+  let failed = (msg: Msg.Oracle.Request.fail_t) => msg->factory([])
 }
 
 module EditDataSource = {
-  let factory = (msg: Msg.EditDataSource.t) => [
+  let factory = (msg: Msg.Oracle.EditDataSource.t) => [
     {
       title: "Name",
       content: ID(
@@ -233,10 +233,10 @@ module EditDataSource = {
 }
 
 module CreateOracleScript = {
-  let factory = (msg: Msg.CreateOracleScript.t<'a>, firsts) =>
+  let factory = (msg: Msg.Oracle.CreateOracleScript.t<'a>, firsts) =>
     firsts->Belt.Array.concat([{title: "Owner", content: Address(msg.owner), order: 2}])
 
-  let success = (msg: Msg.CreateOracleScript.success_t) =>
+  let success = (msg: Msg.Oracle.CreateOracleScript.success_t) =>
     msg->factory([
       {
         title: "ID",
@@ -251,7 +251,7 @@ module CreateOracleScript = {
       },
     ])
 
-  let failed = (msg: Msg.CreateOracleScript.fail_t) =>
+  let failed = (msg: Msg.Oracle.CreateOracleScript.fail_t) =>
     msg->factory([
       {
         title: "Name",
@@ -262,7 +262,7 @@ module CreateOracleScript = {
 }
 
 module EditOracleScript = {
-  let factory = (msg: Msg.EditOracleScript.t) => [
+  let factory = (msg: Msg.Oracle.EditOracleScript.t) => [
     {
       title: "Name",
       content: ID(
@@ -283,7 +283,7 @@ module EditOracleScript = {
 }
 
 module Send = {
-  let factory = (msg: Msg.Send.t) => [
+  let factory = (msg: Msg.Bank.Send.t) => [
     {
       title: "From",
       content: Address(msg.fromAddress),
@@ -303,7 +303,7 @@ module Send = {
 }
 
 module Report = {
-  let factory = (msg: Msg.Report.t) => [
+  let factory = (msg: Msg.Oracle.Report.t) => [
     {
       title: "Request ID",
       content: ID(<TypeID.Request position=TypeID.Subtitle id={msg.requestID} />),
@@ -323,25 +323,20 @@ module Report = {
 }
 
 module Grant = {
-  let factory = (msg: Msg.Grant.t) => [
+  let factory = (msg: Msg.Authz.Grant.t) => [
     {
       title: "Granter",
-      content: Address(msg.validator),
+      content: Address(msg.granter),
       order: 1,
     },
     {
       title: "Grantee",
-      content: Address(msg.reporter),
+      content: Address(msg.grantee),
       order: 2,
     },
     {
       title: "Authorization URL",
-      content: PlainText({
-        switch msg.url {
-        | Some(url) => url
-        | None => "-"
-        }
-      }),
+      content: PlainText(msg.url),
       order: 4,
     },
     {
@@ -353,7 +348,7 @@ module Grant = {
 }
 
 module Revoke = {
-  let factory = (msg: Msg.Revoke.t) => [
+  let factory = (msg: Msg.Authz.Revoke.t) => [
     {
       title: "Granter",
       content: Address(msg.validator),
@@ -372,23 +367,23 @@ module Revoke = {
   ]
 }
 
-module RevokeAllowance = {
-  let factory = (msg: Msg.RevokeAllowance.t) => [
-    {
-      title: "Granter",
-      content: Address(msg.granter),
-      order: 1,
-    },
-    {
-      title: "Grantee",
-      content: Address(msg.grantee),
-      order: 2,
-    },
-  ]
-}
+// module RevokeAllowance = {
+//   let factory = (msg: Msg.RevokeAllowance.t) => [
+//     {
+//       title: "Granter",
+//       content: Address(msg.granter),
+//       order: 1,
+//     },
+//     {
+//       title: "Grantee",
+//       content: Address(msg.grantee),
+//       order: 2,
+//     },
+//   ]
+// }
 
 module CreateValidator = {
-  let factory = (msg: Msg.CreateValidator.t) => [
+  let factory = (msg: Msg.Staking.CreateValidator.t) => [
     {
       title: "Moniker",
       content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
@@ -454,7 +449,7 @@ module CreateValidator = {
 }
 
 module EditValidator = {
-  let factory = (msg: Msg.EditValidator.t) => [
+  let factory = (msg: Msg.Staking.EditValidator.t) => [
     {
       title: "Moniker",
       content: PlainText(msg.moniker == Config.doNotModify ? "Unchanged" : msg.moniker),
@@ -504,7 +499,7 @@ module EditValidator = {
 }
 
 module Delegate = {
-  let factory = (msg: Msg.Delegate.t<'a, 'b>, firsts) =>
+  let factory = (msg: Msg.Staking.Delegate.t<'a, 'b>, firsts) =>
     firsts->Belt.Array.concat([
       {
         title: "Delegator Address",
@@ -518,7 +513,7 @@ module Delegate = {
       },
     ])
 
-  let success = (msg: Msg.Delegate.success_t) =>
+  let success = (msg: Msg.Staking.Delegate.success_t) =>
     msg->factory([
       {
         title: "Validator",
@@ -527,7 +522,7 @@ module Delegate = {
       },
     ])
 
-  let failed = (msg: Msg.Delegate.fail_t) =>
+  let failed = (msg: Msg.Staking.Delegate.fail_t) =>
     msg->factory([
       {
         title: "Validator Address",
@@ -538,7 +533,7 @@ module Delegate = {
 }
 
 module Undelegate = {
-  let factory = (msg: Msg.Undelegate.t<'a, 'b>, firsts) =>
+  let factory = (msg: Msg.Staking.Undelegate.t<'a, 'b>, firsts) =>
     firsts->Belt.Array.concat([
       {
         title: "Delegator Address",
@@ -552,7 +547,7 @@ module Undelegate = {
       },
     ])
 
-  let success = (msg: Msg.Undelegate.success_t) =>
+  let success = (msg: Msg.Staking.Undelegate.success_t) =>
     msg->factory([
       {
         title: "Validator",
@@ -561,7 +556,7 @@ module Undelegate = {
       },
     ])
 
-  let failed = (msg: Msg.Undelegate.fail_t) =>
+  let failed = (msg: Msg.Staking.Undelegate.fail_t) =>
     msg->factory([
       {
         title: "Validator Address",
@@ -572,7 +567,7 @@ module Undelegate = {
 }
 
 module Redelegate = {
-  let factory = (msg: Msg.Redelegate.t<'a, 'b, 'c, 'd>, firsts) =>
+  let factory = (msg: Msg.Staking.Redelegate.t<'a, 'b, 'c, 'd>, firsts) =>
     firsts->Belt.Array.concat([
       {
         title: "Delegator Address",
@@ -586,7 +581,7 @@ module Redelegate = {
       },
     ])
 
-  let success = (msg: Msg.Redelegate.success_t) =>
+  let success = (msg: Msg.Staking.Redelegate.success_t) =>
     msg->factory([
       {
         title: "Source Validator Address",
@@ -604,7 +599,7 @@ module Redelegate = {
       },
     ])
 
-  let failed = (msg: Msg.Redelegate.fail_t) =>
+  let failed = (msg: Msg.Staking.Redelegate.fail_t) =>
     msg->factory([
       {
         title: "Source Validator",
@@ -619,81 +614,8 @@ module Redelegate = {
     ])
 }
 
-module WithdrawReward = {
-  let factory = (msg: Msg.WithdrawReward.t<'a, 'b, 'c>, firsts) =>
-    firsts->Belt.Array.concat([
-      {
-        title: "Delegator Address",
-        content: Address(msg.delegatorAddress),
-        order: 1,
-      },
-    ])
-
-  let success = (msg: Msg.WithdrawReward.success_t) =>
-    msg->factory([
-      {
-        title: "Validator Address",
-        content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
-        order: 2,
-      },
-      {
-        title: "Amount",
-        content: CoinList(msg.amount),
-        order: 3,
-      },
-    ])
-
-  let failed = (msg: Msg.WithdrawReward.fail_t) =>
-    msg->factory([
-      {
-        title: "Validator Address",
-        content: ValidatorAddress(msg.validatorAddress),
-        order: 2,
-      },
-    ])
-}
-
-module WithdrawCommission = {
-  let factory = (msg: Msg.WithdrawCommission.t<'a, 'b, 'c>, firsts) =>
-    firsts->Belt.Array.concat([
-      {
-        title: "Validator Address",
-        content: ValidatorAddress(msg.validatorAddress),
-        order: 1,
-      },
-    ])
-
-  let success = (msg: Msg.WithdrawCommission.success_t) =>
-    msg->factory([
-      {
-        title: "Validator Address",
-        content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
-        order: 2,
-      },
-      {
-        title: "Amount",
-        content: CoinList(msg.amount),
-        order: 3,
-      },
-    ])
-
-  let failed = (msg: Msg.WithdrawCommission.fail_t) => msg->factory([])
-}
-
-module Unjail = {
-  let factory = (msg: Msg.Unjail.t) => {
-    [
-      {
-        title: "Validator",
-        content: ValidatorAddress(msg.address),
-        order: 1,
-      },
-    ]
-  }
-}
-
 module SetWithdrawAddress = {
-  let factory = (msg: Msg.SetWithdrawAddress.t) => {
+  let factory = (msg: Msg.Distribution.SetWithdrawAddress.t) => {
     [
       {
         title: "Delegator Address",
@@ -709,8 +631,81 @@ module SetWithdrawAddress = {
   }
 }
 
+module WithdrawReward = {
+  let factory = (msg: Msg.Distribution.WithdrawReward.t<'a, 'b, 'c>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Delegator Address",
+        content: Address(msg.delegatorAddress),
+        order: 1,
+      },
+    ])
+
+  let success = (msg: Msg.Distribution.WithdrawReward.success_t) =>
+    msg->factory([
+      {
+        title: "Validator Address",
+        content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
+        order: 2,
+      },
+      {
+        title: "Amount",
+        content: CoinList(msg.amount),
+        order: 3,
+      },
+    ])
+
+  let failed = (msg: Msg.Distribution.WithdrawReward.fail_t) =>
+    msg->factory([
+      {
+        title: "Validator Address",
+        content: ValidatorAddress(msg.validatorAddress),
+        order: 2,
+      },
+    ])
+}
+
+module WithdrawCommission = {
+  let factory = (msg: Msg.Distribution.WithdrawCommission.t<'a, 'b, 'c>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Validator Address",
+        content: ValidatorAddress(msg.validatorAddress),
+        order: 1,
+      },
+    ])
+
+  let success = (msg: Msg.Distribution.WithdrawCommission.success_t) =>
+    msg->factory([
+      {
+        title: "Validator Address",
+        content: ValidatorLink(msg.validatorAddress, msg.moniker, msg.identity),
+        order: 2,
+      },
+      {
+        title: "Amount",
+        content: CoinList(msg.amount),
+        order: 3,
+      },
+    ])
+
+  let failed = (msg: Msg.Distribution.WithdrawCommission.fail_t) => msg->factory([])
+}
+
+module Unjail = {
+  let factory = (msg: Msg.Slashing.Unjail.t) => {
+    [
+      {
+        title: "Validator",
+        content: ValidatorAddress(msg.address),
+        order: 1,
+      },
+    ]
+  }
+}
+
 module SubmitProposal = {
-  let factory = (msg: Msg.SubmitProposal.t<'a>, firsts) =>
+  let factory = (msg: Msg.Gov.SubmitProposal.t<'a>, firsts) =>
     firsts->Belt.Array.concat([
       {title: "Proposer", content: Address(msg.proposer), order: 1},
       {
@@ -725,7 +720,7 @@ module SubmitProposal = {
       },
     ])
 
-  let success = (msg: Msg.SubmitProposal.success_t) =>
+  let success = (msg: Msg.Gov.SubmitProposal.success_t) =>
     msg->factory([
       {
         title: "Proposal ID",
@@ -738,11 +733,11 @@ module SubmitProposal = {
       },
     ])
 
-  let failed = (msg: Msg.SubmitProposal.fail_t) => msg->factory([])
+  let failed = (msg: Msg.Gov.SubmitProposal.fail_t) => msg->factory([])
 }
 
 module Deposit = {
-  let factory = (msg: Msg.Deposit.t<'a>, firsts) =>
+  let factory = (msg: Msg.Gov.Deposit.t<'a>, firsts) =>
     firsts->Belt.Array.concat([
       {
         title: "Depositor",
@@ -756,7 +751,7 @@ module Deposit = {
       },
     ])
 
-  let success = (msg: Msg.Deposit.success_t) =>
+  let success = (msg: Msg.Gov.Deposit.success_t) =>
     msg->factory([
       {
         title: "Title",
@@ -765,7 +760,7 @@ module Deposit = {
       },
     ])
 
-  let failed = (msg: Msg.Deposit.fail_t) =>
+  let failed = (msg: Msg.Gov.Deposit.fail_t) =>
     msg->factory([
       {
         title: "Proposal ID",
@@ -780,7 +775,7 @@ module Deposit = {
 }
 
 module Vote = {
-  let factory = (msg: Msg.Vote.t<'a>, firsts) =>
+  let factory = (msg: Msg.Gov.Vote.t<'a>, firsts) =>
     firsts->Belt.Array.concat([
       {
         title: "Voter",
@@ -803,7 +798,7 @@ module Vote = {
       },
     ])
 
-  let success = (msg: Msg.Vote.success_t) =>
+  let success = (msg: Msg.Gov.Vote.success_t) =>
     msg->factory([
       {
         title: "Title",
@@ -812,11 +807,11 @@ module Vote = {
       },
     ])
 
-  let failed = (msg: Msg.Vote.fail_t) => msg->factory([])
+  let failed = (msg: Msg.Gov.Vote.fail_t) => msg->factory([])
 }
 
 module VoteWeighted = {
-  let factory = (msg: Msg.VoteWeighted.t<'a>, firsts) =>
+  let factory = (msg: Msg.Gov.VoteWeighted.t<'a>, firsts) =>
     firsts->Belt.Array.concat([
       {
         title: "Voter",
@@ -839,7 +834,7 @@ module VoteWeighted = {
       },
     ])
 
-  let success = (msg: Msg.VoteWeighted.success_t) =>
+  let success = (msg: Msg.Gov.VoteWeighted.success_t) =>
     msg->factory([
       {
         title: "Title",
@@ -848,82 +843,82 @@ module VoteWeighted = {
       },
     ])
 
-  let failed = (msg: Msg.VoteWeighted.fail_t) => msg->factory([])
+  let failed = (msg: Msg.Gov.VoteWeighted.fail_t) => msg->factory([])
 }
 
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
     switch m {
-    | Msg.CreateDataSource.Success(data) => CreateDataSource.success(data)
-    | Msg.CreateDataSource.Failure(data) => CreateDataSource.failed(data)
+    | Msg.Oracle.CreateDataSource.Success(data) => CreateDataSource.success(data)
+    | Msg.Oracle.CreateDataSource.Failure(data) => CreateDataSource.failed(data)
     }
   | Msg.EditDataSourceMsg(data) => EditDataSource.factory(data)
 
   | Msg.CreateOracleScriptMsg(m) =>
     switch m {
-    | Msg.CreateOracleScript.Success(data) => CreateOracleScript.success(data)
-    | Msg.CreateOracleScript.Failure(data) => CreateOracleScript.failed(data)
+    | Msg.Oracle.CreateOracleScript.Success(data) => CreateOracleScript.success(data)
+    | Msg.Oracle.CreateOracleScript.Failure(data) => CreateOracleScript.failed(data)
     }
   | Msg.EditOracleScriptMsg(data) => EditOracleScript.factory(data)
   | Msg.RequestMsg(m) =>
     switch m {
-    | Msg.Request.Success(data) => Request.success(data)
-    | Msg.Request.Failure(data) => Request.failed(data)
+    | Msg.Oracle.Request.Success(data) => Request.success(data)
+    | Msg.Oracle.Request.Failure(data) => Request.failed(data)
     }
   | Msg.SendMsg(data) => Send.factory(data)
   | Msg.ReportMsg(data) => Report.factory(data)
   | Msg.GrantMsg(data) => Grant.factory(data)
   | Msg.RevokeMsg(data) => Revoke.factory(data)
-  | Msg.RevokeAllowanceMsg(data) => RevokeAllowance.factory(data)
+  // | Msg.RevokeAllowanceMsg(data) => RevokeAllowance.factory(data)
   | Msg.CreateValidatorMsg(data) => CreateValidator.factory(data)
   | Msg.EditValidatorMsg(data) => EditValidator.factory(data)
   | Msg.DelegateMsg(m) =>
     switch m {
-    | Msg.Delegate.Success(data) => Delegate.success(data)
-    | Msg.Delegate.Failure(data) => Delegate.failed(data)
+    | Msg.Staking.Delegate.Success(data) => Delegate.success(data)
+    | Msg.Staking.Delegate.Failure(data) => Delegate.failed(data)
     }
   | Msg.UndelegateMsg(m) =>
     switch m {
-    | Msg.Undelegate.Success(data) => Undelegate.success(data)
-    | Msg.Undelegate.Failure(data) => Undelegate.failed(data)
+    | Msg.Staking.Undelegate.Success(data) => Undelegate.success(data)
+    | Msg.Staking.Undelegate.Failure(data) => Undelegate.failed(data)
     }
   | Msg.RedelegateMsg(m) =>
     switch m {
-    | Msg.Redelegate.Success(data) => Redelegate.success(data)
-    | Msg.Redelegate.Failure(data) => Redelegate.failed(data)
+    | Msg.Staking.Redelegate.Success(data) => Redelegate.success(data)
+    | Msg.Staking.Redelegate.Failure(data) => Redelegate.failed(data)
     }
   | Msg.WithdrawRewardMsg(m) =>
     switch m {
-    | Msg.WithdrawReward.Success(data) => WithdrawReward.success(data)
-    | Msg.WithdrawReward.Failure(data) => WithdrawReward.failed(data)
+    | Msg.Distribution.WithdrawReward.Success(data) => WithdrawReward.success(data)
+    | Msg.Distribution.WithdrawReward.Failure(data) => WithdrawReward.failed(data)
     }
   | Msg.WithdrawCommissionMsg(m) =>
     switch m {
-    | Msg.WithdrawCommission.Success(data) => WithdrawCommission.success(data)
-    | Msg.WithdrawCommission.Failure(data) => WithdrawCommission.failed(data)
+    | Msg.Distribution.WithdrawCommission.Success(data) => WithdrawCommission.success(data)
+    | Msg.Distribution.WithdrawCommission.Failure(data) => WithdrawCommission.failed(data)
     }
   | Msg.UnjailMsg(data) => Unjail.factory(data)
   | Msg.SetWithdrawAddressMsg(data) => SetWithdrawAddress.factory(data)
   | Msg.SubmitProposalMsg(m) =>
     switch m {
-    | Msg.SubmitProposal.Success(data) => SubmitProposal.success(data)
-    | Msg.SubmitProposal.Failure(data) => SubmitProposal.failed(data)
+    | Msg.Gov.SubmitProposal.Success(data) => SubmitProposal.success(data)
+    | Msg.Gov.SubmitProposal.Failure(data) => SubmitProposal.failed(data)
     }
   | Msg.DepositMsg(m) =>
     switch m {
-    | Msg.Deposit.Success(data) => Deposit.success(data)
-    | Msg.Deposit.Failure(data) => Deposit.failed(data)
+    | Msg.Gov.Deposit.Success(data) => Deposit.success(data)
+    | Msg.Gov.Deposit.Failure(data) => Deposit.failed(data)
     }
   | Msg.VoteMsg(m) =>
     switch m {
-    | Msg.Vote.Success(data) => Vote.success(data)
-    | Msg.Vote.Failure(data) => Vote.failed(data)
+    | Msg.Gov.Vote.Success(data) => Vote.success(data)
+    | Msg.Gov.Vote.Failure(data) => Vote.failed(data)
     }
   | Msg.VoteWeightedMsg(m) =>
     switch m {
-    | Msg.VoteWeighted.Success(data) => VoteWeighted.success(data)
-    | Msg.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
+    | Msg.Gov.VoteWeighted.Success(data) => VoteWeighted.success(data)
+    | Msg.Gov.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
 
   | Msg.UnknownMsg => []
