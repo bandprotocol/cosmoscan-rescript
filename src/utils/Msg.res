@@ -286,6 +286,34 @@ module Authz = {
       })
     }
   }
+
+  module Exec = {
+    type t<'a> = {
+      grantee: Address.t,
+      msgs: 'a,
+    }
+
+    type fail_t = t<unit>
+    type success_t = t<list<ExecDecoder.t>>
+
+    type decoded_t =
+      | Success(success_t)
+      | Failure(fail_t)
+
+    let decodeFactory = decoder => {
+      open JsonUtils.Decode
+      buildObject(json => {
+        grantee: json.required(list{"msg", "grantee"}, address),
+        msgs: json->decoder,
+      })
+    }
+
+    let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => ())
+    let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+      open JsonUtils.Decode
+      decodeFactory(json => json.required(list{"msg", "msgs"}, list(ExecDecoder.decoder)))
+    }
+  }
 }
 
 module FeeGrant = {
@@ -867,6 +895,7 @@ type msg_t =
   | DepositMsg(Gov.Deposit.decoded_t)
   | VoteMsg(Gov.Vote.decoded_t)
   | VoteWeightedMsg(Gov.VoteWeighted.decoded_t)
+  | ExecMsg(Authz.Exec.decoded_t)
   | UnknownMsg
 
 type t = {
@@ -919,6 +948,7 @@ let getBadge = msg => {
       name: "Multi Send",
       category: TokenMsg,
     }
+  | ExecMsg(_) => {name: "Exec", category: ValidatorMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1102,6 +1132,16 @@ let decodeMsg = (json, isSuccess) => {
     | "/cosmos.bank.v1beta1.MsgMultiSend" =>
       let msg = json->mustDecode(Bank.MultiSend.decode)
       (MultiSendMsg(msg), List.nth(msg.inputs, 0).address, false)
+    | "/cosmos.authz.v1beta1.MsgExec" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Authz.Exec.decodeSuccess)
+            (ExecMsg(Success(msg)), msg.grantee, false)
+          }
+        : {
+            let msg = json->mustDecode(Authz.Exec.decodeFail)
+            (ExecMsg(Failure(msg)), msg.grantee, false)
+          }
 
     | _ => (UnknownMsg, Address.Address(""), false)
     }

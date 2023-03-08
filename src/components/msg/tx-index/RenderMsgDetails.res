@@ -42,6 +42,7 @@ type content_inner_t =
   | VoteWeighted(Belt.List.t<Msg.Gov.VoteWeighted.Options.t>)
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
+  | ExecList(Belt.List.t<ExecDecoder.t>)
 
 type content_t = {
   title: string,
@@ -140,6 +141,19 @@ let renderValue = v => {
         ),
       ])}
     />
+  | ExecList(msgs) =>
+    <>
+      {msgs
+      ->Belt.List.toArray
+      ->Belt.Array.mapWithIndex((i, msg) => {
+        <Text
+          key={msg->ExecDecoder.getName ++ i->string_of_int}
+          size=Text.Body1
+          value={msg->ExecDecoder.getName}
+        />
+      })
+      ->React.array}
+    </>
   }
 }
 
@@ -929,6 +943,28 @@ module MultiSend = {
   ]
 }
 
+module Exec = {
+  let factory = (msg: Msg.Authz.Exec.t<'a>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Grantee",
+        content: Address(msg.grantee),
+        order: 1,
+      },
+    ])
+
+  let success = (msg: Msg.Authz.Exec.success_t) =>
+    msg->factory([
+      {
+        title: "Executed Messages",
+        content: ExecList(msg.msgs),
+        order: 2,
+      },
+    ])
+
+  let failed = (msg: Msg.Authz.Exec.fail_t) => msg->factory([])
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1005,6 +1041,11 @@ let getContent = msg => {
     | Msg.Gov.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
   | Msg.MultiSendMsg(data) => MultiSend.factory(data)
+  | Msg.ExecMsg(m) =>
+    switch m {
+    | Msg.Authz.Exec.Success(data) => Exec.success(data)
+    | Msg.Authz.Exec.Failure(data) => Exec.failed(data)
+    }
 
   | Msg.UnknownMsg => []
   }
