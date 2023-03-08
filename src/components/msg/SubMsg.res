@@ -201,7 +201,6 @@ let make = (~msg: Msg.t) => {
     // | TimeoutMsg(_)
     // | TimeoutOnCloseMsg(_)
     | UnknownMsg => React.null
-    | _ => React.null
     }}
   </div>
 }
