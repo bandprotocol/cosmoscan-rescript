@@ -311,6 +311,7 @@ module ChannelItemMobile = {
           <Text size={Body1} value="Last Update" color=theme.neutral_600 />
         </Col>
         <Col colSm=Col.Six mbSm=10>
+          // TODO: Can't get this value from mainnet, waiting for chain team create a new view
           {switch channel.latestTx {
           | Some(time) =>
             <TimeAgos time={time} size=Text.Body1 color={theme.neutral_900} code=true />

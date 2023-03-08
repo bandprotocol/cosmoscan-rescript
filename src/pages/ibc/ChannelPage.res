@@ -170,6 +170,7 @@ let make = (~chainID, ~port, ~channel) => {
             <div>
               {switch (totalInCount, totalOutCount) {
               | (Data(totalInCount), Data(totalOutCount)) =>
+                // TODO: Can't get this value from mainnet, waiting for chain team create a new view
                 <Text
                   size=Text.Xxxl
                   value={(totalInCount + totalOutCount)->Format.iPretty}
