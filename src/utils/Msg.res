@@ -288,110 +288,104 @@ module Authz = {
   }
 }
 
-// module FeeGrant = {
-//   module BasicAllowance = {
-//     type t = {
-//       spendLimit: list<Coin.t>,
-//       expiration: option<MomentRe.Moment.t>,
-//     }
+module FeeGrant = {
+  module BasicAllowance = {
+    type t = {
+      spendLimit: list<Coin.t>,
+      expiration: option<MomentRe.Moment.t>,
+    }
 
-//     let decodeAllowance = json => {
-//       open JsonUtils.Decode
-//       buildObject(json => {
-//         spendLimit: json.required(list{"spend_limit"}, list(Coin.decodeCoin)),
-//         expiration: json.optional(list{"expiration"}, moment),
-//       })
-//     }
+    let decoder = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        spendLimit: json.required(list{"spend_limit"}, list(Coin.decodeCoin)),
+        expiration: json.optional(list{"expiration"}, moment),
+      })
+    }
+  }
 
-//     let decode = {
-//       open JsonUtils.Decode
-//       buildObject(json => {
-//         spendLimit: json.required(list{"spend_limit"}, list(Coin.decodeCoin)),
-//         expiration: json.optional(list{"expiration"}, moment),
-//       })
-//     }
+  module PeriodicAllowance = {
+    type t = {
+      basic: BasicAllowance.t,
+      period: MomentRe.Moment.t,
+      periodSpendLimit: list<Coin.t>,
+      periodCanSpend: list<Coin.t>,
+      periodReset: MomentRe.Moment.t,
+    }
 
-//     // let decode = json => json->decodeAllowance
-//   }
+    let decoder = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        basic: json.required(list{"basic"}, BasicAllowance.decoder),
+        period: json.required(list{"period"}, moment),
+        periodSpendLimit: json.required(list{"period_spend_limit"}, list(Coin.decodeCoin)),
+        periodCanSpend: json.required(list{"period_can_spend"}, list(Coin.decodeCoin)),
+        periodReset: json.required(list{"period_reset"}, moment),
+      })
+    }
+  }
 
-//   module PeriodicAllowance = {
-//     type t = {
-//       spendLimit: list<Coin.t>,
-//       expiration: option<MomentRe.Moment.t>,
-//       period: int,
-//       periodSpendLimit: list<Coin.t>,
-//     }
+  module Allowance = {
+    type t =
+      | BasicAllowance(BasicAllowance.t)
+      | PeriodicAllowance(PeriodicAllowance.t)
+      | UnknownMsg
 
-//     let decode = {
-//       open JsonUtils.Decode
-//       buildObject(json => {
-//         spendLimit: json.required(list{"basic", "spend_limit"}, list(Coin.decodeCoin)),
-//         expiration: json.optional(list{"basic", "expiration"}, moment),
-//         period: json.required(list{"period"}, stringOrInt),
-//         periodSpendLimit: json.required(list{"period_spend_limit"}, list(Coin.decodeCoin)),
-//       })
-//     }
-//   }
+    let decoder = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        let allowance = json.required(list{"type"}, string)
+        switch allowance {
+        | "/cosmos.feegrant.v1beta1.BasicAllowance" => {
+            let allowance = json.required(list{"allowance"}, BasicAllowance.decoder)
+            BasicAllowance(allowance)
+          }
 
-//   module Allowance = {
-//     type t =
-//       | BasicAllowance(BasicAllowance.t)
-//       | PeriodicAllowance(PeriodicAllowance.t)
-//       | UnknownMsg
+        | "/cosmos.feegrant.v1beta1.PeriodicAllowance" => {
+            let allowance = json.required(list{"allowance"}, PeriodicAllowance.decoder)
+            PeriodicAllowance(allowance)
+          }
 
-//     let decode = json => {
-//       open JsonUtils.Decode
+        | _ => UnknownMsg
+        }
+      })
+    }
+  }
 
-//       switch json->mustGet("type", string) {
-//       | "/cosmos.feegrant.v1beta1.BasicAllowance" => {
-//           let allowance = json->mustDecode(BasicAllowance.decode)
-//           BasicAllowance(allowance)
-//         }
+  module GrantAllowance = {
+    type t = {
+      grantee: Address.t,
+      granter: Address.t,
+      allowance: Allowance.t,
+      allowedMessages: list<string>,
+    }
 
-//       | "/cosmos.feegrant.v1beta1.PeriodicAllowance" => {
-//           let allowance = json->mustDecode(PeriodicAllowance.decode)
-//           PeriodicAllowance(allowance)
-//         }
+    let decoder = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        granter: json.required(list{"msg", "granter"}, address),
+        grantee: json.required(list{"msg", "grantee"}, address),
+        allowance: json.required(list{"msg", "allowance"}, Allowance.decoder),
+        allowedMessages: json.required(list{"msg", "allowance", "allowed_messages"}, list(string)),
+      })
+    }
+  }
 
-//       | _ => UnknownMsg
-//       }
-//     }
-//   }
+  module RevokeAllowance = {
+    type t = {
+      granter: Address.t,
+      grantee: Address.t,
+    }
 
-//   // module GrantAllowance = {
-//   //   type t = {
-//   //     grantee: Address.t,
-//   //     granter: Address.t,
-//   //     allowance: Allowance.t,
-//   //     allowedMessages: list<string>,
-//   //   }
-
-//   //   let decode = {
-//   //     open JsonUtils.Decode
-//   //     buildObject(json => {
-//   //       grantee: json.required(list{"msg", "grantee"}, string)->Address.fromBech32,
-//   //       granter: json.required(list{"msg", "granter"}, string)->Address.fromBech32,
-//   //       allowance: json.required(list{"msg", "allowance", "allowance"}, Allowance.decode),
-//   //       allowedMessages: json.required(list{"msg", "allowance", "allowed_messages"}, list(string)),
-//   //     })
-//   //   }
-//   // }
-
-//   module RevokeAllowance = {
-//     type t = {
-//       granter: Address.t,
-//       grantee: Address.t,
-//     }
-
-//     let decode = {
-//       open JsonUtils.Decode
-//       buildObject(json => {
-//         granter: json.required(list{"msg", "granter"}, string)->Address.fromBech32,
-//         grantee: json.required(list{"msg", "grantee"}, string)->Address.fromBech32,
-//       })
-//     }
-//   }
-// }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        granter: json.required(list{"msg", "granter"}, string)->Address.fromBech32,
+        grantee: json.required(list{"msg", "grantee"}, string)->Address.fromBech32,
+      })
+    }
+  }
+}
 
 module Staking = {
   module CreateValidator = {
@@ -796,23 +790,25 @@ module Gov = {
   }
 
   module VoteWeighted = {
-    type option_t = {
-      option: string,
-      weight: float,
-    }
+    module Options = {
+      type t = {
+        option: string,
+        weight: float,
+      }
 
-    let parse = {
-      open JsonUtils.Decode
-      buildObject(json => {
-        option: json.required(list{"option"}, int)->Vote.parse,
-        weight: json.required(list{"weight"}, floatstr),
-      })
+      let decoder = {
+        open JsonUtils.Decode
+        buildObject(json => {
+          option: json.required(list{"option"}, int)->Vote.parse,
+          weight: json.required(list{"weight"}, floatstr),
+        })
+      }
     }
 
     type t<'a> = {
       voterAddress: Address.t,
       proposalID: ID.Proposal.t,
-      options: list<option_t>,
+      options: list<Options.t>,
       title: 'a,
     }
 
@@ -828,7 +824,7 @@ module Gov = {
       buildObject(json => {
         voterAddress: json.required(list{"msg", "voter"}, address),
         proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
-        options: json.required(list{"msg", "options"}, list(parse)),
+        options: json.required(list{"msg", "options"}, list(Options.decoder)),
         title: json->titleD,
       })
     }
@@ -856,8 +852,8 @@ type msg_t =
   | ReportMsg(Oracle.Report.t)
   | GrantMsg(Authz.Grant.t)
   | RevokeMsg(Authz.Revoke.t)
-  // | FeeGrantAllowanceMsg(Fee.t)
-  // | RevokeAllowanceMsg(RevokeAllowance.t)
+  | GrantAllowanceMsg(FeeGrant.GrantAllowance.t)
+  | RevokeAllowanceMsg(FeeGrant.RevokeAllowance.t)
   | CreateValidatorMsg(Staking.CreateValidator.t)
   | EditValidatorMsg(Staking.EditValidator.t)
   | DelegateMsg(Staking.Delegate.decoded_t)
@@ -904,7 +900,8 @@ let getBadge = msg => {
   | ReportMsg(_) => {name: "Report", category: OracleMsg}
   | GrantMsg(_) => {name: "Grant", category: ValidatorMsg}
   | RevokeMsg(_) => {name: "Revoke", category: ValidatorMsg}
-  // | RevokeAllowanceMsg(_) => {name: "Revoke Allowance", category: ValidatorMsg}
+  | RevokeAllowanceMsg(_) => {name: "Revoke Allowance", category: ValidatorMsg}
+  | GrantAllowanceMsg(_) => {name: "Grant Allowance", category: ValidatorMsg}
   | CreateValidatorMsg(_) => {name: "Create Validator", category: ValidatorMsg}
   | EditValidatorMsg(_) => {name: "Edit Validator", category: ValidatorMsg}
   | DelegateMsg(_) => {name: "Delegate", category: TokenMsg}
@@ -918,6 +915,10 @@ let getBadge = msg => {
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
   | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
+  | MultiSendMsg(_) => {
+      name: "Multi Send",
+      category: TokenMsg,
+    }
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -980,12 +981,12 @@ let decodeMsg = (json, isSuccess) => {
     | "/cosmos.authz.v1beta1.MsgRevoke" =>
       let msg = json->mustDecode(Authz.Revoke.decode)
       (RevokeMsg(msg), msg.validator, false)
-    // | "/cosmos.feegrant.v1beta1.MsgGrantAllowance" =>
-    //   let msg = json->mustDecode(GrantAllowance.decode)
-    //   (GrantAllowanceMsg(msg), msg.granter, false)
-    // | "/cosmos.feegrant.v1beta1.MsgRevokeAllowance" =>
-    //   let msg = json->mustDecode(RevokeAllowance.decode)
-    //   (RevokeAllowanceMsg(msg), msg.granter, false)
+    | "/cosmos.feegrant.v1beta1.MsgGrantAllowance" =>
+      let msg = json->mustDecode(FeeGrant.GrantAllowance.decoder)
+      (GrantAllowanceMsg(msg), msg.granter, false)
+    | "/cosmos.feegrant.v1beta1.MsgRevokeAllowance" =>
+      let msg = json->mustDecode(FeeGrant.RevokeAllowance.decode)
+      (RevokeAllowanceMsg(msg), msg.granter, false)
     | "/cosmos.staking.v1beta1.MsgCreateValidator" =>
       let msg = json->mustDecode(Staking.CreateValidator.decode)
       (CreateValidatorMsg(msg), msg.delegatorAddress, false)
@@ -1097,6 +1098,10 @@ let decodeMsg = (json, isSuccess) => {
             let msg = json->mustDecode(Gov.VoteWeighted.decodeFail)
             (VoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
           }
+
+    | "/cosmos.bank.v1beta1.MsgMultiSend" =>
+      let msg = json->mustDecode(Bank.MultiSend.decode)
+      (MultiSendMsg(msg), List.nth(msg.inputs, 0).address, false)
 
     | _ => (UnknownMsg, Address.Address(""), false)
     }

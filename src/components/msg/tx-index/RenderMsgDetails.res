@@ -39,7 +39,9 @@ type content_inner_t =
   | RawReports(Belt.List.t<Msg.Oracle.RawDataReport.t>)
   | Timestamp(MomentRe.Moment.t)
   | ValidatorLink(Address.t, string, string)
-  | VoteWeighted(Belt.List.t<Msg.Gov.VoteWeighted.option_t>)
+  | VoteWeighted(Belt.List.t<Msg.Gov.VoteWeighted.Options.t>)
+  | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
+  | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
 
 type content_t = {
   title: string,
@@ -102,6 +104,42 @@ let renderValue = v => {
       ->Belt.List.toArray
       ->React.array}
     </>
+  | MultiSendInputList(inputs) =>
+    <KVTable
+      headers=["Address", "Amount (BAND)"]
+      rows={inputs
+      ->Belt.List.toArray
+      ->Belt.Array.map(input => [
+        KVTable.Value(
+          // <AddressRender address={input.address} />
+          input.address->Address.toBech32,
+        ),
+        KVTable.Value(
+          // <AmountRender coins={input.coins} />
+          input.coins
+          ->Coin.getBandAmountFromCoins
+          ->Belt.Float.toString,
+        ),
+      ])}
+    />
+  | MultiSendOutputList(outputs) =>
+    <KVTable
+      headers=["Address", "Amount (BAND)"]
+      rows={outputs
+      ->Belt.List.toArray
+      ->Belt.Array.map(output => [
+        KVTable.Value(
+          // <AddressRender address={output.address} />
+          output.address->Address.toBech32,
+        ),
+        KVTable.Value(
+          // <AmountRender coins={output.coins} />
+          output.coins
+          ->Coin.getBandAmountFromCoins
+          ->Belt.Float.toString,
+        ),
+      ])}
+    />
   }
 }
 
@@ -381,6 +419,36 @@ module Revoke = {
 //     },
 //   ]
 // }
+
+module GrantAllowance = {
+  let factory = (msg: Msg.FeeGrant.GrantAllowance.t) => [
+    {
+      title: "Granter",
+      content: Address(msg.granter),
+      order: 1,
+    },
+    {
+      title: "Grantee",
+      content: Address(msg.grantee),
+      order: 2,
+    },
+  ]
+}
+
+module RevokeAllowance = {
+  let factory = (msg: Msg.FeeGrant.RevokeAllowance.t) => [
+    {
+      title: "Granter",
+      content: Address(msg.granter),
+      order: 1,
+    },
+    {
+      title: "Grantee",
+      content: Address(msg.grantee),
+      order: 2,
+    },
+  ]
+}
 
 module CreateValidator = {
   let factory = (msg: Msg.Staking.CreateValidator.t) => [
@@ -846,6 +914,21 @@ module VoteWeighted = {
   let failed = (msg: Msg.Gov.VoteWeighted.fail_t) => msg->factory([])
 }
 
+module MultiSend = {
+  let factory = (msg: Msg.Bank.MultiSend.t) => [
+    {
+      title: "From",
+      content: MultiSendInputList(msg.inputs),
+      order: 1,
+    },
+    {
+      title: "To",
+      content: MultiSendOutputList(msg.outputs),
+      order: 2,
+    },
+  ]
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -870,7 +953,8 @@ let getContent = msg => {
   | Msg.ReportMsg(data) => Report.factory(data)
   | Msg.GrantMsg(data) => Grant.factory(data)
   | Msg.RevokeMsg(data) => Revoke.factory(data)
-  // | Msg.RevokeAllowanceMsg(data) => RevokeAllowance.factory(data)
+  | Msg.RevokeAllowanceMsg(data) => RevokeAllowance.factory(data)
+  | Msg.GrantAllowanceMsg(data) => GrantAllowance.factory(data)
   | Msg.CreateValidatorMsg(data) => CreateValidator.factory(data)
   | Msg.EditValidatorMsg(data) => EditValidator.factory(data)
   | Msg.DelegateMsg(m) =>
@@ -920,6 +1004,7 @@ let getContent = msg => {
     | Msg.Gov.VoteWeighted.Success(data) => VoteWeighted.success(data)
     | Msg.Gov.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
+  | Msg.MultiSendMsg(data) => MultiSend.factory(data)
 
   | Msg.UnknownMsg => []
   }
@@ -934,7 +1019,7 @@ let make = (~contents: array<content_t>) => {
     ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
     ->Belt.Array.mapWithIndex((i, content) => {
       <Row key={i->Belt.Int.toString} marginBottom=0 marginBottomSm=24>
-        <Col col=Col.Four mb=16 mbSm=8>
+        <Col col=Col.Three mb=16 mbSm=8>
           <Heading
             value={content.title}
             size=Heading.H4
@@ -943,7 +1028,7 @@ let make = (~contents: array<content_t>) => {
             color=theme.neutral_600
           />
         </Col>
-        <Col col=Col.Eight mb=16 mbSm=8 key={i->Belt.Int.toString}>
+        <Col col=Col.Nine mb=16 mbSm=8 key={i->Belt.Int.toString}>
           {renderValue(content.content)}
         </Col>
       </Row>
