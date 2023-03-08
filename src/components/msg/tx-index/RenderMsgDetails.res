@@ -29,6 +29,13 @@ module Calldata = {
   }
 }
 
+module Packet = {
+  @react.component
+  let make = (~packet: Msg.Packet.t) => {
+    <Text value={packet.data} size=Text.Body1 />
+  }
+}
+
 type content_inner_t =
   | PlainText(string)
   | Address(Address.t)
@@ -40,11 +47,13 @@ type content_inner_t =
   | Timestamp(MomentRe.Moment.t)
   | ValidatorLink(Address.t, string, string)
   | VoteWeighted(Belt.List.t<Msg.VoteWeighted.option_t>)
+  | Packet(Msg.Packet.t)
 
 type content_t = {
   title: string,
   content: content_inner_t,
   order: int,
+  heading?: string
 }
 
 let renderValue = v => {
@@ -52,7 +61,7 @@ let renderValue = v => {
   | Address(address) => <AddressRender position=AddressRender.Subtitle address />
   | ValidatorAddress(address) =>
     <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
-  | PlainText(content) => <Text value={content} size=Text.Body1 />
+  | PlainText(content) => <Text value={content} size=Text.Body1 breakAll=true/>
   | CoinList(amount) => <AmountRender coins={amount} />
   | ID(element) => element
   | Calldata(schema, data) => <Calldata schema calldata=data />
@@ -102,6 +111,7 @@ let renderValue = v => {
       ->Belt.List.toArray
       ->React.array}
     </>
+  | Packet(packet) => <Packet packet/>
   }
 }
 
@@ -851,6 +861,146 @@ module VoteWeighted = {
   let failed = (msg: Msg.VoteWeighted.fail_t) => msg->factory([])
 }
 
+module RecvPacket = {
+  let factory = (msg: Msg.RecvPacket.t<'a>, firsts) => 
+    firsts->Belt.Array.concat([
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 2,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 3,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 4,
+      },
+      {
+        heading: "Packet",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Source Port",
+        content: PlainText(msg.packet.sourcePort),
+        order: 6,
+      },
+      {
+        title: "Destination Port",
+        content: PlainText(msg.packet.destinationPort),
+        order: 7,
+      },
+      {
+        title: "Source Channel",
+        content: PlainText(msg.packet.sourceChannel),
+        order: 8,
+      },
+      {
+        title: "Destination Channel",
+        content: PlainText(msg.packet.destinationChannel),
+        order: 9,
+      },
+      {
+        title: "Data",
+        content: PlainText(msg.packet.data),
+        order: 10,
+      },
+      {
+        title: "Timeout Timestamp",
+        content: Timestamp(msg.packet.timeoutTimestamp),
+        order: 11,
+      },
+    ])
+
+  let success = (msg: Msg.RecvPacket.success_t) =>
+    msg->factory(switch msg.packetData {
+      | Some(packetData) => switch packetData.packetDetail {
+        | OracleRequestPacket(details) => [
+          {
+            heading: "Packet Data",
+            title: "",
+            content: PlainText(""),
+            order: 12,
+          },
+          {
+            title: "Request ID",
+            content: ID(<TypeID.Request position=TypeID.Subtitle id=details.requestID />),
+            order: 13,
+          },
+          {
+            title: "Oracle Script",
+            content: ID(<TypeID.OracleScript position=TypeID.Subtitle id=details.oracleScriptID />),
+            order: 14,
+          },
+          {
+            title: "Prepare Gas",
+            content: PlainText(details.prepareGas->Belt.Int.toString),
+            order: 15,
+          },
+          {
+            title: "Execute Gas",
+            content: PlainText(details.executeGas->Belt.Int.toString),
+            order: 16,
+          },
+          {
+            title: "Calldata",
+            content: Calldata(details.schema, details.calldata),
+            order: 17,
+          },
+          {
+            title: "Request Validator Count",
+            content: PlainText(details.askCount->Belt.Int.toString),
+            order: 18,
+          },
+          {
+            title: "Sufficient Validator Count",
+            content: PlainText(details.minCount->Belt.Int.toString),
+            order: 19,
+          },
+        ]
+        | FungibleTokenPacket(details) => [
+           {
+            heading: "Packet Data",
+            title: "",
+            content: PlainText(""),
+            order: 12,
+          },
+          {
+            title: "Sender",
+            content: PlainText(details.sender),
+            order: 13,
+          },
+          {
+            title: "Receiver",
+            content: PlainText(details.receiver),
+            order: 14,
+          },
+          {
+            title: "Amount",
+            content: PlainText(details.amount->Belt.Int.toString),
+            order: 15,
+          },
+         
+        ]
+        | Unknown => []
+        } 
+      | None => []
+      })
+
+  let failed = (msg: Msg.RecvPacket.fail_t) => msg->factory([])
+}
+
 module UpdateClient = {
   let factory = (msg: Msg.UpdateClient.t) => {
     [
@@ -943,6 +1093,11 @@ let getContent = msg => {
     | Msg.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
   | Msg.UpdateClientMsg(data) => UpdateClient.factory(data)
+  | Msg.RecvPacketMsg(m) =>
+    switch m {
+    | Msg.RecvPacket.Success(data) => RecvPacket.success(data)
+    | Msg.RecvPacket.Failure(data) => RecvPacket.failed(data)
+    }
   | Msg.UnknownMsg => []
   }
 }
@@ -955,20 +1110,33 @@ let make = (~contents: array<content_t>) => {
     contents
     ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
     ->Belt.Array.mapWithIndex((i, content) => {
-      <Row key={i->Belt.Int.toString} marginBottom=0 marginBottomSm=24>
-        <Col col=Col.Four mb=16 mbSm=8>
-          <Heading
-            value={content.title}
-            size=Heading.H4
-            weight=Heading.Regular
-            marginBottom=8
-            color=theme.neutral_600
-          />
-        </Col>
-        <Col col=Col.Eight mb=16 mbSm=8 key={i->Belt.Int.toString}>
-          {renderValue(content.content)}
-        </Col>
-      </Row>
+      { 
+        switch content.heading {
+        | Some(headerText) => <>
+          <SeperatedLine mt=0 mb=24 />
+          <Row>
+            <Col mb=24>
+              <Heading value=headerText size=Heading.H4 color={theme.neutral_600} />
+            </Col>
+          </Row>
+        </>
+        | None => 
+        <Row key={i->Belt.Int.toString} marginBottom=0 marginBottomSm=24>
+          <Col col=Col.Four mb=16 mbSm=8>
+            <Heading
+              value={content.title}
+              size=Heading.H4
+              weight=Heading.Regular
+              marginBottom=8
+              color=theme.neutral_600
+            />
+          </Col>
+          <Col col=Col.Eight mb=16 mbSm=8 key={i->Belt.Int.toString}>
+            {renderValue(content.content)}
+          </Col>
+        </Row>
+        } 
+      }
     })
     ->React.array
   }

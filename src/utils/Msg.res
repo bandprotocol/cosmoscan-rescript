@@ -689,6 +689,84 @@ module UpdateClient = {
   }
 }
 
+module Height = {
+  type t = {
+    revisionHeight: int,
+    revisionNumber: int,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      revisionHeight: json.required(list{"revision_height"}, int),
+      revisionNumber: json.required(list{"revision_number"}, int),
+    })
+  }
+}
+
+module Packet = {
+  type t = {
+    sequence: int,
+    sourcePort: string,
+    sourceChannel: string,
+    destinationPort: string,
+    destinationChannel: string,
+    timeoutHeight: int,
+    timeoutTimestamp: MomentRe.Moment.t,
+    data: string,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      sequence: json.required(list{"sequence"}, int),
+      sourcePort: json.required(list{"source_port"}, string),
+      sourceChannel: json.required(list{"source_channel"}, string),
+      destinationPort: json.required(list{"destination_port"}, string),
+      destinationChannel: json.required(list{"destination_channel"}, string),
+      timeoutHeight: json.required(list{"timeout_height", "revision_height"}, int),
+      timeoutTimestamp: json.required(list{"timeout_timestamp"}, GraphQLParser.timeNS),
+      data: json.required(list{"data"}, string),
+    })
+  }
+}
+
+module RecvPacket = {
+  type t<'a> = {
+    signer: Address.t,
+    packet: Packet.t,
+    proofHeight: Height.t,
+    packetData: 'a,
+  }
+
+  type success_t = t<option<PacketDecoder.t>>
+  type fail_t = t<unit>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(fail_t)
+
+  let decodeFactory = dataD => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+      packet: json.required(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      packetData: json->dataD,
+    })
+  }
+
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(json => json.optional(list{}, PacketDecoder.decodeAction))
+  }
+
+  let decodeFail: JsonUtils.Decode.t<fail_t> = {
+    open JsonUtils.Decode
+    decodeFactory(_ => ())
+  }
+}
+
 module Deposit = {
   type t<'a> = {
     depositor: Address.t,
@@ -857,6 +935,7 @@ type msg_t =
   | VoteMsg(Vote.decoded_t)
   | VoteWeightedMsg(VoteWeighted.decoded_t)
   | UpdateClientMsg(UpdateClient.t)
+  | RecvPacketMsg(RecvPacket.decoded_t)
   | UnknownMsg
 
 type t = {
@@ -905,6 +984,7 @@ let getBadge = msg => {
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
   | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
   | UpdateClientMsg(_) => {name: "Update Client", category: IBCMsg}
+  | RecvPacketMsg(_) => {name: "Recv Packet", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1086,7 +1166,16 @@ let decodeMsg = (json, isSuccess) => {
     | "/ibc.core.client.v1.MsgUpdateClient" =>
       let msg = json->mustDecode(UpdateClient.decode)
       (UpdateClientMsg(msg), msg.signer, true)
-
+    | "/ibc.core.channel.v1.MsgRecvPacket" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(RecvPacket.decodeSuccess)
+            (RecvPacketMsg(Success(msg)), msg.signer, false)
+          }
+        : {
+            let msg = json->mustDecode(RecvPacket.decodeFail)
+            (RecvPacketMsg(Failure(msg)), msg.signer, false)
+          }
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }

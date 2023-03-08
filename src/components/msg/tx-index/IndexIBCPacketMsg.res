@@ -126,7 +126,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <AddressRender address=request.payer />
+          // <AddressRender address=request.payer />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
@@ -136,7 +136,7 @@ module OracleRequestPacket = {
             marginBottom=8
             color=theme.neutral_600
           />
-          <Text value=request.requestKey size=Text.Body1 />
+          // <Text value=request.requestKey size=Text.Body1 />
         </Col>
         <Col col=Col.Six mb=24>
           <Heading
