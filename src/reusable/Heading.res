@@ -22,11 +22,11 @@ module Styles = {
   let lineHeight = style(. [lineHeight(#em(1.41))])
   let fontSize = x =>
     switch x {
-    | H1 => style(. [fontSize(#px(24)), Media.smallMobile([fontSize(#px(20))])])
-    | H2 => style(. [fontSize(#px(20)), Media.smallMobile([fontSize(#px(18))])])
-    | H3 => style(. [fontSize(#px(18)), Media.smallMobile([fontSize(#px(16))])])
-    | H4 => style(. [fontSize(#px(14)), Media.smallMobile([fontSize(#px(12))])])
-    | H5 => style(. [fontSize(#px(12)), Media.smallMobile([fontSize(#px(11))])])
+    | H1 => style(. [fontSize(#px(24)), Media.mobile([fontSize(#px(20))])])
+    | H2 => style(. [fontSize(#px(20)), Media.mobile([fontSize(#px(18))])])
+    | H3 => style(. [fontSize(#px(18)), Media.mobile([fontSize(#px(16))])])
+    | H4 => style(. [fontSize(#px(14)), Media.mobile([fontSize(#px(12))])])
+    | H5 => style(. [fontSize(#px(12)), Media.mobile([fontSize(#px(11))])])
     }
 
   let fontWeight = x =>
@@ -48,6 +48,7 @@ module Styles = {
   let mb = (~mb, ~mbSm, ()) =>
     style(. [marginBottom(#px(mb)), Media.mobile([marginBottom(#px(mbSm))])])
   let mt = (~mt, ~mtSm, ()) => style(. [marginTop(#px(mt)), Media.mobile([marginTop(#px(mtSm))])])
+  let mono = style(. [fontFamilies([#custom("Roboto Mono"), #monospace])])
 }
 
 @react.component
@@ -62,6 +63,7 @@ let make = (
   ~marginBottomSm=0,
   ~style="",
   ~color=?,
+  ~mono=false,
 ) => {
   let children_ = React.string(value)
 
@@ -76,6 +78,7 @@ let make = (
       Styles.lineHeight,
       Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),
       Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
+      mono ? Styles.mono : "",
       style,
     ])
 

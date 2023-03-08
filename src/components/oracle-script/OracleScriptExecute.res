@@ -296,13 +296,13 @@ module ExecutionPart = {
     let (_, dispatchModal) = React.useContext(ModalContext.context)
     let trackingSub = TrackingSub.use()
     let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
-    let numParams = paramsInput->Belt.Array.size
+    let numParams = paramsInput->Belt.Array.length
 
     let validatorCount = ValidatorSub.countByActive(true)
 
     let (callDataArr, setCallDataArr) = React.useState(_ => Belt.Array.make(numParams, ""))
     let (clientID, setClientID) = React.useState(_ => "from_scan")
-    let (feeLimit, setFeeLimit) = React.useState(_ => "100")
+    let (feeLimit, setFeeLimit) = React.useState(_ => "200")
     let (prepareGas, setPrepareGas) = React.useState(_ => "")
     let (executeGas, setExecuteGas) = React.useState(_ => "")
     let (gaslimit, setGaslimit) = React.useState(_ => "")
@@ -458,6 +458,7 @@ module ExecutionPart = {
                               feeLimit: feeLimit->Parse.mustParseInt,
                               prepareGas: feeLimit->Parse.mustParseInt,
                               executeGas: feeLimit->Parse.mustParseInt,
+                              gaslimit,
                             }),
                           )
                           ()

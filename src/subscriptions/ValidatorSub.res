@@ -255,6 +255,22 @@ let getList = (~isActive, ()) => {
   )
 }
 
+let avgCommission = (~isActive, ()) => {
+  let result = MultiConfig.use({jailed: !isActive})
+
+  result
+  ->Sub.fromData
+  ->Sub.map(x => {
+    let exclude100percent = x.validators ->Belt_Array.keep(({commissionRate} )=> commissionRate != 1.)
+    let length = Belt_Array.length(exclude100percent) |> float_of_int
+
+    exclude100percent
+    ->Belt_Array.reduce(0., (acc, {commissionRate}) => acc +. commissionRate)
+    ->(sum => sum /. length *. 100. )
+    }
+  );
+};
+
 let count = () => {
   let result = ValidatorCountConfig.use()
 
@@ -358,9 +374,9 @@ let getBlockUptimeByValidator = consensusAddress => {
     {
       validatorVotes->Sub.map(each => {
         validatorVotes: each,
-        proposedCount: each->Belt.Array.keep(({status}) => status == Proposed)->Belt.Array.size,
-        signedCount: each->Belt.Array.keep(({status}) => status == Signed)->Belt.Array.size,
-        missedCount: each->Belt.Array.keep(({status}) => status == Missed)->Belt.Array.size,
+        proposedCount: each->Belt.Array.keep(({status}) => status == Proposed)->Belt.Array.length,
+        signedCount: each->Belt.Array.keep(({status}) => status == Signed)->Belt.Array.length,
+        missedCount: each->Belt.Array.keep(({status}) => status == Missed)->Belt.Array.length,
       })
     }
   })
@@ -378,7 +394,7 @@ let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
   ->Sub.fromData
   ->Sub.flatMap(({historical_oracle_statuses}) => {
     let oracleStatusReports =
-      historical_oracle_statuses->Belt.Array.size > 0
+      historical_oracle_statuses->Belt.Array.length > 0
         ? historical_oracle_statuses
           ->Belt.Array.map(each => {
             HistoryOracleParser.status: each.status,
@@ -393,7 +409,7 @@ let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
           }
     let rawParsedReports = HistoryOracleParser.parse(~oracleStatusReports, ~startDate, ())
 
-    let parsedReports = if !oracleStatus && historical_oracle_statuses->Belt.Array.size == 0 {
+    let parsedReports = if !oracleStatus && historical_oracle_statuses->Belt.Array.length == 0 {
       rawParsedReports->Belt.Array.map(({timestamp}) => {
         HistoryOracleParser.timestamp,
         status: false,
@@ -404,8 +420,8 @@ let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
 
     Sub.resolve({
       oracleStatusReports: parsedReports,
-      uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.size,
-      downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.size,
+      uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.length,
+      downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.length,
     })
   })
 }
@@ -433,9 +449,9 @@ let getBlockUptimeByValidator = consensusAddress => {
     {
       validatorVotes->Sub.map(each => {
         validatorVotes: each,
-        proposedCount: each->Belt.Array.keep(({status}) => status == Proposed)->Belt.Array.size,
-        signedCount: each->Belt.Array.keep(({status}) => status == Signed)->Belt.Array.size,
-        missedCount: each->Belt.Array.keep(({status}) => status == Missed)->Belt.Array.size,
+        proposedCount: each->Belt.Array.keep(({status}) => status == Proposed)->Belt.Array.length,
+        signedCount: each->Belt.Array.keep(({status}) => status == Signed)->Belt.Array.length,
+        missedCount: each->Belt.Array.keep(({status}) => status == Missed)->Belt.Array.length,
       })
     }
   })
@@ -480,7 +496,7 @@ let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
   ->Sub.fromData
   ->Sub.flatMap(({historical_oracle_statuses}) => {
     let oracleStatusReports =
-      historical_oracle_statuses->Belt.Array.size > 0
+      historical_oracle_statuses->Belt.Array.length > 0
         ? historical_oracle_statuses
           ->Belt.Array.map(each => {
             HistoryOracleParser.status: each.status,
@@ -495,7 +511,7 @@ let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
           }
     let rawParsedReports = HistoryOracleParser.parse(~oracleStatusReports, ~startDate, ())
 
-    let parsedReports = if !oracleStatus && historical_oracle_statuses->Belt.Array.size == 0 {
+    let parsedReports = if !oracleStatus && historical_oracle_statuses->Belt.Array.length == 0 {
       rawParsedReports->Belt.Array.map(({timestamp}) => {
         HistoryOracleParser.timestamp,
         status: false,
@@ -506,8 +522,8 @@ let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
 
     Sub.resolve({
       oracleStatusReports: parsedReports,
-      uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.size,
-      downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.size,
+      uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.length,
+      downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.length,
     })
   })
 }

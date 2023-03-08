@@ -22,4 +22,11 @@ let address = addr => {
   }
 }
 
+let notBandAddress = addr => {
+  switch Address.fromBech32OptNotBandPrefix(addr->String.trim) {
+  | Some(address) => Result.Ok(address)
+  | None => Err("Invalid address")
+  }
+}
+
 let mustParseInt = a => a->Belt.Int.fromString->Belt.Option.getExn

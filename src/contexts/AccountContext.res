@@ -15,6 +15,7 @@ type send_request_t = {
   feeLimit: int,
   prepareGas: int,
   executeGas: int,
+  gaslimit: string,
 }
 
 type a =
@@ -41,6 +42,7 @@ let reducer = (state, action) =>
       feeLimit,
       prepareGas,
       executeGas,
+      gaslimit,
     }) =>
     switch state {
     | Some({address, wallet, pubKey, chainID}) => {
@@ -65,7 +67,7 @@ let reducer = (state, action) =>
             ~address,
             ~msgs=[msg],
             ~chainID,
-            ~gas="700000",
+            ~gas={"700000"->int_of_string},
             ~feeAmount="0",
             ~memo="send via scan",
             (),

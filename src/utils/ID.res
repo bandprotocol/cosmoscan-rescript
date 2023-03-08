@@ -64,7 +64,7 @@ module IDCreator = (RawID: RawIDSig) => {
     open JsonUtils.Decode
     int->map((. a) => ID(a))
   }
-  let fromJson = json => ID(json->Js.Json.decodeNumber->Belt.Option.getExn->int_of_float)
+  let fromJson = json => ID(json->Js.Json.decodeNumber->Belt.Option.getExn->Belt.Float.toInt)
 
   let fromInt = x => ID(x)
 

@@ -23,6 +23,7 @@ type t =
   | OracleScript(ID.OracleScript.t, string)
   | RequestID(ID.Request.t)
   | RequestResponse(request_response_t)
+  | RequestStatus(RequestSub.resolve_status_t, string)
   | ProgressBar(request_count_t)
   | Float(float, option<int>)
   | KVTableReport(array<string>, array<MsgDecoder.RawDataReport.t>)
@@ -34,6 +35,7 @@ type t =
   | BlockHash(Hash.t)
   | Validator(Address.t, string, string)
   | Messages(Hash.t, list<Msg.t>, bool, string)
+  | MsgBadgeGroup(Hash.t, list<Msg.t>)
   | PubKey(PubKey.t)
   | Badge(Msg.badge_theme_t)
   | VotingPower(Coin.t, float)
@@ -70,24 +72,20 @@ let make = (~info) => {
     </div>
   | Height(height) =>
     <div className=Styles.vFlex>
-      <TypeID.Block id=height position=TypeID.Text />
+      <TypeID.Block id=height size=Text.Xl position=TypeID.MobileCard />
     </div>
   | Coin({value, hasDenom}) =>
     <AmountRender coins=value pos={hasDenom ? AmountRender.TxIndex : Fee} />
   | Count(value) => <Text value={value->Format.iPretty} size=Text.Body2 />
   | DataSource(id, name) =>
     <div className=Styles.vFlex>
-      <TypeID.DataSource id />
+      <TypeID.DataSource id position=TypeID.MobileCard />
       <HSpacing size=Spacing.sm />
       <Text value=name ellipsis=true />
     </div>
   | OracleScript(id, name) =>
-    <div className=Styles.vFlex>
-      <TypeID.OracleScript id />
-      <HSpacing size=Spacing.sm />
-      <Text value=name ellipsis=true />
-    </div>
-  | RequestID(id) => <TypeID.Request id />
+    <TypeID.OracleScript id size=Text.Xl position=TypeID.MobileCard details=name />
+  | RequestID(id) => <TypeID.Request id size=Text.Xl position=TypeID.MobileCard />
   | RequestResponse({requestCount, responseTime: responseTimeOpt}) =>
     <div className={CssHelper.flexBox()}>
       <Text value={requestCount->Format.iPretty} block=true ellipsis=true />
@@ -100,6 +98,7 @@ let make = (~info) => {
         block=true
       />
     </div>
+  | RequestStatus(resolveStatus, text) => <RequestStatus resolveStatus text size=Text.Xl />
   | ProgressBar({reportedValidators, minimumValidators, requestValidators}) =>
     <ProgressBar reportedValidators minimumValidators requestValidators />
   | Float(value, digits) => <Text value={value->Format.fPretty(~digits?)} />
@@ -141,7 +140,7 @@ let make = (~info) => {
       validatorAddress=address moniker size=Text.Body2 identity width={#px(230)}
     />
   | PubKey(publicKey) => <PubKeyRender alignLeft=true pubKey=publicKey display=#block />
-  | TxHash(txHash, width) => <TxLink txHash width />
+  | TxHash(txHash, width) => <TxLink txHash width size=Text.Xl />
   | BlockHash(hash) =>
     <Text
       value={hash->Hash.toHex(~upper=true)}
@@ -152,6 +151,7 @@ let make = (~info) => {
       color={theme.neutral_900}
     />
   | Messages(txHash, messages, success, errMsg) => <TxMessages txHash messages success errMsg />
+  | MsgBadgeGroup(txHash, messages) => <MsgBadgeGroup txHash messages />
   // TODO: do it later
   // <TxMessages txHash messages success errMsg />
   | Badge(_) => React.null
@@ -165,8 +165,7 @@ let make = (~info) => {
         value={"(" ++ votingPercent->Format.fPercent(~digits=2) ++ ")"} weight=Text.Thin block=true
       />
     </div>
-  | Status(status) => <img src={status ? Images.success : Images.fail} className=Styles.logo />
-
+  | Status(status) => <StatusIcon status />
   // Special case for uptime to have loading state inside.
   | Uptime(uptimeOpt) =>
     switch uptimeOpt {

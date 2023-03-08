@@ -196,7 +196,7 @@ let get = txHash => {
   })
 }
 
-let getList = (~page, ~pageSize, ()) => {
+let getList = (~page, ~pageSize) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({limit: pageSize, offset})
 

@@ -27,7 +27,11 @@ module RenderBody = {
           <div className={CssHelper.flexBox(~justify=#center, ())}>
             {switch txSub {
             | Data({success}) =>
-              <img src={success ? Images.success : Images.fail} className=Styles.statusImg />
+              <img 
+                src={success ? Images.success : Images.fail} 
+                alt={success ? "Success" : "Failed"}
+                className=Styles.statusImg 
+              />
             | _ => <LoadingCensorBar width=20 height=20 radius=20 />
             }}
           </div>
@@ -109,7 +113,7 @@ let make = (~txsSub: Sub.variant<array<TxSub.t>>, ~msgTransform: Msg.t => Msg.t=
   <>
     {switch txsSub {
     | Data(txs) =>
-      txs->Belt.Array.size > 0
+      txs->Belt.Array.length > 0
         ? txs
           ->Belt.Array.mapWithIndex((i, e) =>
             isMobile
@@ -121,7 +125,9 @@ let make = (~txsSub: Sub.variant<array<TxSub.t>>, ~msgTransform: Msg.t => Msg.t=
           ->React.array
         : <EmptyContainer>
             <img
-              src={isDarkMode ? Images.noTxDark : Images.noTxLight} className=Styles.noDataImage
+              src={isDarkMode ? Images.noTxDark : Images.noTxLight} 
+              alt="No Transaction"
+              className=Styles.noDataImage
             />
             <Heading
               size=Heading.H4
