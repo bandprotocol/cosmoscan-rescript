@@ -29,7 +29,7 @@ module RenderCreateDataSourceMsg = {
 
   module Outer = {
     @react.component
-    let make = (~msg: Msg.CreateDataSource.t<'a>, ~children1, ~children2) => {
+    let make = (~msg: Msg.Oracle.CreateDataSource.t<'a>, ~children1, ~children2) => {
       let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
       <Row>
         <RenderColumn title="Owner" value={ValueAddress(msg.owner)} />
@@ -60,7 +60,7 @@ module RenderCreateDataSourceMsg = {
   }
   module RenderSuccess = {
     @react.component
-    let make = (~msg: Msg.CreateDataSource.t<'a>, ~theme: Theme.t) => {
+    let make = (~msg: Msg.Oracle.CreateDataSource.t<'a>, ~theme: Theme.t) => {
       <Outer
         msg
         children1={<Col col=Col.Six mb=24>
@@ -107,19 +107,20 @@ module RenderCreateDataSourceMsg = {
 
 module RenderDataSourceMsgOuter = {
   @react.component
-  let make = (~msg: Msg.CreateDataSource.decoded_t) => {
+  let make = (~msg: Msg.Oracle.CreateDataSource.decoded_t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     switch msg {
-    | Msg.CreateDataSource.Success(msg) => <RenderCreateDataSourceMsg.RenderSuccess msg theme />
-    | Msg.CreateDataSource.Failure(msg) => <RenderCreateDataSourceMsg.RenderFail msg theme />
+    | Msg.Oracle.CreateDataSource.Success(msg) =>
+      <RenderCreateDataSourceMsg.RenderSuccess msg theme />
+    | Msg.Oracle.CreateDataSource.Failure(msg) => <RenderCreateDataSourceMsg.RenderFail msg theme />
     }
   }
 }
 
 // module RenderCreateDataSourceMsgSuccess = {
 //   @react.component
-//   let make = (~dataSource: Msg.CreateDataSource.t_success) => {
+//   let make = (~dataSource: Msg.Oracle.CreateDataSource.t_success) => {
 //     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 //     <Row>
 //       <Col col=Col.Six mb=24>
@@ -166,7 +167,7 @@ module RenderDataSourceMsgOuter = {
 
 // module RenderCreateDataSourceMsgFailure = {
 //   @react.component
-//   let make = (~dataSource: Msg.CreateDataSource.t_base) => {
+//   let make = (~dataSource: Msg.Oracle.CreateDataSource.t_base) => {
 //     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 //     <Row>
 //       <Col col=Col.Six mb=24>
@@ -208,7 +209,7 @@ module RenderDataSourceMsgOuter = {
 // }
 module CreateDataSourceMsg = {
   @react.component
-  let make = (~dataSource: Msg.CreateDataSource.decoded_t) => {
+  let make = (~dataSource: Msg.Oracle.CreateDataSource.decoded_t) => {
     <RenderDataSourceMsgOuter msg=dataSource />
   }
 }
@@ -350,7 +351,7 @@ module RequestMsg = {
     }
   }
   @react.component
-  let make = (~request: Msg.Request.decoded_t) => {
+  let make = (~request: Msg.Oracle.Request.decoded_t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div />
     // <Row>
