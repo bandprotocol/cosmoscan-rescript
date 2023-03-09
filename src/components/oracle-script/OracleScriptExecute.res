@@ -212,7 +212,7 @@ module ValueInput = {
   @react.component
   let make = (~value, ~setValue, ~title, ~info=?) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-    
+
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
         <Text value=title weight=Text.Semibold transform=Text.Capitalize />
@@ -237,7 +237,7 @@ type result_t =
   | Nothing
   | Loading
   | Error(string)
-  | Success(TxCreator.tx_response_t)
+  | Success(TxCreator2.tx_response_t)
 
 let loadingRender = (wDiv, wImg, h) => {
   <div className={Styles.withWH(wDiv, h)}>
@@ -289,7 +289,7 @@ module ExecutionPart = {
   ) => {
     let isMobile = Media.isMobile()
 
-    // let client = React.useContext(ClientContext.context)
+    let client = React.useContext(ClientContext.context)
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     let (accountOpt, dispatch) = React.useContext(AccountContext.context)
@@ -327,7 +327,7 @@ module ExecutionPart = {
         requestPromise
         ->Promise.then(res =>
           switch res {
-          | TxCreator.Tx(txResponse) =>
+          | TxCreator2.Tx(txResponse) =>
             setResult(_ => Success(txResponse))
             Promise.resolve()
           | _ =>
@@ -443,25 +443,27 @@ module ExecutionPart = {
                         | Some(encoded) =>
                           setResult(_ => Loading)
                           dispatch(
-                            AccountContext.SendRequest({
-                              oracleScriptID: id,
-                              calldata: encoded,
-                              callback: requestCallback,
-                              askCount,
-                              minCount,
-                              clientID: {
-                                switch clientID->String.trim == "" {
-                                | false => clientID->String.trim
-                                | true => "from_scan"
-                                }
+                            AccountContext.SendRequest(
+                              {
+                                oracleScriptID: id,
+                                calldata: encoded,
+                                callback: requestCallback,
+                                askCount,
+                                minCount,
+                                clientID: {
+                                  switch clientID->String.trim == "" {
+                                  | false => clientID->String.trim
+                                  | true => "from_scan"
+                                  }
+                                },
+                                feeLimit,
+                                prepareGas,
+                                executeGas,
+                                gaslimit,
                               },
-                              feeLimit: feeLimit->Parse.mustParseInt,
-                              prepareGas: feeLimit->Parse.mustParseInt,
-                              executeGas: feeLimit->Parse.mustParseInt,
-                              gaslimit,
-                            }),
+                              client,
+                            ),
                           )
-                          ()
                         | None =>
                           setResult(_ => Error("Encoding fail, please check each parameter's type"))
                         }

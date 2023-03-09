@@ -8,101 +8,113 @@ type t = {
 type send_request_t = {
   oracleScriptID: ID.OracleScript.t,
   calldata: JsBuffer.t,
-  callback: promise<TxCreator.response_t> => unit,
   askCount: string,
   minCount: string,
   clientID: string,
-  feeLimit: int,
-  prepareGas: int,
-  executeGas: int,
+  feeLimit: string,
+  prepareGas: string,
+  executeGas: string,
   gaslimit: string,
+  callback: Promise.t<TxCreator2.response_t> => unit,
 }
 
 type a =
   | Connect(Wallet.t, Address.t, PubKey.t, string)
   | Disconnect
-  | SendRequest(send_request_t)
+  | SendRequest(send_request_t, BandChainJS.Client.t)
 
-let reducer = (state, action) =>
+let reducer = (state, action) => {
   switch action {
   | Connect(wallet, address, pubKey, chainID) => Some({wallet, pubKey, address, chainID})
-  | Disconnect =>
-    switch state {
-    | Some({wallet}) => wallet->Wallet.disconnect
-    | None => ()
-    }
-    None
-  | SendRequest({
-      oracleScriptID,
-      calldata,
-      callback,
-      askCount,
-      minCount,
-      clientID,
-      feeLimit,
-      prepareGas,
-      executeGas,
-      gaslimit,
-    }) =>
-    switch state {
-    | Some({address, wallet, pubKey, chainID}) => {
-        let msg = TxCreator.createMsg(
-          ~sender=address,
-          ~msg=Request(
-            oracleScriptID,
-            calldata,
-            askCount,
-            minCount,
-            address,
-            clientID,
-            {amount: feeLimit->Belt.Int.toString, denom: "uband"},
-            prepareGas->Belt.Int.toString,
-            executeGas->Belt.Int.toString,
-          ),
-          (),
-        )
-        Js.log(msg)
-        let promiseCallBack = async () => {
-          let rawTx = await TxCreator.createRawTx(
-            ~address,
-            ~msgs=[msg],
-            ~chainID,
-            ~gas={"700000"->int_of_string},
-            ~feeAmount="0",
-            ~memo="send via scan",
-            (),
-          )
-          let signature = await Wallet.sign(TxCreator.sortAndStringify(rawTx), wallet)
-          let signedTx = TxCreator.createSignedTx(
-            ~signature=signature->JsBuffer.toBase64,
-            ~pubKey,
-            ~tx=rawTx,
-            ~mode="block",
-            (),
-          )
-
-          let result = await TxCreator.broadcast(signedTx)
-
-          result
-
-          //TODO: update bandchain.js to 2.1.4
-          // let jsonTxStr = rawTx->BandChainJS.Transaction.getSignMessage->JsBuffer.toUTF8;
-          // let%Promise signature = Wallet.sign(jsonTxStr, wallet);
-          // let signedTx = rawTx->BandChainJS.Transaction.getTxData(signature, wrappedPubKey, 127);
-          // TxCreator2.broadcast(client, signedTx);
-        }
-
-        callback(()->promiseCallBack)
-        state
+  | Disconnect => {
+      switch state {
+      | Some({wallet}) => wallet->Wallet.disconnect
+      | None => ()
       }
+      None
+    }
 
-    | None =>
-      callback(Promise.resolve(TxCreator.Unknown))
+  | SendRequest(
+      {
+        oracleScriptID,
+        calldata,
+        askCount,
+        minCount,
+        clientID,
+        feeLimit,
+        prepareGas,
+        executeGas,
+        gaslimit,
+        callback,
+      },
+      client,
+    ) =>
+    switch state {
+    | Some({address, wallet, pubKey, chainID}) =>
+      let feeLimitCoin = BandChainJS.Coin.create()
+      feeLimitCoin->BandChainJS.Coin.setAmount(feeLimit)
+      feeLimitCoin->BandChainJS.Coin.setDenom("uband")
+
+      let pubKeyHex = pubKey->PubKey.toHex
+      let wrappedPubKey = pubKeyHex->BandChainJS.PubKey.fromHex
+
+      callback({
+        let createRawTX = async () => {
+          let rawTx = await TxCreator2.createRawTx(
+            ~sender=address,
+            ~msgs=[
+              Request({
+                osID: oracleScriptID,
+                calldata,
+                askCount: askCount->int_of_string,
+                minCount: minCount->int_of_string,
+                sender: address,
+                clientID,
+                feeLimitList: [feeLimitCoin],
+                prepareGas: {
+                  switch prepareGas {
+                  | "" => None
+                  | _ => Some(prepareGas->int_of_string)
+                  }
+                },
+                executeGas: {
+                  switch executeGas {
+                  | "" => None
+                  | _ => Some(executeGas->int_of_string)
+                  }
+                },
+              }),
+            ],
+            ~chainID,
+            ~gas={
+              switch int_of_string_opt(gaslimit) {
+              | Some(gasOpt) => gasOpt
+              | _ => 1000000
+              }
+            },
+            ~feeAmount={
+              switch int_of_string_opt(gaslimit) {
+              | Some(gasOpt) => Js.Float.toString(float_of_int(gasOpt) *. 0.0025)
+              | _ => "2500"
+              }
+            },
+            ~memo="send via scan",
+            ~client,
+          )
+
+          let jsonTxStr = rawTx->BandChainJS.Transaction.getSignMessage->JsBuffer.toUTF8
+          let signature = await Wallet.sign(jsonTxStr, wallet)
+          let signedTx = rawTx->BandChainJS.Transaction.getTxData(signature, wrappedPubKey, 127)
+          await TxCreator2.broadcast(client, signedTx)
+        }
+        createRawTX()
+      })
       state
+    | None => state
     }
   }
+}
 
-type props = {value: (option<t>, a => unit), children: React.element}
 let context = React.createContext((None, _ => ()))
 
 module Provider = {

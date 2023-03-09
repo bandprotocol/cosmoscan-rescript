@@ -57,41 +57,35 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
   let client = React.useContext(ClientContext.context)
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  let startBroadcast = async (accountIndex: int): unit => {
+  let startBroadcast = async () => {
     dispatchModal(DisableExit)
     setState(_ => Signing)
-
     try {
-      Js.log("Test")
-      //   let (pubKeyHex, pubKey, txRawBytes) = await Wallet.sign(jsonTxStr, account.wallet)->(
-      //     async signature => {
-      //       setState(_ => Broadcasting)
-      //       let pubKeyHex = account.pubKey->PubKey.toHex
-      //       let pubKey = pubKeyHex->BandChainJS.PubKey.fromHex
-      //       let txRawBytes = rawTx->BandChainJS.Transaction.getTxData(signature, pubKey, 127)
-      //     }
-      //   )
+      let signature = await Wallet.sign(jsonTxStr, account.wallet)
 
-      //   let txResult = await TxCreator2.broadcast(client, txRawBytes)->(
-      //     res => {
-      //       switch res {
-      //       | TxCreator2.Tx(txResponse) =>
-      //         txResponse.success
-      //           ? {
-      //               setState(_ => Success(txResponse.txHash))
-      //             }
-      //           : {
-      //               Js.Console.error(txResponse)
-      //               setState(_ => Error(txResponse.code->TxResError.parse))
-      //             }
+      setState(_ => Broadcasting)
+      let pubKeyHex = account.pubKey->PubKey.toHex
+      let pubKey = pubKeyHex->BandChainJS.PubKey.fromHex
+      let txRawBytes = rawTx->BandChainJS.Transaction.getTxData(signature, pubKey, 127)
+      let txResult = await TxCreator2.broadcast(client, txRawBytes)
+      switch txResult {
+      | TxCreator2.Tx(txResponse) =>
+        {
+          txResponse.success
+            ? {
+                setState(_ => Success(txResponse.txHash))
+              }
+            : {
+                Js.Console.error(txResponse)
+                setState(_ => Error(txResponse.code->TxResError.parse))
+              }
+        }
 
-      //         dispatchModal(EnableExit)
-      //       | _ =>
-      //         setState(_ => Error("Fail to broadcast"))
-      //         dispatchModal(EnableExit)
-      //       }
-      //     }
-      //   )
+        dispatchModal(EnableExit)
+      | _ =>
+        setState(_ => Error("Fail to broadcast"))
+        dispatchModal(EnableExit)
+      }
     } catch {
     | Js.Exn.Error(e) =>
       switch Js.Json.stringifyAny(e) {
@@ -122,7 +116,7 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
             py=10
             style={Css.merge(list{Styles.btn, CssHelper.mb(~size=16, ())})}
             onClick={_ => {
-              let _ = startBroadcast
+              let _ = startBroadcast()
             }}>
             {"Broadcast"->React.string}
           </Button>

@@ -166,11 +166,11 @@ module SubmitTxStep = {
                   },
                   ~memo=memo',
                   ~client,
-                  (),
                 ),
               )
             }
-            let _ = async () =>
+
+            let sendTx = async () => {
               switch rawTxOpt {
               | Some(rawTxPromise) =>
                 let rawTx = await rawTxPromise
@@ -179,6 +179,8 @@ module SubmitTxStep = {
                 open Webapi.Dom
                 window->Window.alert("invalid messages")
               }
+            }
+            let _ = sendTx()
           }}>
           {"Next"->React.string}
         </Button>
@@ -194,11 +196,10 @@ module CreateTxFlow = {
 
     <>
       <SubmitTxStep account setRawTx isActive={rawTx->Belt.Option.isNone} msg />
-      // TODO: handle unit
-      // {switch rawTx {
-      // | None => React.null
-      // | Some(rawTx') => <PreviewJsonStep rawTx=rawTx' onBack={_ => setRawTx(_ => None)} account />
-      // }}
+      {switch rawTx {
+      | None => React.null
+      | Some(rawTx') => <PreviewJsonStep rawTx=rawTx' onBack={_ => setRawTx(_ => None)} account />
+      }}
     </>
   }
 }

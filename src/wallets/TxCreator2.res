@@ -89,7 +89,7 @@ let stringifyWithSpaces: Js.Json.t => string = %raw(`
     }
 `)
 
-let createRawTx = (~sender, ~msgs, ~chainID, ~feeAmount, ~gas, ~memo, ~client, ()) => {
+let createRawTx = async (~sender, ~msgs, ~chainID, ~feeAmount, ~gas, ~memo, ~client) => {
   open BandChainJS.Transaction
   let senderStr = sender->Address.toBech32
 
@@ -106,14 +106,18 @@ let createRawTx = (~sender, ~msgs, ~chainID, ~feeAmount, ~gas, ~memo, ~client, (
   tx->withChainId(chainID)
   tx->withFee(fee)
   tx->withMemo(memo)
-  tx->withSender(client, senderStr)
+  await tx->withSender(client, senderStr)
+
+  tx
 }
 
 let broadcast = async (client, txRawBytes) => {
   open JsonUtils.Decode
-  let response = await client->BandChainJS.Client.sendTxSyncMode(txRawBytes)
-  let txHash = response->Belt.Option.getWithDefault("txhash")->Hash.fromHex
-  let code = response->Belt.Option.getWithDefault(_, 0)
-  let success = code == 0
-  Tx({txHash, code, success})
+  let response = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
+
+  Tx({
+    txHash: response->mustAt(list{"txhash"}, string)->Hash.fromHex,
+    code: response->mustAt(list{"code"}, int),
+    success: response->mustAt(list{"code"}, int) == 0,
+  })
 }
