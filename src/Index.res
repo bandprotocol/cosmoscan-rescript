@@ -1,6 +1,6 @@
 %%raw("require('./index.css')")
 
-AxiosHooks.setRpcUrl(Env.rpc);
+AxiosHooks.setRpcUrl(Env.rpc)
 
 @react.component
 let make = () =>

@@ -5,7 +5,7 @@ type amount_t = {
 
 type fee_t = {
   amount: array<amount_t>,
-  gas: string,
+  gas: int,
 }
 
 type msg_send_t = {

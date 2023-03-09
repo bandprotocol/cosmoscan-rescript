@@ -19,7 +19,7 @@ let make = (~coins, ~pos=Msg, ~color=?) => {
     {switch (pos) {
      | TxIndex =>
        <Text
-         value={coins |> Coin.getBandAmountFromCoins |> Format.fPretty}
+         value={coins->Coin.getBandAmountFromCoins->Format.fPretty}
          code=true
          block=true
          nowrap=true
@@ -28,7 +28,7 @@ let make = (~coins, ~pos=Msg, ~color=?) => {
        />
      | _ =>
        <Text
-         value={coins |> Coin.getBandAmountFromCoins |> Format.fPretty}
+         value={coins->Coin.getBandAmountFromCoins->Format.fPretty}
          block=true
          nowrap=true
          code=true

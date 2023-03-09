@@ -2,7 +2,7 @@ module Styles = {
   open CssJs
 
   let container = style(. [
-    maxWidth(#px(340)),
+    maxWidth(#px(564)),
     width(#percent(100.)),
     height(#percent(100.)),
     position(#relative),
@@ -23,15 +23,21 @@ module Styles = {
       background(theme.neutral_000),
       border(#px(1), #solid, isDarkMode ? theme.neutral_400 : theme.neutral_300),
       borderRadius(#px(8)),
-      padding4(~left=#px(15), ~right=Spacing.md, ~top=#px(10), ~bottom=#px(10)),
+      padding4(~left=#px(16), ~right=#px(16), ~top=#px(10), ~bottom=#px(10)),
       boxShadows([
         Shadow.box(~x=#zero, ~y=#px(1), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.07))),
         Shadow.box(~x=#zero, ~y=#px(4), ~blur=#px(12), Css.rgba(0, 0, 0, #num(0.02))),
       ]),
+      fontFamilies([#custom("Roboto Mono"), #monospace]),
       fontSize(#px(12)),
       outline(#px(1), #none, theme.neutral_100),
       border(#px(1), #solid, theme.neutral_100),
-      placeholder([color(theme.neutral_500)]),
+      placeholder([
+        width(#percent(90.)),
+        color(theme.neutral_500),
+        fontWeight(#num(300)),
+        textOverflow(#ellipsis)
+      ]),
       Media.mobile([fontSize(#px(10))]),
     ])
 
@@ -200,7 +206,7 @@ let make = () => {
         }}
       value=searchTerm
       className={Styles.search(theme, isDarkMode)}
-      placeholder="Search Address / TXN Hash / Block"
+      placeholder="Search Address / TXN Hash / Block / Validator / etc."
     />
     {switch resultState {
     | ShowAndFocus(_)

@@ -48,6 +48,8 @@ type t = {
 
 };
 
+let toString = (col) => col -> Types.Color.toString
+
 let black = hex("000000");
 let white = hex("FFFFFF");
 

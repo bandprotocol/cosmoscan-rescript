@@ -43,8 +43,15 @@
 @module("./no-data-light.png") external noDataLight: string = "default"
 @module("./no-request-light.png") external noRequestLight: string = "default"
 
+// Homepage
+@module("./band-token.svg") external bandToken: string = "default"
+@module("./bgleft-dark.png") external bgLeftDark: string = "default"
+@module("./bgleft-light.png") external bgLeftLight: string = "default"
+
+
 // IBC
 @module("./tx-ibc-icon.svg") external ibcIcon: string = "default"
+@module("./unknown-chain.svg") external unknownChain: string = "default"
 
 // ICON
 @module("./ethereum.svg") external ethereumIcon: string = "default"
@@ -52,6 +59,8 @@
 @module("./solidity.svg") external solidityIcon: string = "default"
 @module("./golang.svg") external golangIcon: string = "default"
 @module("./right-arrow.svg") external rightArrow: string = "default"
+@module("./long-arrow-dark.svg") external longArrowDark: string = "default"
+@module("./long-arrow-light.svg") external longArrowLight: string = "default"
 
 // BG
 @module("./not-found-bg.svg") external notFoundBg: string = "default"
