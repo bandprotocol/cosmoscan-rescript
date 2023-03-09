@@ -46,7 +46,7 @@ module Bank = {
 
 module Oracle = {
   module CreateDataSource = {
-    type t<'a> = {
+    type internal_t<'a> = {
       owner: Address.t,
       name: string,
       executable: JsBuffer.t,
@@ -56,10 +56,10 @@ module Oracle = {
       id: 'a,
     }
 
-    type fail_t = t<unit>
-    type success_t = t<ID.DataSource.t>
+    type fail_t = internal_t<unit>
+    type success_t = internal_t<ID.DataSource.t>
 
-    type decoded_t =
+    type t =
       | Success(success_t)
       | Failure(fail_t)
 
@@ -220,9 +220,9 @@ module Oracle = {
     let decode = {
       open JsonUtils.Decode
       buildObject(json => {
-        externalDataID: json.required(list{"msg", "external_id"}, int),
-        exitCode: json.required(list{"msg", "exit_code"}, int),
-        data: json.required(list{"msg", "data"}, bufferWithDefault),
+        externalDataID: json.optional(list{"external_id"}, int)->Belt.Option.getWithDefault(0),
+        exitCode: json.optional(list{"exit_code"}, int)->Belt.Option.getWithDefault(0),
+        data: json.required(list{"data"}, bufferWithDefault),
       })
     }
   }
@@ -232,7 +232,6 @@ module Oracle = {
       requestID: ID.Request.t,
       rawReports: list<RawDataReport.t>,
       validator: Address.t,
-      reporter: Address.t,
     }
 
     let decode = {
@@ -241,7 +240,6 @@ module Oracle = {
         requestID: json.required(list{"msg", "request_id"}, ID.Request.decoder),
         rawReports: json.required(list{"msg", "raw_reports"}, list(RawDataReport.decode)),
         validator: json.required(list{"msg", "validator"}, address),
-        reporter: json.required(list{"msg", "reporter"}, address),
       })
     }
   }
@@ -290,28 +288,7 @@ module Authz = {
   module Exec = {
     type t<'a> = {
       grantee: Address.t,
-      msgs: 'a,
-    }
-
-    type fail_t = t<unit>
-    type success_t = t<list<ExecDecoder.t>>
-
-    type decoded_t =
-      | Success(success_t)
-      | Failure(fail_t)
-
-    let decodeFactory = decoder => {
-      open JsonUtils.Decode
-      buildObject(json => {
-        grantee: json.required(list{"msg", "grantee"}, address),
-        msgs: json->decoder,
-      })
-    }
-
-    let decodeFail: JsonUtils.Decode.t<fail_t> = decodeFactory(_ => ())
-    let decodeSuccess: JsonUtils.Decode.t<success_t> = {
-      open JsonUtils.Decode
-      decodeFactory(json => json.required(list{"msg", "msgs"}, list(ExecDecoder.decoder)))
+      msgs: list<'a>,
     }
   }
 }
@@ -388,7 +365,7 @@ module FeeGrant = {
       allowedMessages: list<string>,
     }
 
-    let decoder = {
+    let decode = {
       open JsonUtils.Decode
       buildObject(json => {
         granter: json.required(list{"msg", "granter"}, address),
@@ -869,10 +846,10 @@ module Gov = {
   }
 }
 
-type msg_t =
+type rec msg_t =
   | SendMsg(Bank.Send.t)
   | MultiSendMsg(Bank.MultiSend.t)
-  | CreateDataSourceMsg(Oracle.CreateDataSource.decoded_t)
+  | CreateDataSourceMsg(Oracle.CreateDataSource.t)
   | EditDataSourceMsg(Oracle.EditDataSource.t)
   | CreateOracleScriptMsg(Oracle.CreateOracleScript.decoded_t)
   | EditOracleScriptMsg(Oracle.EditOracleScript.t)
@@ -895,7 +872,7 @@ type msg_t =
   | DepositMsg(Gov.Deposit.decoded_t)
   | VoteMsg(Gov.Vote.decoded_t)
   | VoteWeightedMsg(Gov.VoteWeighted.decoded_t)
-  | ExecMsg(Authz.Exec.decoded_t)
+  | ExecMsg(Authz.Exec.t<msg_t>)
   | UnknownMsg
 
 type t = {
@@ -921,6 +898,7 @@ type badge_theme_t = {
 let getBadge = msg => {
   switch msg {
   | SendMsg(_) => {name: "Send", category: TokenMsg}
+  | MultiSendMsg(_) => {name: "Multi Send", category: TokenMsg}
   | CreateDataSourceMsg(_) => {name: "Create Data Source", category: OracleMsg}
   | EditDataSourceMsg(_) => {name: "Edit Data Source", category: OracleMsg}
   | CreateOracleScriptMsg(_) => {name: "Create Oracle Script", category: OracleMsg}
@@ -944,16 +922,12 @@ let getBadge = msg => {
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
   | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
-  | MultiSendMsg(_) => {
-      name: "Multi Send",
-      category: TokenMsg,
-    }
   | ExecMsg(_) => {name: "Exec", category: ValidatorMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
 
-let decodeMsg = (json, isSuccess) => {
+let rec decodeMsg = (json, isSuccess) => {
   let (decoded, sender, isIBC) = {
     open JsonUtils.Decode
     switch json->mustGet("type", string) {
@@ -961,6 +935,10 @@ let decodeMsg = (json, isSuccess) => {
         let msg = json->mustDecode(Bank.Send.decode)
         (SendMsg(msg), msg.fromAddress, false)
       }
+
+    | "/cosmos.bank.v1beta1.MsgMultiSend" =>
+      let msg = json->mustDecode(Bank.MultiSend.decode)
+      (MultiSendMsg(msg), Belt.List.getExn(msg.inputs, 0).address, false)
 
     | "/oracle.v1.MsgCreateDataSource" =>
       isSuccess
@@ -1004,7 +982,7 @@ let decodeMsg = (json, isSuccess) => {
 
     | "/oracle.v1.MsgReportData" =>
       let msg = json->mustDecode(Oracle.Report.decode)
-      (ReportMsg(msg), msg.reporter, false)
+      (ReportMsg(msg), msg.validator, false)
     | "/cosmos.authz.v1beta1.MsgGrant" =>
       let msg = json->mustDecode(Authz.Grant.decode)
       (GrantMsg(msg), msg.granter, false)
@@ -1012,7 +990,7 @@ let decodeMsg = (json, isSuccess) => {
       let msg = json->mustDecode(Authz.Revoke.decode)
       (RevokeMsg(msg), msg.validator, false)
     | "/cosmos.feegrant.v1beta1.MsgGrantAllowance" =>
-      let msg = json->mustDecode(FeeGrant.GrantAllowance.decoder)
+      let msg = json->mustDecode(FeeGrant.GrantAllowance.decode)
       (GrantAllowanceMsg(msg), msg.granter, false)
     | "/cosmos.feegrant.v1beta1.MsgRevokeAllowance" =>
       let msg = json->mustDecode(FeeGrant.RevokeAllowance.decode)
@@ -1129,22 +1107,26 @@ let decodeMsg = (json, isSuccess) => {
             (VoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
           }
 
-    | "/cosmos.bank.v1beta1.MsgMultiSend" =>
-      let msg = json->mustDecode(Bank.MultiSend.decode)
-      (MultiSendMsg(msg), List.nth(msg.inputs, 0).address, false)
     | "/cosmos.authz.v1beta1.MsgExec" =>
-      isSuccess
-        ? {
-            let msg = json->mustDecode(Authz.Exec.decodeSuccess)
-            (ExecMsg(Success(msg)), msg.grantee, false)
-          }
-        : {
-            let msg = json->mustDecode(Authz.Exec.decodeFail)
-            (ExecMsg(Failure(msg)), msg.grantee, false)
-          }
-
+      // let msg = json->mustGet("msg", id)
+      // let grantee = msg->mustGet("grantee", address)
+      // let rawMsgs =
+      //   msg->mustGet("msgs", list(id))->Belt.List.map(x => decodeMsg(x, isSuccess).decoded)
+      let msg = json->mustDecode(decodeExecMsg(isSuccess))
+      (ExecMsg(msg), msg.grantee, false)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }
   {raw: json, decoded, sender, isIBC}
+}
+and decodeExecMsg = isSuccess => {
+  open JsonUtils.Decode
+  let f: fd_type => Authz.Exec.t<msg_t> = json => {
+    grantee: json.required(list{"msg", "grantee"}, address),
+    msgs: json.required(
+      list{"msg", "msgs"},
+      list(custom((. json) => decodeMsg(json, isSuccess).decoded)),
+    ),
+  }
+  buildObject(f)
 }

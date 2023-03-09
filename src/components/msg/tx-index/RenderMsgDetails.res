@@ -29,7 +29,8 @@ module Calldata = {
   }
 }
 
-type content_inner_t =
+// TODO: Re-visit data structure
+type rec content_inner_t =
   | PlainText(string)
   | Address(Address.t)
   | ValidatorAddress(Address.t)
@@ -42,15 +43,15 @@ type content_inner_t =
   | VoteWeighted(Belt.List.t<Msg.Gov.VoteWeighted.Options.t>)
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
-  | ExecList(Belt.List.t<ExecDecoder.t>)
-
-type content_t = {
+  | ExecList(list<(string, array<content_t>)>)
+// | ExecList(list<Msg.msg_t>)
+and content_t = {
   title: string,
   content: content_inner_t,
   order: int,
 }
 
-let renderValue = v => {
+let rec renderValue = v => {
   switch v {
   | Address(address) => <AddressRender position=AddressRender.Subtitle address />
   | ValidatorAddress(address) =>
@@ -145,12 +146,11 @@ let renderValue = v => {
     <>
       {msgs
       ->Belt.List.toArray
-      ->Belt.Array.mapWithIndex((i, msg) => {
-        <Text
-          key={msg->ExecDecoder.getName ++ i->string_of_int}
-          size=Text.Body1
-          value={msg->ExecDecoder.getName}
-        />
+      ->Belt.Array.mapWithIndex((i, (name, contents)) => {
+        <div key={i->string_of_int}>
+          <Text size=Text.Body1 value={name} />
+          <div> {contents->Belt.Array.map(c => c.content->renderValue)->React.array} </div>
+        </div>
       })
       ->React.array}
     </>
@@ -158,7 +158,7 @@ let renderValue = v => {
 }
 
 module CreateDataSource = {
-  let factory = (msg: Msg.Oracle.CreateDataSource.t<'a>, firsts) =>
+  let factory = (msg: Msg.Oracle.CreateDataSource.internal_t<'a>, firsts) =>
     firsts->Belt.Array.concat([
       {title: "Owner", content: Address(msg.owner), order: 2},
       {title: "Treasury", content: Address(msg.treasury), order: 3},
@@ -362,8 +362,8 @@ module Report = {
       order: 1,
     },
     {
-      title: "Reporter",
-      content: Address(msg.reporter),
+      title: "Validator",
+      content: ValidatorAddress(msg.validator),
       order: 2,
     },
     {
@@ -943,29 +943,33 @@ module MultiSend = {
   ]
 }
 
-module Exec = {
-  let factory = (msg: Msg.Authz.Exec.t<'a>, firsts) =>
-    firsts->Belt.Array.concat([
-      {
-        title: "Grantee",
-        content: Address(msg.grantee),
-        order: 1,
-      },
-    ])
+// module Exec = {
+//   let factory = (msg: Msg.Authz.Exec.t<Msg.msg_t>) => [
+//     {
+//       title: "Grantee",
+//       content: Address(msg.grantee),
+//       order: 1,
+//     },
+//     {
+//       title: "Executed Messages",
+//       content: ExecList(msg.msgs),
+//       order: 2,
+//     },
+//   ]
 
-  let success = (msg: Msg.Authz.Exec.success_t) =>
-    msg->factory([
-      {
-        title: "Executed Messages",
-        content: ExecList(msg.msgs),
-        order: 2,
-      },
-    ])
+//   // let success = (msg: Msg.Authz.Exec.success_t) =>
+//   //   msg->factory([
+//   //     {
+//   //       title: "Executed Messages",
+//   //       content: ExecList(msg.msgs),
+//   //       order: 2,
+//   //     },
+//   //   ])
 
-  let failed = (msg: Msg.Authz.Exec.fail_t) => msg->factory([])
-}
+//   // let failed = (msg: Msg.Authz.Exec.fail_t) => msg->factory([])
+// }
 
-let getContent = msg => {
+let rec getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
     switch m {
@@ -1041,12 +1045,20 @@ let getContent = msg => {
     | Msg.Gov.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
   | Msg.MultiSendMsg(data) => MultiSend.factory(data)
-  | Msg.ExecMsg(m) =>
-    switch m {
-    | Msg.Authz.Exec.Success(data) => Exec.success(data)
-    | Msg.Authz.Exec.Failure(data) => Exec.failed(data)
-    }
-
+  | Msg.ExecMsg(msg) => [
+      {
+        title: "Grantee",
+        content: Address(msg.grantee),
+        order: 1,
+      },
+      {
+        title: "Executed Messages",
+        content: ExecList(
+          msg.msgs->Belt.List.map(msg => (Msg.getBadge(msg).name, getContent(msg))),
+        ),
+        order: 2,
+      },
+    ]
   | Msg.UnknownMsg => []
   }
 }
@@ -1058,20 +1070,18 @@ let make = (~contents: array<content_t>) => {
   {
     contents
     ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
-    ->Belt.Array.mapWithIndex((i, content) => {
+    ->Belt.Array.mapWithIndex((i, {content, title}) => {
       <Row key={i->Belt.Int.toString} marginBottom=0 marginBottomSm=24>
         <Col col=Col.Three mb=16 mbSm=8>
           <Heading
-            value={content.title}
+            value={title}
             size=Heading.H4
             weight=Heading.Regular
             marginBottom=8
             color=theme.neutral_600
           />
         </Col>
-        <Col col=Col.Nine mb=16 mbSm=8 key={i->Belt.Int.toString}>
-          {renderValue(content.content)}
-        </Col>
+        <Col col=Col.Nine mb=16 mbSm=8 key={i->Belt.Int.toString}> {renderValue(content)} </Col>
       </Row>
     })
     ->React.array

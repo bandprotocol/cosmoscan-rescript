@@ -143,11 +143,7 @@ let make = (~msg: Msg.t) => {
       | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
     | MultiSendMsg(msg) => <TokenMsg.MultisendMsg inputs={msg.inputs} outputs={msg.outputs} />
-    | ExecMsg(msg) =>
-      switch msg {
-      | Msg.Authz.Exec.Success(m) => <ValidatorMsg.Exec messages={m.msgs} />
-      | Msg.Authz.Exec.Failure(f) => React.null
-      }
+    | ExecMsg(msg) => <ValidatorMsg.Exec messages={msg.msgs} />
 
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
