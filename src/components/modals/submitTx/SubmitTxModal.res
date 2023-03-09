@@ -194,10 +194,11 @@ module CreateTxFlow = {
 
     <>
       <SubmitTxStep account setRawTx isActive={rawTx->Belt.Option.isNone} msg />
-      {switch rawTx {
-      | None => React.null
-      | Some(rawTx') => <PreviewJsonStep rawTx=rawTx' onBack={_ => setRawTx(_ => None)} account />
-      }}
+      // TODO: handle unit
+      // {switch rawTx {
+      // | None => React.null
+      // | Some(rawTx') => <PreviewJsonStep rawTx=rawTx' onBack={_ => setRawTx(_ => None)} account />
+      // }}
     </>
   }
 }

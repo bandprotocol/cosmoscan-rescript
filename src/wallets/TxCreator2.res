@@ -98,7 +98,7 @@ let createRawTx = (~sender, ~msgs, ~chainID, ~feeAmount, ~gas, ~memo, ~client, (
   feeCoin->BandChainJS.Coin.setAmount(feeAmount)
 
   let fee = BandChainJS.Fee.create()
-  fee->BandChainJS.Fee.setAmountList(list{feeCoin})
+  fee->BandChainJS.Fee.setAmountList([feeCoin])
   fee->BandChainJS.Fee.setGasLimit(gas)
 
   let tx = create()
