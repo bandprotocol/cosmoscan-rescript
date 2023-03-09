@@ -7,19 +7,19 @@ module Styles = {
       overflow(overflowed ? #hidden : #visible),
       selector("> div + div", [marginTop(#px(10))]),
     ])
-  let showButton = (theme: Theme.t) => 
-  style(. [
-    display(#flex),
-    backgroundColor(theme.neutral_200),
-    borderRadius(#px(30)),
-    width(#px(65)),
-    alignItems(#center),
-    justifyContent(#center),
-    fontSize(#px(10)),
-    cursor(#pointer),
-    color(Theme.black),
-    height(#px(20)),
-  ])
+  let showButton = (theme: Theme.t) =>
+    style(. [
+      display(#flex),
+      backgroundColor(theme.neutral_200),
+      borderRadius(#px(30)),
+      width(#px(65)),
+      alignItems(#center),
+      justifyContent(#center),
+      fontSize(#px(10)),
+      cursor(#pointer),
+      color(Theme.black),
+      height(#px(20)),
+    ])
   let showContainer = style(. [display(#flex), marginTop(#px(10))])
 }
 
@@ -46,7 +46,7 @@ let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string) => {
       ->Belt.List.toArray
       ->Belt.Array.mapWithIndex((i, msg) =>
         <React.Fragment key={txHash->Hash.toHex ++ i->Belt.Int.toString}>
-          {<Msg msg />}
+          {<SubMsg msg />}
         </React.Fragment>
       )
       ->React.array}
@@ -61,12 +61,12 @@ let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string) => {
               setExpanded(_ => !expanded)
             }}>
             {expanded
-              ? <div className=Styles.showButton(theme)> {"show less"->React.string} </div>
+              ? <div className={Styles.showButton(theme)}> {"show less"->React.string} </div>
               : isMobile
-              ? <Link className=Styles.showButton(theme) route=Route.TxIndexPage(txHash)>
+              ? <Link className={Styles.showButton(theme)} route=Route.TxIndexPage(txHash)>
                 {"show more"->React.string}
               </Link>
-              : <div className=Styles.showButton(theme)> {"show more"->React.string} </div>}
+              : <div className={Styles.showButton(theme)}> {"show more"->React.string} </div>}
           </div>
         </div>
       : React.null}

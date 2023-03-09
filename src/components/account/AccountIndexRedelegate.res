@@ -222,7 +222,7 @@ let make = (~address) => {
         </THead>}
     {switch redelegateListSub {
     | Data(redelegateList) =>
-      redelegateList->Belt.Array.size > 0
+      redelegateList->Belt.Array.length > 0
         ? redelegateList
           ->Belt.Array.mapWithIndex((i, e) => {
             let componentKey =

@@ -45,53 +45,57 @@ let reducer = (state, action) =>
       gaslimit,
     }) =>
     switch state {
-    | Some({address, wallet, pubKey, chainID}) =>
-      callback(
-        TxCreator.createRawTx(
-          ~address,
-          ~msgs=[
-            Request(
-              oracleScriptID,
-              calldata,
-              askCount,
-              minCount,
-              address,
-              clientID,
-              {amount: feeLimit->Belt.Int.toString, denom: "uband"},
-              prepareGas->Belt.Int.toString,
-              executeGas->Belt.Int.toString,
-            ),
-          ],
-          ~chainID,
-          ~gas={
-            switch (gaslimit->Belt.Int.fromString) {
-            | Some(gasOpt) => gasOpt
-            | _ => 1000000
-            };
-          },
-          ~feeAmount={
-            switch (int_of_string_opt(gaslimit)) {
-            | Some(gasOpt) => Js.Float.toString(float_of_int(gasOpt) *. 0.0025)
-            | _ => "2500"
-            };
-          },
-          ~memo="send via scan",
+    | Some({address, wallet, pubKey, chainID}) => {
+        let msg = TxCreator.createMsg(
+          ~sender=address,
+          ~msg=Request(
+            oracleScriptID,
+            calldata,
+            askCount,
+            minCount,
+            address,
+            clientID,
+            {amount: feeLimit->Belt.Int.toString, denom: "uband"},
+            prepareGas->Belt.Int.toString,
+            executeGas->Belt.Int.toString,
+          ),
           (),
-        )->Promise.then(rawTx => {
-          Wallet.sign(TxCreator.sortAndStringify(rawTx), wallet)->Promise.then(signature => {
-            let signedTx = TxCreator.createSignedTx(
-              ~signature=signature->JsBuffer.toBase64,
-              ~pubKey,
-              ~tx=rawTx,
-              ~mode="block",
-              (),
-            )
-            TxCreator.broadcast(signedTx)
-          })
-        }),
-      )
+        )
+        Js.log(msg)
+        let promiseCallBack = async () => {
+          let rawTx = await TxCreator.createRawTx(
+            ~address,
+            ~msgs=[msg],
+            ~chainID,
+            ~gas={"700000"->int_of_string},
+            ~feeAmount="0",
+            ~memo="send via scan",
+            (),
+          )
+          let signature = await Wallet.sign(TxCreator.sortAndStringify(rawTx), wallet)
+          let signedTx = TxCreator.createSignedTx(
+            ~signature=signature->JsBuffer.toBase64,
+            ~pubKey,
+            ~tx=rawTx,
+            ~mode="block",
+            (),
+          )
 
-      state
+          let result = await TxCreator.broadcast(signedTx)
+
+          result
+
+          //TODO: update bandchain.js to 2.1.4
+          // let jsonTxStr = rawTx->BandChainJS.Transaction.getSignMessage->JsBuffer.toUTF8;
+          // let%Promise signature = Wallet.sign(jsonTxStr, wallet);
+          // let signedTx = rawTx->BandChainJS.Transaction.getTxData(signature, wrappedPubKey, 127);
+          // TxCreator2.broadcast(client, signedTx);
+        }
+
+        callback(()->promiseCallBack)
+        state
+      }
+
     | None =>
       callback(Promise.resolve(TxCreator.Unknown))
       state

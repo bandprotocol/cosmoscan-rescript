@@ -33,7 +33,7 @@ module Styles = {
       position(#absolute),
       top(#percent(50.)),
       left(#percent(50.)),
-      backgroundColor(theme.neutral_100),
+      backgroundColor(theme.neutral_000),
       borderRadius(#px(8)),
       overflow(#hidden),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.2)))),
@@ -111,10 +111,11 @@ let make = () => {
         {switch //TODO: Will patch the modal component later
         modal {
         | Connect(chainID) => <ConnectModal chainID />
-        | SubmitTx(_) => "SubmitTx"->React.string
+        | SubmitTx(msg) => <SubmitTxModal msg />
+        | ChainSelector(targetChain) => <ChainSelectorModal targetChain />
         | QRCode(address) => <QRCodeModal address />
         | IBCPacketError(_) => "Connect"->React.string
-        | Syncing => "Sync"->React.string
+        | Syncing => <SyncingModal />
         }}
       </div>
     </div>

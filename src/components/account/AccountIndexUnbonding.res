@@ -181,7 +181,7 @@ let make = (~address) => {
           </Row>
         </THead>}
     {switch unbondingListSub {
-    | Data(unbondingList) if unbondingList->Belt.Array.size > 0 =>
+    | Data(unbondingList) => unbondingList->Belt.Array.length > 0 ?
       unbondingList
       ->Belt.Array.mapWithIndex((i, e) =>
         isMobile
@@ -200,9 +200,7 @@ let make = (~address) => {
             />
       )
       ->React.array
-
-    | Data(unbondingList) if unbondingList->Belt.Array.size == 0 =>
-      <EmptyContainer>
+    : <EmptyContainer>
         <img
           src={isDarkMode ? Images.noDataDark : Images.noDataLight}
           alt="No Data"

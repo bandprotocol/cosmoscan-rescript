@@ -10,7 +10,7 @@ type t = {
   gasUsed: int,
   sender: Address.t,
   timestamp: MomentRe.Moment.t,
-  messages: list<MsgDecoder.t>,
+  messages: list<Msg.t>,
   memo: string,
   errMsg: string,
 }
@@ -66,10 +66,17 @@ let toExternal = ({
   sender,
   memo,
   timestamp: block.timestamp,
-  messages: {
-    let msg = messages->Js.Json.decodeArray->Belt.Option.getExn->Belt.List.fromArray
-    msg->Belt.List.map(success ? MsgDecoder.decodeAction : MsgDecoder.decodeFailAction)
+  messages: // let msg = messages->Js.Json.decodeArray->Belt.Option.getExn->Belt.List.fromArray
+
+  {
+    let msg = messages->Js.Json.decodeArray
+    switch msg {
+    | Some(msg) => msg->Belt.List.fromArray
+    | None => []->Belt.List.fromArray
+    }->Belt.List.map(each => Msg.decodeMsg(each, success))
   },
+  // msg->Belt.List.map(each => Msg.decodeMsg(each, success))
+
   errMsg: errMsg->Belt.Option.getWithDefault(""),
 }
 
@@ -189,14 +196,14 @@ let get = txHash => {
   })
 }
 
-let getList = (~page, ~pageSize, ()) => {
+let getList = (~page, ~pageSize) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({limit: pageSize, offset})
 
   result->Sub.fromData->Sub.map(({transactions}) => transactions->Belt.Array.map(toExternal))
 }
 
-let getListBySender = (sender, ~page, ~pageSize) => {
+let getListBySender = (~sender, ~page, ~pageSize) => {
   let offset = (page - 1) * pageSize
   let result = MultiBySenderConfig.use({
     limit: pageSize,
@@ -217,7 +224,7 @@ let getListBySender = (sender, ~page, ~pageSize) => {
   })
 }
 
-let getListByBlockHeight = (height) => {
+let getListByBlockHeight = height => {
   let result = MultiByHeightConfig.use({height: height->ID.Block.toInt})
 
   result->Sub.fromData->Sub.map(({transactions}) => transactions->Belt.Array.map(toExternal))

@@ -3,11 +3,13 @@ open Webapi.Dom
 type t =
   | Sm
   | Md
+  | Lg
 
 let getBreakpoint = size =>
   switch size {
   | Sm => 370
   | Md => 768
+  | Lg => 1024
   }
 
 let query = (size, styles) => {
@@ -38,3 +40,4 @@ let smallMobile = styles => query(Sm, styles)
 
 let isMobile = useQuery(~size=Md)
 let isSmallMobile = useQuery(~size=Sm)
+let isTablet = useQuery(~size=Lg)

@@ -5,6 +5,7 @@ type t = {
   btcPrice: float,
   btcMarketCap: float,
   circulatingSupply: float,
+  totalSupply: float
 }
 
 let getBandUsd24Change = () => {
@@ -40,6 +41,18 @@ let getCirculatingSupply = () => {
   })
 }
 
+let getTotalSupply = () => {
+  open! JsonUtils.Decode
+
+  Axios.get("https://api.bandchain.org/supply/total")
+  -> Promise.then(result => Promise.resolve(result->mustGet("data", float)))
+  -> Promise.catch(e => {
+      Js.Console.log("can't get totalsupply");
+      Js.Console.log(e);
+      Js.Promise.resolve(0.);
+     });
+};
+
 module Price = {
   type t = {
     multiplier: float,
@@ -49,8 +62,8 @@ module Price = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      multiplier: json.at(list{"multiplier"}, floatstr),
-      px: json.at(list{"px"}, floatstr),
+      multiplier: json.required(list{"multiplier"}, floatstr),
+      px: json.required(list{"px"}, floatstr),
     })
   }
 }
@@ -88,10 +101,11 @@ let getBandInfo = _ => {
   let ratesPromise = getPrices()
   let supplyPromise = getCirculatingSupply()
   let usd24HrChangePromise = getBandUsd24Change()
+  let totalPromise = getTotalSupply();
 
-  Promise.all3((ratesPromise, usd24HrChangePromise, supplyPromise))->Promise.then(result => {
+  Promise.all4((ratesPromise, usd24HrChangePromise, supplyPromise, totalPromise))->Promise.then(result => {
     Promise.resolve({
-      let (rates, usd24HrChange, supply) = result
+      let (rates, usd24HrChange, supply, totalSupply) = result
       rates->Belt.Option.flatMap(prices => {
         let (bandUsd, bandBtc) = prices
         Some({
@@ -101,6 +115,7 @@ let getBandInfo = _ => {
           btcPrice: bandBtc,
           btcMarketCap: bandBtc *. supply,
           circulatingSupply: supply,
+          totalSupply
         })
       })
     })
