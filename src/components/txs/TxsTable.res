@@ -7,7 +7,7 @@ module Styles = {
 
 module RenderBody = {
   @react.component
-  let make = (~txSub: Sub.variant<TxSub.t>, ~msgTransform: MsgDecoder.t => MsgDecoder.t) => {
+  let make = (~txSub: Sub.variant<TxSub.t>, ~msgTransform: Msg.t => Msg.t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <TBody>
       <Row alignItems=Row.Start>
@@ -67,11 +67,7 @@ module RenderBody = {
 
 module RenderBodyMobile = {
   @react.component
-  let make = (
-    ~reserveIndex,
-    ~txSub: Sub.variant<TxSub.t>,
-    ~msgTransform: MsgDecoder.t => MsgDecoder.t,
-  ) => {
+  let make = (~reserveIndex, ~txSub: Sub.variant<TxSub.t>, ~msgTransform: Msg.t => Msg.t) => {
     let isSmallMobile = Media.isSmallMobile()
 
     switch txSub {
@@ -110,10 +106,7 @@ module RenderBodyMobile = {
 }
 
 @react.component
-let make = (
-  ~txsSub: Sub.variant<array<TxSub.t>>,
-  ~msgTransform: MsgDecoder.t => MsgDecoder.t=x => x,
-) => {
+let make = (~txsSub: Sub.variant<array<TxSub.t>>, ~msgTransform: Msg.t => Msg.t=x => x) => {
   let isMobile = Media.isMobile()
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)

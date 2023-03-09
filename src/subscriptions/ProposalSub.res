@@ -28,9 +28,9 @@ module Plan = {
 
     buildObject(json => {
       {
-        name: json.at(list{"name"}, string),
-        time: json.at(list{"time"}, moment),
-        height: json.at(list{"height"}, int),
+        name: json.required(list{"name"}, string),
+        time: json.required(list{"time"}, moment),
+        height: json.required(list{"height"}, int),
       }
     })
   }
@@ -81,15 +81,15 @@ module ProposalStatus = {
     }
   }
   //TODO: implement for status
-  let serialize = status => 
-  switch (status) {
-  | Deposit => "DepositPeriod"->Js.Json.string
-  | Voting => "VotingPeriod"->Js.Json.string
-  | Passed => "Passed"->Js.Json.string
-  | Rejected => "Rejected"->Js.Json.string
-  | Failed => "Failed"->Js.Json.string
-  | Inactive => "Inactive"->Js.Json.string
-  }
+  let serialize = status =>
+    switch status {
+    | Deposit => "DepositPeriod"->Js.Json.string
+    | Voting => "VotingPeriod"->Js.Json.string
+    | Passed => "Passed"->Js.Json.string
+    | Rejected => "Rejected"->Js.Json.string
+    | Failed => "Failed"->Js.Json.string
+    | Inactive => "Inactive"->Js.Json.string
+    }
 }
 
 type account_t = {address: Address.t}
@@ -187,7 +187,7 @@ let toExternal = ({
     endTotalAbstain: abstainVote /. 1e6,
     endTotalAbstainPercent: abstainVote /. totalVote *. 100.,
     endTotalVote: totalVote /. 1e6,
-    totalBondedTokens: total_bonded_tokens -> Belt.Option.map(d => d /. 1e6) ,
+    totalBondedTokens: total_bonded_tokens->Belt.Option.map(d => d /. 1e6),
     totalDeposit,
   }
 }

@@ -62,8 +62,8 @@ module Price = {
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
-      multiplier: json.at(list{"multiplier"}, floatstr),
-      px: json.at(list{"px"}, floatstr),
+      multiplier: json.required(list{"multiplier"}, floatstr),
+      px: json.required(list{"px"}, floatstr),
     })
   }
 }

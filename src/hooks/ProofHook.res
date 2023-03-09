@@ -7,8 +7,8 @@ module Proof = {
   let decodeProof = {
     open JsonUtils.Decode
     buildObject(json => {
-      jsonProof: json.at(list{"result", "proof"}, id),
-      evmProofBytes: json.at(
+      jsonProof: json.required(list{"result", "proof"}, id),
+      evmProofBytes: json.required(
         list{"result", "evm_proof_bytes"},
         string->map((. a) => JsBuffer.fromHex(a)),
       ),

@@ -44,7 +44,7 @@ let make = (
           weight
           ellipsis=false
           size
-          color={theme.neutral_900}
+          color={theme.primary_600}
         />
       </Link>
     | true =>
@@ -56,6 +56,7 @@ let make = (
           weight
           ellipsis=true
           size
+          code=true
           color={theme.neutral_900}
         />
       </Link>

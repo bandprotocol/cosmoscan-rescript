@@ -17,19 +17,22 @@ module OracleRequestPacket = {
 
   open JsonUtils.Decode
   let decode = buildObject(json => {
-    requestID: json.at(list{"id"}, ID.Request.decoder),
-    oracleScriptID: json.at(list{"decoded_data", "oracle_script_id"}, ID.OracleScript.decoder),
-    oracleScriptName: json.at(list{"decoded_data", "oracle_script_name"}, string),
-    clientID: json.at(list{"decoded_data", "client_id"}, string),
-    calldata: json.at(list{"decoded_data", "calldata"}, bufferWithDefault),
-    askCount: json.at(list{"decoded_data", "ask_count"}, int),
-    minCount: json.at(list{"decoded_data", "min_count"}, int),
-    feeLimit: json.at(list{"decoded_data", "fee_limit"}, string),
-    executeGas: json.at(list{"decoded_data", "execute_gas"}, int),
-    prepareGas: json.at(list{"decoded_data", "prepare_gas"}, int),
-    schema: json.at(list{"decoded_data", "oracle_script_schema"}, string),
-    requestKey: json.at(list{"decoded_data", "request_key"}, string),
-    payer: json.at(list{"decoded_data", "payer"}, string)->Address.fromBech32,
+    requestID: json.required(list{"id"}, ID.Request.decoder),
+    oracleScriptID: json.required(
+      list{"decoded_data", "oracle_script_id"},
+      ID.OracleScript.decoder,
+    ),
+    oracleScriptName: json.required(list{"decoded_data", "oracle_script_name"}, string),
+    clientID: json.required(list{"decoded_data", "client_id"}, string),
+    calldata: json.required(list{"decoded_data", "calldata"}, bufferWithDefault),
+    askCount: json.required(list{"decoded_data", "ask_count"}, int),
+    minCount: json.required(list{"decoded_data", "min_count"}, int),
+    feeLimit: json.required(list{"decoded_data", "fee_limit"}, string),
+    executeGas: json.required(list{"decoded_data", "execute_gas"}, int),
+    prepareGas: json.required(list{"decoded_data", "prepare_gas"}, int),
+    schema: json.required(list{"decoded_data", "oracle_script_schema"}, string),
+    requestKey: json.required(list{"decoded_data", "request_key"}, string),
+    payer: json.required(list{"decoded_data", "payer"}, string)->Address.fromBech32,
   })
 }
 
@@ -43,10 +46,10 @@ module FungibleTokenPacket = {
 
   open JsonUtils.Decode
   let decode = buildObject(json => {
-    amount: json.at(list{"amount"}, int),
-    denom: json.at(list{"denom"}, string),
-    receiver: json.at(list{"receiver"}, string),
-    sender: json.at(list{"sender"}, string),
+    amount: json.required(list{"amount"}, int),
+    denom: json.required(list{"denom"}, string),
+    receiver: json.required(list{"receiver"}, string),
+    sender: json.required(list{"sender"}, string),
   })
 }
 
