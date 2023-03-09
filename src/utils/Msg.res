@@ -767,6 +767,17 @@ module RecvPacket = {
   }
 }
 
+module CreateClient = {
+  type t = {signer: Address.t}
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+    })
+  }
+}
+
 module Deposit = {
   type t<'a> = {
     depositor: Address.t,
@@ -936,6 +947,7 @@ type msg_t =
   | VoteWeightedMsg(VoteWeighted.decoded_t)
   | UpdateClientMsg(UpdateClient.t)
   | RecvPacketMsg(RecvPacket.decoded_t)
+  | CreateClientMsg(CreateClient.t)
   | UnknownMsg
 
 type t = {
@@ -983,6 +995,7 @@ let getBadge = msg => {
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
   | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
+  | CreateClientMsg(_) => {name: "Create Client", category: IBCMsg}
   | UpdateClientMsg(_) => {name: "Update Client", category: IBCMsg}
   | RecvPacketMsg(_) => {name: "Recv Packet", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
@@ -1163,6 +1176,9 @@ let decodeMsg = (json, isSuccess) => {
             let msg = json->mustDecode(VoteWeighted.decodeFail)
             (VoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
           }
+    | "/ibc.core.client.v1.MsgCreateClient" =>
+      let msg = json->mustDecode(CreateClient.decode)
+      (CreateClientMsg(msg), msg.signer, true)
     | "/ibc.core.client.v1.MsgUpdateClient" =>
       let msg = json->mustDecode(UpdateClient.decode)
       (UpdateClientMsg(msg), msg.signer, true)

@@ -145,6 +145,7 @@ let make = (~msg: Msg.t) => {
       } 
       | Msg.RecvPacket.Failure(f) => React.null
       }
+    | CreateClientMsg(msg) => React.null
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />

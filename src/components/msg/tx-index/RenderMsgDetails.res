@@ -1001,6 +1001,18 @@ module RecvPacket = {
   let failed = (msg: Msg.RecvPacket.fail_t) => msg->factory([])
 }
 
+module CreateClient = {
+  let factory = (msg: Msg.CreateClient.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+    ]
+  }
+}
+
 module UpdateClient = {
   let factory = (msg: Msg.UpdateClient.t) => {
     [
@@ -1092,6 +1104,7 @@ let getContent = msg => {
     | Msg.VoteWeighted.Success(data) => VoteWeighted.success(data)
     | Msg.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
+  | Msg.CreateClientMsg(data) => CreateClient.factory(data)
   | Msg.UpdateClientMsg(data) => UpdateClient.factory(data)
   | Msg.RecvPacketMsg(m) =>
     switch m {
