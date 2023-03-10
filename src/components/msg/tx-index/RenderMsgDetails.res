@@ -156,18 +156,34 @@ let rec renderValue = v => {
             {contents
             ->Belt.Array.mapWithIndex((j, c) => {
               <Row key={j->string_of_int}>
-                <Col col={j === 2 ? Col.Twelve : Col.Two} mb={4} mbSm={8}>
-                  <Heading
-                    value={c.title ++ ": "}
-                    size=Heading.H4
-                    weight=Heading.Regular
-                    marginBottom=8
-                    color=theme.neutral_600
-                  />
-                </Col>
-                <Col col={j === 2 ? Col.Twelve : Col.Ten} mb={4} mbSm={8}>
-                  {renderValue(c.content)}
-                </Col>
+                {switch c.content {
+                | RawReports(_) =>
+                  <>
+                    <Col col=Col.Twelve>
+                      <Heading
+                        value="Raw Reports: "
+                        size=Heading.H4
+                        weight=Heading.Regular
+                        marginBottom=8
+                        color=theme.neutral_600
+                      />
+                    </Col>
+                    <Col col=Col.Twelve> {renderValue(c.content)} </Col>
+                  </>
+                | _ =>
+                  <>
+                    <Col col=Col.Two mb={4} mbSm={8}>
+                      <Heading
+                        value={c.title ++ ": "}
+                        size=Heading.H4
+                        weight=Heading.Regular
+                        marginBottom=8
+                        color=theme.neutral_600
+                      />
+                    </Col>
+                    <Col col=Col.Ten mb={4} mbSm={8}> {renderValue(c.content)} </Col>
+                  </>
+                }}
               </Row>
             })
             ->React.array}
