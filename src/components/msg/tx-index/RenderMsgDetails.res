@@ -1,3 +1,9 @@
+module Styles = {
+  open CssJs
+
+  let execContainers = (theme: Theme.t) =>
+    style(. [padding(#px(10)), backgroundColor(theme.neutral_100), borderRadius(#px(4))])
+}
 module Calldata = {
   @react.component
   let make = (~schema, ~calldata) => {
@@ -52,6 +58,7 @@ and content_t = {
 }
 
 let rec renderValue = v => {
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   switch v {
   | Address(address) => <AddressRender position=AddressRender.Subtitle address />
   | ValidatorAddress(address) =>
@@ -143,17 +150,49 @@ let rec renderValue = v => {
       ])}
     />
   | ExecList(msgs) =>
-    <>
+    <div>
       {msgs
       ->Belt.List.toArray
       ->Belt.Array.mapWithIndex((i, (name, contents)) => {
         <div key={i->string_of_int}>
-          <Text size=Text.Body1 value={name} />
-          <div> {contents->Belt.Array.map(c => c.content->renderValue)->React.array} </div>
+          <Row key={i->string_of_int}>
+            <Col col=Col.Two mb={4} mbSm={8}>
+              <Heading
+                value="Message: "
+                size=Heading.H4
+                weight=Heading.Regular
+                marginBottom=8
+                color=theme.neutral_600
+              />
+            </Col>
+            <Col col=Col.Ten mb={4} mbSm={8}>
+              <Text size=Text.Body1 value={name} color={theme.neutral_900} />
+            </Col>
+          </Row>
+          <div>
+            {contents
+            ->Belt.Array.mapWithIndex((j, c) => {
+              <Row key={j->string_of_int}>
+                <Col col={j === 2 ? Col.Twelve : Col.Two} mb={4} mbSm={8}>
+                  <Heading
+                    value={c.title ++ ": "}
+                    size=Heading.H4
+                    weight=Heading.Regular
+                    marginBottom=8
+                    color=theme.neutral_600
+                  />
+                </Col>
+                <Col col={j === 2 ? Col.Twelve : Col.Ten} mb={4} mbSm={8}>
+                  {renderValue(c.content)}
+                </Col>
+              </Row>
+            })
+            ->React.array}
+          </div>
         </div>
       })
       ->React.array}
-    </>
+    </div>
   }
 }
 
