@@ -50,7 +50,6 @@ type rec content_inner_t =
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | ExecList(list<(string, array<content_t>)>)
-// | ExecList(list<Msg.msg_t>)
 and content_t = {
   title: string,
   content: content_inner_t,
@@ -119,16 +118,8 @@ let rec renderValue = v => {
       rows={inputs
       ->Belt.List.toArray
       ->Belt.Array.map(input => [
-        KVTable.Value(
-          // <AddressRender address={input.address} />
-          input.address->Address.toBech32,
-        ),
-        KVTable.Value(
-          // <AmountRender coins={input.coins} />
-          input.coins
-          ->Coin.getBandAmountFromCoins
-          ->Belt.Float.toString,
-        ),
+        KVTable.Value(input.address->Address.toBech32),
+        KVTable.Value(input.coins->Coin.getBandAmountFromCoins->Belt.Float.toString),
       ])}
     />
   | MultiSendOutputList(outputs) =>
@@ -137,16 +128,8 @@ let rec renderValue = v => {
       rows={outputs
       ->Belt.List.toArray
       ->Belt.Array.map(output => [
-        KVTable.Value(
-          // <AddressRender address={output.address} />
-          output.address->Address.toBech32,
-        ),
-        KVTable.Value(
-          // <AmountRender coins={output.coins} />
-          output.coins
-          ->Coin.getBandAmountFromCoins
-          ->Belt.Float.toString,
-        ),
+        KVTable.Value(output.address->Address.toBech32),
+        KVTable.Value(output.coins->Coin.getBandAmountFromCoins->Belt.Float.toString),
       ])}
     />
   | ExecList(msgs) =>
@@ -457,21 +440,6 @@ module Revoke = {
     },
   ]
 }
-
-// module RevokeAllowance = {
-//   let factory = (msg: Msg.RevokeAllowance.t) => [
-//     {
-//       title: "Granter",
-//       content: Address(msg.granter),
-//       order: 1,
-//     },
-//     {
-//       title: "Grantee",
-//       content: Address(msg.grantee),
-//       order: 2,
-//     },
-//   ]
-// }
 
 module GrantAllowance = {
   let factory = (msg: Msg.FeeGrant.GrantAllowance.t) => [
@@ -981,32 +949,6 @@ module MultiSend = {
     },
   ]
 }
-
-// module Exec = {
-//   let factory = (msg: Msg.Authz.Exec.t<Msg.msg_t>) => [
-//     {
-//       title: "Grantee",
-//       content: Address(msg.grantee),
-//       order: 1,
-//     },
-//     {
-//       title: "Executed Messages",
-//       content: ExecList(msg.msgs),
-//       order: 2,
-//     },
-//   ]
-
-//   // let success = (msg: Msg.Authz.Exec.success_t) =>
-//   //   msg->factory([
-//   //     {
-//   //       title: "Executed Messages",
-//   //       content: ExecList(msg.msgs),
-//   //       order: 2,
-//   //     },
-//   //   ])
-
-//   // let failed = (msg: Msg.Authz.Exec.fail_t) => msg->factory([])
-// }
 
 let rec getContent = msg => {
   switch msg {
