@@ -14,6 +14,7 @@ module Styles = {
       backgroundColor(theme.neutral_100),
       borderRadius(px(8)),
       Media.mobile([padding2(~v=#px(8), ~h=#px(12))]),
+      width(#percent(100.)),
     ])
 
   let tableSpacing = style(. [
@@ -52,7 +53,11 @@ let renderField = (field, maxWidth) => {
       <TypeID.DataSource id position=TypeID.Mini />
       <HSpacing size=Spacing.sm />
       <Text
-        value=name weight=Text.Regular spacing={Text.Em(0.02)} size=Text.Caption height={Text.Px(16)}
+        value=name
+        weight=Text.Regular
+        spacing={Text.Em(0.02)}
+        size=Text.Caption
+        height={Text.Px(16)}
       />
     </div>
   | Block(id) =>
