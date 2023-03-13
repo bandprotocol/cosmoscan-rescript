@@ -998,6 +998,22 @@ module ConnectionOpenAck = {
   }
 }
 
+module ConnectionOpenConfirm = {
+  type t = {
+    signer: Address.t,
+    connectionID: string,
+    proofHeight: Height.t,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+      connectionID: json.required(list{"msg", "connection_id"}, string),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+    })
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -1028,6 +1044,7 @@ type msg_t =
   | ConnectionOpenInitMsg(ConnectionOpenInit.t)
   | ConnectionOpenTryMsg(ConnectionOpenTry.t)
   | ConnectionOpenAckMsg(ConnectionOpenAck.t)
+  | ConnectionOpenConfirmMsg(ConnectionOpenConfirm.t)
   | UnknownMsg
 
 type t = {
@@ -1081,6 +1098,7 @@ let getBadge = msg => {
   | ConnectionOpenInitMsg(_) => {name: "Connection Open Init", category: IBCMsg}
   | ConnectionOpenTryMsg(_) => {name: "Connection Open Try", category: IBCMsg}
   | ConnectionOpenAckMsg(_) => {name: "Connection Open Ack", category: IBCMsg}
+  | ConnectionOpenConfirmMsg(_) => {name: "Connection Open Confirm", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1284,6 +1302,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/ibc.core.connection.v1.MsgConnectionOpenAck" =>
       let msg = json->mustDecode(ConnectionOpenAck.decode)
       (ConnectionOpenAckMsg(msg), msg.signer, true)
+    | "/ibc.core.connection.v1.MsgConnectionOpenConfirm" =>
+      let msg = json->mustDecode(ConnectionOpenConfirm.decode)
+      (ConnectionOpenConfirmMsg(msg), msg.signer, true)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }

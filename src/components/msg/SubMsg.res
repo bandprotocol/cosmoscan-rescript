@@ -147,8 +147,12 @@ let make = (~msg: Msg.t) => {
       }
     | CreateClientMsg(msg) => React.null
     | ConnectionOpenTryMsg({clientID, counterparty})
-    | ConnectionOpenInitMsg({clientID, counterparty}) => <IBCConnectionMsg.ConnectionCommon clientID counterpartyClientID={counterparty.clientID} />
-    | ConnectionOpenAckMsg({connectionID, counterpartyConnectionID}) => <IBCConnectionMsg.ConnectionOpenAck connectionID counterpartyConnectionID />
+    | ConnectionOpenInitMsg({clientID, counterparty}) => 
+      <IBCConnectionMsg.ConnectionCommon clientID counterpartyClientID={counterparty.clientID} />
+    | ConnectionOpenAckMsg({connectionID, counterpartyConnectionID}) => 
+      <IBCConnectionMsg.ConnectionOpenAck connectionID counterpartyConnectionID />
+    | ConnectionOpenConfirmMsg({connectionID}) =>
+      <IBCConnectionMsg.ConnectionOpenConfirm connectionID />
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />

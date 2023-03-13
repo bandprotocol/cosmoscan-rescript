@@ -1149,50 +1149,83 @@ module ConnectionOpenAck = {
       {
         title: "Connection ID",
         content: PlainText(msg.connectionID),
-        order: 4,
+        order: 2,
       },
       {
         heading: "Counterparty",
         title: "",
         content: PlainText(""),
-        order: 5,
+        order: 3,
       },
       {
         title: "Connection ID",
         content: PlainText(msg.counterpartyConnectionID),
-        order: 7,
+        order: 4,
       },
       {
         heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 6,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 7,
+      },
+      {
+        heading: "Consensus Height",
         title: "",
         content: PlainText(""),
         order: 8,
       },
       {
         title: "Revision Height",
-        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        content: PlainText(msg.consensusHeight.revisionHeight->Belt.Int.toString),
         order: 9,
       },
       {
         title: "Revision Number",
-        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        content: PlainText(msg.consensusHeight.revisionNumber->Belt.Int.toString),
         order: 10,
       },
+    ]
+  }
+}
+
+module ConnectionOpenConfirm = {
+  let factory = (msg: Msg.ConnectionOpenConfirm.t) => {
+    [
       {
-        heading: "Consensus Height",
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Connection ID",
+        content: PlainText(msg.connectionID),
+        order: 2,
+      },
+      {
+        heading: "Proof Height",
         title: "",
         content: PlainText(""),
-        order: 11,
+        order: 3,
       },
       {
         title: "Revision Height",
-        content: PlainText(msg.consensusHeight.revisionHeight->Belt.Int.toString),
-        order: 12,
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 4,
       },
       {
         title: "Revision Number",
-        content: PlainText(msg.consensusHeight.revisionNumber->Belt.Int.toString),
-        order: 13,
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 5,
       },
     ]
   }
@@ -1282,6 +1315,7 @@ let getContent = msg => {
   | Msg.ConnectionOpenInitMsg(data) => ConnectionOpenInit.factory(data)
   | Msg.ConnectionOpenTryMsg(data) => ConnectionOpenTry.factory(data)
   | Msg.ConnectionOpenAckMsg(data) => ConnectionOpenAck.factory(data)
+  | Msg.ConnectionOpenConfirmMsg(data) => ConnectionOpenConfirm.factory(data)
   | Msg.UnknownMsg => []
   }
 }
