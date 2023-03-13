@@ -42,3 +42,11 @@ let toBandChainCoins = (coins: list<t>) => {
 
   bandCoins->Belt.List.toArray
 }
+
+let toBandChainCoin = (coin: t) => {
+  let bandCoin = BandChainJS.Coin.create()
+  bandCoin->BandChainJS.Coin.setDenom(coin.denom)
+  bandCoin->BandChainJS.Coin.setAmount(coin.amount->Js.Float.toString)
+
+  bandCoin
+}
