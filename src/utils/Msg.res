@@ -1014,6 +1014,71 @@ module ConnectionOpenConfirm = {
   }
 }
 
+let getStateText = state => 
+  switch state {
+  | 0 => "Uninitialized"
+  | 1 => "Init"
+  | 2 => "Try Open"
+  | 3 => "Open"
+  | 4 => "Closed"
+  | _ => "Unknown"
+  }
+
+let getOrderText = order => 
+  switch order {
+  | 0 => "None"
+  | 1 => "Unordered"
+  | 2 => "Ordered"
+  | _ => "Unknown"
+  }
+
+module ChannelCounterParty = {
+  type t = {
+    portID: string,
+    channelID: string,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      portID: json.required(list{"port_id"}, string),
+      channelID: json.optional(list{"channel_id"}, string)->Belt.Option.getWithDefault(""),
+    })
+  }
+}
+
+module Channel = {
+  type t = {
+    state: string,
+    ordering: string,
+    counterparty: ChannelCounterParty.t,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      state: json.required(list{"state"}, int)->getStateText,
+      ordering: json.required(list{"ordering"}, int)->getOrderText,
+      counterparty: json.required(list{"counterparty"}, ChannelCounterParty.decode),
+    })
+  }
+}
+
+module ChannelOpenInit = {
+  type t = {
+    signer: Address.t,
+    portID: string,
+    channel: Channel.t,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+      portID: json.required(list{"msg", "port_id"}, string),
+      channel: json.required(list{"msg", "channel"}, Channel.decode),
+    })
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -1045,6 +1110,7 @@ type msg_t =
   | ConnectionOpenTryMsg(ConnectionOpenTry.t)
   | ConnectionOpenAckMsg(ConnectionOpenAck.t)
   | ConnectionOpenConfirmMsg(ConnectionOpenConfirm.t)
+  | ChannelOpenInitMsg(ChannelOpenInit.t)
   | UnknownMsg
 
 type t = {
@@ -1099,6 +1165,7 @@ let getBadge = msg => {
   | ConnectionOpenTryMsg(_) => {name: "Connection Open Try", category: IBCMsg}
   | ConnectionOpenAckMsg(_) => {name: "Connection Open Ack", category: IBCMsg}
   | ConnectionOpenConfirmMsg(_) => {name: "Connection Open Confirm", category: IBCMsg}
+  | ChannelOpenInitMsg(_) => {name: "Channel Open Init", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1305,6 +1372,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/ibc.core.connection.v1.MsgConnectionOpenConfirm" =>
       let msg = json->mustDecode(ConnectionOpenConfirm.decode)
       (ConnectionOpenConfirmMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgChannelOpenInit" =>
+      let msg = json->mustDecode(ChannelOpenInit.decode)
+      (ChannelOpenInitMsg(msg), msg.signer, true)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }

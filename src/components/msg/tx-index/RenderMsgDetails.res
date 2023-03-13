@@ -1231,6 +1231,45 @@ module ConnectionOpenConfirm = {
   }
 }
 
+module ChannelOpenInit = {
+  let factory = (msg: Msg.ChannelOpenInit.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.portID),
+        order: 2,
+      },
+      {
+        title: "State",
+        content: PlainText(msg.channel.state),
+        order: 3,
+      },
+      {
+        title: "Order",
+        content: PlainText(msg.channel.ordering),
+        order: 4,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.channel.counterparty.portID),
+        order: 6,
+      },
+      
+    ]
+  }
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1316,6 +1355,7 @@ let getContent = msg => {
   | Msg.ConnectionOpenTryMsg(data) => ConnectionOpenTry.factory(data)
   | Msg.ConnectionOpenAckMsg(data) => ConnectionOpenAck.factory(data)
   | Msg.ConnectionOpenConfirmMsg(data) => ConnectionOpenConfirm.factory(data)
+  | Msg.ChannelOpenInitMsg(data) => ChannelOpenInit.factory(data)
   | Msg.UnknownMsg => []
   }
 }

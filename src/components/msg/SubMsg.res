@@ -153,6 +153,8 @@ let make = (~msg: Msg.t) => {
       <IBCConnectionMsg.ConnectionOpenAck connectionID counterpartyConnectionID />
     | ConnectionOpenConfirmMsg({connectionID}) =>
       <IBCConnectionMsg.ConnectionOpenConfirm connectionID />
+    | ChannelOpenInitMsg({portID, channel}) =>
+       <IBCChannelMsg.ChannelOpenCommon portID counterpartyPortID={channel.counterparty.portID} />
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />
