@@ -1097,6 +1097,26 @@ module ChannelOpenTry = {
   }
 }
 
+module ChannelOpenAck = {
+  type t = {
+    signer: Address.t,
+    portID: string,
+    channelID: string,
+    counterpartyChannelID: string,
+    proofHeight: Height.t,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+      portID: json.required(list{"msg", "port_id"}, string),
+      channelID: json.required(list{"msg", "channel_id"}, string),
+      counterpartyChannelID: json.required(list{"msg", "counterparty_channel_id"}, string),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+    })
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -1130,6 +1150,7 @@ type msg_t =
   | ConnectionOpenConfirmMsg(ConnectionOpenConfirm.t)
   | ChannelOpenInitMsg(ChannelOpenInit.t)
   | ChannelOpenTryMsg(ChannelOpenTry.t)
+  | ChannelOpenAckMsg(ChannelOpenAck.t)
   | UnknownMsg
 
 type t = {
@@ -1186,6 +1207,7 @@ let getBadge = msg => {
   | ConnectionOpenConfirmMsg(_) => {name: "Connection Open Confirm", category: IBCMsg}
   | ChannelOpenInitMsg(_) => {name: "Channel Open Init", category: IBCMsg}
   | ChannelOpenTryMsg(_) => {name: "Channel Open Try", category: IBCMsg}
+  | ChannelOpenAckMsg(_) => {name: "Channel Open Ack", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1398,6 +1420,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/ibc.core.channel.v1.MsgChannelOpenTry" =>
       let msg = json->mustDecode(ChannelOpenTry.decode)
       (ChannelOpenTryMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgChannelOpenAck" =>
+      let msg = json->mustDecode(ChannelOpenAck.decode)
+      (ChannelOpenAckMsg(msg), msg.signer, true)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }
