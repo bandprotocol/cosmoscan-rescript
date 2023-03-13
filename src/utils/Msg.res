@@ -921,6 +921,39 @@ module VoteWeighted = {
   }
 }
 
+module ConnectionCounterParty = {
+  type t = {
+    clientID: string,
+    connectionID: option<string>,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      clientID: json.required(list{"client_id"}, string),
+      connectionID: json.optional(list{"connectionID"}, string),
+    })
+  }
+}
+
+module ConnectionOpenInit = {
+  type t = {
+    signer: Address.t,
+    clientID: string,
+    delayPeriod: int,
+    counterparty: ConnectionCounterParty.t,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string) -> Address.fromBech32,
+      clientID: json.required(list{"msg", "client_id"}, string),
+      delayPeriod: json.required(list{"msg", "delay_period"}, int),
+      counterparty: json.required(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
+    })
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -948,6 +981,7 @@ type msg_t =
   | UpdateClientMsg(UpdateClient.t)
   | RecvPacketMsg(RecvPacket.decoded_t)
   | CreateClientMsg(CreateClient.t)
+  | ConnectionOpenInitMsg(ConnectionOpenInit.t)
   | UnknownMsg
 
 type t = {
@@ -998,6 +1032,7 @@ let getBadge = msg => {
   | CreateClientMsg(_) => {name: "Create Client", category: IBCMsg}
   | UpdateClientMsg(_) => {name: "Update Client", category: IBCMsg}
   | RecvPacketMsg(_) => {name: "Recv Packet", category: IBCMsg}
+  | ConnectionOpenInitMsg(_) => {name: "Connection Open Init", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1186,12 +1221,15 @@ let decodeMsg = (json, isSuccess) => {
       isSuccess
         ? {
             let msg = json->mustDecode(RecvPacket.decodeSuccess)
-            (RecvPacketMsg(Success(msg)), msg.signer, false)
+            (RecvPacketMsg(Success(msg)), msg.signer, true)
           }
         : {
             let msg = json->mustDecode(RecvPacket.decodeFail)
-            (RecvPacketMsg(Failure(msg)), msg.signer, false)
+            (RecvPacketMsg(Failure(msg)), msg.signer, true)
           }
+    | "/ibc.core.connection.v1.MsgConnectionOpenInit" =>
+      let msg = json->mustDecode(ConnectionOpenInit.decode)
+      (ConnectionOpenInitMsg(msg), msg.signer, true)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }

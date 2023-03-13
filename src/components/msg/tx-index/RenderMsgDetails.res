@@ -970,7 +970,7 @@ module RecvPacket = {
           },
         ]
         | FungibleTokenPacket(details) => [
-           {
+          {
             heading: "Packet Data",
             title: "",
             content: PlainText(""),
@@ -1025,6 +1025,39 @@ module UpdateClient = {
         title: "Client ID",
         content: PlainText(msg.clientID),
         order: 2,
+      },
+    ]
+  }
+}
+
+module ConnectionOpenInit = {
+  let factory = (msg: Msg.ConnectionOpenInit.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.clientID),
+        order: 2,
+      },
+      {
+        title: "Delay Period",
+        content: PlainText(msg.delayPeriod->Belt.Int.toString ++ "ns"),
+        order: 3,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 4,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.counterparty.clientID),
+        order: 5,
       },
     ]
   }
@@ -1111,6 +1144,7 @@ let getContent = msg => {
     | Msg.RecvPacket.Success(data) => RecvPacket.success(data)
     | Msg.RecvPacket.Failure(data) => RecvPacket.failed(data)
     }
+  | Msg.ConnectionOpenInitMsg(data) => ConnectionOpenInit.factory(data)
   | Msg.UnknownMsg => []
   }
 }
@@ -1125,14 +1159,14 @@ let make = (~contents: array<content_t>) => {
     ->Belt.Array.mapWithIndex((i, content) => {
       { 
         switch content.heading {
-        | Some(headerText) => <>
+        | Some(headerText) => <div key={i->Belt.Int.toString}>
           <SeperatedLine mt=0 mb=24 />
           <Row>
             <Col mb=24>
               <Heading value=headerText size=Heading.H4 color={theme.neutral_600} />
             </Col>
           </Row>
-        </>
+        </div>
         | None => 
         <Row key={i->Belt.Int.toString} marginBottom=0 marginBottomSm=24>
           <Col col=Col.Four mb=16 mbSm=8>

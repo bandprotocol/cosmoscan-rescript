@@ -1,23 +1,27 @@
-const path = require("path")
-const HtmlWebpackPlugin = require("html-webpack-plugin")
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
-const outputDir = path.join(__dirname, "dist/")
-const webpack = require("webpack") //to access built-in plugins
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+const outputDir = path.join(__dirname, 'dist/')
+const webpack = require('webpack') //to access built-in plugins
 
-const isProd = process.env.NODE_ENV === "production"
+const isProd = process.env.NODE_ENV === 'production'
 
 module.exports = {
-  entry: "./src/WebpackEntry.bs.js",
-  mode: isProd ? "production" : "development",
+  entry: './src/WebpackEntry.bs.js',
+  mode: isProd ? 'production' : 'development',
   output: {
     path: outputDir,
-    filename: "clientBundle.js",
+    filename: 'clientBundle.js',
   },
-
+  resolve: {
+    fallback: {
+      fs: false,
+    },
+  },
   plugins: [
     new NodePolyfillPlugin(),
     new HtmlWebpackPlugin({
-      template: "src/index.html",
+      template: 'src/index.html',
       inject: false,
     }),
     new webpack.DefinePlugin({
@@ -32,14 +36,14 @@ module.exports = {
     rules: [
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
-        loader: "file-loader",
+        loader: 'file-loader',
         options: {
-          name: "[name].[ext]",
-          outputPath: "src/images",
+          name: '[name].[ext]',
+          outputPath: 'src/images',
         },
       },
     ],
