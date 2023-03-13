@@ -924,14 +924,14 @@ module VoteWeighted = {
 module ConnectionCounterParty = {
   type t = {
     clientID: string,
-    connectionID: option<string>,
+    connectionID: string,
   }
 
   let decode = {
     open JsonUtils.Decode
     buildObject(json => {
       clientID: json.required(list{"client_id"}, string),
-      connectionID: json.optional(list{"connectionID"}, string),
+      connectionID: json.optional(list{"connection_id"}, string)->Belt.Option.getWithDefault(""),
     })
   }
 }
@@ -950,6 +950,30 @@ module ConnectionOpenInit = {
       clientID: json.required(list{"msg", "client_id"}, string),
       delayPeriod: json.required(list{"msg", "delay_period"}, int),
       counterparty: json.required(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
+    })
+  }
+}
+
+module ConnectionOpenTry = {
+  type t = {
+    signer: Address.t,
+    clientID: string,
+    previousConnectionID: string,
+    delayPeriod: int,
+    counterparty: ConnectionCounterParty.t,
+    consensusHeight: Height.t,
+    proofHeight: Height.t,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+      clientID: json.required(list{"msg", "client_id"}, string),
+      previousConnectionID: json.required(list{"msg", "previous_connection_id"}, string),
+      delayPeriod: json.required(list{"msg", "delay_period"}, int),
+      counterparty: json.required(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
+      consensusHeight: json.required(list{"msg", "consensus_height"}, Height.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
     })
   }
 }
@@ -982,6 +1006,7 @@ type msg_t =
   | RecvPacketMsg(RecvPacket.decoded_t)
   | CreateClientMsg(CreateClient.t)
   | ConnectionOpenInitMsg(ConnectionOpenInit.t)
+  | ConnectionOpenTryMsg(ConnectionOpenTry.t)
   | UnknownMsg
 
 type t = {
@@ -1033,6 +1058,7 @@ let getBadge = msg => {
   | UpdateClientMsg(_) => {name: "Update Client", category: IBCMsg}
   | RecvPacketMsg(_) => {name: "Recv Packet", category: IBCMsg}
   | ConnectionOpenInitMsg(_) => {name: "Connection Open Init", category: IBCMsg}
+  | ConnectionOpenTryMsg(_) => {name: "Connection Open Try", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1230,6 +1256,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/ibc.core.connection.v1.MsgConnectionOpenInit" =>
       let msg = json->mustDecode(ConnectionOpenInit.decode)
       (ConnectionOpenInitMsg(msg), msg.signer, true)
+    | "/ibc.core.connection.v1.MsgConnectionOpenTry" =>
+      let msg = json->mustDecode(ConnectionOpenTry.decode)
+      (ConnectionOpenTryMsg(msg), msg.signer, true)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }

@@ -1063,6 +1063,81 @@ module ConnectionOpenInit = {
   }
 }
 
+module ConnectionOpenTry = {
+  let factory = (msg: Msg.ConnectionOpenTry.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.clientID),
+        order: 2,
+      },
+       {
+        title: "Delay Period",
+        content: PlainText(msg.delayPeriod->Belt.Int.toString ++ "ns"),
+        order: 3,
+      },
+       {
+        title: "Previous Connection ID",
+        content: PlainText(msg.previousConnectionID),
+        order: 4,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.counterparty.clientID),
+        order: 6,
+      },
+      {
+        title: "Connection ID",
+        content: PlainText(msg.counterparty.connectionID),
+        order: 7,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 8,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 9,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 10,
+      },
+      {
+        heading: "Consensus Height",
+        title: "",
+        content: PlainText(""),
+        order: 11,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.consensusHeight.revisionHeight->Belt.Int.toString),
+        order: 12,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.consensusHeight.revisionNumber->Belt.Int.toString),
+        order: 13,
+      },
+    ]
+  }
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1145,6 +1220,7 @@ let getContent = msg => {
     | Msg.RecvPacket.Failure(data) => RecvPacket.failed(data)
     }
   | Msg.ConnectionOpenInitMsg(data) => ConnectionOpenInit.factory(data)
+  | Msg.ConnectionOpenTryMsg(data) => ConnectionOpenTry.factory(data)
   | Msg.UnknownMsg => []
   }
 }
