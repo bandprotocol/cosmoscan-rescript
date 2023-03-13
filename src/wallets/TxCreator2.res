@@ -1,13 +1,6 @@
 type request_params_t = {
-  osID: ID.OracleScript.t,
-  calldata: JsBuffer.t,
-  askCount: int,
-  minCount: int,
+  msg: Msg.Oracle.Request.t<unit, unit, unit>,
   clientID: string,
-  sender: Address.t,
-  feeLimitList: array<BandChainJS.Coin.t>,
-  prepareGas: option<int>,
-  executeGas: option<int>,
 }
 
 type ibc_transfer_t = {
@@ -56,27 +49,27 @@ let createMsg = (sender, msg: msg_input_t) => {
   | WithdrawReward(validator) =>
     MsgWithdrawReward.create(sender, validator->Address.toOperatorBech32)
   | Vote(ID.Proposal.ID(proposalID), answer) => MsgVote.create(proposalID, sender, answer)
-  | Request({
-      osID: ID.OracleScript.ID(oracleScriptID),
-      calldata,
-      askCount,
-      minCount,
-      clientID,
-      sender,
-      feeLimitList,
-      prepareGas,
-      executeGas,
-    }) =>
+  | Request({msg, clientID}) =>
     MsgRequest.create(
-      oracleScriptID,
-      calldata,
-      askCount,
-      minCount,
+      msg.oracleScriptID->ID.OracleScript.toInt,
+      msg.calldata,
+      msg.askCount,
+      msg.minCount,
       clientID,
-      sender->Address.toBech32,
-      feeLimitList,
-      prepareGas,
-      executeGas,
+      msg.sender->Address.toBech32,
+      msg.feeLimit->Coin.toBandChainCoins,
+      {
+        switch msg.prepareGas {
+        | 0 => None
+        | _ => Some(msg.prepareGas)
+        }
+      },
+      {
+        switch msg.executeGas {
+        | 0 => None
+        | _ => Some(msg.executeGas)
+        }
+      },
     )
   | IBCTransfer({sourcePort, sourceChannel, receiver, token, timeoutTimestamp}) =>
     MsgTransfer.create(sourcePort, sourceChannel, sender, receiver, token, timeoutTimestamp)

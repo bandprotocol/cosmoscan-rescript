@@ -408,27 +408,6 @@ module ExecutionPart = {
                     style={Styles.button(theme, result == Loading)}
                     onClick={_ =>
                       if result !== Loading {
-                        // TODO: For testing OBI type-safe version, will be removed later
-                        // Js.log(
-                        //   Obi2.encode(
-                        //     schema,
-                        //     Obi2.Input,
-                        //     Belt.List.map(paramsInput, input => input.fieldName)
-                        //     ->Belt.List.zip(callDataArr->Belt.List.fromArray)
-                        //     ->Belt.List.map(([fieldName, fieldValue]) => {fieldName, fieldValue}),
-                        //   ),
-                        // )
-
-                        // Js.log(
-                        //   Obi.encode(
-                        //     schema,
-                        //     "input",
-                        //     Belt.List.map(paramsInput, input => input.fieldName)
-                        //     ->Belt.List.zip(callDataArr)
-                        //     ->Belt.List.map(([fieldName, fieldValue]) => {fieldName, fieldValue}),
-                        //   ),
-                        // )
-
                         switch Obi.encode(
                           schema,
                           "input",
@@ -445,21 +424,39 @@ module ExecutionPart = {
                           dispatch(
                             AccountContext.SendRequest(
                               {
-                                oracleScriptID: id,
-                                calldata: encoded,
-                                callback: requestCallback,
-                                askCount,
-                                minCount,
+                                msg: {
+                                  oracleScriptID: id,
+                                  calldata: encoded,
+                                  askCount: askCount->int_of_string,
+                                  minCount: minCount->int_of_string,
+                                  sender: Address.Address(""),
+                                  feeLimit: list{
+                                    feeLimit->float_of_string->Coin.newUBANDFromAmount,
+                                  },
+                                  prepareGas: {
+                                    switch prepareGas->String.trim == "" {
+                                    | false => prepareGas->String.trim->int_of_string
+                                    | true => 0
+                                    }
+                                  },
+                                  executeGas: {
+                                    switch executeGas->String.trim == "" {
+                                    | false => executeGas->String.trim->int_of_string
+                                    | true => 0
+                                    }
+                                  },
+                                  id: (),
+                                  oracleScriptName: (),
+                                  schema: (),
+                                },
                                 clientID: {
                                   switch clientID->String.trim == "" {
                                   | false => clientID->String.trim
                                   | true => "from_scan"
                                   }
                                 },
-                                feeLimit,
-                                prepareGas,
-                                executeGas,
                                 gaslimit,
+                                callback: requestCallback,
                               },
                               client,
                             ),

@@ -6,14 +6,8 @@ type t = {
 }
 
 type send_request_t = {
-  oracleScriptID: ID.OracleScript.t,
-  calldata: JsBuffer.t,
-  askCount: string,
-  minCount: string,
+  msg: Msg.Oracle.Request.t<unit, unit, unit>,
   clientID: string,
-  feeLimit: string,
-  prepareGas: string,
-  executeGas: string,
   gaslimit: string,
   callback: Promise.t<TxCreator2.response_t> => unit,
 }
@@ -34,26 +28,13 @@ let reducer = (state, action) => {
       None
     }
 
-  | SendRequest(
-      {
-        oracleScriptID,
-        calldata,
-        askCount,
-        minCount,
-        clientID,
-        feeLimit,
-        prepareGas,
-        executeGas,
-        gaslimit,
-        callback,
-      },
-      client,
-    ) =>
+  | SendRequest({msg, gaslimit, clientID, callback}, client) =>
+    let {oracleScriptID, calldata, askCount, minCount, feeLimit, prepareGas, executeGas} = msg
     switch state {
     | Some({address, wallet, pubKey, chainID}) =>
-      let feeLimitCoin = BandChainJS.Coin.create()
-      feeLimitCoin->BandChainJS.Coin.setAmount(feeLimit)
-      feeLimitCoin->BandChainJS.Coin.setDenom("uband")
+      // let feeLimitCoin = BandChainJS.Coin.create()
+      // feeLimitCoin->BandChainJS.Coin.setAmount(feeLimit)
+      // feeLimitCoin->BandChainJS.Coin.setDenom("uband")
 
       let pubKeyHex = pubKey->PubKey.toHex
       let wrappedPubKey = pubKeyHex->BandChainJS.PubKey.fromHex
@@ -64,25 +45,20 @@ let reducer = (state, action) => {
             ~sender=address,
             ~msgs=[
               Request({
-                osID: oracleScriptID,
-                calldata,
-                askCount: askCount->int_of_string,
-                minCount: minCount->int_of_string,
-                sender: address,
+                msg: {
+                  oracleScriptID,
+                  calldata,
+                  askCount,
+                  minCount,
+                  prepareGas,
+                  executeGas,
+                  feeLimit,
+                  sender: address,
+                  id: (),
+                  oracleScriptName: (),
+                  schema: (),
+                },
                 clientID,
-                feeLimitList: [feeLimitCoin],
-                prepareGas: {
-                  switch prepareGas {
-                  | "" => None
-                  | _ => Some(prepareGas->int_of_string)
-                  }
-                },
-                executeGas: {
-                  switch executeGas {
-                  | "" => None
-                  | _ => Some(executeGas->int_of_string)
-                  }
-                },
               }),
             ],
             ~chainID,
