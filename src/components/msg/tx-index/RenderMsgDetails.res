@@ -1270,6 +1270,65 @@ module ChannelOpenInit = {
   }
 }
 
+module ChannelOpenTry = {
+  let factory = (msg: Msg.ChannelOpenTry.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.portID),
+        order: 2,
+      },
+      {
+        title: "State",
+        content: PlainText(msg.channel.state),
+        order: 3,
+      },
+      {
+        title: "Order",
+        content: PlainText(msg.channel.ordering),
+        order: 4,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 6,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 7,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 8,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.channel.counterparty.portID),
+        order: 9,
+      },
+      {
+        title: "Channel ID",
+        content: PlainText(msg.channel.counterparty.channelID),
+        order: 9,
+      },
+    ]
+  }
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1356,6 +1415,7 @@ let getContent = msg => {
   | Msg.ConnectionOpenAckMsg(data) => ConnectionOpenAck.factory(data)
   | Msg.ConnectionOpenConfirmMsg(data) => ConnectionOpenConfirm.factory(data)
   | Msg.ChannelOpenInitMsg(data) => ChannelOpenInit.factory(data)
+  | Msg.ChannelOpenTryMsg(data) => ChannelOpenTry.factory(data)
   | Msg.UnknownMsg => []
   }
 }
