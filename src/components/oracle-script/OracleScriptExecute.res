@@ -433,18 +433,12 @@ module ExecutionPart = {
                                   feeLimit: list{
                                     feeLimit->float_of_string->Coin.newUBANDFromAmount,
                                   },
-                                  prepareGas: {
-                                    switch prepareGas->String.trim == "" {
-                                    | false => prepareGas->String.trim->int_of_string
-                                    | true => 0
-                                    }
-                                  },
-                                  executeGas: {
-                                    switch executeGas->String.trim == "" {
-                                    | false => executeGas->String.trim->int_of_string
-                                    | true => 0
-                                    }
-                                  },
+                                  prepareGas: prepareGas->String.trim == ""
+                                    ? 0
+                                    : prepareGas->String.trim->int_of_string,
+                                  executeGas: executeGas->String.trim == ""
+                                    ? 0
+                                    : executeGas->String.trim->int_of_string,
                                   id: (),
                                   oracleScriptName: (),
                                   schema: (),
