@@ -108,8 +108,7 @@ let make = () => {
           id="closeModal" onClick={_ => canExit ? closeModal() : ()} className=Styles.closeButton>
           <Icon name="fal fa-times" color=theme.neutral_900 size=18 />
         </div>
-        {switch //TODO: Will patch the modal component later
-        modal {
+        {switch modal {
         | Connect(chainID) => <ConnectModal chainID />
         | SubmitTx(msg) => <SubmitTxModal msg />
         | ChainSelector(targetChain) => <ChainSelectorModal targetChain />

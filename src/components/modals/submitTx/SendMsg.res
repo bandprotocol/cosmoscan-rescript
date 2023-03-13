@@ -24,25 +24,36 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
 
       let amountValue = amount.value->Belt.Option.getWithDefault(0.)
 
-      let coin = BandChainJS.Coin.create()
-      coin->BandChainJS.Coin.setDenom("uband")
-      coin->BandChainJS.Coin.setAmount(amountValue->Belt.Float.toString)
+      // let coin = BandChainJS.Coin.create()
+      // coin->BandChainJS.Coin.setDenom("uband")
+      // coin->BandChainJS.Coin.setAmount(amountValue->Belt.Float.toString)
 
+      // switch targetChain {
+      // | IBCConnectionQuery.BAND => Some([TxCreator2.Send(toAddressValue, [coin])])
+      // | IBC({channel}) =>
+      //   Some([
+      //     TxCreator2.IBCTransfer({
+      //       sourcePort: "transfer",
+      //       sourceChannel: channel,
+      //       receiver: toAddress.text, // Hack: use text instead
+      //       token: coin,
+      //       timeoutTimestamp: (MomentRe.momentNow()
+      //       ->MomentRe.Moment.defaultUtc
+      //       ->MomentRe.Moment.toUnix
+      //       ->float_of_int +. 600.) *. 1e9, // add 10 mins
+      //     }),
+      //   ])
+      // }
       switch targetChain {
-      | IBCConnectionQuery.BAND => Some([TxCreator2.Send(toAddressValue, [coin])])
-      | IBC({channel}) =>
+      | IBCConnectionQuery.BAND =>
         Some([
-          TxCreator2.IBCTransfer({
-            sourcePort: "transfer",
-            sourceChannel: channel,
-            receiver: toAddress.text, // Hack: use text instead
-            token: coin,
-            timeoutTimestamp: (MomentRe.momentNow()
-            ->MomentRe.Moment.defaultUtc
-            ->MomentRe.Moment.toUnix
-            ->float_of_int +. 600.) *. 1e9, // add 10 mins
+          Msg.SendMsg({
+            fromAddress: address,
+            toAddress: toAddressValue,
+            amount: list{amountValue->Coin.newUBANDFromAmount},
           }),
         ])
+      | _ => None
       }
     }
     setMsgsOpt(_ => msgsOpt)

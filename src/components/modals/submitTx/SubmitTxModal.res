@@ -75,13 +75,14 @@ module SubmitTxStep = {
       {switch msg {
       | SubmitMsg.Send(receiver, targetChain) =>
         <SendMsg address={account.address} receiver setMsgsOpt targetChain />
-      | Delegate(validator) => <DelegateMsg address={account.address} validator setMsgsOpt />
-      | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
-      | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
-      | WithdrawReward(validator) =>
-        <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
-      | Reinvest(validator, amount) => <ReinvestMsg validator setMsgsOpt amount />
-      | Vote(proposalID, proposalName) => <VoteMsg proposalID proposalName setMsgsOpt />
+      // | Delegate(validator) => <DelegateMsg address={account.address} validator setMsgsOpt />
+      // | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
+      // | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
+      // | WithdrawReward(validator) =>
+      //   <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
+      // | Reinvest(validator, amount) => <ReinvestMsg validator setMsgsOpt amount />
+      // | Vote(proposalID, proposalName) => <VoteMsg proposalID proposalName setMsgsOpt />
+      | _ => React.null
       }}
       <EnhanceTxInput
         width=300
@@ -153,7 +154,7 @@ module SubmitTxStep = {
               let msgs = msgsOpt->Belt.Option.getWithDefault(_, [])
 
               Some(
-                TxCreator2.createRawTx(
+                TxCreator3.createRawTx(
                   ~sender=account.address,
                   ~msgs,
                   ~chainID=account.chainID,
