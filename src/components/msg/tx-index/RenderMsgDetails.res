@@ -1438,6 +1438,28 @@ module ChannelCloseInit = {
   }
 }
 
+module ChannelCloseConfirm = {
+  let factory = (msg: Msg.ChannelCloseConfirm.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.portID),
+        order: 2,
+      },
+      {
+        title: "Channel ID",
+        content: PlainText(msg.channelID),
+        order: 3,
+      },
+    ]
+  }
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1528,6 +1550,7 @@ let getContent = msg => {
   | Msg.ChannelOpenAckMsg(data) => ChannelOpenAck.factory(data)
   | Msg.ChannelOpenConfirmMsg(data) => ChannelOpenConfirm.factory(data)
   | Msg.ChannelCloseInitMsg(data) => ChannelCloseInit.factory(data)
+  | Msg.ChannelCloseConfirmMsg(data) => ChannelCloseConfirm.factory(data)
   | Msg.UnknownMsg => []
   }
 }
