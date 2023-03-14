@@ -48,7 +48,7 @@ let makeBadge = (name, length, color1, color2) =>
   </div>
 
 @react.component
-let make = (~msg: Msg.t) => {
+let make = (~msg: Msg.result_t) => {
   let badge = msg.decoded->Msg.getBadge
   <div
     className={CssJs.merge(. [

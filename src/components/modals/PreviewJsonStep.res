@@ -67,25 +67,18 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
       let pubKeyHex = account.pubKey->PubKey.toHex
       let pubKey = pubKeyHex->BandChainJS.PubKey.fromHex
       let txRawBytes = rawTx->BandChainJS.Transaction.getTxData(signature, pubKey, 127)
-      let txResult = await TxCreator2.broadcast(client, txRawBytes)
-      switch txResult {
-      | TxCreator2.Tx(txResponse) =>
-        {
-          txResponse.success
-            ? {
-                setState(_ => Success(txResponse.txHash))
-              }
-            : {
-                Js.Console.error(txResponse)
-                setState(_ => Error(txResponse.code->TxResError.parse))
-              }
-        }
+      // let txResult = await TxCreator2.broadcast(client, txRawBytes)
+      let txResult = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
+      txResult.code == 0
+        ? {
+            setState(_ => Success(txResult.txHash->Hash.fromHex))
+          }
+        : {
+            Js.Console.error(txResult)
+            setState(_ => Error(txResult.code->TxResError.parse))
+          }
 
-        dispatchModal(EnableExit)
-      | _ =>
-        setState(_ => Error("Fail to broadcast"))
-        dispatchModal(EnableExit)
-      }
+      dispatchModal(EnableExit)
     } catch {
     | Js.Exn.Error(e) =>
       switch Js.Json.stringifyAny(e) {

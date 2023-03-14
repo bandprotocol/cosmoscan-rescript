@@ -47,7 +47,7 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
       switch targetChain {
       | IBCConnectionQuery.BAND =>
         Some([
-          Msg.SendMsg({
+          Msg.Input.SendMsg({
             fromAddress: address,
             toAddress: toAddressValue,
             amount: list{amountValue->Coin.newUBANDFromAmount},

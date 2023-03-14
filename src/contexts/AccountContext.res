@@ -7,9 +7,8 @@ type t = {
 
 type send_request_t = {
   msg: Msg.Oracle.Request.t<unit, unit, unit>,
-  clientID: string,
   gaslimit: string,
-  callback: Promise.t<TxCreator2.response_t> => unit,
+  callback: Promise.t<TxCreator3.broadcast_response_t> => unit,
 }
 
 type a =
@@ -28,8 +27,17 @@ let reducer = (state, action) => {
       None
     }
 
-  | SendRequest({msg, gaslimit, clientID, callback}, client) =>
-    let {oracleScriptID, calldata, askCount, minCount, feeLimit, prepareGas, executeGas} = msg
+  | SendRequest({msg, gaslimit, callback}, client) =>
+    let {
+      oracleScriptID,
+      clientID,
+      calldata,
+      askCount,
+      minCount,
+      feeLimit,
+      prepareGas,
+      executeGas,
+    } = msg
     switch state {
     | Some({address, wallet, pubKey, chainID}) =>
       // let feeLimitCoin = BandChainJS.Coin.create()
@@ -41,26 +49,9 @@ let reducer = (state, action) => {
 
       callback({
         let createRawTX = async () => {
-          let rawTx = await TxCreator2.createRawTx(
+          let rawTx = await TxCreator3.createRawTx(
             ~sender=address,
-            ~msgs=[
-              Request({
-                msg: {
-                  oracleScriptID,
-                  calldata,
-                  askCount,
-                  minCount,
-                  prepareGas,
-                  executeGas,
-                  feeLimit,
-                  sender: address,
-                  id: (),
-                  oracleScriptName: (),
-                  schema: (),
-                },
-                clientID,
-              }),
-            ],
+            ~msgs=[Msg.Input.RequestMsg(msg)],
             ~chainID,
             ~gas={
               switch int_of_string_opt(gaslimit) {
@@ -81,7 +72,8 @@ let reducer = (state, action) => {
           let jsonTxStr = rawTx->BandChainJS.Transaction.getSignMessage->JsBuffer.toUTF8
           let signature = await Wallet.sign(jsonTxStr, wallet)
           let signedTx = rawTx->BandChainJS.Transaction.getTxData(signature, wrappedPubKey, 127)
-          await TxCreator2.broadcast(client, signedTx)
+          // await TxCreator2.broadcast(client, signedTx)
+          await client->TxCreator3.broadcast(signedTx)
         }
         createRawTX()
       })

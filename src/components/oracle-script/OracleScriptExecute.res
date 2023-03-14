@@ -236,8 +236,8 @@ module ValueInput = {
 type result_t =
   | Nothing
   | Loading
+  | Success(TxCreator3.tx_response_t)
   | Error(string)
-  | Success(TxCreator2.tx_response_t)
 
 let loadingRender = (wDiv, wImg, h) => {
   <div className={Styles.withWH(wDiv, h)}>
@@ -324,23 +324,10 @@ module ExecutionPart = {
 
     let requestCallback = React.useCallback0(requestPromise => {
       ignore(
-        requestPromise
-        ->Promise.then(res =>
+        requestPromise->Promise.then(res => {
           switch res {
-          | TxCreator2.Tx(txResponse) =>
-            setResult(_ => Success(txResponse))
-            Promise.resolve()
-          | _ =>
-            setResult(
-              _ => Error("Fail to sign message, please connect with mnemonic or ledger first"),
-            )
-            Promise.resolve()
-          }
-        )
-        ->Promise.catch(err => {
-          switch Js.Json.stringifyAny(err) {
-          | Some(errorValue) => setResult(_ => Error(errorValue))
-          | None => setResult(_ => Error("Can not stringify error"))
+          | TxCreator3.Tx(response) => setResult(_ => Success(response))
+          | Error(err) => setResult(_ => Error(err))
           }
           Promise.resolve()
         }),
@@ -430,6 +417,12 @@ module ExecutionPart = {
                                   askCount: askCount->int_of_string,
                                   minCount: minCount->int_of_string,
                                   sender: Address.Address(""),
+                                  clientID: {
+                                    switch clientID->String.trim == "" {
+                                    | false => clientID->String.trim
+                                    | true => "from_scan"
+                                    }
+                                  },
                                   feeLimit: list{
                                     feeLimit->float_of_string->Coin.newUBANDFromAmount,
                                   },
@@ -442,12 +435,6 @@ module ExecutionPart = {
                                   id: (),
                                   oracleScriptName: (),
                                   schema: (),
-                                },
-                                clientID: {
-                                  switch clientID->String.trim == "" {
-                                  | false => clientID->String.trim
-                                  | true => "from_scan"
-                                  }
                                 },
                                 gaslimit,
                                 callback: requestCallback,

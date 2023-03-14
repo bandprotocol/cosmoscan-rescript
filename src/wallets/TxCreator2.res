@@ -104,13 +104,13 @@ let createRawTx = async (~sender, ~msgs, ~chainID, ~feeAmount, ~gas, ~memo, ~cli
   tx
 }
 
-let broadcast = async (client, txRawBytes) => {
-  open JsonUtils.Decode
-  let response = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
+// let broadcast = async (client, txRawBytes) => {
+//   open JsonUtils.Decode
+//   let response = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
 
-  Tx({
-    txHash: response->mustAt(list{"txhash"}, string)->Hash.fromHex,
-    code: response->mustAt(list{"code"}, int),
-    success: response->mustAt(list{"code"}, int) == 0,
-  })
-}
+//   Tx({
+//     txHash: response->mustAt(list{"txhash"}, string)->Hash.fromHex,
+//     code: response->mustAt(list{"code"}, int),
+//     success: response->mustAt(list{"code"}, int) == 0,
+//   })
+// }

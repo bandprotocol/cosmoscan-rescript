@@ -7,7 +7,7 @@ module Styles = {
 
 module RenderBody = {
   @react.component
-  let make = (~txSub: Sub.variant<TxSub.t>, ~msgTransform: Msg.t => Msg.t) => {
+  let make = (~txSub: Sub.variant<TxSub.t>, ~msgTransform: Msg.result_t => Msg.result_t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <TBody>
       <Row alignItems=Row.Start>
@@ -27,10 +27,10 @@ module RenderBody = {
           <div className={CssHelper.flexBox(~justify=#center, ())}>
             {switch txSub {
             | Data({success}) =>
-              <img 
-                src={success ? Images.success : Images.fail} 
+              <img
+                src={success ? Images.success : Images.fail}
                 alt={success ? "Success" : "Failed"}
-                className=Styles.statusImg 
+                className=Styles.statusImg
               />
             | _ => <LoadingCensorBar width=20 height=20 radius=20 />
             }}
@@ -67,7 +67,11 @@ module RenderBody = {
 
 module RenderBodyMobile = {
   @react.component
-  let make = (~reserveIndex, ~txSub: Sub.variant<TxSub.t>, ~msgTransform: Msg.t => Msg.t) => {
+  let make = (
+    ~reserveIndex,
+    ~txSub: Sub.variant<TxSub.t>,
+    ~msgTransform: Msg.result_t => Msg.result_t,
+  ) => {
     let isSmallMobile = Media.isSmallMobile()
 
     switch txSub {
@@ -106,7 +110,10 @@ module RenderBodyMobile = {
 }
 
 @react.component
-let make = (~txsSub: Sub.variant<array<TxSub.t>>, ~msgTransform: Msg.t => Msg.t=x => x) => {
+let make = (
+  ~txsSub: Sub.variant<array<TxSub.t>>,
+  ~msgTransform: Msg.result_t => Msg.result_t=x => x,
+) => {
   let isMobile = Media.isMobile()
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
@@ -125,7 +132,7 @@ let make = (~txsSub: Sub.variant<array<TxSub.t>>, ~msgTransform: Msg.t => Msg.t=
           ->React.array
         : <EmptyContainer>
             <img
-              src={isDarkMode ? Images.noTxDark : Images.noTxLight} 
+              src={isDarkMode ? Images.noTxDark : Images.noTxLight}
               alt="No Transaction"
               className=Styles.noDataImage
             />
