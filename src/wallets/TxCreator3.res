@@ -23,6 +23,12 @@ let createMsg = (sender, msg: Msg.msg_t) => {
       validatorAddress->Address.toOperatorBech32,
       amount->Coin.toBandChainCoin,
     )
+  | UndelegateMsg(Failure({delegatorAddress, validatorAddress, amount})) =>
+    MsgUndelegate.create(
+      delegatorAddress->Address.toBech32,
+      validatorAddress->Address.toOperatorBech32,
+      amount->Coin.toBandChainCoin,
+    )
   | _ => failwith("Not implemented")
   }
 }

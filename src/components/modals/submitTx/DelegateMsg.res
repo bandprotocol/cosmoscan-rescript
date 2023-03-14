@@ -75,9 +75,7 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
       {switch allSub {
       | Data(({balance}, _)) =>
         <div>
-          <Text
-            value={balance |> Coin.getBandAmountFromCoins |> Format.fPretty(~digits=6)} code=true
-          />
+          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
           <Text value=" BAND" />
         </div>
       | _ => <LoadingCensorBar width=150 height=18 />
@@ -86,13 +84,13 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
     {switch allSub {
     | Data(({balance}, _)) =>
       //  TODO: hard-coded tx fee
-      let maxValInUband = (balance |> Coin.getUBandAmountFromCoins) -. 5000.
+      let maxValInUband = balance->Coin.getUBandAmountFromCoins -. 5000.
       <EnhanceTxInput
         width=300
         inputData=amount
         setInputData=setAmount
         parse={Parse.getBandAmount(maxValInUband)}
-        maxValue={maxValInUband /. 1e6 |> Js.Float.toString}
+        maxValue={(maxValInUband /. 1e6)->Belt.Float.toString}
         msg="Amount"
         placeholder="0.000000"
         inputType="number"

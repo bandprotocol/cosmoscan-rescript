@@ -53,7 +53,7 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
             amount: list{amountValue->Coin.newUBANDFromAmount},
           }),
         ])
-      | _ => None
+      | _ => None //TODO: add IBCTransfer tx
       }
     }
     setMsgsOpt(_ => msgsOpt)
@@ -99,7 +99,7 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
         inputData=amount
         setInputData=setAmount
         parse={Parse.getBandAmount(maxValInUband)}
-        maxValue={(maxValInUband /. 1e6)->Js.Float.toString}
+        maxValue={(maxValInUband /. 1e6)->Belt.Float.toString}
         msg="Send Amount (BAND)"
         inputType="number"
         code=true
