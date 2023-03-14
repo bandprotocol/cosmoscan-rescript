@@ -1030,6 +1030,23 @@ module UpdateClient = {
   }
 }
 
+module UpgradeClient = {
+  let factory = (msg: Msg.UpgradeClient.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.clientID),
+        order: 2,
+      },
+    ]
+  }
+}
+
 module ConnectionOpenInit = {
   let factory = (msg: Msg.ConnectionOpenInit.t) => {
     [
@@ -1548,6 +1565,7 @@ let getContent = msg => {
     }
   | Msg.CreateClientMsg(data) => CreateClient.factory(data)
   | Msg.UpdateClientMsg(data) => UpdateClient.factory(data)
+  | Msg.UpgradeClientMsg(data) => UpgradeClient.factory(data)
   | Msg.RecvPacketMsg(m) =>
     switch m {
     | Msg.RecvPacket.Success(data) => RecvPacket.success(data)
