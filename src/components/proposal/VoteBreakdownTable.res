@@ -238,7 +238,7 @@ let make = (~proposalID) => {
               </THead>}
           {switch votesSub {
           | Data(votes) =>
-            votes->Belt.Array.size > 0
+            votes->Belt.Array.length > 0
               ? votes
                 ->Belt.Array.mapWithIndex((i, e) =>
                   isMobile

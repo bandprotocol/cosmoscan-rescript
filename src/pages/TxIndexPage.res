@@ -186,12 +186,12 @@ let make = (~txHash: Hash.t) => {
               <Heading value="Information" size=Heading.H4 />
               <SeperatedLine mt=32 mb=24 />
               <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+                <Col col=Col.Three mbSm=8>
                   <Heading
                     value="Block" size=Heading.H4 weight=Heading.Thin color=theme.neutral_600
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Nine>
                   {switch txSub {
                   | Data({blockHeight}) => <TypeID.Block id=blockHeight position=TypeID.Subtitle />
                   | _ => <LoadingCensorBar width=75 height=15 />
@@ -199,12 +199,12 @@ let make = (~txHash: Hash.t) => {
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+                <Col col=Col.Three mbSm=8>
                   <Heading
                     value="Sender" size=Heading.H4 weight=Heading.Thin color=theme.neutral_600
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Nine>
                   {switch txSub {
                   | Data({sender}) =>
                     <AddressRender address=sender position=AddressRender.Subtitle />
@@ -213,12 +213,12 @@ let make = (~txHash: Hash.t) => {
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+                <Col col=Col.Three mbSm=8>
                   <Heading
                     value="Timestamp" size=Heading.H4 weight=Heading.Thin color=theme.neutral_600
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Nine>
                   {switch txSub {
                   | Data({timestamp}) =>
                     <div className={CssHelper.flexBox()}>
@@ -236,26 +236,27 @@ let make = (~txHash: Hash.t) => {
                 </Col>
               </Row>
               <Row alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+                <Col col=Col.Three mbSm=8>
                   <Heading
                     value="Memo" size=Heading.H4 weight=Heading.Thin color=theme.neutral_600
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Nine>
                   {switch txSub {
-                  | Data({memo}) => <Text value=memo weight=Text.Regular size=Text.Body1 block=true />
+                  | Data({memo}) =>
+                    <Text value=memo weight=Text.Regular size=Text.Body1 block=true />
                   | _ => <LoadingCensorBar width=280 height=15 />
                   }}
                 </Col>
               </Row>
               <SeperatedLine mt=32 mb=24 />
               <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+                <Col col=Col.Three mbSm=8>
                   <Heading
                     value="Gas Used" size=Heading.H4 weight=Heading.Thin color=theme.neutral_600
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Nine>
                   {switch txSub {
                   | Data({gasUsed}) => <Text value={gasUsed->Format.iPretty} size=Text.Body1 />
                   | _ => <LoadingCensorBar width=75 height=15 />
@@ -263,12 +264,12 @@ let make = (~txHash: Hash.t) => {
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+                <Col col=Col.Three mbSm=8>
                   <Heading
                     value="Gas Limit" size=Heading.H4 weight=Heading.Thin color=theme.neutral_600
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Nine>
                   {switch txSub {
                   | Data({gasLimit}) => <Text value={gasLimit->Format.iPretty} size=Text.Body1 />
                   | _ => <LoadingCensorBar width=75 height=15 />
@@ -276,7 +277,7 @@ let make = (~txHash: Hash.t) => {
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+                <Col col=Col.Three mbSm=8>
                   <Heading
                     value="Gas Price (UBAND)"
                     size=Heading.H4
@@ -284,7 +285,7 @@ let make = (~txHash: Hash.t) => {
                     color=theme.neutral_600
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Nine>
                   {switch txSub {
                   | Data({gasFee, gasLimit}) =>
                     <Text
@@ -297,12 +298,12 @@ let make = (~txHash: Hash.t) => {
                 </Col>
               </Row>
               <Row alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+                <Col col=Col.Three mbSm=8>
                   <Heading
                     value="Fee (BAND)" size=Heading.H4 weight=Heading.Thin color=theme.neutral_600
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Nine>
                   {switch txSub {
                   | Data({gasFee}) =>
                     <Text

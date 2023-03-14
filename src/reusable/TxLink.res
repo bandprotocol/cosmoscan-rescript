@@ -44,19 +44,19 @@ let make = (
           weight
           ellipsis=false
           size
-          color={theme.neutral_900}
+          color={theme.primary_600}
         />
       </Link>
     | true =>
       <Link className={Styles.withWidth(width, theme, fullHash)} route={Route.TxIndexPage(txHash)}>
         <Text
           block=true
-          code=true
           spacing={Text.Em(0.02)}
           value={txHash->Hash.toHex(~upper=true)}
           weight
           ellipsis=true
           size
+          code=true
           color={theme.neutral_900}
         />
       </Link>

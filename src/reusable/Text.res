@@ -73,16 +73,14 @@ module Styles = {
     style(. [fontSize(#px(12)), lineHeight(#px(16)), Media.mobile([fontSize(#px(10))])]),
     x =>
       switch x {
-      | Xs =>
-        style(. [fontSize(#px(8)), lineHeight(#em(1.41)), Media.mobile([fontSize(#px(7))])])
+      | Xs => style(. [fontSize(#px(8)), lineHeight(#em(1.41)), Media.mobile([fontSize(#px(7))])])
       | Caption =>
         style(. [fontSize(#px(10)), lineHeight(#px(16)), Media.mobile([fontSize(#px(8))])])
       | Body2 =>
         style(. [fontSize(#px(12)), lineHeight(#px(20)), Media.mobile([fontSize(#px(10))])])
       | Body1 =>
         style(. [fontSize(#px(14)), lineHeight(#px(22)), Media.mobile([fontSize(#px(12))])])
-      | Xl =>
-        style(. [fontSize(#px(16)), lineHeight(#em(1.41)), Media.mobile([fontSize(#px(14))])])
+      | Xl => style(. [fontSize(#px(16)), lineHeight(#em(1.41)), Media.mobile([fontSize(#px(14))])])
       | Xxl => style(. [fontSize(#px(18)), Media.mobile([fontSize(#px(16))])])
       | Xxxl => style(. [fontSize(#px(20)), Media.mobile([fontSize(#px(18))])])
       | Xxxxl => style(. [fontSize(#px(24)), Media.mobile([fontSize(#px(20))])])
@@ -130,8 +128,7 @@ module Styles = {
     }
   )
 
-  let code = style(. [fontFamilies([#custom("Roboto Mono"), #monospace]), paddingBottom(#em(0.1))])
-  let mono = style(. [fontFamilies([#custom("Roboto Mono"), #monospace])])
+  let code = style(. [fontFamilies([#custom("Roboto Mono"), #monospace])])
 
   let special = style(. [fontFamilies([#custom("Lexend Exa"), #monospace])])
 
@@ -185,7 +182,6 @@ let make = (
           nowrap ? Styles.noWrap : "",
           block ? Styles.block : "inline-block",
           code ? Styles.code : "",
-          mono ? Styles.mono : "",
           special ? Styles.special : "",
           ellipsis ? Styles.ellipsis : "",
           underline ? Styles.underline : "",
@@ -212,7 +208,6 @@ let make = (
             nowrap ? Styles.noWrap : "",
             block ? Styles.block : "inline-block",
             code ? Styles.code : "",
-            mono ? Styles.mono : "",
             ellipsis ? Styles.ellipsis : "",
             underline ? Styles.underline : "",
             breakAll ? Styles.breakAll : "",

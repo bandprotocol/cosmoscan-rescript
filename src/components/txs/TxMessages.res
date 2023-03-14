@@ -46,7 +46,7 @@ let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string) => {
       ->Belt.List.toArray
       ->Belt.Array.mapWithIndex((i, msg) =>
         <React.Fragment key={txHash->Hash.toHex ++ i->Belt.Int.toString}>
-          {<Msg msg />}
+          {<SubMsg msg />}
         </React.Fragment>
       )
       ->React.array}
