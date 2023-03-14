@@ -2,7 +2,7 @@ module Styles = {
   open CssJs
 
   let execContainers = (theme: Theme.t) =>
-    style(. [padding(#px(10)), backgroundColor(theme.neutral_100), borderRadius(#px(4))])
+    style(. [padding(#px(20)), backgroundColor(theme.neutral_100), borderRadius(#px(4))])
 }
 module Calldata = {
   @react.component
@@ -49,151 +49,11 @@ type rec content_inner_t =
   | VoteWeighted(Belt.List.t<Msg.Gov.VoteWeighted.Options.t>)
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
-  | ExecList(list<(string, array<content_t>)>)
-// | ExecList(list<Msg.msg_t>)
+  | ExecList(list<Msg.msg_t>)
 and content_t = {
   title: string,
   content: content_inner_t,
   order: int,
-}
-
-let rec renderValue = v => {
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-  switch v {
-  | Address(address) => <AddressRender position=AddressRender.Subtitle address />
-  | ValidatorAddress(address) =>
-    <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
-  | PlainText(content) => <Text value={content} size=Text.Body1 />
-  | CoinList(amount) => <AmountRender coins={amount} />
-  | ID(element) => element
-  | Calldata(schema, data) => <Calldata schema calldata=data />
-  | RawReports(data) =>
-    <KVTable
-      headers=["External Id", "Exit Code", "Value"]
-      rows={data
-      ->Belt.List.toArray
-      ->Belt.Array.map(rawReport => [
-        KVTable.Value(rawReport.externalDataID->string_of_int),
-        KVTable.Value(rawReport.exitCode->string_of_int),
-        KVTable.Value(rawReport.data->JsBuffer.toUTF8),
-      ])}
-    />
-  | Timestamp(timestamp) => <Timestamp time={timestamp} size=Text.Body1 />
-  | ValidatorLink(address, moniker, identity) =>
-    <ValidatorMonikerLink
-      validatorAddress={address}
-      moniker={moniker}
-      identity={identity}
-      width={#percent(100.)}
-      avatarWidth=20
-      size=Text.Body1
-    />
-  | VoteWeighted(options) =>
-    <>
-      {options
-      ->Belt.List.mapWithIndex((index, {weight, option}) => {
-        let optionCount = options->Belt.List.toArray->Belt_Array.length
-        let mb = index == optionCount ? 0 : 8
-
-        <div
-          key={index->string_of_int ++ weight->Js.Float.toString ++ option}
-          className={CssHelper.flexBox(
-            ~justify=#flexStart,
-            ~align=#center,
-            ~direction=#row,
-            ~wrap=#wrap,
-            (),
-          )}>
-          <Text size=Text.Body1 value=option />
-          <HSpacing size=Spacing.sm />
-          <Text size=Text.Body1 value={weight->Js.Float.toString} />
-          {index == optionCount - 1 ? React.null : <HSpacing size=Spacing.md />}
-        </div>
-      })
-      ->Belt.List.toArray
-      ->React.array}
-    </>
-  | MultiSendInputList(inputs) =>
-    <KVTable
-      headers=["Address", "Amount (BAND)"]
-      rows={inputs
-      ->Belt.List.toArray
-      ->Belt.Array.map(input => [
-        KVTable.Value(
-          // <AddressRender address={input.address} />
-          input.address->Address.toBech32,
-        ),
-        KVTable.Value(
-          // <AmountRender coins={input.coins} />
-          input.coins
-          ->Coin.getBandAmountFromCoins
-          ->Belt.Float.toString,
-        ),
-      ])}
-    />
-  | MultiSendOutputList(outputs) =>
-    <KVTable
-      headers=["Address", "Amount (BAND)"]
-      rows={outputs
-      ->Belt.List.toArray
-      ->Belt.Array.map(output => [
-        KVTable.Value(
-          // <AddressRender address={output.address} />
-          output.address->Address.toBech32,
-        ),
-        KVTable.Value(
-          // <AmountRender coins={output.coins} />
-          output.coins
-          ->Coin.getBandAmountFromCoins
-          ->Belt.Float.toString,
-        ),
-      ])}
-    />
-  | ExecList(msgs) =>
-    <div>
-      {msgs
-      ->Belt.List.toArray
-      ->Belt.Array.mapWithIndex((i, (name, contents)) => {
-        <div key={i->string_of_int}>
-          <Row key={i->string_of_int}>
-            <Col col=Col.Two mb={4} mbSm={8}>
-              <Heading
-                value="Message: "
-                size=Heading.H4
-                weight=Heading.Regular
-                marginBottom=8
-                color=theme.neutral_600
-              />
-            </Col>
-            <Col col=Col.Ten mb={4} mbSm={8}>
-              <Text size=Text.Body1 value={name} color={theme.neutral_900} />
-            </Col>
-          </Row>
-          <div>
-            {contents
-            ->Belt.Array.mapWithIndex((j, c) => {
-              <Row key={j->string_of_int}>
-                <Col col={j === 2 ? Col.Twelve : Col.Two} mb={4} mbSm={8}>
-                  <Heading
-                    value={c.title ++ ": "}
-                    size=Heading.H4
-                    weight=Heading.Regular
-                    marginBottom=8
-                    color=theme.neutral_600
-                  />
-                </Col>
-                <Col col={j === 2 ? Col.Twelve : Col.Ten} mb={4} mbSm={8}>
-                  {renderValue(c.content)}
-                </Col>
-              </Row>
-            })
-            ->React.array}
-          </div>
-        </div>
-      })
-      ->React.array}
-    </div>
-  }
 }
 
 module CreateDataSource = {
@@ -457,21 +317,6 @@ module Revoke = {
     },
   ]
 }
-
-// module RevokeAllowance = {
-//   let factory = (msg: Msg.RevokeAllowance.t) => [
-//     {
-//       title: "Granter",
-//       content: Address(msg.granter),
-//       order: 1,
-//     },
-//     {
-//       title: "Grantee",
-//       content: Address(msg.grantee),
-//       order: 2,
-//     },
-//   ]
-// }
 
 module GrantAllowance = {
   let factory = (msg: Msg.FeeGrant.GrantAllowance.t) => [
@@ -982,32 +827,6 @@ module MultiSend = {
   ]
 }
 
-// module Exec = {
-//   let factory = (msg: Msg.Authz.Exec.t<Msg.msg_t>) => [
-//     {
-//       title: "Grantee",
-//       content: Address(msg.grantee),
-//       order: 1,
-//     },
-//     {
-//       title: "Executed Messages",
-//       content: ExecList(msg.msgs),
-//       order: 2,
-//     },
-//   ]
-
-//   // let success = (msg: Msg.Authz.Exec.success_t) =>
-//   //   msg->factory([
-//   //     {
-//   //       title: "Executed Messages",
-//   //       content: ExecList(msg.msgs),
-//   //       order: 2,
-//   //     },
-//   //   ])
-
-//   // let failed = (msg: Msg.Authz.Exec.fail_t) => msg->factory([])
-// }
-
 let rec getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1092,9 +911,7 @@ let rec getContent = msg => {
       },
       {
         title: "Executed Messages",
-        content: ExecList(
-          msg.msgs->Belt.List.map(msg => (Msg.getBadge(msg).name, getContent(msg))),
-        ),
+        content: ExecList(msg.msgs),
         order: 2,
       },
     ]
@@ -1102,27 +919,143 @@ let rec getContent = msg => {
   }
 }
 
+let rec renderValue = v => {
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  switch v {
+  | Address(address) => <AddressRender position=AddressRender.Subtitle address />
+  | ValidatorAddress(address) =>
+    <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
+  | PlainText(content) => <Text value={content} size=Text.Body1 />
+  | CoinList(amount) => <AmountRender coins={amount} />
+  | ID(element) => element
+  | Calldata(schema, data) => <Calldata schema calldata=data />
+  | RawReports(data) =>
+    <KVTable
+      headers=["External Id", "Exit Code", "Value"]
+      rows={data
+      ->Belt.List.toArray
+      ->Belt.Array.map(rawReport => [
+        KVTable.Value(rawReport.externalDataID->string_of_int),
+        KVTable.Value(rawReport.exitCode->string_of_int),
+        KVTable.Value(rawReport.data->JsBuffer.toUTF8),
+      ])}
+    />
+  | Timestamp(timestamp) => <Timestamp time={timestamp} size=Text.Body1 />
+  | ValidatorLink(address, moniker, identity) =>
+    <ValidatorMonikerLink
+      validatorAddress={address}
+      moniker={moniker}
+      identity={identity}
+      width={#percent(100.)}
+      avatarWidth=20
+      size=Text.Body1
+    />
+  | VoteWeighted(options) =>
+    <>
+      {options
+      ->Belt.List.mapWithIndex((index, {weight, option}) => {
+        let optionCount = options->Belt.List.toArray->Belt_Array.length
+        let mb = index == optionCount ? 0 : 8
+
+        <div
+          key={index->string_of_int ++ weight->Js.Float.toString ++ option}
+          className={CssHelper.flexBox(
+            ~justify=#flexStart,
+            ~align=#center,
+            ~direction=#row,
+            ~wrap=#wrap,
+            (),
+          )}>
+          <Text size=Text.Body1 value=option />
+          <HSpacing size=Spacing.sm />
+          <Text size=Text.Body1 value={weight->Js.Float.toString} />
+          {index == optionCount - 1 ? React.null : <HSpacing size=Spacing.md />}
+        </div>
+      })
+      ->Belt.List.toArray
+      ->React.array}
+    </>
+  | MultiSendInputList(inputs) =>
+    <KVTable
+      headers=["Address", "Amount (BAND)"]
+      rows={inputs
+      ->Belt.List.toArray
+      ->Belt.Array.map(input => [
+        KVTable.Value(input.address->Address.toBech32),
+        KVTable.Value(input.coins->Coin.getBandAmountFromCoins->Belt.Float.toString),
+      ])}
+    />
+  | MultiSendOutputList(outputs) =>
+    <KVTable
+      headers=["Address", "Amount (BAND)"]
+      rows={outputs
+      ->Belt.List.toArray
+      ->Belt.Array.map(output => [
+        KVTable.Value(output.address->Address.toBech32),
+        KVTable.Value(output.coins->Coin.getBandAmountFromCoins->Belt.Float.toString),
+      ])}
+    />
+  | ExecList(msgs) => React.null
+  }
+}
+
+module MessageItem = {
+  @react.component
+  let make = (~title, ~content: content_inner_t) => {
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
+    <Row marginBottom=0 marginBottomSm=24>
+      {switch content {
+      | ExecList(msgs) =>
+        <Col col=Col.Twelve>
+          {msgs
+          ->Belt.List.toArray
+          ->Belt.Array.mapWithIndex((i, msg) => {
+            let contents = getContent(msg)
+            contents
+            ->Belt.Array.map(c => {
+              <Row marginBottom=0 marginBottomSm=24>
+                <Col col=Col.Three mb=16 mbSm=8>
+                  <Heading
+                    value={c.title}
+                    size=Heading.H4
+                    weight=Heading.Regular
+                    marginBottom=8
+                    color=theme.neutral_600
+                  />
+                </Col>
+                <Col col=Col.Nine mb=16 mbSm=8> {renderValue(c.content)} </Col>
+              </Row>
+            })
+            ->React.array
+          })
+          ->React.array}
+        </Col>
+
+      | _ =>
+        <>
+          <Col col=Col.Three mb=16 mbSm=8>
+            <Heading
+              value={title}
+              size=Heading.H4
+              weight=Heading.Regular
+              marginBottom=8
+              color=theme.neutral_600
+            />
+          </Col>
+          <Col col=Col.Nine mb=16 mbSm=8> {renderValue(content)} </Col>
+        </>
+      }}
+    </Row>
+  }
+}
+
 @react.component
 let make = (~contents: array<content_t>) => {
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-
-  {
-    contents
-    ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
-    ->Belt.Array.mapWithIndex((i, {content, title}) => {
-      <Row key={i->Belt.Int.toString} marginBottom=0 marginBottomSm=24>
-        <Col col=Col.Three mb=16 mbSm=8>
-          <Heading
-            value={title}
-            size=Heading.H4
-            weight=Heading.Regular
-            marginBottom=8
-            color=theme.neutral_600
-          />
-        </Col>
-        <Col col=Col.Nine mb=16 mbSm=8 key={i->Belt.Int.toString}> {renderValue(content)} </Col>
-      </Row>
-    })
-    ->React.array
-  }
+  contents
+  ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
+  ->Belt.Array.mapWithIndex((i, {content, title}) => {
+    <MessageItem key={i->string_of_int} title={title} content={content} />
+  })
+  ->React.array
 }

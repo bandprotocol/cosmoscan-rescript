@@ -7,7 +7,7 @@ module Styles = {
       marginTop(#px(mt)),
       marginBottom(#px(mb)),
       height(#px(1)),
-      backgroundColor(isDarkMode ? theme.neutral_300 : theme.neutral_100),
+      backgroundColor(isDarkMode ? theme.neutral_300 : theme.neutral_300),
       Media.mobile([marginTop(#px(15))]),
     ])
 }

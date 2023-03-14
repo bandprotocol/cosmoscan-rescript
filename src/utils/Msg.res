@@ -1108,10 +1108,6 @@ let rec decodeMsg = (json, isSuccess) => {
           }
 
     | "/cosmos.authz.v1beta1.MsgExec" =>
-      // let msg = json->mustGet("msg", id)
-      // let grantee = msg->mustGet("grantee", address)
-      // let rawMsgs =
-      //   msg->mustGet("msgs", list(id))->Belt.List.map(x => decodeMsg(x, isSuccess).decoded)
       let msg = json->mustDecode(decodeExecMsg(isSuccess))
       (ExecMsg(msg), msg.grantee, false)
     | _ => (UnknownMsg, Address.Address(""), false)
