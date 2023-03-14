@@ -1169,6 +1169,16 @@ module ChannelCloseConfirm = {
   }
 }
 
+module Activate = {
+  type t = {validatorAddress: Address.t}
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      validatorAddress: json.required(list{"msg", "validator"}, string)->Address.fromBech32,
+    })
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -1206,6 +1216,7 @@ type msg_t =
   | ChannelOpenConfirmMsg(ChannelOpenConfirm.t)
   | ChannelCloseInitMsg(ChannelCloseInit.t)
   | ChannelCloseConfirmMsg(ChannelCloseConfirm.t)
+  | ActivateMsg(Activate.t)
   | UnknownMsg
 
 type t = {
@@ -1266,6 +1277,7 @@ let getBadge = msg => {
   | ChannelOpenConfirmMsg(_) => {name: "Channel Open Confirm", category: IBCMsg}
   | ChannelCloseInitMsg(_) => {name: "Channel Close Init", category: IBCMsg}
   | ChannelCloseConfirmMsg(_) => {name: "Channel Close Confirm", category: IBCMsg}
+  | ActivateMsg(_) => {name: "Activate", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1490,6 +1502,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/ibc.core.channel.v1.MsgChannelCloseConfirm" =>
       let msg = json->mustDecode(ChannelCloseConfirm.decode)
       (ChannelCloseConfirmMsg(msg), msg.signer, true)
+    | "/oracle.v1.MsgActivate" =>
+      let msg = json->mustDecode(Activate.decode)
+      (ActivateMsg(msg), msg.validatorAddress, true)
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }

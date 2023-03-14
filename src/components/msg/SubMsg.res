@@ -161,6 +161,7 @@ let make = (~msg: Msg.t) => {
     | ChannelOpenConfirmMsg({channelID})
     | ChannelCloseInitMsg({channelID})
     | ChannelCloseConfirmMsg({channelID}) => <IBCChannelMsg.ChannelCloseCommon channelID />
+    | ActivateMsg(_) => React.null
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />

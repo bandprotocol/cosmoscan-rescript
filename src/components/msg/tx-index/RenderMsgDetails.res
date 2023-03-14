@@ -1460,6 +1460,18 @@ module ChannelCloseConfirm = {
   }
 }
 
+module Activate = {
+  let factory = (msg: Msg.Activate.t) => {
+    [
+      {
+        title: "Validator",
+        content: Address(msg.validatorAddress),
+        order: 1,
+      },
+    ]
+  }
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1551,6 +1563,7 @@ let getContent = msg => {
   | Msg.ChannelOpenConfirmMsg(data) => ChannelOpenConfirm.factory(data)
   | Msg.ChannelCloseInitMsg(data) => ChannelCloseInit.factory(data)
   | Msg.ChannelCloseConfirmMsg(data) => ChannelCloseConfirm.factory(data)
+  | Msg.ActivateMsg(data) => Activate.factory(data)
   | Msg.UnknownMsg => []
   }
 }
