@@ -35,8 +35,7 @@ module Calldata = {
   }
 }
 
-// TODO: Re-visit data structure
-type rec content_inner_t =
+type content_inner_t =
   | PlainText(string)
   | Address(Address.t)
   | ValidatorAddress(Address.t)
@@ -50,7 +49,8 @@ type rec content_inner_t =
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | ExecList(list<Msg.msg_t>)
-and content_t = {
+
+type content_t = {
   title: string,
   content: content_inner_t,
   order: int,
@@ -827,7 +827,7 @@ module MultiSend = {
   ]
 }
 
-let rec getContent = msg => {
+let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
     switch m {
@@ -919,7 +919,7 @@ let rec getContent = msg => {
   }
 }
 
-let rec renderValue = v => {
+let renderValue = v => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   switch v {
   | Address(address) => <AddressRender position=AddressRender.Subtitle address />
@@ -995,6 +995,7 @@ let rec renderValue = v => {
         KVTable.Value(output.coins->Coin.getBandAmountFromCoins->Belt.Float.toString),
       ])}
     />
+  // Noted: We support only 1 level of exec (no recursion)
   | ExecList(msgs) => React.null
   }
 }

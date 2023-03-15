@@ -60,6 +60,7 @@ let make = (~msg: Msg.t) => {
     <MsgFront name=badge.name fromAddress={msg.sender} />
     {switch msg.decoded {
     | SendMsg({toAddress, amount}) => <TokenMsg.SendMsg toAddress amount />
+    | MultiSendMsg(msg) => <TokenMsg.MultisendMsg inputs={msg.inputs} outputs={msg.outputs} />
     | CreateDataSourceMsg(msg) =>
       switch msg {
       | Msg.Oracle.CreateDataSource.Success(m) => <OracleMsg.CreateDataSourceMsg.Success msg=m />
@@ -74,7 +75,6 @@ let make = (~msg: Msg.t) => {
         <OracleMsg.CreateOracleScriptMsg.Failure msg=f />
       }
     | EditOracleScriptMsg(msg) => <OracleMsg.EditOracleScriptMsg id=msg.id name=msg.name />
-
     | RequestMsg(msg) =>
       switch msg {
       | Msg.Oracle.Request.Success(m) => <OracleMsg.RequestMsg.Success msg=m />
@@ -142,7 +142,6 @@ let make = (~msg: Msg.t) => {
         <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
       | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
-    | MultiSendMsg(msg) => <TokenMsg.MultisendMsg inputs={msg.inputs} outputs={msg.outputs} />
     | ExecMsg(msg) => <ValidatorMsg.Exec messages={msg.msgs} />
 
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
