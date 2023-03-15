@@ -856,6 +856,14 @@ module Gov = {
   }
 }
 
+type ibc_transfer_t = {
+  sourcePort: string,
+  sourceChannel: string,
+  receiver: string,
+  token: Coin.t,
+  timeoutTimestamp: float,
+}
+
 module Input = {
   type t =
     | SendMsg(Bank.Send.input_t)
@@ -865,6 +873,7 @@ module Input = {
     | RedelegateMsg(Staking.Redelegate.input_t)
     | WithdrawRewardMsg(Distribution.WithdrawReward.input_t)
     | VoteMsg(Gov.Vote.input_t)
+    | IBCTransfer(ibc_transfer_t)
 }
 
 type decoded_msg_t =

@@ -70,7 +70,15 @@ let createMsg = (sender, msg: Msg.Input.t) => {
     )
   | VoteMsg({proposalID, option, voterAddress}) =>
     MsgVote.create(proposalID->ID.Proposal.toInt, voterAddress->Address.toBech32, option)
-  // | _ => failwith("Not implemented")
+  | IBCTransfer({sourcePort, sourceChannel, receiver, token, timeoutTimestamp}) =>
+    MsgTransfer.create(
+      sourcePort,
+      sourceChannel,
+      sender,
+      receiver,
+      token->Coin.toBandChainCoin,
+      timeoutTimestamp,
+    )
   }
 }
 
@@ -119,3 +127,9 @@ let broadcast = async (client, txRawBytes) => {
     Error(Js.Exn.message(obj)->Belt.Option.getWithDefault("Unknown error"))
   }
 }
+
+let stringifyWithSpaces: Js.Json.t => string = %raw(`
+    function stringifyWithSpaces(obj) {
+        return JSON.stringify(obj, undefined, 4);
+    }
+`)

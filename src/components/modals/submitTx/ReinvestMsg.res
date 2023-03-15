@@ -12,12 +12,7 @@ let make = (~address, ~validator, ~amount, ~setMsgsOpt) => {
 
   React.useEffect0(_ => {
     let msgsOpt = {
-      // let coin = BandChainJS.Coin.create()
-      // coin->BandChainJS.Coin.setDenom("uband")
-      // coin->BandChainJS.Coin.setAmount(amount->Js.Math.floor_float->Belt.Float.toString)
-
       Some([
-        // TxCreator2.WithdrawReward(validator), TxCreator2.Delegate(validator, coin)
         Msg.Input.WithdrawRewardMsg({
           delegatorAddress: address,
           validatorAddress: validator,

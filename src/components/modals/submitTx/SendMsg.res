@@ -53,7 +53,19 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
             amount: list{amountValue->Coin.newUBANDFromAmount},
           }),
         ])
-      | _ => None //TODO: add IBCTransfer tx
+      | IBC({channel}) =>
+        Some([
+          Msg.Input.IBCTransfer({
+            sourcePort: "transfer",
+            sourceChannel: channel,
+            receiver: toAddress.text, // Hack: use text instead
+            token: amountValue->Coin.newUBANDFromAmount,
+            timeoutTimestamp: (MomentRe.momentNow()
+            ->MomentRe.Moment.defaultUtc
+            ->MomentRe.Moment.toUnix
+            ->float_of_int +. 600.) *. 1e9, // add 10 mins
+          }),
+        ])
       }
     }
     setMsgsOpt(_ => msgsOpt)

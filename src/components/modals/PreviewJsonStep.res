@@ -67,7 +67,7 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
       let pubKeyHex = account.pubKey->PubKey.toHex
       let pubKey = pubKeyHex->BandChainJS.PubKey.fromHex
       let txRawBytes = rawTx->BandChainJS.Transaction.getTxData(signature, pubKey, 127)
-      // let txResult = await TxCreator2.broadcast(client, txRawBytes)
+
       let txResult = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
       Js.log(txResult)
       txResult.code == 0
@@ -103,7 +103,7 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
         <textarea
           className={Styles.jsonDisplay(theme)}
           disabled=true
-          defaultValue={jsonTxStr->Js.Json.parseExn->TxCreator2.stringifyWithSpaces}
+          defaultValue={jsonTxStr->Js.Json.parseExn->TxCreator3.stringifyWithSpaces}
         />
         <div id="broadcastButtonContainer">
           <Button
