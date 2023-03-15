@@ -42,7 +42,7 @@ module Styles = {
 }
 
 type state_t =
-  | Nothing
+  | Preview(BandChainJS.Transaction.transaction_t)
   | Signing
   | Broadcasting
   | Success(Hash.t)
@@ -51,8 +51,7 @@ type state_t =
 @react.component
 let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
   let (_, dispatchModal) = React.useContext(ModalContext.context)
-  let (state, setState) = React.useState(_ => Nothing)
-  let jsonTxStr = rawTx->BandChainJS.Transaction.getSignMessage->JsBuffer.toUTF8
+  let (state, setState) = React.useState(_ => Preview(rawTx))
 
   let client = React.useContext(ClientContext.context)
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
@@ -60,40 +59,34 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
   let startBroadcast = async () => {
     dispatchModal(DisableExit)
     setState(_ => Signing)
-    try {
-      let signature = await Wallet.sign(jsonTxStr, account.wallet)
-
+    let signTxResult = await TxCreator3.signTx(account, rawTx)
+    switch signTxResult {
+    | Ok(signedTx) =>
       setState(_ => Broadcasting)
-      let pubKeyHex = account.pubKey->PubKey.toHex
-      let pubKey = pubKeyHex->BandChainJS.PubKey.fromHex
-      let txRawBytes = rawTx->BandChainJS.Transaction.getTxData(signature, pubKey, 127)
+      let txResult = await client->TxCreator3.broadcastTx(signedTx)
+      switch txResult {
+      | Ok(tx) =>
+        tx.success
+          ? {
+              setState(_ => Success(tx.txHash))
+            }
+          : {
+              Js.Console.error(tx)
+              setState(_ => Error(tx.code->TxResError.parse))
+            }
 
-      let txResult = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
-      Js.log(txResult)
-      txResult.code == 0
-        ? {
-            setState(_ => Success(txResult.txhash->Hash.fromHex))
-          }
-        : {
-            Js.Console.error(txResult)
-            setState(_ => Error(txResult.code->TxResError.parse))
-          }
-
-      dispatchModal(EnableExit)
-    } catch {
-    | Js.Exn.Error(e) =>
-      switch Js.Json.stringifyAny(e) {
-      | Some(errorValue) => setState(_ => Error(errorValue))
-      | None => setState(_ => Error("Can not stringify error"))
+      | Error(err) => setState(_ => Error(err))
       }
-      dispatchModal(EnableExit)
+    | Error(err) => setState(_ => Error(err))
     }
+
+    dispatchModal(EnableExit)
   }
 
   <div className=Styles.container>
     <Heading value="Confirm Transactions" size=Heading.H4 marginBottom=24 />
     {switch state {
-    | Nothing =>
+    | Preview(rawTx) =>
       <div>
         <div className={CssHelper.mb(~size=16, ())}>
           <Text
@@ -103,7 +96,11 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
         <textarea
           className={Styles.jsonDisplay(theme)}
           disabled=true
-          defaultValue={jsonTxStr->Js.Json.parseExn->TxCreator3.stringifyWithSpaces}
+          defaultValue={rawTx
+          ->BandChainJS.Transaction.getSignMessage
+          ->JsBuffer.toUTF8
+          ->Js.Json.parseExn
+          ->TxCreator3.stringifyWithSpaces}
         />
         <div id="broadcastButtonContainer">
           <Button

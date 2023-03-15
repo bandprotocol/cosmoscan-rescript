@@ -322,19 +322,6 @@ module ExecutionPart = {
       None
     })
 
-    let requestCallback = React.useCallback0(requestPromise => {
-      ignore(
-        requestPromise->Promise.then(res => {
-          switch res {
-          | TxCreator3.Tx(response) => setResult(_ => Success(response))
-          | Error(err) => setResult(_ => Error(err))
-          }
-          Promise.resolve()
-        }),
-      )
-      ()
-    })
-
     isMobile
       ? <MobileBlock>
           <Icon name="fal fa-exclamation-circle" size=32 color={theme.neutral_900} />
@@ -386,7 +373,7 @@ module ExecutionPart = {
               | _ => React.null
               }}
               {switch accountOpt {
-              | Some(_) =>
+              | Some(account) =>
                 <>
                   <Button
                     fsize=14
@@ -408,40 +395,45 @@ module ExecutionPart = {
                         ) {
                         | Some(encoded) =>
                           setResult(_ => Loading)
-                          dispatch(
-                            AccountContext.SendRequest(
-                              {
-                                msg: {
-                                  oracleScriptID: id,
-                                  calldata: encoded,
-                                  askCount: askCount->int_of_string,
-                                  minCount: minCount->int_of_string,
-                                  sender: Address.Address(""),
-                                  clientID: {
-                                    switch clientID->String.trim == "" {
-                                    | false => clientID->String.trim
-                                    | true => "from_scan"
-                                    }
-                                  },
-                                  feeLimit: list{
-                                    feeLimit->float_of_string->Coin.newUBANDFromAmount,
-                                  },
-                                  prepareGas: prepareGas->String.trim == ""
-                                    ? 0
-                                    : prepareGas->String.trim->int_of_string,
-                                  executeGas: executeGas->String.trim == ""
-                                    ? 0
-                                    : executeGas->String.trim->int_of_string,
-                                  id: (),
-                                  oracleScriptName: (),
-                                  schema: (),
+                          let _ = TxCreator3.sendTransaction(
+                            client,
+                            account,
+                            [
+                              Msg.Input.RequestMsg({
+                                oracleScriptID: id,
+                                calldata: encoded,
+                                askCount: askCount->int_of_string,
+                                minCount: minCount->int_of_string,
+                                sender: account.address,
+                                clientID: {
+                                  switch clientID->String.trim == "" {
+                                  | false => clientID->String.trim
+                                  | true => "from_scan"
+                                  }
                                 },
-                                gaslimit,
-                                callback: requestCallback,
-                              },
-                              client,
-                            ),
-                          )
+                                feeLimit: list{feeLimit->float_of_string->Coin.newUBANDFromAmount},
+                                prepareGas: prepareGas->String.trim == ""
+                                  ? 0
+                                  : prepareGas->String.trim->int_of_string,
+                                executeGas: executeGas->String.trim == ""
+                                  ? 0
+                                  : executeGas->String.trim->int_of_string,
+                                id: (),
+                                oracleScriptName: (),
+                                schema: (),
+                              }),
+                            ],
+                            5000,
+                            int_of_string_opt(gaslimit)->Belt.Option.getWithDefault(200000),
+                            "Request via scan",
+                          )->Promise.then(res => {
+                            switch res {
+                            | Belt.Result.Ok(response) => setResult(_ => Success(response))
+                            | Error(err) => setResult(_ => Error(err))
+                            }
+                            Promise.resolve()
+                          })
+
                         | None =>
                           setResult(_ => Error("Encoding fail, please check each parameter's type"))
                         }

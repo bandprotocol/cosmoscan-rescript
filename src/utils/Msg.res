@@ -862,6 +862,7 @@ type ibc_transfer_t = {
   receiver: string,
   token: Coin.t,
   timeoutTimestamp: float,
+  sender: Address.t,
 }
 
 module Input = {

@@ -4,11 +4,7 @@ type tx_response_t = {
   code: int,
 }
 
-type broadcast_response_t =
-  | Tx(tx_response_t)
-  | Error(string)
-
-let createMsg = (sender, msg: Msg.Input.t) => {
+let createMsg = (msg: Msg.Input.t) => {
   open BandChainJS.Message
   switch msg {
   | SendMsg({fromAddress, toAddress, amount}) =>
@@ -70,11 +66,11 @@ let createMsg = (sender, msg: Msg.Input.t) => {
     )
   | VoteMsg({proposalID, option, voterAddress}) =>
     MsgVote.create(proposalID->ID.Proposal.toInt, voterAddress->Address.toBech32, option)
-  | IBCTransfer({sourcePort, sourceChannel, receiver, token, timeoutTimestamp}) =>
+  | IBCTransfer({sourcePort, sourceChannel, receiver, token, timeoutTimestamp, sender}) =>
     MsgTransfer.create(
       sourcePort,
       sourceChannel,
-      sender,
+      sender->Address.toBech32,
       receiver,
       token->Coin.toBandChainCoin,
       timeoutTimestamp,
@@ -82,28 +78,20 @@ let createMsg = (sender, msg: Msg.Input.t) => {
   }
 }
 
-let createRawTx = async (
-  ~sender,
-  ~msgs: array<Msg.Input.t>,
-  ~chainID,
-  ~feeAmount,
-  ~gas,
-  ~memo,
-  ~client,
-) => {
+let createRawTx = async (client, sender, msgs, chainID, feeAmount, gas, memo) => {
   open BandChainJS.Transaction
   let senderStr = sender->Address.toBech32
 
   let feeCoin = BandChainJS.Coin.create()
   feeCoin->BandChainJS.Coin.setDenom("uband")
-  feeCoin->BandChainJS.Coin.setAmount(feeAmount)
+  feeCoin->BandChainJS.Coin.setAmount(feeAmount->Belt.Int.toString)
 
   let fee = BandChainJS.Fee.create()
   fee->BandChainJS.Fee.setAmountList([feeCoin])
   fee->BandChainJS.Fee.setGasLimit(gas)
 
   let tx = create()
-  msgs->Belt.Array.forEach(msg => tx->withMessages(createMsg(senderStr, msg)))
+  msgs->Belt.Array.forEach(msg => tx->withMessages(createMsg(msg)))
   tx->withChainId(chainID)
   tx->withFee(fee)
   tx->withMemo(memo)
@@ -112,11 +100,28 @@ let createRawTx = async (
   tx
 }
 
-let broadcast = async (client, txRawBytes) => {
+let signTx = async (account: AccountContext.t, rawTx) => {
   try {
-    let response = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
+    let jsonTxStr = rawTx->BandChainJS.Transaction.getSignMessage->JsBuffer.toUTF8
+    let signature = await Wallet.sign(jsonTxStr, account.wallet)
+    Belt.Result.Ok(
+      rawTx->BandChainJS.Transaction.getTxData(
+        signature,
+        account.pubKey->PubKey.toHex->BandChainJS.PubKey.fromHex,
+        127,
+      ),
+    )
+  } catch {
+  | Js.Exn.Error(obj) =>
+    Js.Console.log(obj)
+    Error(Js.Exn.message(obj)->Belt.Option.getWithDefault("Unknown error on signing"))
+  }
+}
 
-    Tx({
+let broadcastTx = async (client, signedTx) => {
+  try {
+    let response = await client->BandChainJS.Client.sendTxBlockMode(signedTx)
+    Belt.Result.Ok({
       txHash: response.txhash->Hash.fromHex,
       code: response.code,
       success: response.code == 0,
@@ -124,7 +129,30 @@ let broadcast = async (client, txRawBytes) => {
   } catch {
   | Js.Exn.Error(obj) =>
     Js.Console.log(obj)
-    Error(Js.Exn.message(obj)->Belt.Option.getWithDefault("Unknown error"))
+    Error(Js.Exn.message(obj)->Belt.Option.getWithDefault("Unknown error on broadcasting"))
+  }
+}
+
+let sendTransaction = async (
+  client,
+  account: AccountContext.t,
+  msgs: array<Msg.Input.t>,
+  feeAmount,
+  gas,
+  memo,
+) => {
+  let rawTx = await createRawTx(
+    client,
+    account.address,
+    msgs,
+    account.chainID,
+    feeAmount,
+    gas,
+    memo,
+  )
+  switch await signTx(account, rawTx) {
+  | Ok(signedTx) => await broadcastTx(client, signedTx)
+  | Error(err) => Error(err)
   }
 }
 
