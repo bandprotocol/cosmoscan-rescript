@@ -210,7 +210,7 @@ module ClientIDInput = {
 
 module ValueInput = {
   @react.component
-  let make = (~value, ~setValue, ~title, ~info=?) => {
+  let make = (~value, ~setValue, ~title, ~info=?, ~inputType="text") => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.listContainer>
@@ -222,7 +222,7 @@ module ValueInput = {
       <VSpacing size=Spacing.sm />
       <input
         className={Styles.input(theme, isDarkMode)}
-        type_="text"
+        type_=inputType
         onChange={event => {
           let newVal = ReactEvent.Form.target(event)["value"]
           setValue(_ => newVal)
@@ -303,9 +303,9 @@ module ExecutionPart = {
     let (callDataArr, setCallDataArr) = React.useState(_ => Belt.Array.make(numParams, ""))
     let (clientID, setClientID) = React.useState(_ => "from_scan")
     let (feeLimit, setFeeLimit) = React.useState(_ => "200")
-    let (prepareGas, setPrepareGas) = React.useState(_ => "")
-    let (executeGas, setExecuteGas) = React.useState(_ => "")
-    let (gaslimit, setGaslimit) = React.useState(_ => "")
+    let (prepareGas, setPrepareGas) = React.useState(_ => 20000)
+    let (executeGas, setExecuteGas) = React.useState(_ => 100000)
+    let (gaslimit, setGaslimit) = React.useState(_ => 2000000)
     let (askCount, setAskCount) = React.useState(_ => "1")
     let (minCount, setMinCount) = React.useState(_ => "1")
     let (result, setResult) = React.useState(_ => Nothing)
@@ -359,12 +359,23 @@ module ExecutionPart = {
               <ClientIDInput clientID setClientID />
               <ValueInput value=feeLimit setValue=setFeeLimit title="Fee Limit" info="(uband)" />
               <ValueInput
-                value=prepareGas setValue=setPrepareGas title="Prepare Gas" info="(optional)"
+                value={prepareGas->Belt.Int.toString}
+                setValue=setPrepareGas
+                title="Prepare Gas"
+                inputType="number"
               />
               <ValueInput
-                value=executeGas setValue=setExecuteGas title="Execute Gas" info="(optional)"
+                value={executeGas->Belt.Int.toString}
+                setValue=setExecuteGas
+                title="Execute Gas"
+                inputType="number"
               />
-              <ValueInput value=gaslimit setValue=setGaslimit title="Gas Limit" info="(optional)" />
+              <ValueInput
+                value={gaslimit->Belt.Int.toString}
+                setValue=setGaslimit
+                title="Gas Limit"
+                inputType="number"
+              />
               <SeperatedLine />
               {switch validatorCount {
               | Data(count) =>
@@ -412,19 +423,15 @@ module ExecutionPart = {
                                   }
                                 },
                                 feeLimit: list{feeLimit->float_of_string->Coin.newUBANDFromAmount},
-                                prepareGas: prepareGas->String.trim == ""
-                                  ? 0
-                                  : prepareGas->String.trim->int_of_string,
-                                executeGas: executeGas->String.trim == ""
-                                  ? 0
-                                  : executeGas->String.trim->int_of_string,
+                                prepareGas,
+                                executeGas,
                                 id: (),
                                 oracleScriptName: (),
                                 schema: (),
                               }),
                             ],
                             5000,
-                            int_of_string_opt(gaslimit)->Belt.Option.getWithDefault(200000),
+                            gaslimit,
                             "Request via scan",
                           )->Promise.then(res => {
                             switch res {
