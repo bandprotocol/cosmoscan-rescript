@@ -67,6 +67,11 @@ module ResolveStatus = {
   @react.component
   let make = (~packet: IBCQuery.t) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+    let errorMsg = reason =>
+      reason->ModalContext.IBCPacketError->ModalContext.OpenModal->dispatchModal
+
     <div>
       {switch packet {
       | {acknowledgement, packetType, data} =>
@@ -96,8 +101,7 @@ module ResolveStatus = {
                   CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ()),
                   Styles.failText,
                 })}
-                // onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
-                onClick={_ => Js.log("Show Error")}>
+                onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
                 <Text value="View Error" color=theme.error_600 />
                 <HSpacing size=#px(8) />
                 <img alt="Fail Icon" src=Images.fail />
