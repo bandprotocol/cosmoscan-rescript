@@ -26,6 +26,9 @@ let getChannelInfo = (~port, ~channel, ()) => {
   result
   ->Query.fromData
   ->Query.map(({channels_by_pk}) => {
-    channels_by_pk->Belt.Option.getExn
+    switch channels_by_pk {
+    | Some(data) => Query.resolve(data)
+    | None => Query.NoData
+    }
   })
 }

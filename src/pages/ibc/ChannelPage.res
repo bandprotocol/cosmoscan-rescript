@@ -33,6 +33,8 @@ module Styles = {
   let chainLogo = style(. [width(#px(24)), height(#px(24))])
 
   let chainWrapper = style(. [marginBottom(#px(16))])
+
+  let packetWrapper = style(. [marginBottom(#px(40))])
 }
 
 module ChainLogo = {
@@ -80,66 +82,70 @@ let make = (~chainID, ~port, ~channel) => {
           <div className={Styles.card(theme, isDarkMode)}>
             {switch channelInfo {
             | Data(info) =>
-              <div className={CssHelper.fullWidth}>
-                <div
-                  className={CssHelper.flexBox(
-                    ~justify=#spaceBetween,
-                    ~align=#center,
-                    ~direction=#row,
-                    (),
-                  )}>
-                  <ChainLogo chain={"band"} channel={""} />
-                  <ChainLogo chain={chainID} channel={info.counterpartyChannel} />
-                </div>
-                <Row alignItems=Row.Center>
-                  <Col col=Col.Four colSm=Col.Five>
-                    <div className="src-channel">
-                      <Text
-                        value={info.port} size=Text.Body1 block=true color={theme.neutral_900}
-                      />
+              switch info {
+              | Data({counterpartyChannel, port, channel, counterpartyPort}) =>
+                <div className={CssHelper.fullWidth}>
+                  <div
+                    className={CssHelper.flexBox(
+                      ~justify=#spaceBetween,
+                      ~align=#center,
+                      ~direction=#row,
+                      (),
+                    )}>
+                    <ChainLogo chain={"band"} channel={""} />
+                    <ChainLogo chain={chainID} channel={counterpartyChannel} />
+                  </div>
+                  <Row alignItems=Row.Center>
+                    <Col col=Col.Four colSm=Col.Five>
+                      <div className="src-channel">
+                        <Text value={port} size=Text.Body1 block=true color={theme.neutral_900} />
+                        <VSpacing size=Spacing.xs />
+                        <Text
+                          size=Text.Xxl
+                          value={channel}
+                          code=true
+                          color={theme.primary_600}
+                          weight={Bold}
+                        />
+                      </div>
+                    </Col>
+                    <Col col=Col.Four colSm=Col.Two>
+                      <div className="channel-arrow">
+                        <div className={CssHelper.flexBox(~justify=#center, ())}>
+                          <img
+                            alt="arrow"
+                            src={isDarkMode
+                              ? Images.connectionArrowLight
+                              : Images.connectionArrowDark}
+                            className="img-fullWidth"
+                          />
+                        </div>
+                      </div>
+                    </Col>
+                    <Col col=Col.Four colSm=Col.Five>
+                      {
+                        let port = Ellipsis.format(~text=counterpartyPort, ~limit=15, ())
+                        <Text
+                          value={port} size=Text.Body1 align={Right} color={theme.neutral_900}
+                        />
+                      }
                       <VSpacing size=Spacing.xs />
                       <Text
                         size=Text.Xxl
-                        value={info.channel}
+                        value={counterpartyChannel}
+                        ellipsis=true
+                        block=true
                         code=true
                         color={theme.primary_600}
                         weight={Bold}
+                        align={Right}
                       />
-                    </div>
-                  </Col>
-                  <Col col=Col.Four colSm=Col.Two>
-                    <div className="channel-arrow">
-                      <div className={CssHelper.flexBox(~justify=#center, ())}>
-                        <img
-                          alt="arrow"
-                          src={isDarkMode
-                            ? Images.connectionArrowLight
-                            : Images.connectionArrowDark}
-                          className="img-fullWidth"
-                        />
-                      </div>
-                    </div>
-                  </Col>
-                  <Col col=Col.Four colSm=Col.Five>
-                    {
-                      let port = Ellipsis.format(~text=info.counterpartyPort, ~limit=15, ())
-                      <Text value={port} size=Text.Body1 align={Right} color={theme.neutral_900} />
-                    }
-                    <VSpacing size=Spacing.xs />
-                    <Text
-                      size=Text.Xxl
-                      value={info.counterpartyChannel}
-                      ellipsis=true
-                      block=true
-                      code=true
-                      color={theme.primary_600}
-                      weight={Bold}
-                      align={Right}
-                    />
-                  </Col>
-                </Row>
-                <div className={Styles.channelInfo} />
-              </div>
+                    </Col>
+                  </Row>
+                  <div className={Styles.channelInfo} />
+                </div>
+              | _ => React.null
+              }
             | _ => <LoadingCensorBar width=100 height=20 />
             }}
           </div>
@@ -185,11 +191,15 @@ let make = (~chainID, ~port, ~channel) => {
         </Col>
       </Row>
     </div>
-    <div className=CssHelper.container id="section_incoming_packets">
-      <IncomingSection chainID channel port />
+    <div className={Css.merge(list{CssHelper.container})} id="section_incoming_packets">
+      <div className={Styles.packetWrapper}>
+        <IncomingSection chainID channel port />
+      </div>
     </div>
-    <div className=CssHelper.container id="section_outgoing_packets">
-      <OutgoingSection chainID channel port />
+    <div className={Css.merge(list{CssHelper.container})} id="section_outgoing_packets">
+      <div className={Styles.packetWrapper}>
+        <OutgoingSection chainID channel port />
+      </div>
     </div>
   </Section>
 }

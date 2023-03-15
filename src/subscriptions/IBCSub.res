@@ -26,27 +26,6 @@ module OutgoingPacketsCountConfig = %graphql(`
     }
 `)
 
-// let count = () => {
-//   let incomingPacketsSub = IncomingPacketsCountConfig.use()
-//   let outgoingPacketsSub = OutgoingPacketsCountConfig.use()
-
-//   let totalIncoming = {
-//     switch incomingPacketsSub.data {
-//     | Some({incoming_packets_aggregate: {aggregate: Some({count})}}) => count
-//     | _ => 0
-//     }
-//   }
-
-//   let totalOutgoing = {
-//     switch outgoingPacketsSub.data {
-//     | Some({outgoing_packets_aggregate: {aggregate: Some({count})}}) => count
-//     | _ => 0
-//     }
-//   }
-//   let total = totalIncoming + totalOutgoing
-//   total
-// }
-
 let incomingCount = (~port, ~channel, ~packetType, ()) => {
   let packetTypeIsNull = {
     switch packetType {
