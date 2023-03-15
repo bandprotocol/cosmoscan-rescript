@@ -39,18 +39,37 @@ let createMsg = (sender, msg: Msg.Input.t) => {
       prepareGas == 0 ? None : Some(prepareGas),
       executeGas == 0 ? None : Some(executeGas),
     )
-  // | DelegateMsg(Failure({delegatorAddress, validatorAddress, amount})) =>
-  //   MsgDelegate.create(
-  //     delegatorAddress->Address.toBech32,
-  //     validatorAddress->Address.toOperatorBech32,
-  //     amount->Coin.toBandChainCoin,
-  //   )
-  // | UndelegateMsg(Failure({delegatorAddress, validatorAddress, amount})) =>
-  //   MsgUndelegate.create(
-  //     delegatorAddress->Address.toBech32,
-  //     validatorAddress->Address.toOperatorBech32,
-  //     amount->Coin.toBandChainCoin,
-  //   )
+  | DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
+    MsgDelegate.create(
+      delegatorAddress->Address.toBech32,
+      validatorAddress->Address.toOperatorBech32,
+      amount->Coin.toBandChainCoin,
+    )
+  | UndelegateMsg({delegatorAddress, validatorAddress, amount}) =>
+    MsgUndelegate.create(
+      delegatorAddress->Address.toBech32,
+      validatorAddress->Address.toOperatorBech32,
+      amount->Coin.toBandChainCoin,
+    )
+  | RedelegateMsg({
+      validatorSourceAddress,
+      validatorDestinationAddress,
+      delegatorAddress,
+      amount,
+    }) =>
+    MsgRedelegate.create(
+      delegatorAddress->Address.toBech32,
+      validatorSourceAddress->Address.toOperatorBech32,
+      validatorDestinationAddress->Address.toOperatorBech32,
+      amount->Coin.toBandChainCoin,
+    )
+  | WithdrawRewardMsg({delegatorAddress, validatorAddress}) =>
+    MsgWithdrawReward.create(
+      delegatorAddress->Address.toBech32,
+      validatorAddress->Address.toOperatorBech32,
+    )
+  | VoteMsg({proposalID, option, voterAddress}) =>
+    MsgVote.create(proposalID->ID.Proposal.toInt, voterAddress->Address.toBech32, option)
   // | _ => failwith("Not implemented")
   }
 }
@@ -90,7 +109,7 @@ let broadcast = async (client, txRawBytes) => {
     let response = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
 
     Tx({
-      txHash: response.txHash->Hash.fromHex,
+      txHash: response.txhash->Hash.fromHex,
       code: response.code,
       success: response.code == 0,
     })

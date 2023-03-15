@@ -69,9 +69,10 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
       let txRawBytes = rawTx->BandChainJS.Transaction.getTxData(signature, pubKey, 127)
       // let txResult = await TxCreator2.broadcast(client, txRawBytes)
       let txResult = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
+      Js.log(txResult)
       txResult.code == 0
         ? {
-            setState(_ => Success(txResult.txHash->Hash.fromHex))
+            setState(_ => Success(txResult.txhash->Hash.fromHex))
           }
         : {
             Js.Console.error(txResult)

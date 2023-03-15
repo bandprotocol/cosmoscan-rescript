@@ -75,14 +75,15 @@ module SubmitTxStep = {
       {switch msg {
       | SubmitMsg.Send(receiver, targetChain) =>
         <SendMsg address={account.address} receiver setMsgsOpt targetChain />
-      // | Delegate(validator) => <DelegateMsg address={account.address} validator setMsgsOpt />
-      // | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
-      // | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
-      // | WithdrawReward(validator) =>
-      //   <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
-      // | Reinvest(validator, amount) => <ReinvestMsg validator setMsgsOpt amount />
-      // | Vote(proposalID, proposalName) => <VoteMsg proposalID proposalName setMsgsOpt />
-      | _ => React.null
+      | Delegate(validator) => <DelegateMsg address={account.address} validator setMsgsOpt />
+      | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
+      | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
+      | WithdrawReward(validator) =>
+        <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
+      | Reinvest(validator, amount) =>
+        <ReinvestMsg address={account.address} validator amount setMsgsOpt />
+      | Vote(proposalID, proposalName) =>
+        <VoteMsg address={account.address} proposalID proposalName setMsgsOpt />
       }}
       <EnhanceTxInput
         width=300

@@ -5,7 +5,7 @@ type base_account = {
 }
 
 type tx_response = {
-  txHash: string,
+  txhash: string,
   code: int,
 }
 

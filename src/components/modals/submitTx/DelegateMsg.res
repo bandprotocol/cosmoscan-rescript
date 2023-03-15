@@ -29,15 +29,13 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
       let amountValue = amount.value->Belt.Option.getWithDefault(0.)
 
       Some([
-        Msg.DelegateMsg(
-          Failure({
-            validatorAddress: validator,
-            delegatorAddress: address,
-            amount: amountValue->Coin.newUBANDFromAmount,
-            moniker: (),
-            identity: (),
-          }),
-        ),
+        Msg.Input.DelegateMsg({
+          validatorAddress: validator,
+          delegatorAddress: address,
+          amount: amountValue->Coin.newUBANDFromAmount,
+          moniker: (),
+          identity: (),
+        }),
       ])
     }
     setMsgsOpt(_ => msgsOpt)

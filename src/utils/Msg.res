@@ -466,6 +466,7 @@ module Staking = {
 
     type fail_t = t<unit, unit>
     type success_t = t<string, string>
+    type input_t = t<unit, unit>
 
     type decoded_t =
       | Success(success_t)
@@ -502,6 +503,7 @@ module Staking = {
 
     type fail_t = t<unit, unit>
     type success_t = t<string, string>
+    type input_t = t<unit, unit>
 
     type decoded_t =
       | Success(success_t)
@@ -542,6 +544,7 @@ module Staking = {
     type fail_t = t<unit, unit, unit, unit>
     type success_t = t<string, string, string, string>
 
+    type input_t = t<unit, unit, unit, unit>
     type decoded_t =
       | Success(success_t)
       | Failure(fail_t)
@@ -597,6 +600,7 @@ module Distribution = {
 
     type fail_t = t<unit, unit, unit>
     type success_t = t<list<Coin.t>, string, string>
+    type input_t = t<unit, unit, unit>
 
     type decoded_t =
       | Success(success_t)
@@ -769,6 +773,11 @@ module Gov = {
 
     type success_t = t<string>
     type fail_t = t<unit>
+    type input_t = {
+      voterAddress: Address.t,
+      proposalID: ID.Proposal.t,
+      option: int,
+    }
 
     type decoded_t =
       | Success(success_t)
@@ -851,6 +860,11 @@ module Input = {
   type t =
     | SendMsg(Bank.Send.input_t)
     | RequestMsg(Oracle.Request.input_t)
+    | DelegateMsg(Staking.Delegate.input_t)
+    | UndelegateMsg(Staking.Undelegate.input_t)
+    | RedelegateMsg(Staking.Redelegate.input_t)
+    | WithdrawRewardMsg(Distribution.WithdrawReward.input_t)
+    | VoteMsg(Gov.Vote.input_t)
 }
 
 type decoded_msg_t =

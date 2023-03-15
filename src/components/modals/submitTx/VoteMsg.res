@@ -46,7 +46,7 @@ module Styles = {
 module VoteInput = {
   @react.component
   let make = (~setAnswerOpt, ~answerOpt) => {
-    let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <>
       <div className={Css.merge(list{CssHelper.flexBox(), Styles.buttonGroup(theme)})}>
         <Button
@@ -89,19 +89,22 @@ module VoteInput = {
 }
 
 @react.component
-let make = (~proposalID, ~proposalName, ~setMsgsOpt) => {
+let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
   let (answerOpt, setAnswerOpt) = React.useState(_ => None)
-  React.useEffect1(
-    _ => {
-      let msgsOpt = {
-        let answer = answerOpt->Belt.Option.getWithDefault(1)
-        Some([TxCreator2.Vote(proposalID, answer)])
-      }
-      setMsgsOpt(_ => msgsOpt)
-      None
-    },
-    [answerOpt],
-  )
+  React.useEffect1(_ => {
+    let msgsOpt = {
+      let answer = answerOpt->Belt.Option.getWithDefault(1)
+      Some([
+        Msg.Input.VoteMsg({
+          voterAddress: address,
+          proposalID,
+          option: answer,
+        }),
+      ])
+    }
+    setMsgsOpt(_ => msgsOpt)
+    None
+  }, [answerOpt])
 
   <>
     <div className=Styles.container>
