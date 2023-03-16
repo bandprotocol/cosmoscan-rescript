@@ -147,8 +147,6 @@ let make = (~msg: Msg.t) => {
       } 
       | Msg.RecvPacket.Failure(f) => React.null
       }
-    | AcknowledgePacketMsg(_) => React.null
-    | CreateClientMsg(msg) => React.null
     | ConnectionOpenTryMsg({clientID, counterparty})
     | ConnectionOpenInitMsg({clientID, counterparty}) => 
       <IBCConnectionMsg.ConnectionCommon clientID counterpartyClientID={counterparty.clientID} />
@@ -164,6 +162,9 @@ let make = (~msg: Msg.t) => {
     | ChannelOpenConfirmMsg({channelID})
     | ChannelCloseInitMsg({channelID})
     | ChannelCloseConfirmMsg({channelID}) => <IBCChannelMsg.ChannelCloseCommon channelID />
+    | AcknowledgePacketMsg(_)
+    | TimeoutMsg(_)
+    | CreateClientMsg(_)
     | ActivateMsg(_) => React.null
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
