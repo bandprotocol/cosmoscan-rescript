@@ -940,7 +940,7 @@ module MultiSend = {
 }
 
 module RecvPacket = {
-  let factory = (msg: Msg.RecvPacket.t<'a>, firsts) => 
+  let factory = (msg: Msg.Channel.RecvPacket.t<'a>, firsts) => 
     firsts->Belt.Array.concat([
       {
         title: "Signer",
@@ -1001,7 +1001,7 @@ module RecvPacket = {
       },
     ])
 
-  let success = (msg: Msg.RecvPacket.success_t) =>
+  let success = (msg: Msg.Channel.RecvPacket.success_t) =>
     msg->factory(switch msg.packetData {
       | Some(packetData) => switch packetData.packetDetail {
         | OracleRequestPacket(details) => [
@@ -1076,11 +1076,11 @@ module RecvPacket = {
       | None => []
       })
 
-  let failed = (msg: Msg.RecvPacket.fail_t) => msg->factory([])
+  let failed = (msg: Msg.Channel.RecvPacket.fail_t) => msg->factory([])
 }
 
 module AcknowledgePacket = {
-  let factory = (msg: Msg.AcknowledgePacket.t) => {[
+  let factory = (msg: Msg.Channel.AcknowledgePacket.t) => {[
       {
         title: "Signer",
         content: Address(msg.signer),
@@ -1142,7 +1142,7 @@ module AcknowledgePacket = {
 }
 
 module Timeout = {
-  let factory = (msg: Msg.Timeout.t) => {[
+  let factory = (msg: Msg.Channel.Timeout.t) => {[
       {
         title: "Signer",
         content: Address(msg.signer),
@@ -1204,7 +1204,7 @@ module Timeout = {
 }
 
 module CreateClient = {
-  let factory = (msg: Msg.CreateClient.t) => {
+  let factory = (msg: Msg.Client.CreateClient.t) => {
     [
       {
         title: "Signer",
@@ -1216,24 +1216,7 @@ module CreateClient = {
 }
 
 module UpdateClient = {
-  let factory = (msg: Msg.UpdateClient.t) => {
-    [
-      {
-        title: "Signer",
-        content: Address(msg.signer),
-        order: 1,
-      },
-      {
-        title: "Client ID",
-        content: PlainText(msg.clientID),
-        order: 2,
-      },
-    ]
-  }
-}
-
-module SubmitClientMisbehaviour = {
-  let factory = (msg: Msg.SubmitClientMisbehaviour.t) => {
+  let factory = (msg: Msg.Client.UpdateClient.t) => {
     [
       {
         title: "Signer",
@@ -1250,7 +1233,24 @@ module SubmitClientMisbehaviour = {
 }
 
 module UpgradeClient = {
-  let factory = (msg: Msg.UpgradeClient.t) => {
+  let factory = (msg: Msg.Client.UpgradeClient.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.clientID),
+        order: 2,
+      },
+    ]
+  }
+}
+
+module SubmitClientMisbehaviour = {
+  let factory = (msg: Msg.Client.SubmitClientMisbehaviour.t) => {
     [
       {
         title: "Signer",
@@ -1267,7 +1267,7 @@ module UpgradeClient = {
 }
 
 module ConnectionOpenInit = {
-  let factory = (msg: Msg.ConnectionOpenInit.t) => {
+  let factory = (msg: Msg.Connection.ConnectionOpenInit.t) => {
     [
       {
         title: "Signer",
@@ -1300,7 +1300,7 @@ module ConnectionOpenInit = {
 }
 
 module ConnectionOpenTry = {
-  let factory = (msg: Msg.ConnectionOpenTry.t) => {
+  let factory = (msg: Msg.Connection.ConnectionOpenTry.t) => {
     [
       {
         title: "Signer",
@@ -1375,7 +1375,7 @@ module ConnectionOpenTry = {
 }
 
 module ConnectionOpenAck = {
-  let factory = (msg: Msg.ConnectionOpenAck.t) => {
+  let factory = (msg: Msg.Connection.ConnectionOpenAck.t) => {
     [
       {
         title: "Signer",
@@ -1435,7 +1435,7 @@ module ConnectionOpenAck = {
 }
 
 module ConnectionOpenConfirm = {
-  let factory = (msg: Msg.ConnectionOpenConfirm.t) => {
+  let factory = (msg: Msg.Connection.ConnectionOpenConfirm.t) => {
     [
       {
         title: "Signer",
@@ -1468,7 +1468,7 @@ module ConnectionOpenConfirm = {
 }
 
 module ChannelOpenInit = {
-  let factory = (msg: Msg.ChannelOpenInit.t) => {
+  let factory = (msg: Msg.Channel.ChannelOpenInit.t) => {
     [
       {
         title: "Signer",
@@ -1507,7 +1507,7 @@ module ChannelOpenInit = {
 }
 
 module ChannelOpenTry = {
-  let factory = (msg: Msg.ChannelOpenTry.t) => {
+  let factory = (msg: Msg.Channel.ChannelOpenTry.t) => {
     [
       {
         title: "Signer",
@@ -1566,7 +1566,7 @@ module ChannelOpenTry = {
 }
 
 module ChannelOpenAck = {
-  let factory = (msg: Msg.ChannelOpenAck.t) => {
+  let factory = (msg: Msg.Channel.ChannelOpenAck.t) => {
     [
       {
         title: "Signer",
@@ -1615,7 +1615,7 @@ module ChannelOpenAck = {
 }
 
 module ChannelOpenConfirm = {
-  let factory = (msg: Msg.ChannelOpenConfirm.t) => {
+  let factory = (msg: Msg.Channel.ChannelOpenConfirm.t) => {
     [
       {
         title: "Signer",
@@ -1653,7 +1653,7 @@ module ChannelOpenConfirm = {
 }
 
 module ChannelCloseInit = {
-  let factory = (msg: Msg.ChannelCloseInit.t) => {
+  let factory = (msg: Msg.Channel.ChannelCloseInit.t) => {
     [
       {
         title: "Signer",
@@ -1675,7 +1675,7 @@ module ChannelCloseInit = {
 }
 
 module ChannelCloseConfirm = {
-  let factory = (msg: Msg.ChannelCloseConfirm.t) => {
+  let factory = (msg: Msg.Channel.ChannelCloseConfirm.t) => {
     [
       {
         title: "Signer",
@@ -1709,7 +1709,7 @@ module Activate = {
 }
 
 module Transfer = {
-  let factory = (msg: Msg.Transfer.t<'a>, firsts) =>
+  let factory = (msg: Msg.Application.Transfer.t<'a>, firsts) =>
     firsts->Belt.Array.concat([
       {
         title: "Sender",
@@ -1738,7 +1738,7 @@ module Transfer = {
       },
     ])
 
-  let success = (msg: Msg.Transfer.success_t) =>
+  let success = (msg: Msg.Application.Transfer.success_t) =>
     msg->factory([
       {
         title: "Token",
@@ -1747,7 +1747,7 @@ module Transfer = {
       },
     ])
 
-  let failed = (msg: Msg.Transfer.fail_t) =>
+  let failed = (msg: Msg.Application.Transfer.fail_t) =>
     msg->factory([])
 }
 
@@ -1832,8 +1832,8 @@ let getContent = msg => {
   | Msg.SubmitClientMisbehaviourMsg(data) => SubmitClientMisbehaviour.factory(data)
   | Msg.RecvPacketMsg(m) =>
     switch m {
-    | Msg.RecvPacket.Success(data) => RecvPacket.success(data)
-    | Msg.RecvPacket.Failure(data) => RecvPacket.failed(data)
+    | Msg.Channel.RecvPacket.Success(data) => RecvPacket.success(data)
+    | Msg.Channel.RecvPacket.Failure(data) => RecvPacket.failed(data)
     }
   | Msg.AcknowledgePacketMsg(data) => AcknowledgePacket.factory(data)
   | Msg.TimeoutMsg(data) => Timeout.factory(data)
@@ -1851,8 +1851,8 @@ let getContent = msg => {
   | Msg.ActivateMsg(data) => Activate.factory(data)
   | Msg.TransferMsg(m) =>
     switch m {
-    | Msg.Transfer.Success(data) => Transfer.success(data)
-    | Msg.Transfer.Failure(data) => Transfer.failed(data)
+    | Msg.Application.Transfer.Success(data) => Transfer.success(data)
+    | Msg.Application.Transfer.Failure(data) => Transfer.failed(data)
     }
   | Msg.MultiSendMsg(data) => MultiSend.factory(data)
 

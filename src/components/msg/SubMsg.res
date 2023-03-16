@@ -146,11 +146,11 @@ let make = (~msg: Msg.t) => {
     | UpdateClientMsg({clientID})
     | SubmitClientMisbehaviourMsg({clientID}) => <IBCClientMsg.Client clientID />
     | RecvPacketMsg(msg) => switch msg {
-      | Msg.RecvPacket.Success({packetData}) => switch packetData {
+      | Msg.Channel.RecvPacket.Success({packetData}) => switch packetData {
         | Some({packetType}) => <IBCPacketMsg.Packet packetType />
         | None => React.null
       } 
-      | Msg.RecvPacket.Failure(f) => React.null
+      | Msg.Channel.RecvPacket.Failure(f) => React.null
       }
     | ConnectionOpenTryMsg({clientID, counterparty})
     | ConnectionOpenInitMsg({clientID, counterparty}) => 
@@ -173,8 +173,8 @@ let make = (~msg: Msg.t) => {
     | CreateClientMsg(_)
     | ActivateMsg(_) => React.null
     | TransferMsg(msg) => switch msg {
-      | Msg.Transfer.Success({receiver, token}) => <IBCTransferMsg.Transfer toAddress=receiver amount={token.amount} denom={token.denom} />
-      | Msg.Transfer.Failure(f) => React.null
+      | Msg.Application.Transfer.Success({receiver, token}) => <IBCTransferMsg.Transfer toAddress=receiver amount={token.amount} denom={token.denom} />
+      | Msg.Application.Transfer.Failure(f) => React.null
       }
     | MultiSendMsg(msg) => <TokenMsg.MultisendMsg inputs={msg.inputs} outputs={msg.outputs} />
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
