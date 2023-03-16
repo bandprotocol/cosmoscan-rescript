@@ -1630,6 +1630,49 @@ module Activate = {
   }
 }
 
+module Transfer = {
+  let factory = (msg: Msg.Transfer.t<'a>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Sender",
+        content: Address(msg.sender),
+        order: 1,
+      },
+      {
+        title: "Receiver",
+        content: PlainText(msg.receiver),
+        order: 2,
+      },
+      {
+        title: "Source Port",
+        content: PlainText(msg.sourcePort),
+        order: 3,
+      },
+      {
+        title: "Source Channel",
+        content: PlainText(msg.sourceChannel),
+        order: 4,
+      },
+      {
+        title: "Timeout Timestamp",
+        content: Timestamp(msg.timeoutTimestamp),
+        order: 6,
+      },
+    ])
+
+  let success = (msg: Msg.Transfer.success_t) =>
+    msg->factory([
+      {
+        title: "Token",
+        content: CoinList(list{msg.token}),
+        order: 5,
+      },
+    ])
+
+  let failed = (msg: Msg.Transfer.fail_t) =>
+    msg->factory([])
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1727,6 +1770,11 @@ let getContent = msg => {
   | Msg.ChannelCloseInitMsg(data) => ChannelCloseInit.factory(data)
   | Msg.ChannelCloseConfirmMsg(data) => ChannelCloseConfirm.factory(data)
   | Msg.ActivateMsg(data) => Activate.factory(data)
+  | Msg.TransferMsg(m) =>
+    switch m {
+    | Msg.Transfer.Success(data) => Transfer.success(data)
+    | Msg.Transfer.Failure(data) => Transfer.failed(data)
+    }
   | Msg.UnknownMsg => []
   }
 }

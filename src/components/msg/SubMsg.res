@@ -167,6 +167,10 @@ let make = (~msg: Msg.t) => {
     | TimeoutOnCloseMsg(_)
     | CreateClientMsg(_)
     | ActivateMsg(_) => React.null
+    | TransferMsg(msg) => switch msg {
+      | Msg.Transfer.Success({receiver, token}) => <IBCTransferMsg.Transfer toAddress=receiver amount={token.amount} denom={token.denom} />
+      | Msg.Transfer.Failure(f) => React.null
+      }
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />

@@ -1239,6 +1239,48 @@ module Activate = {
   }
 }
 
+module Transfer = {
+  type t<'a> = {
+    sender: Address.t,
+    receiver: string,
+    sourcePort: string,
+    sourceChannel: string,
+    timeoutHeight: Height.t,
+    timeoutTimestamp: MomentRe.Moment.t,
+    token: 'a
+  }
+
+  type success_t = t<Coin.t>
+  type fail_t = t<unit>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(fail_t)
+
+  let decodeFactory = tokenD => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      sender: json.required(list{"msg", "sender"}, string)->Address.fromBech32,
+      receiver: json.required(list{"msg", "receiver"}, string),
+      sourcePort: json.required(list{"msg", "source_port"}, string),
+      sourceChannel: json.required(list{"msg", "source_channel"}, string),
+      timeoutHeight: json.required(list{"msg", "timeout_height"}, Height.decode),
+      timeoutTimestamp: json.required(list{"msg", "timeout_timestamp"}, GraphQLParser.timeNS),
+      token: json->tokenD
+    })
+  }
+
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(json => json.required(list{"msg", "token"}, Coin.decodeCoin))
+  }
+
+  let decodeFail: JsonUtils.Decode.t<fail_t> = {
+    open JsonUtils.Decode
+    decodeFactory(_ => ())
+  }
+}
+
 type msg_t =
   | SendMsg(Send.t)
   | CreateDataSourceMsg(CreateDataSource.decoded_t)
@@ -1282,6 +1324,7 @@ type msg_t =
   | ChannelCloseInitMsg(ChannelCloseInit.t)
   | ChannelCloseConfirmMsg(ChannelCloseConfirm.t)
   | ActivateMsg(Activate.t)
+  | TransferMsg(Transfer.decoded_t)
   | UnknownMsg
 
 type t = {
@@ -1348,6 +1391,7 @@ let getBadge = msg => {
   | ChannelCloseInitMsg(_) => {name: "Channel Close Init", category: IBCMsg}
   | ChannelCloseConfirmMsg(_) => {name: "Channel Close Confirm", category: IBCMsg}
   | ActivateMsg(_) => {name: "Activate", category: IBCMsg}
+  | TransferMsg(_) => {name: "Transfer", category: IBCMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
 }
@@ -1590,6 +1634,16 @@ let decodeMsg = (json, isSuccess) => {
     | "/oracle.v1.MsgActivate" =>
       let msg = json->mustDecode(Activate.decode)
       (ActivateMsg(msg), msg.validatorAddress, true)
+    | "/ibc.applications.transfer.v1.MsgTransfer" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Transfer.decodeSuccess) 
+            (TransferMsg(Success(msg)), msg.sender, true)
+          }
+        : {
+            let msg = json->mustDecode(Transfer.decodeFail)
+            (TransferMsg(Failure(msg)), msg.sender, true)
+          }
     | _ => (UnknownMsg, Address.Address(""), false)
     }
   }
