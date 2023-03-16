@@ -16,6 +16,7 @@ module Styles = {
     ])
 
   let logo = style(. [width(#px(12))])
+  let fullWidth = style(. [width(#percent(100.))]);
 
   let profileCard = (show, theme: Theme.t) =>
     style(. [
@@ -46,8 +47,8 @@ module Styles = {
 module ConnectBtn = {
   @react.component
   let make = (~connect) =>
-    <div id="connectButton">
-      <Button variant=Button.Outline px=24 py=8 onClick={_ => connect()}>
+    <div id="connectButton" className={Styles.fullWidth}>
+      <Button variant=Button.Outline px=24 py=8 fullWidth=true onClick={_ => connect()}>
         {"Connect Wallet"->React.string}
       </Button>
     </div>
@@ -57,7 +58,7 @@ module DisconnectBtn = {
   @react.component
   let make = (~disconnect) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    
+
     <div
       className={Css.merge(list{
         CssHelper.flexBox(~justify=#center, ~align=#center, ()),
@@ -66,7 +67,8 @@ module DisconnectBtn = {
       })}
       onClick={_ => disconnect()}>
       <Text value="Disconnect" weight=Text.Medium color=theme.primary_600 nowrap=true block=true />
-    </div>}
+    </div>
+  }
 }
 
 module FaucetBtn = {
@@ -146,7 +148,7 @@ let make = () => {
     setShow(_ => false)
   }
   let send = () => {
-    None->SubmitMsg.Send->SubmitTx->OpenModal->dispatchModal
+    SubmitMsg.Send(None, IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
     setShow(_ => false)
   }
 
@@ -191,7 +193,7 @@ let make = () => {
         // log for err details
         Js.Console.log(err)
         <Text value="Invalid Chain ID" />
-      | _ => <LoadingCensorBar width=80 height=18 />
+      | _ => <LoadingCensorBar width=150 height=30 />
       }}
     </div>
   }

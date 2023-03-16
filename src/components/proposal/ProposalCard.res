@@ -23,7 +23,6 @@ module Styles = {
     ])
 }
 
-// TODO: need to implement ValidatorSub first
 module Turnout = {
   @react.component
   let make = (~id) => {
@@ -154,6 +153,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
                 | Voting
                 | Passed
                 | Rejected
+                | Inactive
                 | Failed => "Voting End Time"
                 }}
                 size=Heading.H5
@@ -172,6 +172,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
               | Voting
               | Passed
               | Rejected
+              | Inactive
               | Failed => votingEndTime
               }}
               color={theme.neutral_900}
@@ -187,6 +188,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
           | Voting
           | Passed
           | Rejected
+          | Inactive
           | Failed =>
             <Turnout id />
           }

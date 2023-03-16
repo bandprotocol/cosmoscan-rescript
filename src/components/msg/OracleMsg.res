@@ -7,7 +7,7 @@ module Styles = {
 module CreateDataSourceMsg = {
   module Outer = {
     @react.component
-    let make = (~msg: Msg.CreateDataSource.t<'a>, ~children) =>
+    let make = (~msg: Msg.Oracle.CreateDataSource.t<'a>, ~children) =>
       <div
         className={CssJs.merge(. [
           CssHelper.flexBox(~wrap=#nowrap, ()),
@@ -54,7 +54,7 @@ module EditDataSourceMsg = {
 module CreateOracleScriptMsg = {
   module Outer = {
     @react.component
-    let make = (~msg: Msg.CreateOracleScript.t<'a>, ~children) =>
+    let make = (~msg: Msg.Oracle.CreateOracleScript.t<'a>, ~children) =>
       <div
         className={CssJs.merge(. [
           CssHelper.flexBox(~wrap=#nowrap, ()),
@@ -101,7 +101,7 @@ module EditOracleScriptMsg = {
 module RequestMsg = {
   module Outer = {
     @react.component
-    let make = (~msg: Msg.Request.t<'a, 'b, 'c>, ~children) =>
+    let make = (~msg: Msg.Oracle.Request.t<'a, 'b, 'c>, ~children) =>
       <div
         className={CssJs.merge(. [
           CssHelper.flexBox(~wrap=#nowrap, ()),

@@ -189,16 +189,16 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
   let send = chainID =>
     switch accountOpt {
     | Some({address: sender}) =>
-      let openSendModal = () => Some(address)->SubmitMsg.Send->SubmitTx->OpenModal->dispatchModal
-      if sender == address {
-        {
-          open Webapi.Dom
-          window->Window.confirm("Are you sure you want to send tokens to yourself?")
-        }
+      let openSendModal = () =>
+        SubmitMsg.Send(Some(address), IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
+
+      switch sender == address {
+      | true =>
+        open Webapi.Dom
+        window->Window.confirm("Are you sure you want to send tokens to yourself?")
           ? openSendModal()
           : ()
-      } else {
-        openSendModal()
+      | false => openSendModal()
       }
     | None => dispatchModal(OpenModal(Connect(chainID)))
     }

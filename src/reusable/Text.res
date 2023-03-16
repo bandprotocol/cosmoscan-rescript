@@ -6,6 +6,7 @@ type size =
   | Xl
   | Xxl
   | Xxxl
+  | Xxxxl
 
 type weight =
   | Thin
@@ -69,21 +70,20 @@ module Styles = {
 
   let fontSize = mapWithDefault(
     _,
-    style(. [fontSize(#px(12)), lineHeight(#px(16)), Media.smallMobile([fontSize(#px(10))])]),
+    style(. [fontSize(#px(12)), lineHeight(#px(16)), Media.mobile([fontSize(#px(10))])]),
     x =>
       switch x {
-      | Xs =>
-        style(. [fontSize(#px(8)), lineHeight(#em(1.41)), Media.smallMobile([fontSize(#px(7))])])
+      | Xs => style(. [fontSize(#px(8)), lineHeight(#em(1.41)), Media.mobile([fontSize(#px(7))])])
       | Caption =>
-        style(. [fontSize(#px(10)), lineHeight(#px(16)), Media.smallMobile([fontSize(#px(8))])])
+        style(. [fontSize(#px(10)), lineHeight(#px(16)), Media.mobile([fontSize(#px(8))])])
       | Body2 =>
-        style(. [fontSize(#px(12)), lineHeight(#px(20)), Media.smallMobile([fontSize(#px(10))])])
+        style(. [fontSize(#px(12)), lineHeight(#px(20)), Media.mobile([fontSize(#px(10))])])
       | Body1 =>
-        style(. [fontSize(#px(14)), lineHeight(#px(22)), Media.smallMobile([fontSize(#px(12))])])
-      | Xl =>
-        style(. [fontSize(#px(16)), lineHeight(#em(1.41)), Media.smallMobile([fontSize(#px(14))])])
-      | Xxl => style(. [fontSize(#px(18)), Media.smallMobile([fontSize(#px(16))])])
-      | Xxxl => style(. [fontSize(#px(24)), Media.smallMobile([fontSize(#px(22))])])
+        style(. [fontSize(#px(14)), lineHeight(#px(22)), Media.mobile([fontSize(#px(12))])])
+      | Xl => style(. [fontSize(#px(16)), lineHeight(#em(1.41)), Media.mobile([fontSize(#px(14))])])
+      | Xxl => style(. [fontSize(#px(18)), Media.mobile([fontSize(#px(16))])])
+      | Xxxl => style(. [fontSize(#px(20)), Media.mobile([fontSize(#px(18))])])
+      | Xxxxl => style(. [fontSize(#px(24)), Media.mobile([fontSize(#px(20))])])
       },
   )
 
@@ -156,6 +156,7 @@ let make = (
   ~color=?,
   ~block=false,
   ~code=false,
+  ~mono=false,
   ~ellipsis=false,
   ~underline=false,
   ~breakAll=false,
@@ -179,7 +180,7 @@ let make = (
           Styles.textTransform(transform),
           Styles.textColor(color->Belt.Option.getWithDefault(theme.neutral_600)),
           nowrap ? Styles.noWrap : "",
-          block ? Styles.block : "",
+          block ? Styles.block : "inline-block",
           code ? Styles.code : "",
           special ? Styles.special : "",
           ellipsis ? Styles.ellipsis : "",
@@ -205,7 +206,7 @@ let make = (
             Styles.textTransform(transform),
             Styles.textColor(color->Belt.Option.getWithDefault(theme.neutral_600)),
             nowrap ? Styles.noWrap : "",
-            block ? Styles.block : "",
+            block ? Styles.block : "inline-block",
             code ? Styles.code : "",
             ellipsis ? Styles.ellipsis : "",
             underline ? Styles.underline : "",
