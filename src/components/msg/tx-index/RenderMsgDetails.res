@@ -1001,6 +1001,68 @@ module RecvPacket = {
   let failed = (msg: Msg.RecvPacket.fail_t) => msg->factory([])
 }
 
+module AcknowledgePacket = {
+  let factory = (msg: Msg.AcknowledgePacket.t) => {[
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 2,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 3,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 4,
+      },
+      {
+        heading: "Packet",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Source Port",
+        content: PlainText(msg.packet.sourcePort),
+        order: 6,
+      },
+      {
+        title: "Destination Port",
+        content: PlainText(msg.packet.destinationPort),
+        order: 7,
+      },
+      {
+        title: "Source Channel",
+        content: PlainText(msg.packet.sourceChannel),
+        order: 8,
+      },
+      {
+        title: "Destination Channel",
+        content: PlainText(msg.packet.destinationChannel),
+        order: 9,
+      },
+      {
+        title: "Data",
+        content: PlainText(msg.packet.data),
+        order: 10,
+      },
+      {
+        title: "Timeout Timestamp",
+        content: Timestamp(msg.packet.timeoutTimestamp),
+        order: 11,
+      },
+    ]}
+}
+
 module CreateClient = {
   let factory = (msg: Msg.CreateClient.t) => {
     [
@@ -1589,6 +1651,7 @@ let getContent = msg => {
     | Msg.RecvPacket.Success(data) => RecvPacket.success(data)
     | Msg.RecvPacket.Failure(data) => RecvPacket.failed(data)
     }
+  | Msg.AcknowledgePacketMsg(data) => AcknowledgePacket.factory(data)
   | Msg.ConnectionOpenInitMsg(data) => ConnectionOpenInit.factory(data)
   | Msg.ConnectionOpenTryMsg(data) => ConnectionOpenTry.factory(data)
   | Msg.ConnectionOpenAckMsg(data) => ConnectionOpenAck.factory(data)

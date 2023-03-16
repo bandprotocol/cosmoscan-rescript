@@ -795,6 +795,22 @@ module RecvPacket = {
   }
 }
 
+module AcknowledgePacket = {
+  type t = {
+    signer: Address.t,
+    packet: Packet.t,
+    proofHeight: Height.t,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+      packet: json.required(list{"msg", "packet"}, Packet.decode),
+      proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+    })
+  }
+}
+
 module CreateClient = {
   type t = {signer: Address.t}
 
@@ -1235,6 +1251,7 @@ type msg_t =
   | UpgradeClientMsg(UpgradeClient.t)
   | SubmitClientMisbehaviourMsg(SubmitClientMisbehaviour.t)
   | RecvPacketMsg(RecvPacket.decoded_t)
+  | AcknowledgePacketMsg(AcknowledgePacket.t)
   | CreateClientMsg(CreateClient.t)
   | ConnectionOpenInitMsg(ConnectionOpenInit.t)
   | ConnectionOpenTryMsg(ConnectionOpenTry.t)
@@ -1299,6 +1316,7 @@ let getBadge = msg => {
   | UpgradeClientMsg(_) => {name: "Upgrade Client", category: IBCMsg}
   | SubmitClientMisbehaviourMsg(_) => {name: "Submit Client Misbehaviour", category: IBCMsg}
   | RecvPacketMsg(_) => {name: "Recv Packet", category: IBCMsg}
+  | AcknowledgePacketMsg(_) => {name: "Acknowledge Packet", category: IBCMsg}
   | ConnectionOpenInitMsg(_) => {name: "Connection Open Init", category: IBCMsg}
   | ConnectionOpenTryMsg(_) => {name: "Connection Open Try", category: IBCMsg}
   | ConnectionOpenAckMsg(_) => {name: "Connection Open Ack", category: IBCMsg}
@@ -1497,6 +1515,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/ibc.core.client.v1.MsgUpgradeClient" =>
       let msg = json->mustDecode(UpgradeClient.decode)
       (UpgradeClientMsg(msg), msg.signer, true)
+    | "/ibc.core.client.v1.MsgSubmitClientMisbehaviour" =>
+      let msg = json->mustDecode(SubmitClientMisbehaviour.decode)
+      (SubmitClientMisbehaviourMsg(msg), msg.signer, true)
     | "/ibc.core.channel.v1.MsgRecvPacket" =>
       isSuccess
         ? {
@@ -1507,6 +1528,9 @@ let decodeMsg = (json, isSuccess) => {
             let msg = json->mustDecode(RecvPacket.decodeFail)
             (RecvPacketMsg(Failure(msg)), msg.signer, true)
           }
+    | "/ibc.core.channel.v1.MsgAcknowledgement" =>
+      let msg = json->mustDecode(AcknowledgePacket.decode)
+      (AcknowledgePacketMsg(msg), msg.signer, true)
     | "/ibc.core.connection.v1.MsgConnectionOpenInit" =>
       let msg = json->mustDecode(ConnectionOpenInit.decode)
       (ConnectionOpenInitMsg(msg), msg.signer, true)

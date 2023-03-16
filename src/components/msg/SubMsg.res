@@ -147,6 +147,7 @@ let make = (~msg: Msg.t) => {
       } 
       | Msg.RecvPacket.Failure(f) => React.null
       }
+    | AcknowledgePacketMsg(_) => React.null
     | CreateClientMsg(msg) => React.null
     | ConnectionOpenTryMsg({clientID, counterparty})
     | ConnectionOpenInitMsg({clientID, counterparty}) => 
