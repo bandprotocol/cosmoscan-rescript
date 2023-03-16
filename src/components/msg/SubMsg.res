@@ -164,6 +164,7 @@ let make = (~msg: Msg.t) => {
     | ChannelCloseConfirmMsg({channelID}) => <IBCChannelMsg.ChannelCloseCommon channelID />
     | AcknowledgePacketMsg(_)
     | TimeoutMsg(_)
+    | TimeoutOnCloseMsg(_)
     | CreateClientMsg(_)
     | ActivateMsg(_) => React.null
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />

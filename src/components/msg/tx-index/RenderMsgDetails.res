@@ -1715,6 +1715,7 @@ let getContent = msg => {
     }
   | Msg.AcknowledgePacketMsg(data) => AcknowledgePacket.factory(data)
   | Msg.TimeoutMsg(data) => Timeout.factory(data)
+  | Msg.TimeoutOnCloseMsg(data) => Timeout.factory(data)
   | Msg.ConnectionOpenInitMsg(data) => ConnectionOpenInit.factory(data)
   | Msg.ConnectionOpenTryMsg(data) => ConnectionOpenTry.factory(data)
   | Msg.ConnectionOpenAckMsg(data) => ConnectionOpenAck.factory(data)

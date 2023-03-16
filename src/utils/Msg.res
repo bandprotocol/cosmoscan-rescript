@@ -1269,6 +1269,7 @@ type msg_t =
   | RecvPacketMsg(RecvPacket.decoded_t)
   | AcknowledgePacketMsg(AcknowledgePacket.t)
   | TimeoutMsg(Timeout.t)
+  | TimeoutOnCloseMsg(Timeout.t)
   | CreateClientMsg(CreateClient.t)
   | ConnectionOpenInitMsg(ConnectionOpenInit.t)
   | ConnectionOpenTryMsg(ConnectionOpenTry.t)
@@ -1335,6 +1336,7 @@ let getBadge = msg => {
   | RecvPacketMsg(_) => {name: "Recv Packet", category: IBCMsg}
   | AcknowledgePacketMsg(_) => {name: "Acknowledge Packet", category: IBCMsg}
   | TimeoutMsg(_) => {name: "Timeout", category: IBCMsg}
+  | TimeoutOnCloseMsg(_) => {name: "Timeout", category: IBCMsg}
   | ConnectionOpenInitMsg(_) => {name: "Connection Open Init", category: IBCMsg}
   | ConnectionOpenTryMsg(_) => {name: "Connection Open Try", category: IBCMsg}
   | ConnectionOpenAckMsg(_) => {name: "Connection Open Ack", category: IBCMsg}
@@ -1552,6 +1554,9 @@ let decodeMsg = (json, isSuccess) => {
     | "/ibc.core.channel.v1.MsgTimeout" =>
       let msg = json->mustDecode(Timeout.decode)
       (TimeoutMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgTimeoutOnClose" =>
+      let msg = json->mustDecode(Timeout.decode)
+      (TimeoutOnCloseMsg(msg), msg.signer, true)
     | "/ibc.core.connection.v1.MsgConnectionOpenInit" =>
       let msg = json->mustDecode(ConnectionOpenInit.decode)
       (ConnectionOpenInitMsg(msg), msg.signer, true)
