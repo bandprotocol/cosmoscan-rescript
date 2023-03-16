@@ -138,7 +138,8 @@ let make = (~msg: Msg.t) => {
       | Msg.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
     | UpgradeClientMsg({clientID})
-    | UpdateClientMsg({clientID}) => <IBCClientMsg.Client clientID />
+    | UpdateClientMsg({clientID})
+    | SubmitClientMisbehaviourMsg({clientID}) => <IBCClientMsg.Client clientID />
     | RecvPacketMsg(msg) => switch msg {
       | Msg.RecvPacket.Success({packetData}) => switch packetData {
         | Some({packetType}) => <IBCPacketMsg.Packet packetType />

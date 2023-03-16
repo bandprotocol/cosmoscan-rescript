@@ -1030,6 +1030,23 @@ module UpdateClient = {
   }
 }
 
+module SubmitClientMisbehaviour = {
+  let factory = (msg: Msg.SubmitClientMisbehaviour.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.clientID),
+        order: 2,
+      },
+    ]
+  }
+}
+
 module UpgradeClient = {
   let factory = (msg: Msg.UpgradeClient.t) => {
     [
@@ -1566,6 +1583,7 @@ let getContent = msg => {
   | Msg.CreateClientMsg(data) => CreateClient.factory(data)
   | Msg.UpdateClientMsg(data) => UpdateClient.factory(data)
   | Msg.UpgradeClientMsg(data) => UpgradeClient.factory(data)
+  | Msg.SubmitClientMisbehaviourMsg(data) => SubmitClientMisbehaviour.factory(data)
   | Msg.RecvPacketMsg(m) =>
     switch m {
     | Msg.RecvPacket.Success(data) => RecvPacket.success(data)

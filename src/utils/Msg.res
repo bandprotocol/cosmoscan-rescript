@@ -703,6 +703,20 @@ module UpgradeClient = {
   }
 }
 
+module SubmitClientMisbehaviour = {
+  type t = {
+    signer: Address.t,
+    clientID: string,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string) -> Address.fromBech32,
+      clientID: json.required(list{"msg", "client_id"}, string),
+    })
+  }
+}
+
 module Height = {
   type t = {
     revisionHeight: int,
@@ -1219,6 +1233,7 @@ type msg_t =
   | VoteWeightedMsg(VoteWeighted.decoded_t)
   | UpdateClientMsg(UpdateClient.t)
   | UpgradeClientMsg(UpgradeClient.t)
+  | SubmitClientMisbehaviourMsg(SubmitClientMisbehaviour.t)
   | RecvPacketMsg(RecvPacket.decoded_t)
   | CreateClientMsg(CreateClient.t)
   | ConnectionOpenInitMsg(ConnectionOpenInit.t)
@@ -1282,6 +1297,7 @@ let getBadge = msg => {
   | CreateClientMsg(_) => {name: "Create Client", category: IBCMsg}
   | UpdateClientMsg(_) => {name: "Update Client", category: IBCMsg}
   | UpgradeClientMsg(_) => {name: "Upgrade Client", category: IBCMsg}
+  | SubmitClientMisbehaviourMsg(_) => {name: "Submit Client Misbehaviour", category: IBCMsg}
   | RecvPacketMsg(_) => {name: "Recv Packet", category: IBCMsg}
   | ConnectionOpenInitMsg(_) => {name: "Connection Open Init", category: IBCMsg}
   | ConnectionOpenTryMsg(_) => {name: "Connection Open Try", category: IBCMsg}
