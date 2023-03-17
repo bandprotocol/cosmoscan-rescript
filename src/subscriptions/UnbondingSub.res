@@ -35,21 +35,19 @@ module SingleConfig = %graphql(`
     }
 `)
 
-//TODO: Do it when doing on validator page
-
-// module UnbondingByValidatorConfig = %graphql(`
-//     subscription Unbonding($delegator_address: String!, $operator_address: String!, $current_time: timestamp) {
-//       accounts_by_pk(address: $delegator_address) {
-//         unbonding_delegations_aggregate(where: {validator: {operator_address: {_eq: $operator_address}}, completion_time: {_gte: $current_time}}) {
-//           aggregate {
-//             sum {
-//               amount @bsDecoder(fn: "GraphQLParser.coinWithDefault")
-//             }
-//           }
-//         }
-//       }
-//     }
-// `)
+module UnbondingByValidatorConfig = %graphql(`
+    subscription Unbonding($delegator_address: String!, $operator_address: String!, $current_time: timestamp!) {
+      accounts_by_pk(address: $delegator_address) {
+        unbonding_delegations_aggregate(where: {validator: {operator_address: {_eq: $operator_address}}, completion_time: {_gte: $current_time}}) {
+          aggregate {
+            sum {
+              amount
+            }
+          }
+        }
+      }
+    }
+`)
 
 module UnbondingByDelegatorConfig = %graphql(`
     subscription UnbondingByDelegator($limit: Int!, $offset: Int!, $delegator_address: String!, $current_time: timestamp!) {
@@ -101,36 +99,27 @@ let getUnbondingBalance = (delegatorAddress, currentTime) => {
   })
 }
 
-//TODO: Do it when doing on validator page
+let getUnbondingBalanceByValidator = (delegatorAddress, operatorAddress, currentTime) => {
+  let result = UnbondingByValidatorConfig.use({
+    delegator_address: delegatorAddress->Address.toBech32,
+    operator_address: operatorAddress->Address.toOperatorBech32,
+    current_time: currentTime->Js.Json.string,
+  })
 
-// let getUnbondingBalanceByValidator = (delegatorAddress, operatorAddress, currentTime) => {
-//   let (result, _) = ApolloHooks.useSubscription(
-//     UnbondingByValidatorConfig.definition,
-//     ~variables=UnbondingByValidatorConfig.makeVariables(
-//       ~delegator_address=delegatorAddress -> Address.toBech32,
-//       ~operator_address=operatorAddress -> Address.toOperatorBech32,
-//       ~current_time=currentTime -> Js.Json.string,
-//       (),
-//     ),
-//   )
-
-//   let unbondingInfoSub = result -> Sub.map(_, a =>
-//     switch a["accounts_by_pk"] {
-//     | Some(account) =>
-//       (
-//         (
-//           account["unbonding_delegations_aggregate"]["aggregate"] -> Belt.Option.getExn
-//         )["sum"] -> Belt.Option.getExn
-//       )["amount"]
-//     | None => Coin.newUBANDFromAmount(0.)
-//     }
-//   )
-
-//   %Sub({
-//     let unbondingInfo = unbondingInfoSub
-//     unbondingInfo -> Sub.resolve
-//   })
-// }
+  result
+  ->Sub.fromData
+  ->Sub.flatMap(data =>
+    switch data.accounts_by_pk {
+    | Some(account) => Sub.resolve((
+      switch account.unbonding_delegations_aggregate.aggregate {
+      | Some(aggregate') => (aggregate'.sum->Belt.Option.getExn).amount->GraphQLParser.coinWithDefault
+      | None => Coin.newUBANDFromAmount(0.)
+      }
+    ))
+    | None => Sub.resolve(Coin.newUBANDFromAmount(0.))
+    }
+  )
+}
 
 let getUnbondingByDelegator = (delegatorAddress, currentTime, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
