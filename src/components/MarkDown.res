@@ -17,7 +17,7 @@ module Styles = {
       selector("p:last-child", [color(theme.neutral_600), marginBottom(#em(0.))]),
       selector(
         "h2,h3,h4,h5,h6",
-        [color(theme.neutral_600), marginBottom(#px(10)), fontSize(#px(16))],
+        [color(theme.neutral_600), marginBottom(#px(10)), fontSize(#px(16)), fontWeight(#num(600))],
       ),
       selector("ul", [marginLeft(#em(1.2))]),
       selector("ol", [marginLeft(#em(2.0)), listStyleType(#decimal)]),
