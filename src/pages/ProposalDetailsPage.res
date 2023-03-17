@@ -19,31 +19,6 @@ module Styles = {
 
   let parameterChanges = (theme: Theme.t) =>
     style(. [padding2(~v=#px(16), ~h=#px(24)), backgroundColor(theme.neutral_100)])
-
-  let jsonDisplay = (theme: Theme.t) =>
-    style(. [
-      resize(#none),
-      fontSize(#px(12)),
-      color(theme.neutral_900),
-      backgroundColor(theme.neutral_100),
-      border(#px(1), #solid, theme.neutral_100),
-      borderRadius(#px(4)),
-      width(#percent(100.)),
-      minHeight(#px(100)),
-      overflowY(#scroll),
-      marginBottom(#px(16)),
-      fontFamilies([
-        #custom("IBM Plex Mono"),
-        #custom("cousine"),
-        #custom("sfmono-regular"),
-        #custom("Consolas"),
-        #custom("Menlo"),
-        #custom("liberation mono"),
-        #custom("ubuntu mono"),
-        #custom("Courier"),
-        #monospace,
-      ]),
-    ])
 }
 
 module VoteButton = {
@@ -60,13 +35,13 @@ module VoteButton = {
     switch accountOpt {
     | Some(_) =>
       <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
-        {"Vote" |> React.string}
+        {"Vote"->React.string}
       </Button>
     | None =>
       switch trackingSub {
       | Data({chainID}) =>
         <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => connect(chainID)}>
-          {"Vote" |> React.string}
+          {"Vote"->React.string}
         </Button>
       | Error(err) =>
         // log for err details
@@ -273,7 +248,7 @@ let make = (~proposalID) => {
                       />
                     </Col>
                     <Col col=Col.Eight>
-                      <Text value={planObj.height |> string_of_int} size=Text.Body1 block=true />
+                      <Text value={planObj.height->string_of_int} size=Text.Body1 block=true />
                     </Col>
                   </Row>
                 </>
@@ -412,7 +387,7 @@ let make = (~proposalID) => {
                           let turnoutPercent = switch totalBondedTokens {
                           | Some(totalBondedTokensExn) =>
                             endTotalVote /. totalBondedTokensExn *. 100.
-                          | None => total /. (bondedToken |> Coin.getBandAmountFromCoin) *. 100.
+                          | None => total /. bondedToken->Coin.getBandAmountFromCoin *. 100.
                           }
                           <div className=Styles.chartContainer>
                             <TurnoutChart percent=turnoutPercent />
@@ -436,14 +411,14 @@ let make = (~proposalID) => {
                           ) < 0. {
                           | true =>
                             <Text
-                              value={(total |> Format.fPretty(~digits=2)) ++ " BAND"}
+                              value={total->Format.fPretty(~digits=2) ++ " BAND"}
                               size=Text.Body1
                               block=true
                               color={theme.neutral_900}
                             />
                           | false =>
                             <Text
-                              value={(endTotalVote |> Format.fPretty(~digits=2)) ++ " BAND"}
+                              value={endTotalVote->Format.fPretty(~digits=2) ++ " BAND"}
                               size=Text.Body1
                               block=true
                               color={theme.neutral_900}
