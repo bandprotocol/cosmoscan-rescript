@@ -222,7 +222,9 @@ module Oracle = {
       buildObject(json => {
         externalDataID: json.optional(list{"external_id"}, int)->Belt.Option.getWithDefault(0),
         exitCode: json.optional(list{"exit_code"}, int)->Belt.Option.getWithDefault(0),
-        data: json.required(list{"data"}, bufferWithDefault),
+        data: json.optional(list{"data"}, bufferWithDefault)->Belt.Option.getWithDefault(
+          JsBuffer.from([]),
+        ),
       })
     }
   }
