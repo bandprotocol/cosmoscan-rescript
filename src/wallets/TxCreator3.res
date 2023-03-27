@@ -11,7 +11,7 @@ let createMsg = (msg: Msg.Input.t) => {
     MsgSend.create(
       fromAddress->Address.toBech32,
       toAddress->Address.toBech32,
-      amount->Coin.toBandChainCoins,
+      amount->Coin.toBandChainJsCoins,
     )
   | RequestMsg({
       oracleScriptID,
@@ -31,7 +31,7 @@ let createMsg = (msg: Msg.Input.t) => {
       minCount,
       clientID,
       sender->Address.toBech32,
-      feeLimit->Coin.toBandChainCoins,
+      feeLimit->Coin.toBandChainJsCoins,
       prepareGas == 0 ? None : Some(prepareGas),
       executeGas == 0 ? None : Some(executeGas),
     )
@@ -39,13 +39,13 @@ let createMsg = (msg: Msg.Input.t) => {
     MsgDelegate.create(
       delegatorAddress->Address.toBech32,
       validatorAddress->Address.toOperatorBech32,
-      amount->Coin.toBandChainCoin,
+      amount->Coin.toBandChainJsCoin,
     )
   | UndelegateMsg({delegatorAddress, validatorAddress, amount}) =>
     MsgUndelegate.create(
       delegatorAddress->Address.toBech32,
       validatorAddress->Address.toOperatorBech32,
-      amount->Coin.toBandChainCoin,
+      amount->Coin.toBandChainJsCoin,
     )
   | RedelegateMsg({
       validatorSourceAddress,
@@ -57,7 +57,7 @@ let createMsg = (msg: Msg.Input.t) => {
       delegatorAddress->Address.toBech32,
       validatorSourceAddress->Address.toOperatorBech32,
       validatorDestinationAddress->Address.toOperatorBech32,
-      amount->Coin.toBandChainCoin,
+      amount->Coin.toBandChainJsCoin,
     )
   | WithdrawRewardMsg({delegatorAddress, validatorAddress}) =>
     MsgWithdrawReward.create(
@@ -72,7 +72,7 @@ let createMsg = (msg: Msg.Input.t) => {
       sourceChannel,
       sender->Address.toBech32,
       receiver,
-      token->Coin.toBandChainCoin,
+      token->Coin.toBandChainJsCoin,
       timeoutTimestamp,
     )
   }

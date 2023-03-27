@@ -57,7 +57,7 @@ let createMsg = (sender, msg: msg_input_t) => {
       msg.minCount,
       clientID,
       msg.sender->Address.toBech32,
-      msg.feeLimit->Coin.toBandChainCoins,
+      msg.feeLimit->Coin.toBandChainJsCoins,
       {
         switch msg.prepareGas {
         | 0 => None
