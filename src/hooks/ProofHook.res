@@ -17,7 +17,9 @@ module Proof = {
 }
 
 let get = (requestId: ID.Request.t) => {
-  let stringId =  requestId->ID.Request.toInt
-  let (json, reload) = AxiosHooks.useWithReload({j`oracle/proof/$stringId`})
+  let id = ID.Request.toInt(requestId)
+
+  let (json, reload) = AxiosHooks.useWithReload({j`oracle/proof/$id`})
+
   (json->Belt.Option.map(json => JsonUtils.Decode.mustDecode(json, Proof.decodeProof)), reload)
 }

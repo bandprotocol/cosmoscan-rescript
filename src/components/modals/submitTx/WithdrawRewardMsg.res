@@ -3,8 +3,12 @@ module Styles = {
 
   let container = style(. [paddingBottom(#px(24))])
 
-  let validator =
-    style(. [display(#flex), flexDirection(#column), alignItems(#flexEnd), width(#px(330))])
+  let validator = style(. [
+    display(#flex),
+    flexDirection(#column),
+    alignItems(#flexEnd),
+    width(#px(330)),
+  ])
 }
 
 @react.component
@@ -14,18 +18,23 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
 
   let allSub = Sub.all2(validatorInfoSub, delegationSub)
 
-  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  React.useEffect1(
-    _ => {
-      let msgsOpt = {
-        Some([TxCreator2.WithdrawReward(validator)])
-      }
-      setMsgsOpt(_ => msgsOpt)
-      None
-    },
-    [validator],
-  )
+  React.useEffect1(_ => {
+    let msgsOpt = {
+      Some([
+        Msg.Input.WithdrawRewardMsg({
+          delegatorAddress: address,
+          validatorAddress: validator,
+          amount: (),
+          moniker: (),
+          identity: (),
+        }),
+      ])
+    }
+    setMsgsOpt(_ => msgsOpt)
+    None
+  }, [validator])
 
   <>
     <div className=Styles.container>
@@ -38,14 +47,14 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         color={theme.neutral_600}
       />
       <VSpacing size=Spacing.sm />
-      {switch (allSub) {
-       | Data(({moniker}, _)) =>
-         <div>
-           <Text value=moniker ellipsis=true align=Text.Right />
-           <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
-         </div>
-       | _ => <LoadingCensorBar width=300 height=34 />
-       }}
+      {switch allSub {
+      | Data(({moniker}, _)) =>
+        <div>
+          <Text value=moniker ellipsis=true align=Text.Right />
+          <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
+        </div>
+      | _ => <LoadingCensorBar width=300 height=34 />
+      }}
     </div>
     <div className=Styles.container>
       <Heading
@@ -57,19 +66,19 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         color={theme.neutral_600}
       />
       <VSpacing size=Spacing.sm />
-      {switch (allSub) {
-       | Data((_, {reward})) =>
-         <div>
-           <NumberCountUp
-             value={reward->Coin.getBandAmountFromCoin}
-             weight=Text.Thin
-             spacing={Text.Em(0.)}
-             size=Text.Body2
-           />
-           <Text value=" BAND" />
-         </div>
-       | _ => <LoadingCensorBar width=150 height=18 />
-       }}
+      {switch allSub {
+      | Data((_, {reward})) =>
+        <div>
+          <NumberCountUp
+            value={reward->Coin.getBandAmountFromCoin}
+            weight=Text.Thin
+            spacing={Text.Em(0.)}
+            size=Text.Body2
+          />
+          <Text value=" BAND" />
+        </div>
+      | _ => <LoadingCensorBar width=150 height=18 />
+      }}
     </div>
   </>
 }

@@ -23,31 +23,29 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
 
   let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
 
-  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  React.useEffect1(
-    _ => {
-      let msgsOpt = {
-        let amountValue = amount.value->Belt.Option.getWithDefault(0.)
-
-        let coin = BandChainJS.Coin.create()
-        coin->BandChainJS.Coin.setDenom("uband")
-        coin->BandChainJS.Coin.setAmount(amountValue -> Js.Float.toString)
-        Some([TxCreator2.Undelegate(validator, coin)])
-      }
-      setMsgsOpt(_ => msgsOpt)
-      None
-    },
-    [amount],
-  )
+  React.useEffect1(_ => {
+    let msgsOpt = {
+      let amountValue = amount.value->Belt.Option.getWithDefault(0.)
+      Some([
+        Msg.Input.UndelegateMsg({
+          validatorAddress: validator,
+          delegatorAddress: address,
+          amount: amountValue->Coin.newUBANDFromAmount,
+          moniker: (),
+          identity: (),
+        }),
+      ])
+    }
+    setMsgsOpt(_ => msgsOpt)
+    None
+  }, [amount])
 
   <>
     <div className={Styles.warning(theme)}>
       <Heading
-        value="Please read before proceeding:"
-        size=Heading.H5
-        marginBottom=4
-        align=Heading.Left
+        value="Please read before proceeding:" size=Heading.H5 marginBottom=4 align=Heading.Left
       />
       <VSpacing size=Spacing.xs />
       <Text
@@ -67,14 +65,14 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         weight=Heading.Regular
         color={theme.neutral_600}
       />
-      {switch (allSub) {
-       | Data(({moniker}, _)) =>
-         <div>
-           <Text value=moniker ellipsis=true align=Text.Right />
-           <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
-         </div>
-       | _ => <LoadingCensorBar width=300 height=34 />
-       }}
+      {switch allSub {
+      | Data(({moniker}, _)) =>
+        <div>
+          <Text value=moniker ellipsis=true align=Text.Right />
+          <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
+        </div>
+      | _ => <LoadingCensorBar width=300 height=34 />
+      }}
     </div>
     <div className=Styles.container>
       <Heading
@@ -85,35 +83,34 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         weight=Heading.Regular
         color={theme.neutral_600}
       />
-      {switch (allSub) {
-       | Data((_, {amount: stakedAmount})) =>
-         <div>
-           <Text
-             value={stakedAmount -> Coin.getBandAmountFromCoin -> Format.fPretty(~digits=6)}
-             code=true
-           />
-           <Text value=" BAND" />
-         </div>
-       | _ => <LoadingCensorBar width=150 height=18 />
-       }}
+      {switch allSub {
+      | Data((_, {amount: stakedAmount})) =>
+        <div>
+          <Text
+            value={stakedAmount->Coin.getBandAmountFromCoin->Format.fPretty(~digits=6)} code=true
+          />
+          <Text value=" BAND" />
+        </div>
+      | _ => <LoadingCensorBar width=150 height=18 />
+      }}
     </div>
-    {switch (allSub) {
-     | Data((_, {amount: stakedAmount})) =>
-       let maxValInUband = stakedAmount -> Coin.getUBandAmountFromCoin
-       <EnhanceTxInput
-         width=300
-         inputData=amount
-         setInputData=setAmount
-         parse={Parse.getBandAmount(maxValInUband)}
-         maxValue={(maxValInUband /. 1e6) -> Belt.Float.toString}
-         msg="Amount"
-         placeholder="0.000000"
-         inputType="number"
-         code=true
-         autoFocus=true
-         id="undelegateAmountInput"
-       />
-     | _ => <EnhanceTxInput.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
-     }}
+    {switch allSub {
+    | Data((_, {amount: stakedAmount})) =>
+      let maxValInUband = stakedAmount->Coin.getUBandAmountFromCoin
+      <EnhanceTxInput
+        width=300
+        inputData=amount
+        setInputData=setAmount
+        parse={Parse.getBandAmount(maxValInUband)}
+        maxValue={(maxValInUband /. 1e6)->Belt.Float.toString}
+        msg="Amount"
+        placeholder="0.000000"
+        inputType="number"
+        code=true
+        autoFocus=true
+        id="undelegateAmountInput"
+      />
+    | _ => <EnhanceTxInput.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
+    }}
   </>
 }

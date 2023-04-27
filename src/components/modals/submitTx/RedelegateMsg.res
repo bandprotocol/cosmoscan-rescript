@@ -71,22 +71,16 @@ module DstValidatorSelection = {
 
   @react.component
   let make = (~filteredValidators: array<ValidatorSub.t>, ~setDstValidatorOpt) => {
-    let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-    let (selectedValidator, setSelectedValidator) =
-      React.useState(_ =>
-        {
-          open ReactSelect
-          {value: "N/A", label: "Enter or select validator to delegate to"}
-        }
-      )
-    let validatorList =
-      filteredValidators->Belt_Array.map(({operatorAddress, moniker}) =>
-        {
-          open ReactSelect
-          {value: operatorAddress -> Address.toOperatorBech32, label: moniker}
-        }
-      )
+    let (selectedValidator, setSelectedValidator) = React.useState(_ => {
+      open ReactSelect
+      {value: "N/A", label: "Enter or select validator to delegate to"}
+    })
+    let validatorList = filteredValidators->Belt_Array.map(({operatorAddress, moniker}) => {
+      open ReactSelect
+      {value: operatorAddress->Address.toOperatorBech32, label: moniker}
+    })
 
     // TODO: Hack styles for react-select
     <div
@@ -97,7 +91,7 @@ module DstValidatorSelection = {
         onChange={newOption => {
           let newVal = newOption
           setSelectedValidator(_ => newVal)
-          setDstValidatorOpt(_ => Some(newVal.value -> Address.fromBech32))
+          setDstValidatorOpt(_ => Some(newVal.value->Address.fromBech32))
         }}
         value=selectedValidator
         styles={
@@ -109,7 +103,7 @@ module DstValidatorSelection = {
             color: theme.neutral_900->Theme.toString,
             backgroundColor: theme.neutral_000->Theme.toString,
             borderRadius: "8px",
-            border: `1px solid ${theme.neutral_300->Theme.toString}`
+            border: `1px solid ${theme.neutral_300->Theme.toString}`,
           },
           ReactSelect.option: _ => {
             fontSize: "14px",
@@ -166,35 +160,37 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
 
   let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
 
-  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  React.useEffect2(
-    _ => {
-      let msgsOpt = {
-        let dstValidator = dstValidatorOpt
-        let amountValue = amount.value->Belt.Option.getWithDefault(0.)
+  React.useEffect2(_ => {
+    let msgsOpt = {
+      let dstValidator = dstValidatorOpt
+      let amountValue = amount.value->Belt.Option.getWithDefault(0.)
 
-        let coin = BandChainJS.Coin.create()
-        coin->BandChainJS.Coin.setDenom("uband")
-        coin->BandChainJS.Coin.setAmount(amountValue -> Belt.Float.toString)
-
-        switch dstValidatorOpt {
-        | Some(dstValidator) => Some([TxCreator2.Redelegate(validator, dstValidator, coin)])
-        | None => None
-        }
+      switch dstValidatorOpt {
+      | Some(dstValidator) =>
+        Some([
+          Msg.Input.RedelegateMsg({
+            validatorSourceAddress: validator,
+            validatorDestinationAddress: dstValidator,
+            delegatorAddress: address,
+            amount: amountValue->Coin.newUBANDFromAmount,
+            monikerSource: (),
+            monikerDestination: (),
+            identitySource: (),
+            identityDestination: (),
+          }),
+        ])
+      | None => None
       }
-      setMsgsOpt(_ => msgsOpt)
-      None
-    },
-    (dstValidatorOpt, amount),
-  )
+    }
+    setMsgsOpt(_ => msgsOpt)
+    None
+  }, (dstValidatorOpt, amount))
   <>
     <div className={Styles.warning(theme)}>
       <Heading
-        value="Please read before proceeding:"
-        size=Heading.H5
-        marginBottom=4
-        align=Heading.Left
+        value="Please read before proceeding:" size=Heading.H5 marginBottom=4 align=Heading.Left
       />
       <Text
         value="You can only redelegate a maximum of 7 times to/from the same validator pairs during any 21 day period."
@@ -209,14 +205,14 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         weight=Heading.Regular
         color={theme.neutral_600}
       />
-      {switch (allSub) {
-       | Data(({moniker}, _, _)) =>
-         <div>
-           <Text value=moniker ellipsis=true align=Text.Right />
-           <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
-         </div>
-       | _ => <LoadingCensorBar width=300 height=34 />
-       }}
+      {switch allSub {
+      | Data(({moniker}, _, _)) =>
+        <div>
+          <Text value=moniker ellipsis=true align=Text.Right />
+          <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
+        </div>
+      | _ => <LoadingCensorBar width=300 height=34 />
+      }}
     </div>
     <div className=Styles.container>
       <Heading
@@ -227,15 +223,15 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         weight=Heading.Regular
         color={theme.neutral_600}
       />
-      {switch (allSub) {
-       | Data(({operatorAddress}, validators, _)) =>
-         let filteredValidators =
-           validators->Belt_Array.keep(validator =>
-             validator.operatorAddress !== operatorAddress && validator.commission !== 100.
-           )
-         <DstValidatorSelection filteredValidators setDstValidatorOpt />
-       | _ => <LoadingCensorBar width=300 height=59 />
-       }}
+      {switch allSub {
+      | Data(({operatorAddress}, validators, _)) =>
+        let filteredValidators =
+          validators->Belt_Array.keep(validator =>
+            validator.operatorAddress !== operatorAddress && validator.commission !== 100.
+          )
+        <DstValidatorSelection filteredValidators setDstValidatorOpt />
+      | _ => <LoadingCensorBar width=300 height=59 />
+      }}
     </div>
     <div className=Styles.container>
       <Heading
@@ -246,35 +242,34 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         weight=Heading.Regular
         color={theme.neutral_600}
       />
-      {switch (allSub) {
-       | Data((_, _, {amount: stakedAmount})) =>
-         <div>
-           <Text
-             value={stakedAmount -> Coin.getBandAmountFromCoin -> Format.fPretty(~digits=6)}
-             code=true
-           />
-           <Text value=" BAND" />
-         </div>
-       | _ => <LoadingCensorBar width=150 height=18 />
-       }}
+      {switch allSub {
+      | Data((_, _, {amount: stakedAmount})) =>
+        <div>
+          <Text
+            value={stakedAmount->Coin.getBandAmountFromCoin->Format.fPretty(~digits=6)} code=true
+          />
+          <Text value=" BAND" />
+        </div>
+      | _ => <LoadingCensorBar width=150 height=18 />
+      }}
     </div>
-    {switch (allSub) {
-     | Data((_, _, {amount: stakedAmount})) =>
-       let maxValInUband = stakedAmount -> Coin.getUBandAmountFromCoin
-       <EnhanceTxInput
-         width=300
-         inputData=amount
-         setInputData=setAmount
-         parse={Parse.getBandAmount(maxValInUband)}
-         maxValue={(maxValInUband /. 1e6 )->Belt.Float.toString}
-         msg="Amount"
-         placeholder="0.000000"
-         inputType="number"
-         code=true
-         autoFocus=true
-         id="redelegateAmountInput"
-       />
-     | _ => <EnhanceTxInput.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
-     }}
+    {switch allSub {
+    | Data((_, _, {amount: stakedAmount})) =>
+      let maxValInUband = stakedAmount->Coin.getUBandAmountFromCoin
+      <EnhanceTxInput
+        width=300
+        inputData=amount
+        setInputData=setAmount
+        parse={Parse.getBandAmount(maxValInUband)}
+        maxValue={(maxValInUband /. 1e6)->Belt.Float.toString}
+        msg="Amount"
+        placeholder="0.000000"
+        inputType="number"
+        code=true
+        autoFocus=true
+        id="redelegateAmountInput"
+      />
+    | _ => <EnhanceTxInput.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
+    }}
   </>
 }

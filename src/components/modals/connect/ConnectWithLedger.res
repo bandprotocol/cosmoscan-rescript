@@ -101,7 +101,6 @@ let make = (~chainID, ~ledgerApp) => {
       let wallet = await Wallet.createFromLedger(ledgerApp, accountIndex)
       let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
       dispatchAccount(Connect(wallet, address, pubKey, chainID))
-      dispatchModal(EnableExit)
       dispatchModal(CloseModal)
     } catch {
     | Js.Exn.Error(e) =>

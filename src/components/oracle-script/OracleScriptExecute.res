@@ -210,9 +210,9 @@ module ClientIDInput = {
 
 module ValueInput = {
   @react.component
-  let make = (~value, ~setValue, ~title, ~info=?) => {
+  let make = (~value, ~setValue, ~title, ~info=?, ~inputType="text") => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-    
+
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
         <Text value=title weight=Text.Semibold transform=Text.Capitalize />
@@ -222,7 +222,7 @@ module ValueInput = {
       <VSpacing size=Spacing.sm />
       <input
         className={Styles.input(theme, isDarkMode)}
-        type_="text"
+        type_=inputType
         onChange={event => {
           let newVal = ReactEvent.Form.target(event)["value"]
           setValue(_ => newVal)
@@ -236,8 +236,8 @@ module ValueInput = {
 type result_t =
   | Nothing
   | Loading
+  | Success(TxCreator3.tx_response_t)
   | Error(string)
-  | Success(TxCreator.tx_response_t)
 
 let loadingRender = (wDiv, wImg, h) => {
   <div className={Styles.withWH(wDiv, h)}>
@@ -289,7 +289,7 @@ module ExecutionPart = {
   ) => {
     let isMobile = Media.isMobile()
 
-    // let client = React.useContext(ClientContext.context)
+    let client = React.useContext(ClientContext.context)
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     let (accountOpt, dispatch) = React.useContext(AccountContext.context)
@@ -303,9 +303,9 @@ module ExecutionPart = {
     let (callDataArr, setCallDataArr) = React.useState(_ => Belt.Array.make(numParams, ""))
     let (clientID, setClientID) = React.useState(_ => "from_scan")
     let (feeLimit, setFeeLimit) = React.useState(_ => "200")
-    let (prepareGas, setPrepareGas) = React.useState(_ => "")
-    let (executeGas, setExecuteGas) = React.useState(_ => "")
-    let (gaslimit, setGaslimit) = React.useState(_ => "")
+    let (prepareGas, setPrepareGas) = React.useState(_ => 20000)
+    let (executeGas, setExecuteGas) = React.useState(_ => 100000)
+    let (gaslimit, setGaslimit) = React.useState(_ => 2000000)
     let (askCount, setAskCount) = React.useState(_ => "1")
     let (minCount, setMinCount) = React.useState(_ => "1")
     let (result, setResult) = React.useState(_ => Nothing)
@@ -320,32 +320,6 @@ module ExecutionPart = {
         setCallDataArr(_ => ["0"])
       }
       None
-    })
-
-    let requestCallback = React.useCallback0(requestPromise => {
-      ignore(
-        requestPromise
-        ->Promise.then(res =>
-          switch res {
-          | TxCreator.Tx(txResponse) =>
-            setResult(_ => Success(txResponse))
-            Promise.resolve()
-          | _ =>
-            setResult(
-              _ => Error("Fail to sign message, please connect with mnemonic or ledger first"),
-            )
-            Promise.resolve()
-          }
-        )
-        ->Promise.catch(err => {
-          switch Js.Json.stringifyAny(err) {
-          | Some(errorValue) => setResult(_ => Error(errorValue))
-          | None => setResult(_ => Error("Can not stringify error"))
-          }
-          Promise.resolve()
-        }),
-      )
-      ()
     })
 
     isMobile
@@ -385,12 +359,23 @@ module ExecutionPart = {
               <ClientIDInput clientID setClientID />
               <ValueInput value=feeLimit setValue=setFeeLimit title="Fee Limit" info="(uband)" />
               <ValueInput
-                value=prepareGas setValue=setPrepareGas title="Prepare Gas" info="(optional)"
+                value={prepareGas->Belt.Int.toString}
+                setValue=setPrepareGas
+                title="Prepare Gas"
+                inputType="number"
               />
               <ValueInput
-                value=executeGas setValue=setExecuteGas title="Execute Gas" info="(optional)"
+                value={executeGas->Belt.Int.toString}
+                setValue=setExecuteGas
+                title="Execute Gas"
+                inputType="number"
               />
-              <ValueInput value=gaslimit setValue=setGaslimit title="Gas Limit" info="(optional)" />
+              <ValueInput
+                value={gaslimit->Belt.Int.toString}
+                setValue=setGaslimit
+                title="Gas Limit"
+                inputType="number"
+              />
               <SeperatedLine />
               {switch validatorCount {
               | Data(count) =>
@@ -399,7 +384,7 @@ module ExecutionPart = {
               | _ => React.null
               }}
               {switch accountOpt {
-              | Some(_) =>
+              | Some(account) =>
                 <>
                   <Button
                     fsize=14
@@ -408,27 +393,6 @@ module ExecutionPart = {
                     style={Styles.button(theme, result == Loading)}
                     onClick={_ =>
                       if result !== Loading {
-                        // TODO: For testing OBI type-safe version, will be removed later
-                        // Js.log(
-                        //   Obi2.encode(
-                        //     schema,
-                        //     Obi2.Input,
-                        //     Belt.List.map(paramsInput, input => input.fieldName)
-                        //     ->Belt.List.zip(callDataArr->Belt.List.fromArray)
-                        //     ->Belt.List.map(([fieldName, fieldValue]) => {fieldName, fieldValue}),
-                        //   ),
-                        // )
-
-                        // Js.log(
-                        //   Obi.encode(
-                        //     schema,
-                        //     "input",
-                        //     Belt.List.map(paramsInput, input => input.fieldName)
-                        //     ->Belt.List.zip(callDataArr)
-                        //     ->Belt.List.map(([fieldName, fieldValue]) => {fieldName, fieldValue}),
-                        //   ),
-                        // )
-
                         switch Obi.encode(
                           schema,
                           "input",
@@ -442,26 +406,41 @@ module ExecutionPart = {
                         ) {
                         | Some(encoded) =>
                           setResult(_ => Loading)
-                          dispatch(
-                            AccountContext.SendRequest({
-                              oracleScriptID: id,
-                              calldata: encoded,
-                              callback: requestCallback,
-                              askCount,
-                              minCount,
-                              clientID: {
-                                switch clientID->String.trim == "" {
-                                | false => clientID->String.trim
-                                | true => "from_scan"
-                                }
-                              },
-                              feeLimit: feeLimit->Parse.mustParseInt,
-                              prepareGas: feeLimit->Parse.mustParseInt,
-                              executeGas: feeLimit->Parse.mustParseInt,
-                              gaslimit,
-                            }),
-                          )
-                          ()
+                          let _ = TxCreator3.sendTransaction(
+                            client,
+                            account,
+                            [
+                              Msg.Input.RequestMsg({
+                                oracleScriptID: id,
+                                calldata: encoded,
+                                askCount: askCount->int_of_string,
+                                minCount: minCount->int_of_string,
+                                sender: account.address,
+                                clientID: {
+                                  switch clientID->String.trim == "" {
+                                  | false => clientID->String.trim
+                                  | true => "from_scan"
+                                  }
+                                },
+                                feeLimit: list{feeLimit->float_of_string->Coin.newUBANDFromAmount},
+                                prepareGas,
+                                executeGas,
+                                id: (),
+                                oracleScriptName: (),
+                                schema: (),
+                              }),
+                            ],
+                            5000,
+                            gaslimit,
+                            "Request via scan",
+                          )->Promise.then(res => {
+                            switch res {
+                            | Belt.Result.Ok(response) => setResult(_ => Success(response))
+                            | Error(err) => setResult(_ => Error(err))
+                            }
+                            Promise.resolve()
+                          })
+
                         | None =>
                           setResult(_ => Error("Encoding fail, please check each parameter's type"))
                         }

@@ -1,10 +1,13 @@
 module Bank = {
   module Send = {
-    type t = {
+    type internal_t = {
       fromAddress: Address.t,
       toAddress: Address.t,
       amount: list<Coin.t>,
     }
+
+    type input_t = internal_t
+    type decoded_t = internal_t
 
     let decode = {
       open JsonUtils.Decode
@@ -163,6 +166,7 @@ module Oracle = {
   module Request = {
     type t<'a, 'b, 'c> = {
       oracleScriptID: ID.OracleScript.t,
+      clientID: string,
       calldata: JsBuffer.t,
       askCount: int,
       minCount: int,
@@ -178,6 +182,7 @@ module Oracle = {
     type fail_t = t<unit, unit, unit>
     type success_t = t<ID.Request.t, string, string>
 
+    type input_t = t<unit, unit, unit>
     type decoded_t =
       | Success(success_t)
       | Failure(fail_t)
@@ -186,6 +191,7 @@ module Oracle = {
       open JsonUtils.Decode
       buildObject(json => {
         oracleScriptID: json.required(list{"msg", "oracle_script_id"}, ID.OracleScript.decoder),
+        clientID: json.required(list{"msg", "client_id"}, string),
         calldata: json.required(list{"msg", "calldata"}, bufferWithDefault),
         askCount: json.required(list{"msg", "ask_count"}, int),
         minCount: json.required(list{"msg", "min_count"}, int),
@@ -460,6 +466,7 @@ module Staking = {
 
     type fail_t = t<unit, unit>
     type success_t = t<string, string>
+    type input_t = t<unit, unit>
 
     type decoded_t =
       | Success(success_t)
@@ -496,6 +503,7 @@ module Staking = {
 
     type fail_t = t<unit, unit>
     type success_t = t<string, string>
+    type input_t = t<unit, unit>
 
     type decoded_t =
       | Success(success_t)
@@ -536,6 +544,7 @@ module Staking = {
     type fail_t = t<unit, unit, unit, unit>
     type success_t = t<string, string, string, string>
 
+    type input_t = t<unit, unit, unit, unit>
     type decoded_t =
       | Success(success_t)
       | Failure(fail_t)
@@ -591,6 +600,7 @@ module Distribution = {
 
     type fail_t = t<unit, unit, unit>
     type success_t = t<list<Coin.t>, string, string>
+    type input_t = t<unit, unit, unit>
 
     type decoded_t =
       | Success(success_t)
@@ -763,6 +773,11 @@ module Gov = {
 
     type success_t = t<string>
     type fail_t = t<unit>
+    type input_t = {
+      voterAddress: Address.t,
+      proposalID: ID.Proposal.t,
+      option: int,
+    }
 
     type decoded_t =
       | Success(success_t)
@@ -841,8 +856,29 @@ module Gov = {
   }
 }
 
-type msg_t =
-  | SendMsg(Bank.Send.t)
+type ibc_transfer_t = {
+  sourcePort: string,
+  sourceChannel: string,
+  receiver: string,
+  token: Coin.t,
+  timeoutTimestamp: float,
+  sender: Address.t,
+}
+
+module Input = {
+  type t =
+    | SendMsg(Bank.Send.input_t)
+    | RequestMsg(Oracle.Request.input_t)
+    | DelegateMsg(Staking.Delegate.input_t)
+    | UndelegateMsg(Staking.Undelegate.input_t)
+    | RedelegateMsg(Staking.Redelegate.input_t)
+    | WithdrawRewardMsg(Distribution.WithdrawReward.input_t)
+    | VoteMsg(Gov.Vote.input_t)
+    | IBCTransfer(ibc_transfer_t)
+}
+
+type decoded_msg_t =
+  | SendMsg(Bank.Send.decoded_t)
   | MultiSendMsg(Bank.MultiSend.t)
   | CreateDataSourceMsg(Oracle.CreateDataSource.decoded_t)
   | EditDataSourceMsg(Oracle.EditDataSource.t)
@@ -869,9 +905,9 @@ type msg_t =
   | VoteWeightedMsg(Gov.VoteWeighted.decoded_t)
   | UnknownMsg
 
-type t = {
+type result_t = {
   raw: Js.Json.t,
-  decoded: msg_t,
+  decoded: decoded_msg_t,
   sender: Address.t,
   isIBC: bool,
 }

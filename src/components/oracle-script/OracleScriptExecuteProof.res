@@ -27,10 +27,7 @@ let make = (~id: ID.Request.t) => {
   <div className={Css.merge(list{CssHelper.flexBox(), Styles.resultBox})}>
     <div className=Styles.labelWrapper>
       <Text
-        value="Proof of validaty"
-        color={theme.neutral_600}
-        weight=Text.Regular
-        height={Text.Px(15)}
+        value="Proof of validaty" color={theme.neutral_600} weight=Text.Regular height={Text.Px(15)}
       />
     </div>
     {switch proofOpt {

@@ -5,17 +5,29 @@ module Styles = {
 }
 
 @react.component
-let make = (~validator, ~amount, ~setMsgsOpt) => {
+let make = (~address, ~validator, ~amount, ~setMsgsOpt) => {
   let validatorInfoSub = ValidatorSub.get(validator)
 
-  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   React.useEffect0(_ => {
     let msgsOpt = {
-      let coin = BandChainJS.Coin.create()
-      coin->BandChainJS.Coin.setDenom("uband")
-      coin->BandChainJS.Coin.setAmount(amount->Js.Math.floor_float->Belt.Float.toString)
-      Some([TxCreator2.WithdrawReward(validator), TxCreator2.Delegate(validator, coin)])
+      Some([
+        Msg.Input.WithdrawRewardMsg({
+          delegatorAddress: address,
+          validatorAddress: validator,
+          amount: (),
+          moniker: (),
+          identity: (),
+        }),
+        Msg.Input.DelegateMsg({
+          validatorAddress: validator,
+          delegatorAddress: address,
+          amount: amount->Coin.newUBANDFromAmount,
+          moniker: (),
+          identity: (),
+        }),
+      ])
     }
     setMsgsOpt(_ => msgsOpt)
     None
@@ -31,14 +43,14 @@ let make = (~validator, ~amount, ~setMsgsOpt) => {
         weight=Heading.Regular
         color={theme.neutral_600}
       />
-      {switch (validatorInfoSub) {
-       | Data({moniker}) =>
-         <div>
-           <Text value=moniker ellipsis=true align=Text.Right />
-           <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
-         </div>
-       | _ => <LoadingCensorBar width=300 height=34 />
-       }}
+      {switch validatorInfoSub {
+      | Data({moniker}) =>
+        <div>
+          <Text value=moniker ellipsis=true align=Text.Right />
+          <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
+        </div>
+      | _ => <LoadingCensorBar width=300 height=34 />
+      }}
     </div>
     <div className=Styles.container>
       <Heading
@@ -51,12 +63,10 @@ let make = (~validator, ~amount, ~setMsgsOpt) => {
       />
       <div>
         <Text
-          value={
-            amount
-            -> Coin.newUBANDFromAmount
-            -> Coin.getBandAmountFromCoin
-            -> Format.fPretty(~digits=6)
-          }
+          value={amount
+          ->Coin.newUBANDFromAmount
+          ->Coin.getBandAmountFromCoin
+          ->Format.fPretty(~digits=6)}
           code=true
         />
         <Text value=" BAND" />

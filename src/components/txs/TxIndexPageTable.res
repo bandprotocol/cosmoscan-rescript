@@ -22,7 +22,7 @@ let renderUnknownMessage = () =>
     </div>
   </Col>
 
-let renderBody = (msg: Msg.t) =>
+let renderBody = (msg: Msg.result_t) =>
   // switch msg.decoded {
   // | SendMsg(send) => <IndexTokenMsg.SendMsg send />
   // | RequestMsg(request) => <IndexOracleMsg.RequestMsg request />
@@ -112,7 +112,7 @@ let renderBody = (msg: Msg.t) =>
 
 module MsgDetailCard = {
   @react.component
-  let make = (~msg: Msg.t) => {
+  let make = (~msg: Msg.result_t) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     let badge = msg.decoded->Msg.getBadge
     let (showJson, setShowJson) = React.useState(_ => false)
@@ -143,7 +143,7 @@ module MsgDetailCard = {
 }
 
 @react.component
-let make = (~messages: list<Msg.t>) =>
+let make = (~messages: list<Msg.result_t>) =>
   <div className=Styles.msgContainer>
     {messages
     ->Belt.List.mapWithIndex((index, msg) => {

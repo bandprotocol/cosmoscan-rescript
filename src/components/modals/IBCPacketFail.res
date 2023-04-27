@@ -44,7 +44,7 @@ let make = (~reason) => {
     <textarea
       className={Styles.jsonDisplay(theme)}
       disabled=true
-      defaultValue={reason->Js.Json.parseExn->TxCreator2.stringifyWithSpaces}
+      defaultValue={reason->Js.Json.parseExn->TxCreator3.stringifyWithSpaces}
     />
   </div>
 }

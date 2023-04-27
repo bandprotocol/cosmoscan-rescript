@@ -17,7 +17,7 @@ module Styles = {
 }
 
 @react.component
-let make = (~txResponse: TxCreator.tx_response_t, ~schema: string) =>
+let make = (~txResponse: TxCreator3.tx_response_t, ~schema: string) =>
   {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     let requestsByTxHashSub = RequestSub.Mini.getListByTxHash(txResponse.txHash)
@@ -32,7 +32,7 @@ let make = (~txResponse: TxCreator.tx_response_t, ~schema: string) =>
           <div className=Styles.labelWrapper>
             <Text value="Exit Status" color={theme.neutral_600} weight=Text.Regular />
           </div>
-          <Text value={txResponse.code == 0 ? "0" : "1"} />
+          <Text value={txResponse.code->Belt.Int.toString} />
         </div>
         {switch requestOpt {
         | Some({id}) =>
@@ -113,9 +113,7 @@ let make = (~txResponse: TxCreator.tx_response_t, ~schema: string) =>
           <div className={Css.merge(list{CssHelper.flexBox(), Styles.resultBox})}>
             <div className=Styles.labelWrapper>
               <Text
-                value="Waiting for output and #proof#"
-                color={theme.neutral_600}
-                weight=Text.Regular
+                value="Waiting for output and #proof#" color={theme.neutral_600} weight=Text.Regular
               />
             </div>
             <div className=Styles.resultWrapper>
