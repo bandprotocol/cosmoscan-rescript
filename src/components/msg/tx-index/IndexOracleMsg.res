@@ -26,96 +26,6 @@ module RenderCreateDataSourceMsg = {
       </Col>
     }
   }
-
-  module Outer = {
-    @react.component
-    let make = (~msg: Msg.Oracle.CreateDataSource.t<'a>, ~children1, ~children2) => {
-      let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-      <Row>
-        <RenderColumn title="Owner" value={ValueAddress(msg.owner)} />
-        // {children1}
-        // {children2}
-        <Col col=Col.Six mbSm=24>
-          <Heading
-            value="Treasury"
-            size=Heading.H4
-            weight=Heading.Regular
-            marginBottom=8
-            color=theme.neutral_600
-          />
-          <AddressRender position=AddressRender.Subtitle address={msg.treasury} />
-        </Col>
-        <Col col=Col.Six>
-          <Heading
-            value="Fee"
-            size=Heading.H4
-            weight=Heading.Regular
-            marginBottom=8
-            color=theme.neutral_600
-          />
-          <AmountRender coins={msg.fee} />
-        </Col>
-      </Row>
-    }
-  }
-  module RenderSuccess = {
-    @react.component
-    let make = (~msg: Msg.Oracle.CreateDataSource.t<'a>, ~theme: Theme.t) => {
-      <Outer
-        msg
-        children1={<Col col=Col.Six mb=24>
-          <Heading
-            value="Name"
-            size=Heading.H4
-            weight=Heading.Regular
-            marginBottom=8
-            color=theme.neutral_600
-          />
-          <div className={CssHelper.flexBox()}>
-            <TypeID.DataSource position=TypeID.Subtitle id={msg.id} />
-            <HSpacing size=Spacing.sm />
-            <Text value={msg.name} size=Text.Body1 />
-          </div>
-        </Col>}
-        children2={<div />}
-      />
-    }
-  }
-
-  module RenderFail = {
-    @react.component
-    let make = (~msg, ~theme: Theme.t) => {
-      <Outer
-        msg
-        children1={<Col col=Col.Six mb=24>
-          <Heading
-            value="Name"
-            size=Heading.H4
-            weight=Heading.Regular
-            marginBottom=8
-            color=theme.neutral_600
-          />
-          <div className={CssHelper.flexBox()}>
-            <Text value="-" size=Text.Body1 />
-          </div>
-        </Col>}
-        children2={React.null}
-      />
-    }
-  }
-}
-
-module RenderDataSourceMsgOuter = {
-  @react.component
-  let make = (~msg: Msg.Oracle.CreateDataSource.decoded_t) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-
-    switch msg {
-    | Msg.Oracle.CreateDataSource.Success(msg) =>
-      <RenderCreateDataSourceMsg.RenderSuccess msg theme />
-    | Msg.Oracle.CreateDataSource.Failure(msg) => <RenderCreateDataSourceMsg.RenderFail msg theme />
-    }
-  }
 }
 
 // module RenderCreateDataSourceMsgSuccess = {
@@ -207,12 +117,6 @@ module RenderDataSourceMsgOuter = {
 //     </Row>
 //   }
 // }
-module CreateDataSourceMsg = {
-  @react.component
-  let make = (~dataSource: Msg.Oracle.CreateDataSource.decoded_t) => {
-    <RenderDataSourceMsgOuter msg=dataSource />
-  }
-}
 
 module EditDataSourceMsg = {
   @react.component

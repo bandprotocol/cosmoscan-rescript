@@ -69,3 +69,17 @@ module SetWithdrawAddress = {
     </BadgeWrapper>
   }
 }
+
+module Exec = {
+  @react.component
+  let make = (~messages) => {
+    <BadgeWrapper>
+      {messages
+      ->Belt.List.mapWithIndex((index, msg) => {
+        <Text key={index->string_of_int} value={Msg.getBadge(msg).name} />
+      })
+      ->Belt.List.toArray
+      ->React.array}
+    </BadgeWrapper>
+  }
+}

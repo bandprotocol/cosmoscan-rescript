@@ -40,6 +40,37 @@ module Styles = {
             pointerEvents(#none),
             color(theme.primary_600),
           ]),
+        ],
+      ),
+      selector(
+        "ol > li",
+        [fontSize(#px(14)), paddingLeft(#px(15)), position(#relative), lineHeight(#em(1.42))],
+      ),
+      selector(
+        "ol > li::marker",
+        [fontFamilies([#custom("Montserrat"), #custom("sans-serif")]), fontVariant(#inherit_)],
+      ),
+      selector("ul", [marginLeft(#em(1.2))]),
+      selector("ol", [marginLeft(#em(2.0)), listStyleType(#decimal)]),
+      selector(
+        "ul > li",
+        [
+          fontSize(#px(14)),
+          paddingLeft(#px(15)),
+          position(#relative),
+          lineHeight(#em(1.42)),
+          before([
+            contentRule(#text("\f105")),
+            fontFamily(#custom("'Font Awesome 5 Pro'")),
+            fontSize(#px(14)),
+            lineHeight(#zero),
+            display(#block),
+            position(#absolute),
+            left(#zero),
+            top(#px(10)),
+            pointerEvents(#none),
+            color(theme.primary_600),
+          ]),
         ]
       ),
       selector(

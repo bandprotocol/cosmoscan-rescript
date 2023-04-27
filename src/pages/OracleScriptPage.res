@@ -26,6 +26,10 @@ module Styles = {
       height(#px(32)),
       hover([backgroundColor(theme.primary_500)]),
     ])
+
+  let heading = style(. [
+    marginTop(#px(10))
+  ])
 }
 
 type sort_by_t =
@@ -87,7 +91,8 @@ module RenderMostRequestedCard = {
           CssHelper.flexBox(~direction=#column, ~justify=#spaceBetween, ~align=#stretch, ()),
         })}>
         <div
-          className={CssHelper.flexBox(
+          className={
+              CssHelper.flexBox(
             ~justify=#spaceBetween,
             ~align=#flexStart,
             ~wrap=#nowrap,
@@ -101,7 +106,7 @@ module RenderMostRequestedCard = {
               }}
             </div>
             {switch oracleScriptSub {
-            | Data({name}) => <Heading size=Heading.H4 value=name weight=Heading.Thin />
+            | Data({name}) => <Heading size=Heading.H4 value=name weight=Heading.Thin marginTop=24/>
             | _ => <LoadingCensorBar width=200 height=15 />
             }}
           </div>

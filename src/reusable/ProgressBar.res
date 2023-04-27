@@ -130,9 +130,13 @@ module Deposit = {
           CssHelper.mb(~size=8, ()),
           CssHelper.flexBox(~justify=#spaceBetween, ()),
         ])}>
-        <Text value={`Min Deposit ${formatedMinDeposit} BAND`} color=theme.neutral_200 size=Text.Body1 />
         <Text
-          value={`${formatedTotalDeposit} / ${formatedMinDeposit}`} color=theme.neutral_200 size=Text.Body1
+          value={`Min Deposit ${formatedMinDeposit} BAND`} color=theme.neutral_200 size=Text.Body1
+        />
+        <Text
+          value={`${formatedTotalDeposit} / ${formatedMinDeposit}`}
+          color=theme.neutral_200
+          size=Text.Body1
         />
       </div>
       <div className={Styles.progressOuter(theme)}>
@@ -146,7 +150,6 @@ module Voting = {
   @react.component
   let make = (~percent, ~label, ~amount) => {
     // TODO: Remove after using param
-    Js.log(label)
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div>

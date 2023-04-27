@@ -126,6 +126,7 @@ let make = (~chainID) => {
               <VSpacing size=Spacing.xl />
               <Heading size=Heading.H5 value="Select your connection method" />
               <VSpacing size=Spacing.md />
+              // TODO: disable Mnemonic when live on mainnet
               {[Mnemonic, LedgerWithCosmos]
               ->Belt.Array.map(method =>
                 <React.Fragment key={method |> toLoginMethodString}>

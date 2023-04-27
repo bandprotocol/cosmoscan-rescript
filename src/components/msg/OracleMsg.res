@@ -7,7 +7,7 @@ module Styles = {
 module CreateDataSourceMsg = {
   module Outer = {
     @react.component
-    let make = (~msg: Msg.Oracle.CreateDataSource.t<'a>, ~children) =>
+    let make = (~msg: Msg.Oracle.CreateDataSource.internal_t<'a>, ~children) =>
       <div
         className={CssJs.merge(. [
           CssHelper.flexBox(~wrap=#nowrap, ()),
