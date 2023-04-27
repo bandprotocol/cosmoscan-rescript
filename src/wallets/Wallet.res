@@ -16,8 +16,8 @@ let getAddressAndPubKey = x =>
 
 let sign = (msg, x) =>
   switch x {
-  | Mnemonic(x) => x->Mnemonic.sign(_, msg)->Promise.resolve
-  | Ledger(x) => x->Ledger.sign(_, msg)
+  | Mnemonic(x) => x->Mnemonic.sign(msg)->Promise.resolve
+  | Ledger(x) => x->Ledger.sign(msg)
   }
 
 let disconnect = x =>

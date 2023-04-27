@@ -25,10 +25,10 @@ describe("Expect Search Functionality to work correctly", () => {
     expect("d123"->search)->toEqual(DataSourceDetailsPage(123, DataSourceRequests))
   )
   test("test request route prefix is R", () =>
-    expect("R123"->search)->toEqual(RequestIndexPage(123))
+    expect("R123"->search)->toEqual(RequestDetailsPage(123))
   )
   test("test request route prefix is r", () =>
-    expect("r123"->search)->toEqual(RequestIndexPage(123))
+    expect("r123"->search)->toEqual(RequestDetailsPage(123))
   )
   test("test oracle script route prefix is O", () =>
     expect("O123"->search)->toEqual(OracleScriptDetailsPage(123, OracleScriptRequests))

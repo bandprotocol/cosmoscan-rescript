@@ -292,7 +292,7 @@ module RenderSearchResult = {
                 </div>
               </li>
             </>
-          | RequestIndexPage(id) =>
+          | RequestDetailsPage(id) =>
             <>
               <li className={Styles.resultHeading(theme)}>
                 <Heading
@@ -659,7 +659,7 @@ let make = () => {
           {route}
         })
         let requestResults = requests->Belt.Array.map(request => {
-          let route = Route.RequestIndexPage(request.id->ID.Request.toInt)
+          let route = Route.RequestDetailsPage(request.id->ID.Request.toInt)
           {route}
         })
         let osResults = os->Belt.Array.map(os => {

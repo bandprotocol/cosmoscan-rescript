@@ -28,7 +28,7 @@ module Styles = {
       width(#px(32)),
       height(#px(32)),
       borderRadius(#px(8)),
-      // border(#px(1), #solid, active ? theme.neutral_900 : theme.textSecondary),
+      // border(#px(1), #solid, active ? theme.neutral_900 : theme.neutral_600),
       pointerEvents(active ? #auto : #none),
       opacity(active ? 1. : 0.5),
       hover([
@@ -50,8 +50,8 @@ module Styles = {
       borderRadius(#px(4)),
       fontSize(#px(14)),
       fontWeight(#light),
-      border(#px(1), #solid, theme.neutral_400),
-      backgroundColor(theme.neutral_000),
+      border(#px(1), #solid, theme.neutral_200),
+      backgroundColor(theme.neutral_200),
       outlineStyle(#none),
       color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
@@ -89,7 +89,7 @@ let make = (
 
   let (inputPage, setInputPage) = React.useState(_ => "1")
 
-  if pageCount > 1 {
+  if pageCount >= 1 {
     <div className=Styles.container>
       <div className=Styles.innerContainer>
         <ClickableSymbol
@@ -115,11 +115,11 @@ let make = (
             CssHelper.flexBox(~justify=#center, ()),
             Styles.paginationBox,
           })}>
-          <Text value="of" size=Text.Body2 />
+          <Text value="of" size=Text.Body1 />
           <Text
             value={pageCount->Format.iPretty}
             weight=Text.Semibold
-            size=Text.Body2
+            size=Text.Body1
             color=theme.neutral_900
           />
         </div>

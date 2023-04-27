@@ -234,7 +234,7 @@ module EditOracleScript = {
 }
 
 module Send = {
-  let factory = (msg: Msg.Bank.Send.t) => [
+  let factory = (msg: Msg.Bank.Send.internal_t) => [
     {
       title: "From",
       content: Address(msg.fromAddress),

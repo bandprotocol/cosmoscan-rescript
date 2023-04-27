@@ -30,3 +30,14 @@ let getUBandAmountFromCoins = coins =>
   ->Belt.List.keep(coin => coin.denom == "uband")
   ->Belt.List.get(0)
   ->Belt.Option.mapWithDefault(0., getUBandAmountFromCoin)
+
+let toBandChainJsCoin = (coin: t) => {
+  let bandCoin = BandChainJS.Coin.create()
+  bandCoin->BandChainJS.Coin.setDenom(coin.denom)
+  bandCoin->BandChainJS.Coin.setAmount(coin.amount->Js.Math.floor_float->Js.Float.toString)
+
+  bandCoin
+}
+let toBandChainJsCoins = (coins: list<t>) => {
+  coins->Belt.List.map(toBandChainJsCoin)->Belt.List.toArray
+}

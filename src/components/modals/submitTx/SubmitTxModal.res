@@ -61,14 +61,12 @@ module SubmitTxStep = {
     let (show, setShow) = React.useState(_ => false)
     let (msgsOpt, setMsgsOpt) = React.useState(_ => None)
 
-    let gasLimit = SubmitMsg.gasLimit(msg)
-
-    let fee = 5000.
+    let defaultFee = 5000 // Hard code fee for sending transaction on cosmoscan
     let (memo, setMemo) = React.useState(_ => {
       open EnhanceTxInput
       {text: "", value: Some("")}
     })
-    let (gasInput, setGasInput) = React.useState(_ => gasLimit->Belt.Int.toString)
+    let (gasInput, setGasInput) = React.useState(_ => msg->SubmitMsg.defaultGasLimit)
 
     <div className={Css.merge(list{Styles.container, Styles.disable(isActive)})}>
       <Heading value={SubmitMsg.toString(msg)} size=Heading.H4 marginBottom=24 />
@@ -80,8 +78,10 @@ module SubmitTxStep = {
       | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
       | WithdrawReward(validator) =>
         <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
-      | Reinvest(validator, amount) => <ReinvestMsg validator setMsgsOpt amount />
-      | Vote(proposalID, proposalName) => <VoteMsg proposalID proposalName setMsgsOpt />
+      | Reinvest(validator, amount) =>
+        <ReinvestMsg address={account.address} validator amount setMsgsOpt />
+      | Vote(proposalID, proposalName) =>
+        <VoteMsg address={account.address} proposalID proposalName setMsgsOpt />
       }}
       <EnhanceTxInput
         width=300
@@ -108,26 +108,8 @@ module SubmitTxStep = {
       </div>
       <div className={Styles.advancedOptions(show, theme)}>
         <ValueInput
-          value=gasInput setValue=setGasInput title="Gas Limit" info="(optional)" inputType="number"
+          value={gasInput->string_of_int} setValue=setGasInput title="Gas Limit" inputType="number"
         />
-        {switch Belt.Int.fromString(gasInput) {
-        | Some(gasInputAmout) =>
-          gasInputAmout < gasLimit
-            ? {
-                <div>
-                  <Text
-                    value="Gas limit must be at least 300,000"
-                    size=Text.Caption
-                    color=theme.error_600
-                  />
-                </div>
-              }
-            : {
-                React.null
-              }
-
-        | _ => React.null
-        }}
       </div>
       <SeperatedLine />
       <div className=Styles.info>
@@ -137,48 +119,20 @@ module SubmitTxStep = {
       <div id="nextButtonContainer">
         <Button
           style=Styles.nextBtn
-          disabled={switch Belt.Int.fromString(gasInput) {
-          | Some(gasOpt) => gasOpt < gasLimit || msgsOpt->Belt.Option.isNone
-          | None => msgsOpt->Belt.Option.isNone
-          }}
+          disabled={gasInput <= 0}
           onClick={_ => {
-            let rawTxOpt = {
-              let memo' = {
-                switch memo.value {
-                | Some(x) => x
-                | None => ""
-                }
-              }
-
-              let msgs = msgsOpt->Belt.Option.getWithDefault(_, [])
-
-              Some(
-                TxCreator2.createRawTx(
-                  ~sender=account.address,
-                  ~msgs,
-                  ~chainID=account.chainID,
-                  ~feeAmount=fee->Js.Float.toString,
-                  ~gas={
-                    switch Belt.Int.fromString(gasInput) {
-                    | Some(gasOpt) => gasOpt
-                    | None => gasLimit
-                    }
-                  },
-                  ~memo=memo',
-                  ~client,
-                  (),
-                ),
-              )
-            }
-            let _ = async () =>
-              switch rawTxOpt {
-              | Some(rawTxPromise) =>
-                let rawTx = await rawTxPromise
-                setRawTx(_ => Some(rawTx))
-              | None =>
-                open Webapi.Dom
-                window->Window.alert("invalid messages")
-              }
+            let _ = TxCreator3.createRawTx(
+              client,
+              account.address,
+              msgsOpt->Belt.Option.getWithDefault(_, []),
+              account.chainID,
+              defaultFee,
+              gasInput,
+              memo.value->Belt.Option.getWithDefault(""),
+            )->Promise.then(rawTx => {
+              setRawTx(_ => Some(rawTx))
+              Promise.resolve()
+            })
           }}>
           {"Next"->React.string}
         </Button>
@@ -191,13 +145,11 @@ module CreateTxFlow = {
   @react.component
   let make = (~account, ~msg) => {
     let (rawTx, setRawTx) = React.useState(_ => None)
-
     <>
       <SubmitTxStep account setRawTx isActive={rawTx->Belt.Option.isNone} msg />
-      {switch rawTx {
-      | None => React.null
-      | Some(rawTx') => <PreviewJsonStep rawTx=rawTx' onBack={_ => setRawTx(_ => None)} account />
-      }}
+      {rawTx->Belt.Option.mapWithDefault(React.null, tx =>
+        <PreviewJsonStep rawTx=tx onBack={_ => setRawTx(_ => None)} account />
+      )}
     </>
   }
 }

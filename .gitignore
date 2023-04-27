@@ -8,3 +8,4 @@
 /lib/bs/
 /coverage/
 .DS_Store
+/.vscode
