@@ -22,7 +22,7 @@ module RawOracleScriptID = {
 module RawRequestID = {
   type tab_t = unit
   let prefix = "#R"
-  let route = (id, _) => Route.RequestIndexPage(id)
+  let route = (id, _) => Route.RequestDetailsPage(id)
   let defaultTab = ()
 }
 

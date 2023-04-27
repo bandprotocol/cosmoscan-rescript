@@ -111,6 +111,7 @@ type connection_t = {counterPartyChainID: string}
 type channel_t = {connection: connection_t}
 
 type sequence_t = {_eq: int}
+type block_t = {timestamp: MomentRe.Moment.t}
 
 type t = {
   srcChannel: string,
@@ -121,9 +122,10 @@ type t = {
   packetType: packet_type_t,
   acknowledgement: option<acknowledgement_t>,
   blockHeight: ID.Block.t,
-  counterPartyChainID: string,
+  // counterPartyChainID: string,
   txHash: option<Hash.t>,
   data: data_t,
+  timestamp: MomentRe.Moment.t,
 }
 
 type internal_t = {
@@ -137,7 +139,8 @@ type internal_t = {
   dataOpt: option<Js.Json.t>,
   transaction: option<tx_t>,
   blockHeight: ID.Block.t,
-  channel: option<channel_t>,
+  block: block_t,
+  // channel: option<channel_t>,
 }
 
 let toExternal = ({
@@ -151,7 +154,8 @@ let toExternal = ({
   dataOpt,
   transaction,
   blockHeight,
-  channel,
+  block,
+  // channel,
 }) => {
   dstPort,
   packetType: {
@@ -162,9 +166,9 @@ let toExternal = ({
   sequence,
   dstChannel,
   blockHeight,
-  counterPartyChainID: {
-    (channel->Belt.Option.getExn).connection.counterPartyChainID
-  },
+  // counterPartyChainID: {
+  //   (channel->Belt.Option.getExn).connection.counterPartyChainID
+  // },
   acknowledgement: {
     switch acknowledgement {
     | None => None
@@ -203,11 +207,12 @@ let toExternal = ({
     | _ => Empty
     }
   },
+  timestamp: block.timestamp,
 }
 
 module IncomingPacketsConfig = %graphql(`
-    query IncomingPackets($limit: Int!, $offset: Int! $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $chainID: String!, $sequence: Int_comparison_exp)  {
-    incoming_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType}, sequence: $sequence, dst_port: {_ilike: $port}, dst_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) @ppxAs(type: "internal_t"){
+    query IncomingPackets($limit: Int!, $offset: Int! $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $chainID: String!)  {
+    incoming_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType},  dst_port: {_ilike: $port}, dst_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) @ppxAs(type: "internal_t"){
         packetType: type
         srcPort: src_port
         srcChannel: src_channel
@@ -220,18 +225,21 @@ module IncomingPacketsConfig = %graphql(`
           hash @ppxCustom(module: "GraphQLParserModule.Hash")
         }
         blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
-        channel @ppxAs(type: "channel_t")  {
-          connection @ppxAs(type: "connection_t") {
-            counterPartyChainID: counterparty_chain_id
-          }
+        block  @ppxAs(type: "block_t") {
+          timestamp @ppxCustom(module: "GraphQLParserModule.Date")
         }
+        # channel @ppxAs(type: "channel_t")  {
+        #   connection @ppxAs(type: "connection_t") {
+        #     counterPartyChainID: counterparty_chain_id
+        #   }
+        # }
       }
     }
 `)
 
 module OutgoingPacketsConfig = %graphql(`
-    query OutgoingPackets($limit: Int!, $offset: Int!, $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $chainID: String!, $sequence: Int_comparison_exp)  {
-        outgoing_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType},sequence: $sequence,  dst_port: {_ilike: $port}, dst_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) @ppxAs(type: "internal_t"){
+    query OutgoingPackets($limit: Int!, $offset: Int!, $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $chainID: String!,)  {
+        outgoing_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType}, src_port: {_ilike: $port}, src_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) @ppxAs(type: "internal_t"){
             packetType: type
             srcPort: src_port
             srcChannel: src_channel
@@ -244,26 +252,19 @@ module OutgoingPacketsConfig = %graphql(`
               hash @ppxCustom(module: "GraphQLParserModule.Hash")
             }
             blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
-            channel @ppxAs(type: "channel_t")  {
-              connection @ppxAs(type: "connection_t") {
-                counterPartyChainID: counterparty_chain_id
-              }
+            block  @ppxAs(type: "block_t")  {
+              timestamp @ppxCustom(module: "GraphQLParserModule.Date")
             }
+            # channel @ppxAs(type: "channel_t")  {
+            #   connection @ppxAs(type: "connection_t") {
+            #     counterPartyChainID: counterparty_chain_id
+            #   }
+            # }
         }
     }
 `)
 
-let getList = (
-  ~page,
-  ~pageSize,
-  ~direction,
-  ~packetType,
-  ~port,
-  ~channel,
-  ~sequence: option<int>,
-  ~chainID,
-  (),
-) => {
+let getList = (~page, ~pageSize, ~direction, ~packetType, ~port, ~channel, ~chainID, ()) => {
   let offset = (page - 1) * pageSize
 
   let packetTypeKeyword = {
@@ -313,38 +314,15 @@ let getList = (
         chainID: {
           chainID !== "" ? chainID : "%%"
         },
-        sequence: Some({
-          _eq: sequence,
-          _gt: None,
-          _gte: None,
-          _in: None,
-          _is_null: None,
-          _lt: None,
-          _lte: None,
-          _neq: None,
-          _nin: None,
-        }),
       },
       ~pollInterval=5000,
-    )->Query.resolve
+    )
 
-    // data
-    // ->Query.fromData
-    // ->Query.map(({incoming_packets}) => incoming_packets->Belt.Array.map(toExternal))
-
-    switch data {
-    | Data(x) =>
-      switch x {
-      | {data: Some({incoming_packets: _, _}), error: None, loading: true, _} => Query.NoData
-      | {loading: false, error: None, data: Some({incoming_packets})} =>
-        incoming_packets->Belt.Array.map(toExternal)->Query.resolve
-      | {error: Some(_error)} => Error(_error)
-      | _ => Query.NoData
-      }
-    | Error(_error) => Error(_error)
-    | NoData => Query.NoData
-    | Loading => Query.Loading
-    }
+    data
+    ->Query.fromData
+    ->Query.map(({incoming_packets}) => {
+      incoming_packets->Belt.Array.map(toExternal)
+    })
 
   | Outgoing =>
     let data = OutgoingPacketsConfig.use(
@@ -375,41 +353,15 @@ let getList = (
         chainID: {
           chainID !== "" ? chainID : "%%"
         },
-        sequence: Some({
-          _eq: sequence,
-          _gt: None,
-          _gte: None,
-          _in: None,
-          _is_null: None,
-          _lt: None,
-          _lte: None,
-          _neq: None,
-          _nin: None,
-        }),
       },
       ~pollInterval=5000,
-    )->Query.resolve
+    )
 
-    // data
-    // ->Sub.fromData
-    // ->Sub.flatMap(({outgoing_packets}) => {
-    //   outgoing_packets->Belt.Array.map(toExternal)->Sub.resolve
-    // })
-
-    switch data {
-    | Data(x) =>
-      switch x {
-      | {data: Some({outgoing_packets: _, _}), error: None, loading: true, _} => Query.NoData
-      | {loading: false, error: None, data: Some({outgoing_packets})} =>
-        outgoing_packets->Belt.Array.map(toExternal)->Query.resolve
-      | {error: Some(_error)} => Error(_error)
-      | _ => Query.NoData
-      }
-    | Error(_error) => Error(_error)
-    | NoData => Query.NoData
-    | Loading => Query.Loading
-    }
+    data
+    ->Query.fromData
+    ->Query.map(({outgoing_packets}) => {
+      outgoing_packets->Belt.Array.map(toExternal)
+    })
   }
-
   result
 }

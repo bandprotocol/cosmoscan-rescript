@@ -113,7 +113,7 @@ let make = () => {
         | SubmitTx(msg) => <SubmitTxModal msg />
         | ChainSelector(targetChain) => <ChainSelectorModal targetChain />
         | QRCode(address) => <QRCodeModal address />
-        | IBCPacketError(_) => "Connect"->React.string
+        | IBCPacketError(reason) => <IBCPacketFail reason />
         | Syncing => <SyncingModal />
         }}
       </div>

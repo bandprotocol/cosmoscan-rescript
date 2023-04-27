@@ -13,32 +13,30 @@ module RenderDesktop = {
         transition(~duration=400, "all"),
         color(isActive ? theme.neutral_900 : theme.neutral_600),
         borderBottom(#px(4), #solid, isActive ? theme.primary_600 : #transparent),
-      ]);
-  };
+      ])
+  }
 
   @react.component
   let make = (~routes, ~last) => {
-    let currentRoute = RescriptReactRouter.useUrl() -> Route.fromUrl;
+    let currentRoute = RescriptReactRouter.useUrl()->Route.fromUrl
 
-    let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className={CssHelper.flexBox(~justify=#spaceBetween, ())} id="navigationBar">
       {routes
-       ->Belt.List.map(((v, route)) =>
-          <>
-            <div key=v className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
-              <Link className={Styles.nav(currentRoute == route, theme)} route>
-                {v -> React.string}
-              </Link>
-            </div> 
-            { last->Belt.List.has(v, (a, b) => a == b) ? <Divider /> : React.null}
-          </>
-         )
-       ->Array.of_list
-       ->React.array}
-    </div>;
-  };
-};
+      ->Belt.List.map(((v, route)) => <>
+        <div key=v className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
+          <Link className={Styles.nav(currentRoute == route, theme)} route>
+            {v->React.string}
+          </Link>
+        </div>
+        {last->Belt.List.has(v, (a, b) => a == b) ? <Divider /> : React.null}
+      </>)
+      ->Array.of_list
+      ->React.array}
+    </div>
+  }
+}
 
 module RenderMobile = {
   module Styles = {
@@ -61,10 +59,8 @@ module RenderMobile = {
         right(#zero),
         transition(~duration=400, "all"),
         backgroundColor(theme.neutral_000),
-        boxShadow(
-          Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.08))),
-        ),
-      ]);
+        boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.08)))),
+      ])
 
     let nav = (isActive, isLast, theme: Theme.t) =>
       style(. [
@@ -75,22 +71,21 @@ module RenderMobile = {
         padding2(~v=#px(16), ~h=#zero),
         textAlign(#center),
         borderBottom(#px(1), #solid, isLast ? theme.neutral_600 : theme.neutral_300),
-      ]);
+      ])
 
     let bandLogo = style(. [width(#px(40)), marginRight(#px(5)), Media.mobile([width(#px(34))])])
     let blockImage = style(. [display(#block)])
 
-    let menuContainer =
-      style(. [
-        marginLeft(#px(16)),
-        flexBasis(#px(24)),
-        flexGrow(0.),
-        flexShrink(0.),
-        height(#px(24)),
-        textAlign(#center),
-      ]);
-    let menu = style(. [width(#px(20)), display(#block)]);
-    let toggleContainer = style(. [padding2(~v=#px(24), ~h=#zero)]);
+    let menuContainer = style(. [
+      marginLeft(#px(16)),
+      flexBasis(#px(24)),
+      flexGrow(0.),
+      flexShrink(0.),
+      height(#px(24)),
+      textAlign(#center),
+    ])
+    let menu = style(. [width(#px(20)), display(#block)])
+    let toggleContainer = style(. [padding2(~v=#px(24), ~h=#zero)])
     let backdropContainer = show =>
       style(. [
         width(#percent(100.)),
@@ -102,32 +97,28 @@ module RenderMobile = {
         left(#zero),
         top(#px(58)),
         transition(~duration=400, "all"),
-      ]);
+      ])
     let brandRowContainer = {
-      style(. [
-        paddingTop(#px(16)),
-        paddingBottom(#px(24)),
-        width(#percent(100.)),
-      ]);
+      style(. [paddingTop(#px(16)), paddingBottom(#px(24)), width(#percent(100.))])
     }
-  };
+  }
 
   @react.component
   let make = (~routes, ~last) => {
-    let currentRoute = RescriptReactRouter.useUrl() -> Route.fromUrl;
-    let (show, setShow) = React.useState(_ => false);
-    let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+    let currentRoute = RescriptReactRouter.useUrl()->Route.fromUrl
+    let (show, setShow) = React.useState(_ => false)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let modeMsg = {
-      let mode = isDarkMode ? "Lightmode" : "Darkmode";
-      "Switch to " ++ mode;
-    };
+      let mode = isDarkMode ? "Lightmode" : "Darkmode"
+      "Switch to " ++ mode
+    }
 
     <>
       <div className=Styles.menuContainer onClick={_ => setShow(prev => !prev)}>
         {show
           ? <Icon name="fal fa-times" color={theme.neutral_900} size=24 />
           : <Icon name="fal fa-bars" color={theme.neutral_900} size=24 />}
-        </div>
+      </div>
       <div className={Styles.navContainer(show, theme)}>
         <div className={Styles.brandRowContainer}>
           <Row alignItems=Row.Center>
@@ -135,7 +126,8 @@ module RenderMobile = {
               <div className={CssHelper.flexBox(~align=#flexEnd, ())}>
                 <LinkToHome>
                   <img
-                    src=Images.bandLogo className={Css.merge(list{Styles.bandLogo, Styles.blockImage})}
+                    src=Images.bandLogo
+                    className={Css.merge(list{Styles.bandLogo, Styles.blockImage})}
                   />
                 </LinkToHome>
                 <HSpacing size=Spacing.sm />
@@ -163,7 +155,7 @@ module RenderMobile = {
             </Col>
             <Col colSm=Col.Six>
               <div className={CssHelper.flexBox(~justify=#flexEnd, ~wrap=#nowrap, ())}>
-                <ToggleThemeButton /> 
+                <ToggleThemeButton />
                 <div className=Styles.menuContainer onClick={_ => setShow(prev => !prev)}>
                   {show
                     ? <Icon name="fal fa-times" color={theme.neutral_900} size=24 />
@@ -174,22 +166,18 @@ module RenderMobile = {
           </Row>
         </div>
         {routes
-        ->Belt.List.map(((v, route)) =>
-            { 
-              let isActive = currentRoute == route
-              let isLast = last->Belt.List.has(v, (a, b) => a == b)
-              <Link className={Styles.nav(isActive, isLast, theme)} route>
-                {v -> React.string}
-              </Link>
-            }
-          )
+        ->Belt.List.map(((v, route)) => {
+          let isActive = currentRoute == route
+          let isLast = last->Belt.List.has(v, (a, b) => a == b)
+          <Link className={Styles.nav(isActive, isLast, theme)} route> {v->React.string} </Link>
+        })
         ->Array.of_list
         ->React.array}
       </div>
       <div onClick={_ => setShow(prev => !prev)} className={Styles.backdropContainer(show)} />
-    </>;
-  };
-};
+    </>
+  }
+}
 
 @react.component
 let make = () => {
@@ -202,11 +190,12 @@ let make = () => {
     ("Requests", RequestHomePage),
     ("Data Sources", DataSourcePage),
     ("Oracle Scripts", OracleScriptPage),
-    ("IBCs", IBCHomePage),
-  };
+    ("Requests", RequestHomePage),
+    ("IBCs", RelayersHomepage),
+  }
 
   // last nav of each section to separate by divider
   let last = list{"Home", "Proposals", "Oracle Scripts"}
 
-  Media.isMobile() ? <RenderMobile routes last/> : <RenderDesktop routes last/>; 
-};
+  Media.isMobile() ? <RenderMobile routes last /> : <RenderDesktop routes last />
+}
