@@ -282,7 +282,7 @@ let make = (~proposalID) => {
                          />
                        </Col>
                        <Col col=Col.Eight>
-                         <Text value={planObj.height |> string_of_int} size=Text.Body1 block=true />
+                         <Text value={planObj.height->string_of_int} size=Text.Body1 block=true />
                        </Col>
                      </Row>
                    </>
