@@ -245,3 +245,13 @@ select::-ms-expand {
 * {
   -webkit-overflow-scrolling: touch;
 }
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.img-fullWidth {
+  width: 100%;
+  height: auto;
+}

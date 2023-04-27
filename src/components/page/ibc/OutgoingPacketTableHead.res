@@ -12,13 +12,14 @@ module Styles = {
   let tableHeadItem = style(. [
     marginLeft(#px(8)),
     marginRight(#px(8)),
-    // minWidth(#calc((#sub, #percent(16.), #px(8)))),
     minWidth(#px(120)),
     textAlign(#center),
+    textAlign(#center),
+    selector("p", [textAlign(#center)]),
   ])
 
   let largeColumn = style(. [minWidth(#px(245))])
-  let smallColumn = style(. [minWidth(#px(80))])
+  let smallColumn = style(. [minWidth(#px(120))])
   let leftAlign = style(. [textAlign(#left)])
 }
 
@@ -31,10 +32,7 @@ let make = () => {
       <Text value="Block ID" weight={Text.Semibold} />
     </div>
     <div className=Styles.tableHeadItem>
-      <Text value="Counterparty chain ID" weight={Text.Semibold} />
-    </div>
-    <div className={Css.merge(list{Styles.tableHeadItem, Styles.largeColumn})}>
-      <Text value="Port & Channel" weight={Text.Semibold} />
+      <Text value="Packet Type" weight={Text.Semibold} />
     </div>
     {switch isTablet {
     | true => React.null
@@ -44,10 +42,10 @@ let make = () => {
       </div>
     }}
     <div className=Styles.tableHeadItem>
-      <Text value="Packet Type" weight={Text.Semibold} />
-    </div>
-    <div className=Styles.tableHeadItem>
       <Text value="Request ID" weight={Text.Semibold} />
+    </div>
+    <div className={Css.merge(list{Styles.tableHeadItem, Styles.smallColumn})}>
+      <Text value="Time" weight={Text.Semibold} />
     </div>
     <div className={Css.merge(list{Styles.tableHeadItem, Styles.smallColumn})}>
       <Text value="Status" weight={Text.Semibold} />

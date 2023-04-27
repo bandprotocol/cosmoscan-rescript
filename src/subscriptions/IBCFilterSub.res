@@ -11,8 +11,8 @@ type filter_counterparty_t = {
 }
 
 module CounterpartyConfig = %graphql(`
-  subscription Counterparty($chainID: String!) {
-    counterparty_chains(where :{chain_id: {_ilike: $chainID}}) {
+  subscription Counterparty {
+    counterparty_chains {
       chainID: chain_id
       connections {
         channels {
@@ -25,7 +25,7 @@ module CounterpartyConfig = %graphql(`
 `)
 
 let getChainFilterList = () => {
-  let result = CounterpartyConfig.use({chainID: "%%"})
+  let result = CounterpartyConfig.use()
 
   result
   ->Sub.fromData
@@ -48,8 +48,8 @@ let getChainFilterList = () => {
   })
 }
 
-let getFilterList = (~chainID, ()) => {
-  let result = CounterpartyConfig.use({chainID: chainID !== "" ? chainID : "%%"})
+let getFilterList = () => {
+  let result = CounterpartyConfig.use()
   result
   ->Sub.fromData
   ->Sub.map(internal => {
