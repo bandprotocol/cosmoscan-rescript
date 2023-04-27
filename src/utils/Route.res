@@ -32,7 +32,7 @@ type t =
   | BlockPage
   | BlockDetailsPage(int)
   | RequestHomePage
-  | RequestIndexPage(int)
+  | RequestDetailsPage(int)
   | AccountIndexPage(Address.t, account_tab_t)
   | ValidatorsPage
   | ValidatorDetailsPage(Address.t, validator_tab_t)
@@ -82,7 +82,7 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     }
 
   | (list{"requests"}, _) => RequestHomePage
-  | (list{"request", reqID}, _) => RequestIndexPage(reqID->Parse.mustParseInt)
+  | (list{"request", reqID}, _) => RequestDetailsPage(reqID->Parse.mustParseInt)
   | (list{"account", address}, hash) =>
     let urlHash = hash =>
       switch hash {
@@ -186,7 +186,7 @@ let toString = route =>
   | BlockPage => "/blocks"
   | BlockDetailsPage(height) => `/block/${height->Belt.Int.toString}`
   | RequestHomePage => "/requests"
-  | RequestIndexPage(reqID) => `/request/${reqID->Belt.Int.toString}`
+  | RequestDetailsPage(reqID) => `/request/${reqID->Belt.Int.toString}`
   | AccountIndexPage(address, AccountDelegations) => {
       let addressBech32 = address->Address.toBech32
       `/account/${addressBech32}#delegations`
@@ -252,7 +252,7 @@ let search = (str: string) => {
     ))
   } else if capStr->Js.String2.startsWith("R") {
     let requestIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
-    requestIDOpt->Belt.Option.map(requestID => RequestIndexPage(requestID))
+    requestIDOpt->Belt.Option.map(requestID => RequestDetailsPage(requestID))
   } else if capStr->Js.String2.startsWith("O") {
     let oracleScriptIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
     oracleScriptIDOpt->Belt.Option.map(oracleScriptID => OracleScriptDetailsPage(
