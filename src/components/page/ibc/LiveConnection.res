@@ -114,11 +114,11 @@ module ConnectionListDesktop = {
             </Col>
             <Col col=Col.Two>
               <div className={CssHelper.flexBox(~justify=#center, ~align=#center, ())}>
-                {switch channel.latestTx {
-                | Some(time) =>
-                  <TimeAgos time={time} size=Text.Body2 color={theme.neutral_900} code=true />
-                | None => <Text value="N/A" color={theme.neutral_900} />
-                }}
+                {channel.lastUpdate->MomentRe.Moment.year == 1970
+                  ? <Text value={"N/A"} code=true color={theme.neutral_900} size=Text.Body2 />
+                  : <TimeAgos
+                      time={channel.lastUpdate} size=Text.Body2 color={theme.neutral_900} code=true
+                    />}
               </div>
             </Col>
             <Col col=Col.Two>
@@ -311,12 +311,13 @@ module ChannelItemMobile = {
           <Text size={Body1} value="Last Update" color=theme.neutral_600 />
         </Col>
         <Col colSm=Col.Six mbSm=10>
-          // TODO: Can't get this value from mainnet, waiting for chain team create a new view
-          {switch channel.latestTx {
-          | Some(time) =>
-            <TimeAgos time={time} size=Text.Body1 color={theme.neutral_900} code=true />
-          | None => <Text value="N/A" color={theme.neutral_900} />
-          }}
+          {channel.lastUpdate->MomentRe.Moment.year == 1970
+            ? <Text
+                value={"N/A"} code=true color={theme.neutral_900} weight={Bold} size=Text.Xxxl
+              />
+            : <TimeAgos
+                time={channel.lastUpdate} size=Text.Body1 color={theme.neutral_900} code=true
+              />}
         </Col>
         <Col colSm=Col.Six mbSm=10>
           <Text size={Body1} value="Order" color=theme.neutral_600 />
@@ -479,36 +480,38 @@ let make = (~counterpartyChainID, ~state) => {
         />
       </EmptyContainer>
     | Data(connections) =>
-      connections
-      ->Belt.Array.map(connection => {
-        connection.channels->Belt.Array.length > 0
-          ? isMobile
-              ? <ConnectionListMobile
-                  key={connection.connectionID} connectionSub={Sub.resolve(connection)}
-                />
-              : <ConnectionListDesktop
-                  key={connection.connectionID} connectionSub={Sub.resolve(connection)}
-                />
-          : React.null
-      })
-      ->React.array
+      <>
+        {connections
+        ->Belt.Array.map(connection => {
+          connection.channels->Belt.Array.length > 0
+            ? isMobile
+                ? <ConnectionListMobile
+                    key={connection.connectionID} connectionSub={Sub.resolve(connection)}
+                  />
+                : <ConnectionListDesktop
+                    key={connection.connectionID} connectionSub={Sub.resolve(connection)}
+                  />
+            : React.null
+        })
+        ->React.array}
+        {switch connectionCountSub {
+        | Data(connectionCount) =>
+          let pageCount = Page.getPageCount(connectionCount, pageSize)
+          <Pagination2
+            currentPage=page
+            pageCount
+            onPageChange={newPage => setPage(_ => newPage)}
+            onChangeCurrentPage={newPage => setPage(_ => newPage)}
+          />
+        | _ => React.null
+        }}
+      </>
     | _ =>
       Belt.Array.makeBy(pageSize, i =>
         isMobile
           ? <ConnectionListMobile key={i->Belt.Int.toString} connectionSub=NoData />
           : <ConnectionListDesktop key={i->Belt.Int.toString} connectionSub=NoData />
       )->React.array
-    }}
-    {switch connectionCountSub {
-    | Data(connectionCount) =>
-      let pageCount = Page.getPageCount(connectionCount, pageSize)
-      <Pagination2
-        currentPage=page
-        pageCount
-        onPageChange={newPage => setPage(_ => newPage)}
-        onChangeCurrentPage={newPage => setPage(_ => newPage)}
-      />
-    | _ => React.null
     }}
   </>
 }

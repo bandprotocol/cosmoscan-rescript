@@ -86,34 +86,37 @@ let make = (~chainID, ~channel, ~port) => {
       </Col>
     </Row>
     {isTablet ? React.null : <IncomingPacketTableHead />}
-    {switch packetsSub {
-    | Data(packets) if packets->Belt.Array.length > 0 => packets
-      ->Belt_Array.mapWithIndex((i, e) =>
-        <Col col=Col.Twelve key={i->Belt.Int.toString} mb=16 mbSm=16>
-          <PacketItem packetSub={Sub.resolve(e)} />
-        </Col>
-      )
-      ->React.array
+    <Row>
+      {switch packetsSub {
+      | Data(packets) if packets->Belt.Array.length > 0 =>
+        packets
+        ->Belt_Array.mapWithIndex((i, e) =>
+          <Col col=Col.Twelve key={i->Belt.Int.toString} mb=16 mbSm=16>
+            <PacketItem packetSub={Sub.resolve(e)} />
+          </Col>
+        )
+        ->React.array
 
-    | Data(packets) if packets->Belt.Array.length === 0 =>
-      <div className={Styles.paperStyle(theme, isDarkMode)}>
-        <EmptyContainer>
-          <img
-            alt="No Packets"
-            src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
-            className=Styles.noDataImage
-          />
-          <Heading
-            size=Heading.H4
-            value="No Packets"
-            align=Heading.Center
-            weight=Heading.Regular
-            color={theme.neutral_600}
-          />
-        </EmptyContainer>
-      </div>
-    | _ => React.null
-    }}
+      | Data(packets) if packets->Belt.Array.length === 0 =>
+        <div className={Styles.paperStyle(theme, isDarkMode)}>
+          <EmptyContainer>
+            <img
+              alt="No Packets"
+              src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
+              className=Styles.noDataImage
+            />
+            <Heading
+              size=Heading.H4
+              value="No Packets"
+              align=Heading.Center
+              weight=Heading.Regular
+              color={theme.neutral_600}
+            />
+          </EmptyContainer>
+        </div>
+      | _ => React.null
+      }}
+    </Row>
     {switch packetCountSub {
     | Data(packetCount) =>
       let pageCount = Page.getPageCount(packetCount, pageSize)

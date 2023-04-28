@@ -61,6 +61,8 @@ module Styles = {
     alignItems(#center),
     selector(" > div:first-child", [width(#px(90)), marginRight(#px(16))]),
   ])
+
+  let requestWrapper = style(. [selector("  div", [justifyContent(#center)])])
 }
 
 module ResolveStatus = {
@@ -200,7 +202,7 @@ module MobilePacketItem = {
                       | Some(requestID) =>
                         Some(
                           <TypeID.Request
-                            id={requestID->ID.Request.fromInt} position=TypeID.Text
+                            id={requestID->ID.Request.fromInt} position=TypeID.Text block=false
                           />,
                         )
                       }
@@ -216,11 +218,9 @@ module MobilePacketItem = {
                   <div>
                     <Text value="Request ID" size=Text.Body2 weight=Text.Semibold />
                   </div>
-                  <div>
-                    <TypeID.Request
-                      id={response.requestID->ID.Request.fromInt} position=TypeID.Text block=false
-                    />
-                  </div>
+                  <TypeID.Request
+                    id={response.requestID->ID.Request.fromInt} position=TypeID.Text block=false
+                  />
                 </>
               | _ => React.null
               }
@@ -301,7 +301,9 @@ module DesktopPacketItem = {
                     switch requestIDOpt {
                     | Some(requestID) =>
                       Some(
-                        <TypeID.Request id={requestID->ID.Request.fromInt} position=TypeID.Text />,
+                        <div className=Styles.requestWrapper>
+                          <TypeID.Request id={requestID->ID.Request.fromInt} position=TypeID.Text />
+                        </div>,
                       )
                     | None => Some(<Text value="-" align={Center} />)
                     }
@@ -311,11 +313,11 @@ module DesktopPacketItem = {
               | OracleResponse =>
                 switch data {
                 | Response(response) =>
-                  <>
+                  <div className=Styles.requestWrapper>
                     <TypeID.Request
                       id={response.requestID->ID.Request.fromInt} position=TypeID.Text block=false
                     />
-                  </>
+                  </div>
                 | _ => React.null
                 }
               | _ => React.null
