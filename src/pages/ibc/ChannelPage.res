@@ -70,9 +70,6 @@ module ChainLogo = {
 let make = (~chainID, ~port, ~channel) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  let totalInCount = IBCSub.incomingCount(~port, ~channel, ~packetType="", ())
-  let totalOutCount = IBCSub.outgoingCount(~port, ~channel, ~packetType="", ())
-
   let channelInfo = ChannelQuery.getChannelInfo(~port, ~channel, ())
 
   <Section ptSm=32 pbSm=32>
@@ -155,15 +152,23 @@ let make = (~chainID, ~port, ~channel) => {
             <Text value="Transactions" size=Text.Xl />
             <VSpacing size=Spacing.sm />
             <div>
-              {switch (totalInCount, totalOutCount) {
-              | (Data(totalInCount), Data(totalOutCount)) =>
-                <Text
-                  size=Text.Xxxl
-                  value={(totalInCount + totalOutCount)->Format.iPretty}
-                  code=true
-                  color={theme.neutral_900}
-                  weight={Bold}
-                />
+              {switch channelInfo {
+              | Data(info) =>
+                switch info {
+                | Data({totalPackets}) =>
+                  <Text
+                    size=Text.Xxxl
+                    value={totalPackets->Format.iPretty}
+                    code=true
+                    color={theme.neutral_900}
+                    weight={Bold}
+                  />
+                | _ =>
+                  <Text
+                    value={"N/A"} code=true color={theme.neutral_900} weight={Bold} size=Text.Xxxl
+                  />
+                }
+
               | _ => <LoadingCensorBar width=100 height=20 />
               }}
             </div>
@@ -173,20 +178,29 @@ let make = (~chainID, ~port, ~channel) => {
           <div className={Styles.card(theme, isDarkMode)}>
             <Text value="Last Tx Update" size=Text.Xl />
             <VSpacing size=Spacing.sm />
-            <div>
-              {switch (totalInCount, totalOutCount) {
-              | (Data(totalInCount), Data(totalOutCount)) =>
-                // TODO: Can't get this value from mainnet, waiting for chain team create a new view
+            {switch channelInfo {
+            | Data(info) =>
+              switch info {
+              | Data({lastUpdate}) =>
+                lastUpdate->MomentRe.Moment.year === 1970
+                  ? <Text
+                      value={"N/A"} code=true color={theme.neutral_900} weight={Bold} size=Text.Xxxl
+                    />
+                  : <TimeAgos
+                      time={lastUpdate}
+                      size=Text.Xxxl
+                      color={theme.neutral_900}
+                      code=true
+                      weight={Bold}
+                    />
+              | _ =>
                 <Text
-                  size=Text.Xxxl
-                  value={(totalInCount + totalOutCount)->Format.iPretty}
-                  code=true
-                  color={theme.neutral_900}
-                  weight={Bold}
+                  value={"N/A"} code=true color={theme.neutral_900} weight={Bold} size=Text.Xxxl
                 />
-              | _ => <LoadingCensorBar width=100 height=20 />
-              }}
-            </div>
+              }
+
+            | _ => <LoadingCensorBar width=100 height=20 />
+            }}
           </div>
         </Col>
       </Row>

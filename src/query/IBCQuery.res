@@ -211,8 +211,8 @@ let toExternal = ({
 }
 
 module IncomingPacketsConfig = %graphql(`
-    query IncomingPackets($limit: Int!, $offset: Int! $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $chainID: String!)  {
-    incoming_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType},  dst_port: {_ilike: $port}, dst_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) @ppxAs(type: "internal_t"){
+    query IncomingPackets($limit: Int!, $offset: Int! $packetType: String!,  $port: String!, $channel: String!)  {
+    incoming_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: { _like: $packetType},  dst_port: {_eq: $port}, dst_channel: {_eq: $channel} }) @ppxAs(type: "internal_t"){
         packetType: type
         srcPort: src_port
         srcChannel: src_channel
@@ -228,18 +228,13 @@ module IncomingPacketsConfig = %graphql(`
         block  @ppxAs(type: "block_t") {
           timestamp @ppxCustom(module: "GraphQLParserModule.Date")
         }
-        # channel @ppxAs(type: "channel_t")  {
-        #   connection @ppxAs(type: "connection_t") {
-        #     counterPartyChainID: counterparty_chain_id
-        #   }
-        # }
       }
     }
 `)
 
 module OutgoingPacketsConfig = %graphql(`
-    query OutgoingPackets($limit: Int!, $offset: Int!, $packetType: String!, $packetTypeIsNull: Boolean!, $port: String!, $channel: String!, $chainID: String!,)  {
-        outgoing_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: {_is_null: $packetTypeIsNull, _ilike: $packetType}, src_port: {_ilike: $port}, src_channel: {_ilike: $channel}, channel:{connection: {counterparty_chain: {chain_id: {_ilike: $chainID}}}}}) @ppxAs(type: "internal_t"){
+    query OutgoingPackets($limit: Int!, $offset: Int!, $packetType: String!, $port: String!, $channel: String!)  {
+        outgoing_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: { _ilike: $packetType}, src_port: {_eq: $port}, src_channel: {_eq: $channel} }) @ppxAs(type: "internal_t"){
             packetType: type
             srcPort: src_port
             srcChannel: src_channel
@@ -255,11 +250,6 @@ module OutgoingPacketsConfig = %graphql(`
             block  @ppxAs(type: "block_t")  {
               timestamp @ppxCustom(module: "GraphQLParserModule.Date")
             }
-            # channel @ppxAs(type: "channel_t")  {
-            #   connection @ppxAs(type: "connection_t") {
-            #     counterPartyChainID: counterparty_chain_id
-            #   }
-            # }
         }
     }
 `)
@@ -299,21 +289,22 @@ let getList = (~page, ~pageSize, ~direction, ~packetType, ~port, ~channel, ~chai
           | _ => "%%"
           }
         },
-        packetTypeIsNull: {
-          switch packetTypeIsNull {
-          | Some(true) => true
-          | _ => false
-          }
-        },
+        // packetTypeIsNull: {
+        //   switch packetTypeIsNull {
+        //   | Some(true) => true
+        //   | _ => false
+        //   }
+        // },
         port: {
           port !== "" ? port : "%%"
         },
         channel: {
           channel !== "" ? channel : "%%"
         },
-        chainID: {
-          chainID !== "" ? chainID : "%%"
-        },
+
+        // chainID: {
+        //   chainID !== "" ? chainID : "%%"
+        // },
       },
       ~pollInterval=5000,
     )
@@ -338,21 +329,22 @@ let getList = (~page, ~pageSize, ~direction, ~packetType, ~port, ~channel, ~chai
           | _ => "%%"
           }
         },
-        packetTypeIsNull: {
-          switch packetTypeIsNull {
-          | Some(true) => true
-          | _ => false
-          }
-        },
+        // packetTypeIsNull: {
+        //   switch packetTypeIsNull {
+        //   | Some(true) => true
+        //   | _ => false
+        //   }
+        // },
         port: {
           port !== "" ? port : "%%"
         },
         channel: {
           channel !== "" ? channel : "%%"
         },
-        chainID: {
-          chainID !== "" ? chainID : "%%"
-        },
+
+        // chainID: {
+        //   chainID !== "" ? chainID : "%%"
+        // },
       },
       ~pollInterval=5000,
     )

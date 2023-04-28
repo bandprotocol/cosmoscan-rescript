@@ -86,11 +86,9 @@ let make = () => {
   let (showActive, setShowActive) = React.useState(() => true)
 
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
-  // React.useEffect1(() => {
-  //   setPage(_ => 1)
-  //   None
-  // }, [searchTerm])
   let chainIDFilterSub = IBCFilterSub.getChainFilterList()
+
+  Js.log(chainIDFilterSub)
 
   <Section ptSm=32 pbSm=32>
     <div className=CssHelper.container id="ibcSection">

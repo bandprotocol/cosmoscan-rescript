@@ -18,8 +18,7 @@ type channel_t = {
   order: string,
   incomingPacketsCount: IBCSub.PacketsAggregate.internal_t,
   outgoingPacketsCount: IBCSub.PacketsAggregate.internal_t,
-  incomingPacketTimeStamp: array<packet_t>,
-  outgoingPacketTimeStamp: array<packet_t>,
+  lastUpdate: MomentRe.Moment.t,
 }
 
 type external_channel_t = {
@@ -30,7 +29,7 @@ type external_channel_t = {
   state: state_t,
   order: string,
   totalPacketsCount: int,
-  latestTx: option<MomentRe.Moment.t>,
+  lastUpdate: MomentRe.Moment.t,
 }
 
 type internal_t = {
@@ -80,23 +79,7 @@ let toExternal = (
       state: channel.state,
       order: channel.order,
       totalPacketsCount,
-      latestTx: switch (channel.incomingPacketTimeStamp, channel.outgoingPacketTimeStamp) {
-      | ([], [outgoingPacket]) => Some(outgoingPacket.block.timestamp)
-      | ([incomingPacket], []) => Some(incomingPacket.block.timestamp)
-      | ([incomingPacket], [outgoingPacket]) => {
-          let incomingTimestamp = incomingPacket.block.timestamp
-          let outgoingTimestamp = outgoingPacket.block.timestamp
-          let latestTimestamp =
-            incomingTimestamp->MomentRe.Moment.isAfter(outgoingTimestamp)
-              ? incomingTimestamp
-              : outgoingTimestamp
-          Some(latestTimestamp)
-        }
-
-      | ([], [])
-      | (_, _) =>
-        None
-      },
+      lastUpdate: channel.lastUpdate,
     }
   }),
 }
@@ -136,30 +119,21 @@ module Order = {
 }
 
 module MultiConfig = %graphql(`
-  subscription Connections($limit: Int!, $offset: Int!, $chainID: String!, $connectionID: String!, $state: Int_comparison_exp) {
-    connections(offset: $offset, limit: $limit, where: {counterparty_chain: {chain_id: {_ilike: $chainID}}, connection_id: {_ilike: $connectionID}}) @ppxAs(type: "internal_t") {
+  query Connections($limit: Int!, $offset: Int!, $chainID: String!, $connectionID: String!, $state: Int_comparison_exp) {
+    connections(offset: $offset, limit: $limit, where: {counterparty_chain_id: {_eq: $chainID}, connection_id: {_ilike: $connectionID}, channels: { state: $state }}) @ppxAs(type: "internal_t") {
       connectionID: connection_id
       clientID: client_id
       counterpartyClientID: counterparty_client_id
       counterpartyChainID: counterparty_chain_id
       counterpartyConnectionID: counterparty_connection_id
-      channels (where: {state: $state }) @ppxAs(type: "channel_t") {
+      channels @ppxAs(type: "channel_t") {
         channelID: channel
         counterpartyPort: counterparty_port
         counterpartyChannelID: counterparty_channel
         order @ppxCustom(module: "Order")
         state @ppxCustom(module: "State")
         port
-        incomingPacketTimeStamp: incoming_packets(limit: 1) @ppxAs(type: "packet_t"){
-          block @ppxAs(type: "block_t")  {
-            timestamp @ppxCustom(module: "GraphQLParserModule.Date")
-          }
-        }
-        outgoingPacketTimeStamp: outgoing_packets(limit: 1) @ppxAs(type: "packet_t"){
-          block @ppxAs(type: "block_t")  {
-            timestamp @ppxCustom(module: "GraphQLParserModule.Date")
-          }
-        }
+        lastUpdate: last_update @ppxCustom(module: "GraphQLParserModule.Date")
         incomingPacketsCount: incoming_packets_aggregate @ppxAs(type: "IBCSub.PacketsAggregate.internal_t") {
           aggregate @ppxAs(type: "IBCSub.PacketsAggregate.aggregate_t") {
             count
@@ -170,6 +144,7 @@ module MultiConfig = %graphql(`
                 count
             }
         }
+        
       }
     }
   }
@@ -207,7 +182,7 @@ let getList = (~counterpartyChainID, ~connectionID, ~page, ~pageSize, ~state: bo
     offset,
   })
 
-  result->Sub.fromData->Sub.map(internal => internal.connections->Belt.Array.map(toExternal))
+  result->Query.fromData->Query.map(internal => internal.connections->Belt.Array.map(toExternal))
 }
 
 let getCount = (~counterpartyChainID, ~connectionID, ()) => {
