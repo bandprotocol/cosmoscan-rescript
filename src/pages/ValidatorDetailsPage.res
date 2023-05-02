@@ -271,14 +271,13 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
           </InfoContainer>
         </Col>
       </Row>
-      // TODO: Implement later with wallet module
-      // {isMobile
-      //   ? React.null
-      //   : <Row marginBottom=24>
-      //       <Col>
-      //         <ValidatorStakingInfo validatorAddress=address />
-      //       </Col>
-      //     </Row>}
+      {isMobile
+        ? React.null
+        : <Row marginBottom=24>
+            <Col>
+              <ValidatorStakingInfo validatorAddress=address />
+            </Col>
+          </Row>}
       // Validator Information
       <Row marginBottom=24>
         <Col>

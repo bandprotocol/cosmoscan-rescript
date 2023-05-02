@@ -32,13 +32,14 @@ type t =
   | BlockPage
   | BlockDetailsPage(int)
   | RequestHomePage
-  | RequestIndexPage(int)
+  | RequestDetailsPage(int)
   | AccountIndexPage(Address.t, account_tab_t)
   | ValidatorsPage
   | ValidatorDetailsPage(Address.t, validator_tab_t)
   | ProposalPage
   | ProposalDetailsPage(int)
-  | IBCHomePage
+  | RelayersHomepage
+  | ChannelDetailsPage(string, string, string)
 
 let fromUrl = (url: RescriptReactRouter.url) =>
   // TODO: We'll handle the NotFound case for Datasources and Oraclescript later
@@ -82,7 +83,7 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     }
 
   | (list{"requests"}, _) => RequestHomePage
-  | (list{"request", reqID}, _) => RequestIndexPage(reqID->Parse.mustParseInt)
+  | (list{"request", reqID}, _) => RequestDetailsPage(reqID->Parse.mustParseInt)
   | (list{"account", address}, hash) =>
     let urlHash = hash =>
       switch hash {
@@ -108,7 +109,9 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     }
   | (list{"proposals"}, _) => ProposalPage
   | (list{"proposal", proposalID}, _) => ProposalDetailsPage(proposalID->Parse.mustParseInt)
-  | (list{"ibcs"}, _) => IBCHomePage
+  | (list{"relayers"}, _) => RelayersHomepage
+  | (list{"relayers", counterparty, port, channelID}, _) =>
+    ChannelDetailsPage(counterparty, port, channelID)
   | (list{}, _) => HomePage
   | (_, _) => NotFound
   }
@@ -155,8 +158,9 @@ let toAbsoluteString = route =>
       let validatorAddressBech32 = validatorAddress->Address.toOperatorBech32
       `/validator/${validatorAddressBech32}#proposed-blocks`
     }
+
   | ProposalPage => "/proposals"
-  | IBCHomePage => "/ibcs"
+  | RelayersHomepage => "/relayers"
   | HomePage => "/"
   | NotFound => "/notfound"
   | _ => "/"
@@ -186,7 +190,7 @@ let toString = route =>
   | BlockPage => "/blocks"
   | BlockDetailsPage(height) => `/block/${height->Belt.Int.toString}`
   | RequestHomePage => "/requests"
-  | RequestIndexPage(reqID) => `/request/${reqID->Belt.Int.toString}`
+  | RequestDetailsPage(reqID) => `/request/${reqID->Belt.Int.toString}`
   | AccountIndexPage(address, AccountDelegations) => {
       let addressBech32 = address->Address.toBech32
       `/account/${addressBech32}#delegations`
@@ -224,7 +228,8 @@ let toString = route =>
 
   | ProposalPage => "/proposals"
   | ProposalDetailsPage(proposalID) => `/proposal/${proposalID->Belt.Int.toString}`
-  | IBCHomePage => "/ibcs"
+  | RelayersHomepage => "/relayers"
+  | ChannelDetailsPage(chainID, port, channel) => `/relayers/${chainID}/${port}/${channel}`
   | HomePage => "/"
   | NotFound => "/notfound"
   }
@@ -252,7 +257,7 @@ let search = (str: string) => {
     ))
   } else if capStr->Js.String2.startsWith("R") {
     let requestIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
-    requestIDOpt->Belt.Option.map(requestID => RequestIndexPage(requestID))
+    requestIDOpt->Belt.Option.map(requestID => RequestDetailsPage(requestID))
   } else if capStr->Js.String2.startsWith("O") {
     let oracleScriptIDOpt = str->String.sub(1, len - 1)->Belt.Int.fromString
     oracleScriptIDOpt->Belt.Option.map(oracleScriptID => OracleScriptDetailsPage(

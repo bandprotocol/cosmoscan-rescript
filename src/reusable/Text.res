@@ -170,7 +170,7 @@ let make = (
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   tooltipItem == React.null
-    ? <span
+    ? <p
         className={Css.merge(list{
           Styles.fontSize(size),
           Styles.fontWeight(weight),
@@ -188,7 +188,7 @@ let make = (
           breakAll ? Styles.breakAll : "",
         })}>
         {React.string(value)}
-      </span>
+      </p>
     : <Tooltip
         title=tooltipItem
         placement={tooltipPlacement->toPlacementString}

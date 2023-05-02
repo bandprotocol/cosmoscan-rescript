@@ -1,5 +1,5 @@
 @react.component
-let make = (~txHash, ~messages: list<Msg.t>) => {
+let make = (~txHash, ~messages: list<Msg.result_t>) => {
   let theme = List.nth(messages, 0).decoded->Msg.getBadge
   let length = List.length(messages)
 

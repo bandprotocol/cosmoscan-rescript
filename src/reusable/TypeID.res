@@ -76,7 +76,7 @@ module ComponentCreator = (RawID: ID.IDSig) => {
           height={position->lineHeight}
           nowrap=true
           code=true
-          block=true
+          block
           color=theme.primary_600
         />
         {details != ""

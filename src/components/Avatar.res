@@ -34,18 +34,18 @@ module Keybase = {
       | Some(url) =>
         Some(
           <img
-            src=url 
+            src=url
             alt={moniker ++ " Avatar"}
             className={CssJs.merge(. [Styles.avatar(width), Styles.avatarSm(widthSm)])}
           />,
         )
       | None =>
         // Log for debug
-        Js.Console.log3("none", identity, res)
+        // Js.Console.log3("none", identity, res)
         Some(<Placeholder moniker width widthSm />)
       | exception err =>
         // Log for debug
-        Js.Console.log3(identity, res, err)
+        // Js.Console.log3(identity, res, err)
         Some(<Placeholder moniker width widthSm />)
       }
     | None => None

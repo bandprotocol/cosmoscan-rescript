@@ -11,7 +11,7 @@ module Styles = {
       fontSize(#px(14)),
       fontWeight(#light),
       border(#px(1), #solid, theme.neutral_100),
-      backgroundColor(theme.neutral_100),
+      backgroundColor(theme.neutral_000),
       outlineStyle(#none),
       color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),

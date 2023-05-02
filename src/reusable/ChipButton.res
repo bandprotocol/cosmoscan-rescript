@@ -38,12 +38,12 @@ module Styles = {
         backgroundColor(theme.primary_600),
         color(theme.white),
         border(#px(1), #solid, theme.primary_600),
-        hover([backgroundColor(theme.primary_800)]),
+        hover([backgroundColor(theme.primary_600)]),
         active([backgroundColor(theme.primary_600)]),
         disabled([
-          backgroundColor(isDarkMode ? theme.primary_800 : theme.primary_500),
+          backgroundColor(isDarkMode ? theme.primary_600 : theme.neutral_200),
           color(Theme.white),
-          borderColor(isDarkMode ? theme.primary_800 : theme.primary_500),
+          borderColor(isDarkMode ? theme.primary_600 : theme.neutral_200),
           opacity(0.5),
         ]),
       ])

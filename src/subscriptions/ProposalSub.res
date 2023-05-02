@@ -36,6 +36,7 @@ module Plan = {
   }
 }
 
+// TODO: Create data type for each proposal type
 module Content = {
   type t = {
     title: string,
@@ -121,7 +122,7 @@ type t = {
   name: string,
   status: proposal_status_t,
   description: string,
-  content: option<Content.t>,
+  content: Content.t,
   submitTime: MomentRe.Moment.t,
   depositEndTime: MomentRe.Moment.t,
   votingStartTime: MomentRe.Moment.t,
@@ -171,7 +172,8 @@ let toExternal = ({
     name: title,
     status,
     description,
-    content: contentOpt->JsonUtils.Decode.mustDecodeOpt(Content.decode),
+    // TODO: This field expect to exist on every proposals, will fix schema to be required field
+    content: contentOpt->Belt.Option.getExn->JsonUtils.Decode.mustDecode(Content.decode),
     submitTime,
     depositEndTime,
     votingStartTime,

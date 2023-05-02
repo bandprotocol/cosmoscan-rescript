@@ -1,3 +1,9 @@
+module Styles = {
+  open CssJs
+
+  let execContainers = (theme: Theme.t) =>
+    style(. [padding(#px(20)), backgroundColor(theme.neutral_100), borderRadius(#px(4))])
+}
 module Calldata = {
   @react.component
   let make = (~schema, ~calldata) => {
@@ -50,6 +56,7 @@ type content_inner_t =
   | VoteWeighted(Belt.List.t<Msg.Gov.VoteWeighted.Options.t>)
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
+  | ExecList(list<Msg.msg_t>)
 
 type content_t = {
   title: string,
@@ -150,11 +157,13 @@ let renderValue = v => {
         ),
       ])}
     />
+  // Noted: We support only 1 level of exec (no recursion)
+  | ExecList(msgs) => React.null
   }
 }
 
 module CreateDataSource = {
-  let factory = (msg: Msg.Oracle.CreateDataSource.t<'a>, firsts) =>
+  let factory = (msg: Msg.Oracle.CreateDataSource.internal_t<'a>, firsts) =>
     firsts->Belt.Array.concat([
       {title: "Owner", content: Address(msg.owner), order: 2},
       {title: "Treasury", content: Address(msg.treasury), order: 3},
@@ -331,7 +340,7 @@ module EditOracleScript = {
 }
 
 module Send = {
-  let factory = (msg: Msg.Bank.Send.t) => [
+  let factory = (msg: Msg.Bank.Send.internal_t) => [
     {
       title: "From",
       content: Address(msg.fromAddress),
@@ -358,8 +367,8 @@ module Report = {
       order: 1,
     },
     {
-      title: "Reporter",
-      content: Address(msg.reporter),
+      title: "Validator",
+      content: ValidatorAddress(msg.validator),
       order: 2,
     },
     {
@@ -414,21 +423,6 @@ module Revoke = {
     },
   ]
 }
-
-// module RevokeAllowance = {
-//   let factory = (msg: Msg.RevokeAllowance.t) => [
-//     {
-//       title: "Granter",
-//       content: Address(msg.granter),
-//       order: 1,
-//     },
-//     {
-//       title: "Grantee",
-//       content: Address(msg.grantee),
-//       order: 2,
-//     },
-//   ]
-// }
 
 module GrantAllowance = {
   let factory = (msg: Msg.FeeGrant.GrantAllowance.t) => [
@@ -1855,47 +1849,79 @@ let getContent = msg => {
     | Msg.Application.Transfer.Failure(data) => Transfer.failed(data)
     }
   | Msg.MultiSendMsg(data) => MultiSend.factory(data)
-
+  | Msg.ExecMsg(msg) => [
+      {
+        title: "Grantee",
+        content: Address(msg.grantee),
+        order: 1,
+      },
+      {
+        title: "Executed Messages",
+        content: ExecList(msg.msgs),
+        order: 2,
+      },
+    ]
   | Msg.UnknownMsg => []
   }
 }
 
-@react.component
-let make = (~contents: array<content_t>) => {
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+module MessageItem = {
+  @react.component
+  let make = (~title, ~content: content_inner_t) => {
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  {
-    contents
-    ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
-    ->Belt.Array.mapWithIndex((i, content) => {
-      { 
-        switch content.heading {
-        | Some(headerText) => <div key={i->Belt.Int.toString}>
-          <SeperatedLine mt=0 mb=24 />
-          <Row>
-            <Col mb=24>
-              <Heading value=headerText size=Heading.H4 color={theme.neutral_600} />
-            </Col>
-          </Row>
-        </div>
-        | None => 
-        <Row key={i->Belt.Int.toString} marginBottom=0 marginBottomSm=24>
-          <Col col=Col.Four mb=16 mbSm=8>
+    <Row marginBottom=0 marginBottomSm=24>
+      {switch content {
+      | ExecList(msgs) =>
+        <Col col=Col.Twelve>
+          {msgs
+          ->Belt.List.toArray
+          ->Belt.Array.mapWithIndex((i, msg) => {
+            let contents = getContent(msg)
+            contents
+            ->Belt.Array.map(c => {
+              <Row marginBottom=0 marginBottomSm=24>
+                <Col col=Col.Three mb=16 mbSm=8>
+                  <Heading
+                    value={c.title}
+                    size=Heading.H4
+                    weight=Heading.Regular
+                    marginBottom=8
+                    color=theme.neutral_600
+                  />
+                </Col>
+                <Col col=Col.Nine mb=16 mbSm=8> {renderValue(c.content)} </Col>
+              </Row>
+            })
+            ->React.array
+          })
+          ->React.array}
+        </Col>
+
+      | _ =>
+        <>
+          <Col col=Col.Three mb=16 mbSm=8>
             <Heading
-              value={content.title}
+              value={title}
               size=Heading.H4
               weight=Heading.Regular
               marginBottom=8
               color=theme.neutral_600
             />
           </Col>
-          <Col col=Col.Eight mb=16 mbSm=8 key={i->Belt.Int.toString}>
-            {renderValue(content.content)}
-          </Col>
-        </Row>
-        } 
-      }
-    })
-    ->React.array
+          <Col col=Col.Nine mb=16 mbSm=8> {renderValue(content)} </Col>
+        </>
+      }}
+    </Row>
   }
+}
+
+@react.component
+let make = (~contents: array<content_t>) => {
+  contents
+  ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
+  ->Belt.Array.mapWithIndex((i, {content, title}) => {
+    <MessageItem key={i->string_of_int} title={title} content={content} />
+  })
+  ->React.array
 }

@@ -2,7 +2,7 @@ module Styles = {
   open CssJs
   let msgBadge = (theme: Theme.t) =>
     style(. [
-      maxWidth(#px(80)),
+      minWidth(#px(80)),
       backgroundColor(theme.neutral_700),
       border(#px(1), #solid, theme.neutral_600),
       borderRadius(#px(50)),
@@ -10,19 +10,19 @@ module Styles = {
       padding2(~v=#zero, ~h=#px(12)),
       whiteSpace(#pre),
       display(#inlineFlex),
-      Media.mobile([maxWidth(#px(200))])
-    ]);
-};
+      Media.mobile([maxWidth(#px(200))]),
+    ])
+}
 
 @react.component
 let make = (~name) => {
-  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   <div
     className={Css.merge(list{
       CssHelper.flexBox(~wrap=#nowrap, ~justify=#center, ()),
       Styles.msgBadge(theme),
     })}>
-    <Text 
+    <Text
       value=name
       size=Text.Body2
       weight=Text.Semibold
@@ -30,5 +30,5 @@ let make = (~name) => {
       align=Text.Center
       ellipsis=true
     />
-  </div>;
-};
+  </div>
+}

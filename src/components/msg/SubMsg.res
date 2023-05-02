@@ -48,7 +48,7 @@ let makeBadge = (name, length, color1, color2) =>
   </div>
 
 @react.component
-let make = (~msg: Msg.t) => {
+let make = (~msg: Msg.result_t) => {
   let badge = msg.decoded->Msg.getBadge
   <div
     className={CssJs.merge(. [
@@ -60,6 +60,7 @@ let make = (~msg: Msg.t) => {
     <MsgFront name=badge.name fromAddress={msg.sender} />
     {switch msg.decoded {
     | SendMsg({toAddress, amount}) => <TokenMsg.SendMsg toAddress amount />
+    | MultiSendMsg(msg) => <TokenMsg.MultisendMsg inputs={msg.inputs} outputs={msg.outputs} />
     | CreateDataSourceMsg(msg) =>
       switch msg {
       | Msg.Oracle.CreateDataSource.Success(m) => <OracleMsg.CreateDataSourceMsg.Success msg=m />
@@ -74,7 +75,6 @@ let make = (~msg: Msg.t) => {
         <OracleMsg.CreateOracleScriptMsg.Failure msg=f />
       }
     | EditOracleScriptMsg(msg) => <OracleMsg.EditOracleScriptMsg id=msg.id name=msg.name />
-
     | RequestMsg(msg) =>
       switch msg {
       | Msg.Oracle.Request.Success(m) => <OracleMsg.RequestMsg.Success msg=m />
@@ -176,7 +176,8 @@ let make = (~msg: Msg.t) => {
       | Msg.Application.Transfer.Success({receiver, token}) => <IBCTransferMsg.Transfer toAddress=receiver amount={token.amount} denom={token.denom} />
       | Msg.Application.Transfer.Failure(f) => React.null
       }
-    | MultiSendMsg(msg) => <TokenMsg.MultisendMsg inputs={msg.inputs} outputs={msg.outputs} />
+    | ExecMsg(msg) => <ValidatorMsg.Exec messages={msg.msgs} />
+
     // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
     // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
     // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />

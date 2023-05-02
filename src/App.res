@@ -46,12 +46,13 @@ let make = () => {
       | ValidatorsPage => <ValidatorsPage />
       | ValidatorDetailsPage(address, hashtag) => <ValidatorDetailsPage address hashtag />
       | RequestHomePage => <RequestHomePage />
-      | RequestIndexPage(reqID) => <RequestIndexPage reqID=ID.Request.ID(reqID) />
+      | RequestDetailsPage(reqID) => <RequestDetailsPage reqID=ID.Request.ID(reqID) />
       | AccountIndexPage(address, hashtag) => <AccountIndexPage address hashtag />
       | ProposalPage => <ProposalPage />
       | ProposalDetailsPage(proposalID) =>
         <ProposalDetailsPage proposalID=ID.Proposal.ID(proposalID) />
-      | IBCHomePage => <IBCHomePage />
+      | RelayersHomepage => <RelayersHomepage />
+      | ChannelDetailsPage(chainID, port, channel) => <ChannelPage chainID channel port />
       | NotFound => <NotFound />
       }}
     </div>

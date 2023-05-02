@@ -10,7 +10,7 @@ type t = {
   gasUsed: int,
   sender: Address.t,
   timestamp: MomentRe.Moment.t,
-  messages: list<Msg.t>,
+  messages: list<Msg.result_t>,
   memo: string,
   errMsg: string,
 }

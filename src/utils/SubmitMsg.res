@@ -18,7 +18,7 @@ let toString = x =>
   | Vote(_) => "Vote"
   }
 
-let gasLimit = x =>
+let defaultGasLimit = x =>
   switch x {
   | Send(_)
   | Delegate(_)

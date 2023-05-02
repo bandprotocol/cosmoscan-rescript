@@ -4,7 +4,7 @@ module Styles = {
   let tableWrapper = style(. [Media.mobile([padding2(~v=#px(16), ~h=#zero)])])
 }
 
-let transform = (account, msg: Msg.t) => {
+let transform = (account, msg: Msg.result_t) => {
   // TODO: Bring it back when defind ReceiveMsg
   // let transformDecoded = switch decoded {
   // | SendMsg({toAddress, fromAddress, amount}) if Address.isEqual(toAddress, account) =>

@@ -1,7 +1,12 @@
-type baseAccount = {
+type base_account = {
   address: string,
   accountNumber: int,
   sequence: int,
+}
+
+type tx_response = {
+  txhash: string,
+  code: int,
 }
 
 module Client = {
@@ -15,10 +20,11 @@ module Client = {
   @send
   external getReferenceData: (t, array<string>, int, int) => promise<array<reference_data_t>> =
     "getReferenceData"
-  @send external getAccount: (t, string) => promise<baseAccount> = "getAccount"
+  @send external getAccount: (t, string) => promise<base_account> = "getAccount"
   @send external getChainId: t => promise<string> = "getChainId"
-  @send external sendTxBlockMode: (t, array<int>) => promise<'a> = "sendTxBlockMode"
-  @send external sendTxSyncMode: (t, array<int>) => promise<'a> = "sendTxSyncMode"
+  @send
+  external sendTxBlockMode: (t, array<int>) => promise<tx_response> = "sendTxBlockMode"
+  @send external sendTxSyncMode: (t, array<int>) => promise<tx_response> = "sendTxSyncMode"
 }
 
 module Address = {
