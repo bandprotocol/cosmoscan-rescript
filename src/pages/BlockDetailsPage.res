@@ -48,7 +48,7 @@ let make = (~height) => {
           <VSpacing size=Spacing.xxl />
           {height > latestBlock.height
              ? <Text
-                 value=j`This block(#B$height) hasn't mined yet.`
+                 value=j`This block(${height->ID.Block.toString}) hasn't mined yet.`
                  size=Text.Body1
                  color={theme.neutral_600}
                />
