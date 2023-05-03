@@ -58,5 +58,6 @@ let make = () => {
     </div>
     <Footer />
     <Modal />
+    <CookieBar />
   </div>
 }
