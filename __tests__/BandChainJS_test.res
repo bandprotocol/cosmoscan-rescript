@@ -2,7 +2,7 @@ open Jest
 open BandChainJS
 open Expect
 
-let mnemonic = "mule way gather advance quote endorse boat liquid kite mad cart"
+let mnemonic = "test"
 
 describe("Expect BandChainJS Client Module binding work correctly", () => {
   testPromise("getReferenceData", async () => {
@@ -21,7 +21,7 @@ describe("Expect BandChainJS PrivateKey Module binding work correctly", () => {
   test("fromMnemonic then toPubkey", () =>
     expect(
       mnemonic
-      ->PrivateKey.fromMnemonic("test")
+      ->PrivateKey.fromMnemonic("m/44'/494'/0'/0/0")
       ->PrivateKey.toPubkey
       ->PubKey.toAddress
       ->Address.toAccBech32,
@@ -50,14 +50,14 @@ describe("Expect BandChainJS PubKey Module binding work correctly", () => {
 
   test("toBech32", () =>
     expect(
-      mnemonic->PrivateKey.fromMnemonic("test")->PrivateKey.toPubkey->PubKey.toBech32("band"),
-    )->toEqual("band1addwnpepqvzkxlgphmkh4z0wg5lrpsrrgfl7hymwtfz5kzgmmdvwqk70hq67vyrctrw")
+      mnemonic->PrivateKey.fromMnemonic("m/44'/494'/0'/0/0")->PrivateKey.toPubkey->PubKey.toBech32("band"),
+    )->toEqual("band1addwnpepqt79xhl2m49qfpre5jf9td3q64y8r9cxwm26fmzaug2vsrfcwsg0v70ls97")
   )
 
   test("toAddress", () =>
     expect(
       mnemonic
-      ->PrivateKey.fromMnemonic("test")
+      ->PrivateKey.fromMnemonic("m/44'/494'/0'/0/0")
       ->PrivateKey.toPubkey
       ->PubKey.toAddress
       ->Address.toAccBech32,
@@ -228,8 +228,7 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
 
   test("MsgRequest", () =>
     expect({
-      let mnemo = "mule way gather advance quote endorse boat liquid kite mad cart"
-      let privKey = PrivateKey.fromMnemonic(mnemo, "test")
+      let privKey = PrivateKey.fromMnemonic("test", "m/44'/494'/0'/0/0")
       let pub = privKey->PrivateKey.toPubkey
       let address = pub->PubKey.toAddress->Address.toAccBech32
 
@@ -289,8 +288,7 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
 
 describe("Expect BandChainJS Transaction Module binding work correctly", () => {
   testPromise("create Address fromhex and call toHex", async () => {
-    let mnemo = "mule way gather advance quote endorse boat liquid kite mad cart"
-    let privKey = PrivateKey.fromMnemonic(mnemo, "test")
+    let privKey = PrivateKey.fromMnemonic("test", "m/44'/494'/0'/0/0")
     let pub = privKey->PrivateKey.toPubkey
     let address = pub->PubKey.toAddress->Address.toAccBech32
 
