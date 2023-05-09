@@ -265,10 +265,6 @@ let search = (str: string) => {
       OracleScriptRequests,
     ))
   } else {
-    // switch str->Belt.Int.fromString {
-    // | Some(blockID) => Some(BlockDetailsPage(blockID))
-    // | None => None
-    // }
     None
   }->Belt.Option.getWithDefault(_, NotFound)
 }
