@@ -111,7 +111,7 @@ let getName = x =>
 @react.component
 let make = (~dropdown=false) => {
     let isMobile = Media.isMobile()
-    let currentRouteString = RescriptReactRouter.useUrl() -> Route.fromUrl -> Route.toAbsoluteString
+    let currentRouteString = RescriptReactRouter.useUrl() -> Route.fromUrl -> Route.toString
     let (show, setShow) = React.useState(_ => false)
     let trackingSub = TrackingSub.use()
     let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context)

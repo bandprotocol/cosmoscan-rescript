@@ -70,7 +70,6 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     | Some(oracleScriptIDInt) => OracleScriptDetailsPage(oracleScriptIDInt, urlHash(hash))
     | None => NotFound
     }
-
   | (list{"txs"}, _) => TxHomePage
   | (list{"tx", txHash}, _) => TxIndexPage(Hash.fromHex(txHash))
   | (list{"validators"}, _) => ValidatorsPage
@@ -81,9 +80,13 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     | Some(block) => BlockDetailsPage(block)
     | None => NotFound
     }
-
   | (list{"requests"}, _) => RequestHomePage
-  | (list{"request", reqID}, _) => RequestDetailsPage(reqID->Parse.mustParseInt)
+  | (list{"request", reqID}, _) =>
+    let reqIDOpt = reqID->Belt.Int.fromString
+    switch reqIDOpt {
+    | Some(request) => RequestDetailsPage(request)
+    | None => NotFound
+    }
   | (list{"account", address}, hash) =>
     let urlHash = hash =>
       switch hash {
@@ -108,62 +111,17 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     | None => NotFound
     }
   | (list{"proposals"}, _) => ProposalPage
-  | (list{"proposal", proposalID}, _) => ProposalDetailsPage(proposalID->Parse.mustParseInt)
+  | (list{"proposal", proposalID}, _) => {
+    switch proposalID->Belt.Int.fromString {
+    | Some(proposal) => ProposalDetailsPage(proposal)
+    | None => NotFound
+    }
+    }
   | (list{"relayers"}, _) => RelayersHomepage
   | (list{"relayers", counterparty, port, channelID}, _) =>
     ChannelDetailsPage(counterparty, port, channelID)
   | (list{}, _) => HomePage
   | (_, _) => NotFound
-  }
-
-let toAbsoluteString = route =>
-  switch route {
-  | DataSourcePage => "/data-sources"
-  | OracleScriptPage => "/oracle-scripts"
-  | TxHomePage => "/txs"
-  | ValidatorsPage => "/validators"
-  | BlockPage => "/blocks"
-  | RequestHomePage => "/requests"
-  | AccountIndexPage(address, AccountDelegations) => {
-      let addressBech32 = address->Address.toBech32
-      `/account/${addressBech32}#delegations`
-    }
-
-  | AccountIndexPage(address, AccountUnbonding) => {
-      let addressBech32 = address->Address.toBech32
-      `/account/${addressBech32}#unbonding`
-    }
-
-  | AccountIndexPage(address, AccountRedelegate) => {
-      let addressBech32 = address->Address.toBech32
-      `/account/${addressBech32}#redelegate`
-    }
-
-  | ValidatorDetailsPage(validatorAddress, Delegators) => {
-      let validatorAddressBech32 = validatorAddress->Address.toOperatorBech32
-      `/validator/${validatorAddressBech32}#delegators`
-    }
-
-  | ValidatorDetailsPage(validatorAddress, Reports) => {
-      let validatorAddressBech32 = validatorAddress->Address.toOperatorBech32
-      `/validator/${validatorAddressBech32}#reports`
-    }
-
-  | ValidatorDetailsPage(validatorAddress, Reporters) => {
-      let validatorAddressBech32 = validatorAddress->Address.toOperatorBech32
-      `/validator/${validatorAddressBech32}#reporters`
-    }
-
-  | ValidatorDetailsPage(validatorAddress, ProposedBlocks) => {
-      let validatorAddressBech32 = validatorAddress->Address.toOperatorBech32
-      `/validator/${validatorAddressBech32}#proposed-blocks`
-    }
-
-  | ProposalPage => "/proposals"
-  | RelayersHomepage => "/relayers"
-  | HomePage => "/"
-  | NotFound => "/notfound"
-  | _ => "/"
   }
 
 let toString = route =>
