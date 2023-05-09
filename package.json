@@ -9,7 +9,7 @@
     "serve": "webpack serve --open",
     "server": "webpack-dev-server",
     "start": "rescript build -w -with-deps",
-    "test": "yarn jest --coverage"
+    "test": "jest --coverage"
   },
   "devDependencies": {
     "@glennsl/rescript-jest": "^0.9.2",

@@ -16,7 +16,8 @@ let pythonMatch = str => {
 }
 
 let getVariables = str => {
-  Js.String2.split("\n", str)
+  str
+  ->Js.String2.split("\n")
   ->Belt.Array.get(0)
   ->Belt.Option.flatMap(program =>
     switch program {
