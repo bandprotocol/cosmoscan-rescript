@@ -3,6 +3,7 @@ module Styles = {
 
   let header = (theme: Theme.t) =>
     style(. [
+      position(#relative),
       paddingTop(Spacing.lg),
       backgroundColor(theme.neutral_000),
       zIndex(3),
