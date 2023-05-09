@@ -52,5 +52,5 @@ describe("Expect Search Functionality to work correctly", () => {
       ),
     )
   )
-  test("test page not found", () => expect("D123DD"->search)->toEqual(NotFound))
+  test("test page not found", () => expect("asdasd"->search)->toEqual(NotFound))
 })
