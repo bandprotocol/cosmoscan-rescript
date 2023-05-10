@@ -2,7 +2,7 @@ open Jest
 open BandChainJS
 open Expect
 
-let mnemonic = "mule way gather advance quote endorse boat liquid kite mad cart"
+let mnemonic = "test"
 
 describe("Expect BandChainJS Client Module binding work correctly", () => {
   testPromise("getReferenceData", async () => {
@@ -25,7 +25,7 @@ describe("Expect BandChainJS PrivateKey Module binding work correctly", () => {
       ->PrivateKey.toPubkey
       ->PubKey.toAddress
       ->Address.toAccBech32,
-    )->toEqual("band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj")
+    )->toEqual("band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph")
   )
 })
 
@@ -51,7 +51,7 @@ describe("Expect BandChainJS PubKey Module binding work correctly", () => {
   test("toBech32", () =>
     expect(
       mnemonic->PrivateKey.fromMnemonic("m/44'/494'/0'/0/0")->PrivateKey.toPubkey->PubKey.toBech32("band"),
-    )->toEqual("band1addwnpepqvzkxlgphmkh4z0wg5lrpsrrgfl7hymwtfz5kzgmmdvwqk70hq67vyrctrw")
+    )->toEqual("band1addwnpepqt79xhl2m49qfpre5jf9td3q64y8r9cxwm26fmzaug2vsrfcwsg0v70ls97")
   )
 
   test("toAddress", () =>
@@ -61,7 +61,7 @@ describe("Expect BandChainJS PubKey Module binding work correctly", () => {
       ->PrivateKey.toPubkey
       ->PubKey.toAddress
       ->Address.toAccBech32,
-    )->toEqual("band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj")
+    )->toEqual("band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph")
   )
 })
 
@@ -228,8 +228,7 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
 
   test("MsgRequest", () =>
     expect({
-      let mnemo = "mule way gather advance quote endorse boat liquid kite mad cart"
-      let privKey = PrivateKey.fromMnemonic(mnemo, "m/44'/494'/0'/0/0")
+      let privKey = PrivateKey.fromMnemonic(mnemonic, "m/44'/494'/0'/0/0")
       let pub = privKey->PrivateKey.toPubkey
       let address = pub->PubKey.toAddress->Address.toAccBech32
 
@@ -261,7 +260,7 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
       ->Message.MsgRequest.toJSON
       ->Js.Json.stringifyAny
     })->toEqual(
-      Some(`{"type":"oracle/Request","value":{"ask_count":"4","calldata":"AAAAAQAAAANFVEgAAAAAAAAAZA==","oracle_script_id":"37","min_count":"3","client_id":"BandProtocol","sender":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","fee_limit":[{"denom":"uband","amount":"1000000"}],"prepare_gas":"50000","execute_gas":"200000"}}`),
+      Some(`{"type":"oracle/Request","value":{"ask_count":"4","calldata":"AAAAAQAAAANFVEgAAAAAAAAAZA==","oracle_script_id":"37","min_count":"3","client_id":"BandProtocol","sender":"band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph","fee_limit":[{"denom":"uband","amount":"1000000"}],"prepare_gas":"50000","execute_gas":"200000"}}`),
     )
   )
 
@@ -289,8 +288,7 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
 
 describe("Expect BandChainJS Transaction Module binding work correctly", () => {
   testPromise("create Address fromhex and call toHex", async () => {
-    let mnemo = "mule way gather advance quote endorse boat liquid kite mad cart"
-    let privKey = PrivateKey.fromMnemonic(mnemo, "m/44'/494'/0'/0/0")
+    let privKey = PrivateKey.fromMnemonic(mnemonic, "m/44'/494'/0'/0/0")
     let pub = privKey->PrivateKey.toPubkey
     let address = pub->PubKey.toAddress->Address.toAccBech32
 
