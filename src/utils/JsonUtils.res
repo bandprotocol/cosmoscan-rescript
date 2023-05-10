@@ -53,15 +53,15 @@ module Decode = {
 }
 
 // Example how to use
-type t = {
-  a: int,
-  b: option<string>,
-}
+// type t = {
+//   a: int,
+//   b: option<string>,
+// }
 
-let decode_t = Decode.buildObject(access => {
-  a: access.required(list{"a"}, Decode.int),
-  b: access.optional(list{"b"}, Decode.string),
-})
+// let decode_t = Decode.buildObject(access => {
+//   a: access.required(list{"a"}, Decode.int),
+//   b: access.optional(list{"b"}, Decode.string),
+// })
 
 // Or decode to value on specific field
 // let decode_field_a_to_int = Decode.buildObject(access => access.at(list{"a"}, Decode.int))
