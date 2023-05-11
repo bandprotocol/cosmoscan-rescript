@@ -38,14 +38,6 @@ let timestamp = json =>
 //   -> MomentRe.momentWithTimestampMS
 //   -> MomentRe.Moment.defaultUtc
 
-let timeNS =
-  JsonUtils.Decode.float->JsonUtils.Decode.map((. n) =>
-    (n /. 1e6)->MomentRe.momentWithTimestampMS->MomentRe.Moment.defaultUtc
-  )
-
-let timeString =
-  JsonUtils.Decode.string->JsonUtils.Decode.map((. s) => s->MomentRe.momentUtcDefaultFormat)
-
 let timestampOpt = Belt.Option.map(_, timestamp)
 
 let timestampWithDefault = jsonOpt =>
@@ -130,8 +122,8 @@ let coins = str => {
   // })
 }
 
-let addressExn = jsonOpt => jsonOpt->Belt.Option.getExn->Address.fromBech32
-let addressOpt = jsonOpt => jsonOpt->Belt.Option.map(_, Address.fromBech32)
+let addressExn = strOpt => strOpt->Belt.Option.getExn->Address.fromBech32
+let addressOpt = strOpt => strOpt->Belt.Option.map(_, Address.fromBech32)
 
 let numberWithDefault = jsonOpt =>
   jsonOpt->Belt.Option.flatMap(Js.Json.decodeNumber)->Belt.Option.getWithDefault(_, 0.0)
@@ -143,4 +135,4 @@ let floatWithDefault = jsonOpt =>
 
 let floatString = json => json->Js.Json.decodeString->Belt.Option.getExn->float_of_string
 
-let floatExn = jsonOpt => jsonOpt->Js.Json.decodeNumber->Belt.Option.getExn
+let floatExn = json => json->Js.Json.decodeNumber->Belt.Option.getExn
