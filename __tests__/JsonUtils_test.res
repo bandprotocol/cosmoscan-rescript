@@ -80,6 +80,18 @@ describe("Expect Decoder to work correctly", () => {
 
     json->mustDecode(bufferFromHex)
   })->toEqual(JsBuffer.fromHex("0x0235b618ab0f0e9f48b1af32f56b78d955c432279893714737a937035024b83c58=")))
+
+  test("timeNS", () => expect({
+    let json = `1683785808000000000`->Js.Json.parseExn
+
+    json->mustDecode(timeNS)
+  })->toEqual(1683785808->MomentRe.momentWithUnix->MomentRe.Moment.defaultUtc))
+
+  test("timeString", () => expect({
+    let json = `"2023-05-11T06:24:46.511Z"`->Js.Json.parseExn
+
+    json->mustDecode(timeString)
+  })->toEqual("2023-05-11T06:24:46.511Z"->MomentRe.momentUtcDefaultFormat))
 })
 
 describe("Expect mustGet to work correctly", () => {
