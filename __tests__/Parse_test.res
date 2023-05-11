@@ -18,6 +18,10 @@ describe("Expect parse from string to band amount", () => {
   test("shouldn't use invalid value", () => {
     expect(Result.Err("Invalid value"))->toEqual(getBandAmount(2000., "hello"))
   })
+
+  test("band amount shouldn't grater than 4", () => {
+    expect(Result.Err("Maximum precision is 6"))->toEqual(getBandAmount(2000000., "1.1234567"))
+  })
 })
 
 describe("Expect parse from string to Address", () => {
@@ -29,5 +33,25 @@ describe("Expect parse from string to Address", () => {
 
   test("shouldn't use invalid address", () => {
     expect(Result.Err("Invalid address"))->toEqual(address("2"))
+  })
+
+  test("notBandAddress should parse correctly", () => {
+    expect(Result.Ok(Address.fromBech32OptNotBandPrefix("cosmos1pdvm6paaenlelmga2qkr50thpkrzwxy33lrh7c")->Belt.Option.getExn))->toEqual(
+      notBandAddress("cosmos1pdvm6paaenlelmga2qkr50thpkrzwxy33lrh7c")
+    )
+  })
+
+  test("notBandAddress shouldn't parse invalid address", () => {
+    expect(Result.Err("Invalid address"))->toEqual(
+      notBandAddress("1")
+    )
+  })
+})
+
+describe("Expect parse from string to Int", () => {
+  test("mustParseInt should parse correctly", () => {
+    expect(123)->toEqual(
+      mustParseInt("123")
+    )
   })
 })
