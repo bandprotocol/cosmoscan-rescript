@@ -171,18 +171,18 @@ let decodeContent = (json, proposalType) => {
     open JsonUtils.Decode
     switch proposalType {
     | ProposalType.ParameterChange => {
-        let parameterChange = json->mustGet("changes", array(Content.decodeParameterChangeContent))
-        ParameterChange(parameterChange)
+        let contentObj = json->mustGet("changes", array(Content.decodeParameterChangeContent))
+        ParameterChange(contentObj)
       }
 
     | SoftwareUpgrade => {
-        let softwareUpgrade = json->mustGet("plan", Content.decodeSoftwareUpgradeContent)
-        SoftwareUpgrade(softwareUpgrade)
+        let contentObj = json->mustGet("plan", Content.decodeSoftwareUpgradeContent)
+        SoftwareUpgrade(contentObj)
       }
 
     | CommunityPoolSpend => {
-        let communityPoolSpend = json->mustDecode(Content.decodeCommunityPoolSpendContent)
-        CommunityPoolSpend(communityPoolSpend)
+        let contentObj = json->mustDecode(Content.decodeCommunityPoolSpendContent)
+        CommunityPoolSpend(contentObj)
       }
 
     | _ => Unknown
