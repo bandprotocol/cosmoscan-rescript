@@ -1,11 +1,48 @@
-module Changes = {
-  type changes_t = {
+module ProposalType = {
+  type t =
+    | SoftwareUpgrade
+    | ParameterChange
+    | CommunityPoolSpend
+    | Undefined
+
+  let parse = proposalType => {
+    switch proposalType {
+    | "SoftwareUpgrade" => SoftwareUpgrade
+    | "ParameterChange" => ParameterChange
+    | "CommunityPoolSpend" => CommunityPoolSpend
+    | _ => Undefined
+    }
+  }
+
+  let getBadgeText = proposalT => {
+    switch proposalT {
+    | CommunityPoolSpend => "Community Pool Spend"
+    | SoftwareUpgrade => "Software Upgrade"
+    | ParameterChange => "Parameter Change"
+    | Undefined => "Undefined"
+    }
+  }
+}
+
+module Content = {
+  type parameter_change_t = {
     subspace: string,
     key: string,
     value: string,
   }
 
-  let decode = {
+  type sofeware_upgrade_t = {
+    name: string,
+    time: MomentRe.Moment.t,
+    height: int,
+  }
+
+  type community_pool_spend_t = {
+    recipient: Address.t,
+    amount: list<Coin.t>,
+  }
+
+  let decodeParameterChangeContent = {
     open JsonUtils.Decode
 
     object(fields => {
@@ -14,16 +51,8 @@ module Changes = {
       value: fields.required(. "value", string),
     })
   }
-}
 
-module Plan = {
-  type plan_t = {
-    name: string,
-    time: MomentRe.Moment.t,
-    height: int,
-  }
-
-  let decode = {
+  let decodeSoftwareUpgradeContent = {
     open JsonUtils.Decode
 
     buildObject(json => {
@@ -34,29 +63,24 @@ module Plan = {
       }
     })
   }
-}
 
-// TODO: Create data type for each proposal type
-module Content = {
-  type t = {
-    title: string,
-    description: string,
-    changes: option<array<Changes.changes_t>>,
-    plan: option<Plan.plan_t>,
-  }
-
-  let decode = {
+  let decodeCommunityPoolSpendContent = {
     open JsonUtils.Decode
-    object(fields => {
+
+    buildObject(json => {
       {
-        title: fields.required(. "title", string),
-        description: fields.required(. "description", string),
-        changes: fields.optional(. "changes", array(Changes.decode)),
-        plan: fields.optional(. "plan", Plan.decode),
+        recipient: json.required(list{"recipient"}, address),
+        amount: json.required(list{"amount"}, list(Coin.decodeCoin)),
       }
     })
   }
 }
+
+type content_t =
+  | SoftwareUpgrade(Content.sofeware_upgrade_t)
+  | ParameterChange(array<Content.parameter_change_t>)
+  | CommunityPoolSpend(Content.community_pool_spend_t)
+  | Unknown
 
 type proposal_status_t =
   | Deposit
@@ -122,13 +146,13 @@ type t = {
   name: string,
   status: proposal_status_t,
   description: string,
-  content: Content.t,
+  content: content_t,
   submitTime: MomentRe.Moment.t,
   depositEndTime: MomentRe.Moment.t,
   votingStartTime: MomentRe.Moment.t,
   votingEndTime: MomentRe.Moment.t,
   proposerAddressOpt: option<Address.t>,
-  proposalType: string,
+  proposalType: ProposalType.t,
   endTotalYes: float,
   endTotalYesPercent: float,
   endTotalNo: float,
@@ -140,6 +164,31 @@ type t = {
   endTotalVote: float,
   totalBondedTokens: option<float>,
   totalDeposit: list<Coin.t>,
+}
+
+let decodeContent = (json, proposalType) => {
+  let content = {
+    open JsonUtils.Decode
+    switch proposalType {
+    | ProposalType.ParameterChange => {
+        let parameterChange = json->mustGet("changes", array(Content.decodeParameterChangeContent))
+        ParameterChange(parameterChange)
+      }
+
+    | SoftwareUpgrade => {
+        let softwareUpgrade = json->mustGet("plan", Content.decodeSoftwareUpgradeContent)
+        SoftwareUpgrade(softwareUpgrade)
+      }
+
+    | CommunityPoolSpend => {
+        let communityPoolSpend = json->mustDecode(Content.decodeCommunityPoolSpendContent)
+        CommunityPoolSpend(communityPoolSpend)
+      }
+
+    | _ => Unknown
+    }
+  }
+  content
 }
 
 let toExternal = ({
@@ -173,13 +222,13 @@ let toExternal = ({
     status,
     description,
     // TODO: This field expect to exist on every proposals, will fix schema to be required field
-    content: contentOpt->Belt.Option.getExn->JsonUtils.Decode.mustDecode(Content.decode),
+    content: contentOpt->Belt.Option.getExn->decodeContent(proposalType->ProposalType.parse),
+    proposalType: proposalType->ProposalType.parse,
     submitTime,
     depositEndTime,
     votingStartTime,
     votingEndTime,
     proposerAddressOpt: accountOpt->Belt.Option.map(({address}) => address),
-    proposalType,
     endTotalYes: yesVote /. 1e6,
     endTotalYesPercent: yesVote /. totalVote *. 100.,
     endTotalNo: noVote /. 1e6,

@@ -22,6 +22,31 @@ module Styles = {
       padding2(~v=#px(16), ~h=#px(24)),
       backgroundColor(isDarkMode ? theme.neutral_200 : theme.neutral_100),
     ])
+
+  let proposalTypeBadge = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      padding2(~v=#px(6), ~h=#px(12)),
+      borderRadius(#px(20)),
+      backgroundColor(isDarkMode ? theme.neutral_200 : theme.primary_100),
+      display(#inlineBlock),
+      selector(" > p", [color(theme.primary_600)]),
+    ])
+}
+
+module ProposalTypeBadge = {
+  @react.component
+  let make = (~proposalType) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    <div className={Styles.proposalTypeBadge(theme, isDarkMode)}>
+      <Text
+        value={proposalType->ProposalSub.ProposalType.getBadgeText}
+        size=Text.Body2
+        block=true
+        weight={Semibold}
+      />
+    </div>
+  }
 }
 
 module VoteButton = {
@@ -123,7 +148,7 @@ let make = (~proposalID) => {
       <Row marginBottom=24>
         <Col>
           <InfoContainer>
-            <Heading value="Information" size=Heading.H4 />
+            <Heading value="Proposal Details" size=Heading.H4 />
             <SeperatedLine mt=32 mb=24 />
             <Row marginBottom=24 alignItems=Row.Center>
               <Col col=Col.Four mbSm=8>
@@ -167,8 +192,7 @@ let make = (~proposalID) => {
               </Col>
               <Col col=Col.Eight>
                 {switch allSub {
-                | Data(({proposalType}, _, _)) =>
-                  <Text value=proposalType size=Text.Body1 block=true />
+                | Data(({proposalType}, _, _)) => <ProposalTypeBadge proposalType />
                 | _ => <LoadingCensorBar width=90 height=15 />
                 }}
               </Col>
@@ -186,50 +210,44 @@ let make = (~proposalID) => {
                 }}
               </Col>
             </Row>
-            {switch allSub {
-            | Data(({content}, _, _)) =>
-              let {changes} = content
-              switch changes {
-              | Some(changes_data) =>
-                <Row marginBottom=24>
-                  <Col col=Col.Four mbSm=8>
-                    <Heading
-                      value="Parameter Changes"
-                      size=Heading.H4
-                      weight=Heading.Thin
-                      color={theme.neutral_600}
-                    />
-                  </Col>
-                  <Col col=Col.Eight>
-                    <div className={Styles.parameterChanges(theme, isDarkMode)}>
-                      {changes_data
-                      ->Belt.Array.mapWithIndex((i, value) =>
-                        <div key={i->string_of_int}>
-                          <Text
-                            value={value.subspace ++ "." ++ value.key ++ ": " ++ value.value}
-                            size=Text.Body1
-                            block=true
-                            code=true
-                          />
-                          {i < changes_data->Belt.Array.length - 1
-                            ? <VSpacing size=Spacing.md />
-                            : React.null}
-                        </div>
-                      )
-                      ->React.array}
-                    </div>
-                  </Col>
-                </Row>
-              | None => React.null
-              }
-            | _ => React.null
-            }}
-            // TODO: Revisit how to render each proposal content
-            {switch allSub {
-            | Data(({content}, _, _)) =>
-              let {plan} = content
-              switch plan {
-              | Some(planObj) =>
+          </InfoContainer>
+        </Col>
+      </Row>
+      {switch allSub {
+      | Data(({content}, _, _)) =>
+        <Row marginBottom=24>
+          <Col>
+            <InfoContainer>
+              <Heading value="Messages" size=Heading.H4 />
+              <SeperatedLine mt=32 mb=24 />
+              {switch content {
+              | CommunityPoolSpend({recipient, amount}) =>
+                <>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="Recipient Address"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <AddressRender address=recipient position=AddressRender.Subtitle />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="Amount" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <AmountRender coins=amount pos=AmountRender.TxIndex />
+                    </Col>
+                  </Row>
+                </>
+              | SoftwareUpgrade({name, height}) =>
                 <>
                   <Row marginBottom=24>
                     <Col col=Col.Four mbSm=8>
@@ -241,7 +259,7 @@ let make = (~proposalID) => {
                       />
                     </Col>
                     <Col col=Col.Eight>
-                      <Text value={planObj.name} size=Text.Body1 block=true />
+                      <Text value={name} size=Text.Body1 block=true />
                     </Col>
                   </Row>
                   <Row marginBottom=24>
@@ -254,17 +272,41 @@ let make = (~proposalID) => {
                       />
                     </Col>
                     <Col col=Col.Eight>
-                      <Text value={planObj.height->string_of_int} size=Text.Body1 block=true />
+                      <Text value={height->string_of_int} size=Text.Body1 block=true />
                     </Col>
                   </Row>
                 </>
-              | None => React.null
-              }
-            | _ => React.null
-            }}
-          </InfoContainer>
-        </Col>
-      </Row>
+              | ParameterChange(parameters) =>
+                <>
+                  <Row marginBottom=24>
+                    <Col col=Col.Twelve>
+                      <div className={Styles.parameterChanges(theme, isDarkMode)}>
+                        {parameters
+                        ->Belt.Array.mapWithIndex((i, value) =>
+                          <div key={i->string_of_int}>
+                            <Text
+                              value={value.subspace ++ "." ++ value.key ++ ": " ++ value.value}
+                              size=Text.Body1
+                              block=true
+                              code=true
+                            />
+                            {i < parameters->Belt.Array.length - 1
+                              ? <VSpacing size=Spacing.md />
+                              : React.null}
+                          </div>
+                        )
+                        ->React.array}
+                      </div>
+                    </Col>
+                  </Row>
+                </>
+              | _ => <Text value="Unable to show the proposal messages" />
+              }}
+            </InfoContainer>
+          </Col>
+        </Row>
+      | _ => React.null
+      }}
       {switch allSub {
       | Data((
           {
