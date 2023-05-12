@@ -121,7 +121,7 @@ module SubmitTxStep = {
           style=Styles.nextBtn
           disabled={gasInput <= 0}
           onClick={_ => {
-            let _ = TxCreator3.createRawTx(
+            let _ = TxCreator.createRawTx(
               client,
               account.address,
               msgsOpt->Belt.Option.getWithDefault(_, []),

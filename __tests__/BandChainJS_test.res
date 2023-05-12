@@ -148,13 +148,13 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
 
       Message.MsgDelegate.create(
         "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
-        "band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8",
+        "bandvaloper18aqvecak05emvl3hjff40swq0m6t9n4meu8mhv",
         coin,
       )
       ->Message.MsgDelegate.toJSON
       ->Js.Json.stringifyAny
     })->toEqual(
-      Some(`{"type":"cosmos-sdk/MsgDelegate","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_address":"band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8","amount":{"denom":"uband","amount":"1000000"}}}`),
+      Some(`{"type":"cosmos-sdk/MsgDelegate","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_address":"bandvaloper18aqvecak05emvl3hjff40swq0m6t9n4meu8mhv","amount":{"denom":"uband","amount":"1000000"}}}`),
     )
   )
 
@@ -166,13 +166,13 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
 
       Message.MsgUndelegate.create(
         "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
-        "band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8",
+        "bandvaloper18aqvecak05emvl3hjff40swq0m6t9n4meu8mhv",
         coin,
       )
       ->Message.MsgUndelegate.toJSON
       ->Js.Json.stringifyAny
     })->toEqual(
-      Some(`{"type":"cosmos-sdk/MsgUndelegate","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_address":"band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8","amount":{"denom":"uband","amount":"1000000"}}}`),
+      Some(`{"type":"cosmos-sdk/MsgUndelegate","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_address":"bandvaloper18aqvecak05emvl3hjff40swq0m6t9n4meu8mhv","amount":{"denom":"uband","amount":"1000000"}}}`),
     )
   )
 
@@ -184,40 +184,32 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
 
       Message.MsgRedelegate.create(
         "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
-        "band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8",
-        "band1ntwzz6tlvpy52tf5urr7jz6lvk2402sksntxuw",
+        "bandvaloper18aqvecak05emvl3hjff40swq0m6t9n4meu8mhv",
+        "bandvaloper1kfj48adjsnrgu83lau6wc646q2uf65rf84tzus",
         coin,
       )
       ->Message.MsgRedelegate.toJSON
       ->Js.Json.stringifyAny
     })->toEqual(
-      Some(`{"type":"cosmos-sdk/MsgBeginRedelegate","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_src_address":"band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8","validator_dst_address":"band1ntwzz6tlvpy52tf5urr7jz6lvk2402sksntxuw","amount":{"denom":"uband","amount":"1000000"}}}`),
+      Some(`{"type":"cosmos-sdk/MsgBeginRedelegate","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_src_address":"bandvaloper18aqvecak05emvl3hjff40swq0m6t9n4meu8mhv","validator_dst_address":"bandvaloper1kfj48adjsnrgu83lau6wc646q2uf65rf84tzus","amount":{"denom":"uband","amount":"1000000"}}}`),
     )
   )
 
   test("MsgWithdrawReward", () =>
     expect({
-      let coin = Coin.create()
-      coin->Coin.setDenom("uband")
-      coin->Coin.setAmount("1000000")
-
       Message.MsgWithdrawReward.create(
         "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
-        "band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8",
+        "bandvaloper18aqvecak05emvl3hjff40swq0m6t9n4meu8mhv",
       )
       ->Message.MsgWithdrawReward.toJSON
       ->Js.Json.stringifyAny
     })->toEqual(
-      Some(`{"type":"cosmos-sdk/MsgWithdrawDelegationReward","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_address":"band18aqvecak05emvl3hjff40swq0m6t9n4m42rcj8"}}`),
+      Some(`{"type":"cosmos-sdk/MsgWithdrawDelegationReward","value":{"delegator_address":"band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj","validator_address":"bandvaloper18aqvecak05emvl3hjff40swq0m6t9n4meu8mhv"}}`),
     )
   )
 
   test("MsgVote", () =>
     expect({
-      let coin = Coin.create()
-      coin->Coin.setDenom("uband")
-      coin->Coin.setAmount("1000000")
-
       Message.MsgVote.create(2, "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj", 1)
       ->Message.MsgVote.toJSON
       ->Js.Json.stringifyAny

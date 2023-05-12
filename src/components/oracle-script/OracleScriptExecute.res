@@ -236,7 +236,7 @@ module ValueInput = {
 type result_t =
   | Nothing
   | Loading
-  | Success(TxCreator3.tx_response_t)
+  | Success(TxCreator.tx_response_t)
   | Error(string)
 
 let loadingRender = (wDiv, wImg, h) => {
@@ -406,15 +406,15 @@ module ExecutionPart = {
                         ) {
                         | Some(encoded) =>
                           setResult(_ => Loading)
-                          let _ = TxCreator3.sendTransaction(
+                          let _ = TxCreator.sendTransaction(
                             client,
                             account,
                             [
                               Msg.Input.RequestMsg({
                                 oracleScriptID: id,
                                 calldata: encoded,
-                                askCount: askCount->int_of_string,
-                                minCount: minCount->int_of_string,
+                                askCount: askCount->Belt.Int.fromString->Belt.Option.getExn,
+                                minCount: minCount->Belt.Int.fromString->Belt.Option.getExn,
                                 sender: account.address,
                                 clientID: {
                                   switch clientID->String.trim == "" {
@@ -422,7 +422,12 @@ module ExecutionPart = {
                                   | true => "from_scan"
                                   }
                                 },
-                                feeLimit: list{feeLimit->float_of_string->Coin.newUBANDFromAmount},
+                                feeLimit: list{
+                                  feeLimit
+                                  ->Belt.Float.fromString
+                                  ->Belt.Option.getExn
+                                  ->Coin.newUBANDFromAmount
+                                },
                                 prepareGas,
                                 executeGas,
                                 id: (),

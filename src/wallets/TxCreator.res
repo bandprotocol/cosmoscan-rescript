@@ -156,8 +156,4 @@ let sendTransaction = async (
   }
 }
 
-let stringifyWithSpaces: Js.Json.t => string = %raw(`
-    function stringifyWithSpaces(obj) {
-        return JSON.stringify(obj, undefined, 4);
-    }
-`)
+let stringifyWithSpaces = json => Js.Json.stringifyWithSpace(json, 4)
