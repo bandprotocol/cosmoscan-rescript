@@ -2,6 +2,8 @@ open Jest
 open TxCreator
 open Expect
 
+let grpc = "https://laozi-testnet6.bandchain.org/grpc-web"
+
 describe("Expect createMsg Functionality to work correctly", () => {
   test("SendMsg", () => expect({
     let coin = Coin.newCoin("uband", 1000000.)
@@ -204,6 +206,101 @@ describe("Expect createMsg Functionality to work correctly", () => {
       1677512323000., // mock timeoutTimestamp
     )
   }))
+})
+
+describe("Expect Asynchronous Function to work correctly", () => {
+
+  let coin = Coin.newCoin("uband", 1000000.)
+
+  let msg = Msg.Input.SendMsg({
+    fromAddress: "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"->Address.fromBech32, 
+    toAddress: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32, 
+    amount: list{coin}
+  })
+
+  let client = BandChainJS.Client.create(grpc)
+
+  let account: AccountContext.t = {
+    address: "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"->Address.fromBech32,
+    pubKey: "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"->PubKey.fromBech32,
+    wallet: Wallet.createFromMnemonic("test"),
+    chainID: "band-laozi-testnet6",
+  }
+
+  testPromise("createRawTx", async () => {
+
+    let coin = Coin.newCoin("uband", 1000000.)
+
+    let msg = Msg.Input.SendMsg({
+      fromAddress: "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"->Address.fromBech32, 
+      toAddress: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32, 
+      amount: list{coin}
+    })
+
+    let client = BandChainJS.Client.create(grpc)
+
+    await createRawTx(
+        client,
+        "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"->Address.fromBech32,
+        [msg],
+        "band-laozi-testnet6",
+        1000,
+        10000,
+        "memo",
+      )
+      ->Promise.then(_ => Promise.resolve(pass))
+      ->Promise.catch(_ => Promise.resolve(fail("")))
+  })
+
+  testPromise("signTx", async () => {
+
+    let rawTx = await createRawTx(
+        client,
+        "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"->Address.fromBech32,
+        [msg],
+        "band-laozi-testnet6",
+        1000,
+        10000,
+        "memo",
+      )
+
+    await TxCreator.signTx(account, rawTx)
+    ->Promise.then(_ => Promise.resolve(pass))
+    ->Promise.catch(_ => Promise.resolve(fail("")))
+  })
+
+  testPromise("broadcastTx", async () => {
+
+    let rawTx = await createRawTx(
+        client,
+        "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"->Address.fromBech32,
+        [msg],
+        "band-laozi-testnet6",
+        1000,
+        10000,
+        "memo",
+      )
+
+    let signTxResult = await TxCreator.signTx(account, rawTx)
+    let signedTx = signTxResult->Belt.Result.getExn
+
+    await broadcastTx(client, signedTx)
+    ->Promise.then(_ => Promise.resolve(pass))
+    ->Promise.catch(_ => Promise.resolve(fail("")))
+  })
+
+  testPromise("sendTransaction", async () => {
+    await sendTransaction(
+        client, 
+        account, 
+        [msg], 
+        1000,
+        10000,
+        "memo"
+      )
+    ->Promise.then(_ => Promise.resolve(pass))
+    ->Promise.catch(_ => Promise.resolve(fail("")))
+  })
 })
 
 describe("Expect stringifyWithSpaces Functionality to work correctly", () => {
