@@ -864,55 +864,26 @@ module Gov = {
 }
 
 module Client = {
-  module CreateClient = {
+  type t = {
+    signer: Address.t,
+    clientID: string,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+      clientID: json.required(list{"msg", "client_id"}, string),
+    })
+  }
+
+  module Create = {
     type t = {signer: Address.t}
 
     let decode = {
       open JsonUtils.Decode
       buildObject(json => {
         signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
-      })
-    }
-  }
-
-  module UpdateClient = {
-    type t = {
-      signer: Address.t,
-      clientID: string,
-    }
-    let decode = {
-      open JsonUtils.Decode
-      buildObject(json => {
-        signer: json.required(list{"msg", "signer"}, string) -> Address.fromBech32,
-        clientID: json.required(list{"msg", "client_id"}, string),
-      })
-    }
-  }
-
-  module UpgradeClient = {
-    type t = {
-      signer: Address.t,
-      clientID: string,
-    }
-    let decode = {
-      open JsonUtils.Decode
-      buildObject(json => {
-        signer: json.required(list{"msg", "signer"}, string) -> Address.fromBech32,
-        clientID: json.required(list{"msg", "client_id"}, string),
-      })
-    }
-  }
-
-  module SubmitClientMisbehaviour = {
-    type t = {
-      signer: Address.t,
-      clientID: string,
-    }
-    let decode = {
-      open JsonUtils.Decode
-      buildObject(json => {
-        signer: json.required(list{"msg", "signer"}, string) -> Address.fromBech32,
-        clientID: json.required(list{"msg", "client_id"}, string),
       })
     }
   }
@@ -1419,10 +1390,10 @@ type rec msg_t =
   | DepositMsg(Gov.Deposit.decoded_t)
   | VoteMsg(Gov.Vote.decoded_t)
   | VoteWeightedMsg(Gov.VoteWeighted.decoded_t)
-  | CreateClientMsg(Client.CreateClient.t)
-  | UpdateClientMsg(Client.UpdateClient.t)
-  | UpgradeClientMsg(Client.UpgradeClient.t)
-  | SubmitClientMisbehaviourMsg(Client.SubmitClientMisbehaviour.t)
+  | CreateClientMsg(Client.Create.t)
+  | UpdateClientMsg(Client.t)
+  | UpgradeClientMsg(Client.t)
+  | SubmitClientMisbehaviourMsg(Client.t)
   | RecvPacketMsg(Channel.RecvPacket.decoded_t)
   | AcknowledgePacketMsg(Channel.AcknowledgePacket.t)
   | TimeoutMsg(Channel.Timeout.t)
@@ -1694,16 +1665,16 @@ let rec decodeMsg = (json, isSuccess) => {
             (VoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
           }
     | "/ibc.core.client.v1.MsgCreateClient" =>
-      let msg = json->mustDecode(Client.CreateClient.decode)
+      let msg = json->mustDecode(Client.Create.decode)
       (CreateClientMsg(msg), msg.signer, true)
     | "/ibc.core.client.v1.MsgUpdateClient" =>
-      let msg = json->mustDecode(Client.UpdateClient.decode)
+      let msg = json->mustDecode(Client.decode)
       (UpdateClientMsg(msg), msg.signer, true)
     | "/ibc.core.client.v1.MsgUpgradeClient" =>
-      let msg = json->mustDecode(Client.UpgradeClient.decode)
+      let msg = json->mustDecode(Client.decode)
       (UpgradeClientMsg(msg), msg.signer, true)
     | "/ibc.core.client.v1.MsgSubmitClientMisbehaviour" =>
-      let msg = json->mustDecode(Client.SubmitClientMisbehaviour.decode)
+      let msg = json->mustDecode(Client.decode)
       (SubmitClientMisbehaviourMsg(msg), msg.signer, true)
     | "/ibc.core.channel.v1.MsgRecvPacket" =>
       isSuccess

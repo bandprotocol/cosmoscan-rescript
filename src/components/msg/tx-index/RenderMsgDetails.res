@@ -1198,7 +1198,7 @@ module Timeout = {
 }
 
 module CreateClient = {
-  let factory = (msg: Msg.Client.CreateClient.t) => {
+  let factory = (msg: Msg.Client.Create.t) => {
     [
       {
         title: "Signer",
@@ -1209,42 +1209,8 @@ module CreateClient = {
   }
 }
 
-module UpdateClient = {
-  let factory = (msg: Msg.Client.UpdateClient.t) => {
-    [
-      {
-        title: "Signer",
-        content: Address(msg.signer),
-        order: 1,
-      },
-      {
-        title: "Client ID",
-        content: PlainText(msg.clientID),
-        order: 2,
-      },
-    ]
-  }
-}
-
-module UpgradeClient = {
-  let factory = (msg: Msg.Client.UpgradeClient.t) => {
-    [
-      {
-        title: "Signer",
-        content: Address(msg.signer),
-        order: 1,
-      },
-      {
-        title: "Client ID",
-        content: PlainText(msg.clientID),
-        order: 2,
-      },
-    ]
-  }
-}
-
-module SubmitClientMisbehaviour = {
-  let factory = (msg: Msg.Client.SubmitClientMisbehaviour.t) => {
+module Client = {
+  let factory = (msg: Msg.Client.t) => {
     [
       {
         title: "Signer",
@@ -1821,9 +1787,9 @@ let getContent = msg => {
     | Msg.Gov.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
   | Msg.CreateClientMsg(data) => CreateClient.factory(data)
-  | Msg.UpdateClientMsg(data) => UpdateClient.factory(data)
-  | Msg.UpgradeClientMsg(data) => UpgradeClient.factory(data)
-  | Msg.SubmitClientMisbehaviourMsg(data) => SubmitClientMisbehaviour.factory(data)
+  | Msg.UpdateClientMsg(data) 
+  | Msg.UpgradeClientMsg(data)
+  | Msg.SubmitClientMisbehaviourMsg(data) => Client.factory(data)
   | Msg.RecvPacketMsg(m) =>
     switch m {
     | Msg.Channel.RecvPacket.Success(data) => RecvPacket.success(data)

@@ -142,16 +142,10 @@ let make = (~msg: Msg.result_t) => {
         <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
       | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
+    | CreateClientMsg(_) => React.null
     | UpgradeClientMsg({clientID})
     | UpdateClientMsg({clientID})
     | SubmitClientMisbehaviourMsg({clientID}) => <IBCClientMsg.Client clientID />
-    | RecvPacketMsg(msg) => switch msg {
-      | Msg.Channel.RecvPacket.Success({packetData}) => switch packetData {
-        | Some({packetType}) => <IBCPacketMsg.Packet packetType />
-        | None => React.null
-      } 
-      | Msg.Channel.RecvPacket.Failure(f) => React.null
-      }
     | ConnectionOpenTryMsg({clientID, counterparty})
     | ConnectionOpenInitMsg({clientID, counterparty}) => 
       <IBCConnectionMsg.ConnectionCommon clientID counterpartyClientID={counterparty.clientID} />
@@ -167,10 +161,16 @@ let make = (~msg: Msg.result_t) => {
     | ChannelOpenConfirmMsg({channelID})
     | ChannelCloseInitMsg({channelID})
     | ChannelCloseConfirmMsg({channelID}) => <IBCChannelMsg.ChannelCloseCommon channelID />
+    | RecvPacketMsg(msg) => switch msg {
+    | Msg.Channel.RecvPacket.Success({packetData}) => switch packetData {
+      | Some({packetType}) => <IBCPacketMsg.Packet packetType />
+      | None => React.null
+    } 
+    | Msg.Channel.RecvPacket.Failure(f) => React.null
+    }
     | AcknowledgePacketMsg(_)
     | TimeoutMsg(_)
     | TimeoutOnCloseMsg(_)
-    | CreateClientMsg(_)
     | ActivateMsg(_) => React.null
     | TransferMsg(msg) => switch msg {
       | Msg.Application.Transfer.Success({receiver, token}) => <IBCTransferMsg.Transfer toAddress=receiver amount={token.amount} denom={token.denom} />
