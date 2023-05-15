@@ -1,5 +1,5 @@
 let getBandAmount = (maxValue, amount) => {
-  switch float_of_string_opt(amount) {
+  switch Belt.Float.fromString(amount) {
   | Some(amountFloat) =>
     let uband = amountFloat *. 1e6
     uband == Js.Math.floor_float(uband)
@@ -10,7 +10,7 @@ let getBandAmount = (maxValue, amount) => {
           | (_, false) => Err("Amount must be more than 0")
           }
         }
-      : Err("Maximum precision is 4")
+      : Err("Maximum precision is 6")
   | None => Err("Invalid value")
   }
 }

@@ -59,11 +59,11 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
   let startBroadcast = async () => {
     dispatchModal(DisableExit)
     setState(_ => Signing)
-    let signTxResult = await TxCreator3.signTx(account, rawTx)
+    let signTxResult = await TxCreator.signTx(account, rawTx)
     switch signTxResult {
     | Ok(signedTx) =>
       setState(_ => Broadcasting)
-      let txResult = await client->TxCreator3.broadcastTx(signedTx)
+      let txResult = await client->TxCreator.broadcastTx(signedTx)
       switch txResult {
       | Ok(tx) =>
         tx.success
@@ -100,7 +100,7 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t) => {
           ->BandChainJS.Transaction.getSignMessage
           ->JsBuffer.toUTF8
           ->Js.Json.parseExn
-          ->TxCreator3.stringifyWithSpaces}
+          ->TxCreator.stringifyWithSpaces}
         />
         <div id="broadcastButtonContainer">
           <Button

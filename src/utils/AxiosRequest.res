@@ -5,11 +5,4 @@ type t = {
   timeout: int,
 }
 
-/* TODO: FIX THIS MESS */
-let convert: t => Js.t<'a> = %raw(`
-  function(data) {
-    return {...data};
-  }
-`)
-
-let execute = (data: t) => Axios.post(Env.lambda, convert(data))
+let execute = (data: t) => Axios.post(Env.lambda, data)

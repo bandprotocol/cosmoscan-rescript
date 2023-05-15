@@ -1186,7 +1186,7 @@ module Packet = {
       destinationPort: json.required(list{"destination_port"}, string),
       destinationChannel: json.required(list{"destination_channel"}, string),
       timeoutHeight: json.required(list{"timeout_height", "revision_height"}, int),
-      timeoutTimestamp: json.required(list{"timeout_timestamp"}, GraphQLParser.timeNS),
+      timeoutTimestamp: json.required(list{"timeout_timestamp"}, timeNS),
       data: json.required(list{"data"}, string),
     })
   }
@@ -1297,7 +1297,7 @@ module Transfer = {
       sourceChannel: json.required(list{"msg", "source_channel"}, string),
       token: json.required(list{"msg", "token"}, Coin.decodeCoin),
       timeoutHeight: json.required(list{"msg", "timeout_height"}, Height.decode),
-      timeoutTimestamp: json.required(list{"msg", "timeout_timestamp"}, GraphQLParser.timeNS),
+      timeoutTimestamp: json.required(list{"msg", "timeout_timestamp"}, timeNS),
     })
   }
 }

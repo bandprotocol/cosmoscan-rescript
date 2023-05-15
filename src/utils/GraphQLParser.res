@@ -11,14 +11,9 @@ let timeS = json =>
   json
   ->Js.Json.decodeNumber
   ->Belt.Option.getExn
-  ->int_of_float
+  ->Belt.Float.toInt
   ->MomentRe.momentWithUnix
   ->MomentRe.Moment.defaultUtc
-
-let fromUnixSecondOpt = timeOpt =>
-  timeOpt->Belt.Option.map(x => x->MomentRe.momentWithUnix->MomentRe.Moment.defaultUtc)
-
-let fromUnixSecond = timeInt => timeInt->MomentRe.momentWithUnix->MomentRe.Moment.defaultUtc
 
 let timeMS = json =>
   json
@@ -26,9 +21,20 @@ let timeMS = json =>
   ->Belt.Option.getExn
   ->MomentRe.momentWithTimestampMS
   ->MomentRe.Moment.defaultUtc
+let fromUnixSecond = timeInt => timeInt->MomentRe.momentWithUnix->MomentRe.Moment.defaultUtc
+
+let fromUnixSecondOpt = timeOpt =>
+  timeOpt->Belt.Option.map(x => x->MomentRe.momentWithUnix->MomentRe.Moment.defaultUtc)
 
 let timestamp = json =>
   json->Js.Json.decodeString->Belt.Option.getExn->MomentRe.momentUtcDefaultFormat
+
+let timestampOpt = Belt.Option.map(_, timestamp)
+
+let timestampWithDefault = jsonOpt =>
+  jsonOpt
+  ->Belt.Option.flatMap(x => Some(timestamp(x)))
+  ->Belt.Option.getWithDefault(_, MomentRe.momentNow())
 
 // let timeNS = json =>
 //   json
@@ -37,21 +43,6 @@ let timestamp = json =>
 //   -> (nanoSec => nanoSec /. 1e6)
 //   -> MomentRe.momentWithTimestampMS
 //   -> MomentRe.Moment.defaultUtc
-
-let timeNS =
-  JsonUtils.Decode.float->JsonUtils.Decode.map((. n) =>
-    (n /. 1e6)->MomentRe.momentWithTimestampMS->MomentRe.Moment.defaultUtc
-  )
-
-let timeString =
-  JsonUtils.Decode.string->JsonUtils.Decode.map((. s) => s->MomentRe.momentUtcDefaultFormat)
-
-let timestampOpt = Belt.Option.map(_, timestamp)
-
-let timestampWithDefault = jsonOpt =>
-  jsonOpt
-  ->Belt.Option.flatMap(x => Some(timestamp(x)))
-  ->Belt.Option.getWithDefault(_, MomentRe.momentNow())
 
 let optionBuffer = Belt.Option.map(_, buffer)
 
@@ -66,36 +57,36 @@ let bool = json => json->Js.Json.decodeBoolean->Belt.Option.getExn
 let hash = json =>
   json->Js.Json.decodeString->Belt.Option.getExn->Js.String2.substr(~from=2)->Hash.fromHex
 
-let coinRegEx = "([0-9]+)([a-z][a-z0-9/]{2,31})"->Js.Re.fromString
-
-let intToCoin = int_ => int_->float_of_int->Coin.newUBANDFromAmount
+let intToCoin = int_ => int_->Belt.Float.fromInt->Coin.newUBANDFromAmount
 
 let coin = json =>
-  json->Js.Json.decodeString->Belt.Option.getExn->float_of_string->Coin.newUBANDFromAmount
+  json->Js.Json.decodeString->Belt.Option.flatMap(Belt.Float.fromString)->Belt.Option.getExn->Coin.newUBANDFromAmount
 
 let coinExn = jsonOpt =>
   jsonOpt
   ->Belt.Option.flatMap(Js.Json.decodeString)
+  ->Belt.Option.flatMap(Belt.Float.fromString)
   ->Belt.Option.getExn
-  ->float_of_string
   ->Coin.newUBANDFromAmount
 
 let coinWithDefault = jsonOpt => {
   jsonOpt
-  ->Belt.Option.flatMap(_, Js.Json.decodeString)
-  ->Belt.Option.mapWithDefault(_, 0., float_of_string)
+  ->Belt.Option.flatMap(Js.Json.decodeString)
+  ->Belt.Option.flatMap(Belt.Float.fromString)
+  ->Belt.Option.getWithDefault(0.)
   ->Coin.newUBANDFromAmount
 }
 
 let coinStr = str => {
-  str->float_of_string->Coin.newUBANDFromAmount
+  str->Belt.Float.fromString->Belt.Option.getExn->Coin.newUBANDFromAmount
 }
 
+let coinRegEx = "([0-9]+)([a-z][a-z0-9/]{2,31})"->Js.Re.fromString
 let coins = str => {
   str
   ->Js.String2.split(",")
   ->Belt.List.fromArray
-  ->Belt.List.keepMap(_, coin => {
+  ->Belt.List.keepMap(coin => {
     if coin === "" {
       None
     } else {
@@ -114,7 +105,7 @@ let coins = str => {
           amount: {
             switch re[1]->Js.Nullable.toOption {
             | None => 0.
-            | Some(x) => x->float_of_string
+            | Some(x) => x->Belt.Float.fromString->Belt.Option.getExn
             }
           },
         })
@@ -130,8 +121,8 @@ let coins = str => {
   // })
 }
 
-let addressExn = jsonOpt => jsonOpt->Belt.Option.getExn->Address.fromBech32
-let addressOpt = jsonOpt => jsonOpt->Belt.Option.map(_, Address.fromBech32)
+let addressExn = strOpt => strOpt->Belt.Option.getExn->Address.fromBech32
+let addressOpt = strOpt => strOpt->Belt.Option.map(_, Address.fromBech32)
 
 let numberWithDefault = jsonOpt =>
   jsonOpt->Belt.Option.flatMap(Js.Json.decodeNumber)->Belt.Option.getWithDefault(_, 0.0)
@@ -139,8 +130,9 @@ let numberWithDefault = jsonOpt =>
 let floatWithDefault = jsonOpt =>
   jsonOpt
   ->Belt.Option.flatMap(Js.Json.decodeString)
-  ->Belt.Option.mapWithDefault(0., float_of_string)
+  ->Belt.Option.flatMap(Belt.Float.fromString)
+  ->Belt.Option.getWithDefault(0.)
 
-let floatString = json => json->Js.Json.decodeString->Belt.Option.getExn->float_of_string
+let floatString = json => json->Js.Json.decodeString->Belt.Option.flatMap(Belt.Float.fromString)->Belt.Option.getExn
 
-let floatExn = jsonOpt => jsonOpt->Js.Json.decodeNumber->Belt.Option.getExn
+let floatExn = json => json->Js.Json.decodeNumber->Belt.Option.getExn

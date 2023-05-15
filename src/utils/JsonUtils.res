@@ -12,6 +12,10 @@ module Decode = {
   let strWithDefault = string->option->map((. a) => a->Belt.Option.getWithDefault(_, ""))
   let bufferFromHex = string->map((. a) => JsBuffer.fromHex(a))
   let bufferFromBase64 = string->map((. a) => JsBuffer.fromBase64(a))
+  let timeNS = float->map((. n) =>
+    (n /. 1e6)->MomentRe.momentWithTimestampMS->MomentRe.Moment.defaultUtc
+  )
+  let timeString = string->map((. s) => s->MomentRe.momentUtcDefaultFormat)
 
   let stringOrInt = oneOf([int, string->map((. a) => a->int_of_string)])
 
@@ -53,15 +57,15 @@ module Decode = {
 }
 
 // Example how to use
-type t = {
-  a: int,
-  b: option<string>,
-}
+// type t = {
+//   a: int,
+//   b: option<string>,
+// }
 
-let decode_t = Decode.buildObject(access => {
-  a: access.required(list{"a"}, Decode.int),
-  b: access.optional(list{"b"}, Decode.string),
-})
+// let decode_t = Decode.buildObject(access => {
+//   a: access.required(list{"a"}, Decode.int),
+//   b: access.optional(list{"b"}, Decode.string),
+// })
 
 // Or decode to value on specific field
 // let decode_field_a_to_int = Decode.buildObject(access => access.at(list{"a"}, Decode.int))

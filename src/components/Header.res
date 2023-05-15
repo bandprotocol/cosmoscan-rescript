@@ -3,6 +3,7 @@ module Styles = {
 
   let header = (theme: Theme.t) =>
     style(. [
+      position(#relative),
       paddingTop(Spacing.lg),
       backgroundColor(theme.neutral_000),
       zIndex(3),
@@ -75,7 +76,7 @@ module DesktopRender = {
           </Col>
           <Col col=Col.Six>
             <div className={CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ())}>
-              <SearchBarV2 />
+              <SearchBar />
             </div>
           </Col>
         </Row>
@@ -152,7 +153,7 @@ module MobileRender = {
       </Row>
       <Row marginTop=20>
         <Col colSm=Col.Twelve>
-          <SearchBarV2 />
+          <SearchBar />
         </Col>
       </Row>
     </header>

@@ -270,7 +270,7 @@ module Authz = {
         granter: json.required(list{"msg", "granter"}, address),
         grantee: json.required(list{"msg", "grantee"}, address),
         url: json.required(list{"msg", "url"}, string),
-        expiration: json.required(list{"msg", "grant", "expiration"}, GraphQLParser.timeString),
+        expiration: json.required(list{"msg", "grant", "expiration"}, timeString),
         msgTypeUrl: json.required(list{"msg", "grant", "authorization", "msg"}, string),
       })
     }

@@ -42,7 +42,7 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
             timeoutTimestamp: (MomentRe.momentNow()
             ->MomentRe.Moment.defaultUtc
             ->MomentRe.Moment.toUnix
-            ->float_of_int +. 600.) *. 1e9, // add 10 mins
+            ->Belt.Int.toFloat +. 600.) *. 1e9, // add 10 mins
             sender: address,
           }),
         ])
