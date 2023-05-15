@@ -70,7 +70,7 @@ module IDCreator = (RawID: RawIDSig) => {
 
   let fromIntExn = x => ID(x->Belt.Option.getExn)
 
-  let toJson = (ID(id)) => id->float_of_int->Js.Json.number
+  let toJson = (ID(id)) => id->Belt.Int.toFloat->Js.Json.number
 }
 
 module DataSource = IDCreator(RawDataSourceID)
