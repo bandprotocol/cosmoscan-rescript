@@ -11,8 +11,6 @@ module OracleRequestPacket = {
     executeGas: int,
     prepareGas: int,
     schema: string,
-    requestKey: string,
-    payer: Address.t,
   }
 
   open JsonUtils.Decode
@@ -31,8 +29,6 @@ module OracleRequestPacket = {
     executeGas: json.required(list{"decoded_data", "execute_gas"}, int),
     prepareGas: json.required(list{"decoded_data", "prepare_gas"}, int),
     schema: json.required(list{"decoded_data", "oracle_script_schema"}, string),
-    requestKey: json.required(list{"decoded_data", "request_key"}, string),
-    payer: json.required(list{"decoded_data", "payer"}, string)->Address.fromBech32,
   })
 }
 

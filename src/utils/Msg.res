@@ -863,6 +863,486 @@ module Gov = {
   }
 }
 
+module Client = {
+  type t = {
+    signer: Address.t,
+    clientID: string,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+      clientID: json.required(list{"msg", "client_id"}, string),
+    })
+  }
+
+  module Create = {
+    type t = {signer: Address.t}
+
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+      })
+    }
+  }
+}
+
+
+module Height = {
+  type t = {
+    revisionHeight: int,
+    revisionNumber: int,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      revisionHeight: json.required(list{"revision_height"}, int),
+      revisionNumber: json.required(list{"revision_number"}, int),
+    })
+  }
+}
+
+module Packet = {
+  type t = {
+    sequence: int,
+    sourcePort: string,
+    sourceChannel: string,
+    destinationPort: string,
+    destinationChannel: string,
+    timeoutHeight: int,
+    timeoutTimestamp: MomentRe.Moment.t,
+    data: string,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      sequence: json.required(list{"sequence"}, int),
+      sourcePort: json.required(list{"source_port"}, string),
+      sourceChannel: json.required(list{"source_channel"}, string),
+      destinationPort: json.required(list{"destination_port"}, string),
+      destinationChannel: json.required(list{"destination_channel"}, string),
+      timeoutHeight: json.required(list{"timeout_height", "revision_height"}, int),
+      timeoutTimestamp: json.required(list{"timeout_timestamp"}, GraphQLParser.timeNS),
+      data: json.required(list{"data"}, string),
+    })
+  }
+}
+
+let getStateText = state => 
+  switch state {
+  | 0 => "Uninitialized"
+  | 1 => "Init"
+  | 2 => "Try Open"
+  | 3 => "Open"
+  | 4 => "Closed"
+  | _ => "Unknown"
+  }
+
+let getOrderText = order => 
+  switch order {
+  | 0 => "None"
+  | 1 => "Unordered"
+  | 2 => "Ordered"
+  | _ => "Unknown"
+  }
+
+module ChannelCounterParty = {
+  type t = {
+    portID: string,
+    channelID: string,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      portID: json.required(list{"port_id"}, string),
+      channelID: json.optional(list{"channel_id"}, string)->Belt.Option.getWithDefault(""),
+    })
+  }
+}
+
+module ChannelType = {
+  type t = {
+    state: string,
+    ordering: string,
+    counterparty: ChannelCounterParty.t,
+  }
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      state: json.required(list{"state"}, int)->getStateText,
+      ordering: json.required(list{"ordering"}, int)->getOrderText,
+      counterparty: json.required(list{"counterparty"}, ChannelCounterParty.decode),
+    })
+  }
+}
+
+module Channel = {
+  module RecvPacket = {
+    type t<'a> = {
+      signer: Address.t,
+      packet: Packet.t,
+      proofHeight: Height.t,
+      packetData: 'a,
+    }
+
+    type success_t = t<option<PacketDecoder.t>>
+    type fail_t = t<unit>
+
+    type decoded_t =
+      | Success(success_t)
+      | Failure(fail_t)
+
+    let decodeFactory = dataD => {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        packet: json.required(list{"msg", "packet"}, Packet.decode),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+        packetData: json->dataD,
+      })
+    }
+
+    let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+      open JsonUtils.Decode
+      decodeFactory(json => json.optional(list{}, PacketDecoder.decodeAction))
+    }
+
+    let decodeFail: JsonUtils.Decode.t<fail_t> = {
+      open JsonUtils.Decode
+      decodeFactory(_ => ())
+    }
+  }
+  module AcknowledgePacket = {
+    type t = {
+      signer: Address.t,
+      packet: Packet.t,
+      proofHeight: Height.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        packet: json.required(list{"msg", "packet"}, Packet.decode),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      })
+    }
+  }
+
+  module Timeout = {
+    type t = {
+      signer: Address.t,
+      packet: Packet.t,
+      proofHeight: Height.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        packet: json.required(list{"msg", "packet"}, Packet.decode),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      })
+    }
+  }
+
+  module ChannelOpenInit = {
+    type t = {
+      signer: Address.t,
+      portID: string,
+      channel: ChannelType.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        portID: json.required(list{"msg", "port_id"}, string),
+        channel: json.required(list{"msg", "channel"}, ChannelType.decode),
+      })
+    }
+  }
+
+  module ChannelOpenTry = {
+    type t = {
+      signer: Address.t,
+      portID: string,
+      channel: ChannelType.t,
+      proofHeight: Height.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        portID: json.required(list{"msg", "port_id"}, string),
+        channel: json.required(list{"msg", "channel"}, ChannelType.decode),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      })
+    }
+  }
+
+  module ChannelOpenAck = {
+    type t = {
+      signer: Address.t,
+      portID: string,
+      channelID: string,
+      counterpartyChannelID: string,
+      proofHeight: Height.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        portID: json.required(list{"msg", "port_id"}, string),
+        channelID: json.required(list{"msg", "channel_id"}, string),
+        counterpartyChannelID: json.required(list{"msg", "counterparty_channel_id"}, string),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      })
+    }
+  }
+
+  module ChannelOpenConfirm = {
+    type t = {
+      signer: Address.t,
+      portID: string,
+      channelID: string,
+      proofHeight: Height.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        portID: json.required(list{"msg", "port_id"}, string),
+        channelID: json.required(list{"msg", "channel_id"}, string),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      })
+    }
+  }
+
+  module ChannelCloseInit = {
+    type t = {
+      signer: Address.t,
+      portID: string,
+      channelID: string,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        portID: json.required(list{"msg", "port_id"}, string),
+        channelID: json.required(list{"msg", "channel_id"}, string),
+      })
+    }
+  }
+
+  module ChannelCloseConfirm = {
+    type t = {
+      signer: Address.t,
+      portID: string,
+      channelID: string,
+      proofHeight: Height.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        portID: json.required(list{"msg", "port_id"}, string),
+        channelID: json.required(list{"msg", "channel_id"}, string),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      })
+    }
+  }
+}
+
+
+module Deposit = {
+  type t<'a> = {
+    depositor: Address.t,
+    proposalID: ID.Proposal.t,
+    amount: list<Coin.t>,
+    title: 'a,
+  }
+
+  type success_t = t<string>
+  type fail_t = t<unit>
+
+  type decoded_t =
+    | Success(success_t)
+    | Failure(fail_t)
+
+  let decodeFactory = titleD => {
+    open JsonUtils.Decode
+    buildObject(json => {
+      depositor: json.required(list{"msg", "depositor"}, string)->Address.fromBech32,
+      proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+      amount: json.required(list{"msg", "amount"}, list(Coin.decodeCoin)),
+      title: json->titleD,
+    })
+  }
+
+  let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+    open JsonUtils.Decode
+    decodeFactory(json => json.required(list{"msg", "title"}, string))
+  }
+
+  let decodeFail: JsonUtils.Decode.t<fail_t> = {
+    open JsonUtils.Decode
+    decodeFactory(_ => ())
+  }
+}
+
+module Connection = {
+  module ConnectionCounterParty = {
+    type t = {
+      clientID: string,
+      connectionID: string,
+    }
+
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        clientID: json.required(list{"client_id"}, string),
+        connectionID: json.optional(list{"connection_id"}, string)->Belt.Option.getWithDefault(""),
+      })
+    }
+  }
+
+  module ConnectionOpenInit = {
+    type t = {
+      signer: Address.t,
+      clientID: string,
+      delayPeriod: int,
+      counterparty: ConnectionCounterParty.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string) -> Address.fromBech32,
+        clientID: json.required(list{"msg", "client_id"}, string),
+        delayPeriod: json.required(list{"msg", "delay_period"}, int),
+        counterparty: json.required(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
+      })
+    }
+  }
+
+  module ConnectionOpenTry = {
+    type t = {
+      signer: Address.t,
+      clientID: string,
+      previousConnectionID: string,
+      delayPeriod: int,
+      counterparty: ConnectionCounterParty.t,
+      consensusHeight: Height.t,
+      proofHeight: Height.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        clientID: json.required(list{"msg", "client_id"}, string),
+        previousConnectionID: json.required(list{"msg", "previous_connection_id"}, string),
+        delayPeriod: json.required(list{"msg", "delay_period"}, int),
+        counterparty: json.required(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
+        consensusHeight: json.required(list{"msg", "consensus_height"}, Height.decode),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      })
+    }
+  }
+
+  module ConnectionOpenAck = {
+    type t = {
+      signer: Address.t,
+      connectionID: string,
+      counterpartyConnectionID: string,
+      consensusHeight: Height.t,
+      proofHeight: Height.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        connectionID: json.required(list{"msg", "connection_id"}, string),
+        counterpartyConnectionID: json.required(list{"msg", "counterparty_connection_id"}, string),
+        consensusHeight: json.required(list{"msg", "consensus_height"}, Height.decode),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      })
+    }
+  }
+
+  module ConnectionOpenConfirm = {
+    type t = {
+      signer: Address.t,
+      connectionID: string,
+      proofHeight: Height.t,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
+        connectionID: json.required(list{"msg", "connection_id"}, string),
+        proofHeight: json.required(list{"msg", "proof_height"}, Height.decode),
+      })
+    }
+  }
+}
+
+
+module Activate = {
+  type t = {validatorAddress: Address.t}
+  let decode = {
+    open JsonUtils.Decode
+    buildObject(json => {
+      validatorAddress: json.required(list{"msg", "validator"}, string)->Address.fromBech32,
+    })
+  }
+}
+
+module Application = {
+  module Transfer = {
+    type t<'a> = {
+      sender: Address.t,
+      receiver: string,
+      sourcePort: string,
+      sourceChannel: string,
+      timeoutHeight: Height.t,
+      timeoutTimestamp: MomentRe.Moment.t,
+      token: 'a
+    }
+
+    type success_t = t<Coin.t>
+    type fail_t = t<unit>
+
+    type decoded_t =
+      | Success(success_t)
+      | Failure(fail_t)
+
+    let decodeFactory = tokenD => {
+      open JsonUtils.Decode
+      buildObject(json => {
+        sender: json.required(list{"msg", "sender"}, string)->Address.fromBech32,
+        receiver: json.required(list{"msg", "receiver"}, string),
+        sourcePort: json.required(list{"msg", "source_port"}, string),
+        sourceChannel: json.required(list{"msg", "source_channel"}, string),
+        timeoutHeight: json.required(list{"msg", "timeout_height"}, Height.decode),
+        timeoutTimestamp: json.required(list{"msg", "timeout_timestamp"}, GraphQLParser.timeNS),
+        token: json->tokenD
+      })
+    }
+
+    let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+      open JsonUtils.Decode
+      decodeFactory(json => json.required(list{"msg", "token"}, Coin.decodeCoin))
+    }
+
+    let decodeFail: JsonUtils.Decode.t<fail_t> = {
+      open JsonUtils.Decode
+      decodeFactory(_ => ())
+    }
+  }
+}
+
 type ibc_transfer_t = {
   sourcePort: string,
   sourceChannel: string,
@@ -910,6 +1390,26 @@ type rec msg_t =
   | DepositMsg(Gov.Deposit.decoded_t)
   | VoteMsg(Gov.Vote.decoded_t)
   | VoteWeightedMsg(Gov.VoteWeighted.decoded_t)
+  | CreateClientMsg(Client.Create.t)
+  | UpdateClientMsg(Client.t)
+  | UpgradeClientMsg(Client.t)
+  | SubmitClientMisbehaviourMsg(Client.t)
+  | RecvPacketMsg(Channel.RecvPacket.decoded_t)
+  | AcknowledgePacketMsg(Channel.AcknowledgePacket.t)
+  | TimeoutMsg(Channel.Timeout.t)
+  | TimeoutOnCloseMsg(Channel.Timeout.t)
+  | ChannelOpenInitMsg(Channel.ChannelOpenInit.t)
+  | ChannelOpenTryMsg(Channel.ChannelOpenTry.t)
+  | ChannelOpenAckMsg(Channel.ChannelOpenAck.t)
+  | ChannelOpenConfirmMsg(Channel.ChannelOpenConfirm.t)
+  | ChannelCloseInitMsg(Channel.ChannelCloseInit.t)
+  | ChannelCloseConfirmMsg(Channel.ChannelCloseConfirm.t)
+  | ConnectionOpenInitMsg(Connection.ConnectionOpenInit.t)
+  | ConnectionOpenTryMsg(Connection.ConnectionOpenTry.t)
+  | ConnectionOpenAckMsg(Connection.ConnectionOpenAck.t)
+  | ConnectionOpenConfirmMsg(Connection.ConnectionOpenConfirm.t)
+  | ActivateMsg(Activate.t)
+  | TransferMsg(Application.Transfer.decoded_t)
   | ExecMsg(Authz.Exec.t<msg_t>)
   | UnknownMsg
 
@@ -960,6 +1460,26 @@ let getBadge = msg => {
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
   | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
+  | CreateClientMsg(_) => {name: "Create Client", category: IBCMsg}
+  | UpdateClientMsg(_) => {name: "Update Client", category: IBCMsg}
+  | UpgradeClientMsg(_) => {name: "Upgrade Client", category: IBCMsg}
+  | SubmitClientMisbehaviourMsg(_) => {name: "Submit Client Misbehaviour", category: IBCMsg}
+  | RecvPacketMsg(_) => {name: "Recv Packet", category: IBCMsg}
+  | AcknowledgePacketMsg(_) => {name: "Acknowledge Packet", category: IBCMsg}
+  | TimeoutMsg(_) => {name: "Timeout", category: IBCMsg}
+  | TimeoutOnCloseMsg(_) => {name: "Timeout", category: IBCMsg}
+  | ConnectionOpenInitMsg(_) => {name: "Connection Open Init", category: IBCMsg}
+  | ConnectionOpenTryMsg(_) => {name: "Connection Open Try", category: IBCMsg}
+  | ConnectionOpenAckMsg(_) => {name: "Connection Open Ack", category: IBCMsg}
+  | ConnectionOpenConfirmMsg(_) => {name: "Connection Open Confirm", category: IBCMsg}
+  | ChannelOpenInitMsg(_) => {name: "Channel Open Init", category: IBCMsg}
+  | ChannelOpenTryMsg(_) => {name: "Channel Open Try", category: IBCMsg}
+  | ChannelOpenAckMsg(_) => {name: "Channel Open Ack", category: IBCMsg}
+  | ChannelOpenConfirmMsg(_) => {name: "Channel Open Confirm", category: IBCMsg}
+  | ChannelCloseInitMsg(_) => {name: "Channel Close Init", category: IBCMsg}
+  | ChannelCloseConfirmMsg(_) => {name: "Channel Close Confirm", category: IBCMsg}
+  | ActivateMsg(_) => {name: "Activate", category: IBCMsg}
+  | TransferMsg(_) => {name: "Transfer", category: IBCMsg}
   | ExecMsg(_) => {name: "Exec", category: ValidatorMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
@@ -1143,6 +1663,80 @@ let rec decodeMsg = (json, isSuccess) => {
         : {
             let msg = json->mustDecode(Gov.VoteWeighted.decodeFail)
             (VoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
+          }
+    | "/ibc.core.client.v1.MsgCreateClient" =>
+      let msg = json->mustDecode(Client.Create.decode)
+      (CreateClientMsg(msg), msg.signer, true)
+    | "/ibc.core.client.v1.MsgUpdateClient" =>
+      let msg = json->mustDecode(Client.decode)
+      (UpdateClientMsg(msg), msg.signer, true)
+    | "/ibc.core.client.v1.MsgUpgradeClient" =>
+      let msg = json->mustDecode(Client.decode)
+      (UpgradeClientMsg(msg), msg.signer, true)
+    | "/ibc.core.client.v1.MsgSubmitClientMisbehaviour" =>
+      let msg = json->mustDecode(Client.decode)
+      (SubmitClientMisbehaviourMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgRecvPacket" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Channel.RecvPacket.decodeSuccess)
+            (RecvPacketMsg(Success(msg)), msg.signer, true)
+          }
+        : {
+            let msg = json->mustDecode(Channel.RecvPacket.decodeFail)
+            (RecvPacketMsg(Failure(msg)), msg.signer, true)
+          }
+    | "/ibc.core.channel.v1.MsgAcknowledgement" =>
+      let msg = json->mustDecode(Channel.AcknowledgePacket.decode)
+      (AcknowledgePacketMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgTimeout" =>
+      let msg = json->mustDecode(Channel.Timeout.decode)
+      (TimeoutMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgTimeoutOnClose" =>
+      let msg = json->mustDecode(Channel.Timeout.decode)
+      (TimeoutOnCloseMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgChannelOpenInit" =>
+      let msg = json->mustDecode(Channel.ChannelOpenInit.decode)
+      (ChannelOpenInitMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgChannelOpenTry" =>
+      let msg = json->mustDecode(Channel.ChannelOpenTry.decode)
+      (ChannelOpenTryMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgChannelOpenAck" =>
+      let msg = json->mustDecode(Channel.ChannelOpenAck.decode)
+      (ChannelOpenAckMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgChannelOpenConfirm" =>
+      let msg = json->mustDecode(Channel.ChannelOpenConfirm.decode)
+      (ChannelOpenConfirmMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgChannelCloseInit" =>
+      let msg = json->mustDecode(Channel.ChannelCloseInit.decode)
+      (ChannelCloseInitMsg(msg), msg.signer, true)
+    | "/ibc.core.channel.v1.MsgChannelCloseConfirm" =>
+      let msg = json->mustDecode(Channel.ChannelCloseConfirm.decode)
+      (ChannelCloseConfirmMsg(msg), msg.signer, true)
+    | "/ibc.core.connection.v1.MsgConnectionOpenInit" =>
+      let msg = json->mustDecode(Connection.ConnectionOpenInit.decode)
+      (ConnectionOpenInitMsg(msg), msg.signer, true)
+    | "/ibc.core.connection.v1.MsgConnectionOpenTry" =>
+      let msg = json->mustDecode(Connection.ConnectionOpenTry.decode)
+      (ConnectionOpenTryMsg(msg), msg.signer, true)
+    | "/ibc.core.connection.v1.MsgConnectionOpenAck" =>
+      let msg = json->mustDecode(Connection.ConnectionOpenAck.decode)
+      (ConnectionOpenAckMsg(msg), msg.signer, true)
+    | "/ibc.core.connection.v1.MsgConnectionOpenConfirm" =>
+      let msg = json->mustDecode(Connection.ConnectionOpenConfirm.decode)
+      (ConnectionOpenConfirmMsg(msg), msg.signer, true)
+    | "/oracle.v1.MsgActivate" =>
+      let msg = json->mustDecode(Activate.decode)
+      (ActivateMsg(msg), msg.validatorAddress, true)
+    | "/ibc.applications.transfer.v1.MsgTransfer" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Application.Transfer.decodeSuccess) 
+            (TransferMsg(Success(msg)), msg.sender, true)
+          }
+        : {
+            let msg = json->mustDecode(Application.Transfer.decodeFail)
+            (TransferMsg(Failure(msg)), msg.sender, true)
           }
 
     | "/cosmos.authz.v1beta1.MsgExec" =>

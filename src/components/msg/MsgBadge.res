@@ -2,7 +2,7 @@ module Styles = {
   open CssJs
   let msgBadge = (theme: Theme.t) =>
     style(. [
-      minWidth(#px(80)),
+      maxWidth(#px(80)),
       backgroundColor(theme.neutral_700),
       border(#px(1), #solid, theme.neutral_600),
       borderRadius(#px(50)),
