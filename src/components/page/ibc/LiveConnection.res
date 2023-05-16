@@ -443,7 +443,6 @@ let make = (~counterpartyChainID, ~state) => {
 
   let connectionCountSub = ConnectionSub.getCount(
     ~counterpartyChainID,
-    ~connectionID=searchTerm,
     (),
   )
 

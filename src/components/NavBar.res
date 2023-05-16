@@ -190,7 +190,6 @@ let make = () => {
     ("Requests", RequestHomePage),
     ("Data Sources", DataSourcePage),
     ("Oracle Scripts", OracleScriptPage),
-    ("Requests", RequestHomePage),
     ("IBCs", RelayersHomepage),
   }
 

@@ -151,8 +151,8 @@ module MultiConfig = %graphql(`
 `)
 
 module ConnectionCountConfig = %graphql(`
-    subscription ConnectionCount($chainID: String!, $connectionID: String!){
-       connections_aggregate(where: {counterparty_chain: {chain_id: {_ilike: $chainID}}, connection_id: {_ilike: $connectionID}}) {
+    subscription ConnectionCount($chainID: String!){
+       connections_aggregate(where: {counterparty_chain: {chain_id: {_eq: $chainID}}}) {
         aggregate {
           count
         }
@@ -185,10 +185,9 @@ let getList = (~counterpartyChainID, ~connectionID, ~page, ~pageSize, ~state: bo
   result->Query.fromData->Query.map(internal => internal.connections->Belt.Array.map(toExternal))
 }
 
-let getCount = (~counterpartyChainID, ~connectionID, ()) => {
+let getCount = (~counterpartyChainID,  ()) => {
   let result = ConnectionCountConfig.use({
-    chainID: counterpartyChainID !== "" ? counterpartyChainID : "%%",
-    connectionID: j`%$connectionID%`,
+    chainID: counterpartyChainID !== "" ? counterpartyChainID : "%%"
   })
 
   result
