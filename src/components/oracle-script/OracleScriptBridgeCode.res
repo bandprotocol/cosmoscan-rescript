@@ -140,7 +140,7 @@ module LanguageIcon = {
 }
 
 let getFileNameFromLanguage = (~language, ~dataType) => {
-  let dataTypeString = dataType->Obi.dataTypeToString
+  let dataTypeString = dataType->Obi2.dataTypeToString
   switch language {
   | Solidity => "Decoders.sol"
   | Go => j`$(dataTypeString)Decoder.go`
@@ -149,8 +149,8 @@ let getFileNameFromLanguage = (~language, ~dataType) => {
 
 let getCodeFromSchema = (~schema, ~language, ~dataType) => {
   switch language {
-  | Solidity => Obi.generateDecoderSolidity(schema)
-  | Go => Obi.generateDecoderGo("main", schema, dataType)
+  | Solidity => Obi2.generateDecoderSolidity(schema)
+  | Go => Obi2.generateDecoderGo("main", schema, dataType)
   }
 }
 
@@ -270,6 +270,6 @@ let make = (~schema) => {
       </Col>
     </Row>
     <div className=Styles.tableLowerContainer> {schema->renderCode} </div>
-    <GenerateDecodeCode language schema dataType=Obi.Params />
+    <GenerateDecodeCode language schema dataType=Obi2.Params />
   </div>
 }

@@ -27,7 +27,7 @@ type t =
   | ProgressBar(request_count_t)
   | Float(float, option<int>)
   | KVTableReport(array<string>, array<MsgDecoder.RawDataReport.t>)
-  | KVTableRequest(option<array<Obi.field_key_value_t>>)
+  | KVTableRequest(option<array<Obi2.field_key_value_t>>)
   | CopyButton(JsBuffer.t)
   | Percentage(float, option<int>)
   | Timestamp(MomentRe.Moment.t)

@@ -180,9 +180,9 @@ let decodeProof = {
   })
 }
 let obi_encode_int = (i, n) =>
-  Obi.encode(
+  Obi2.encode(
     "{x: " ++ n ++ "}/{_:u64}",
-    "input",
+    Obi2.Input,
     [{fieldName: "x", fieldValue: i->Belt.Int.toString}],
   )->Belt.Option.getExn
 
@@ -200,9 +200,9 @@ type variant_of_proof_t =
 let rec encode = x =>
   switch x {
   | RequestPacket({clientID, oracleScriptID, calldata, askCount, minCount}) =>
-    Obi.encode(
+    Obi2.encode(
       "{clientID: string, oracleScriptID: u64, calldata: bytes, askCount: u64, minCount: u64}/{_:u64}",
-      "input",
+      Obi2.Input,
       [
         {fieldName: "clientID", fieldValue: clientID},
         {fieldName: "oracleScriptID", fieldValue: oracleScriptID->Belt.Int.toString},
@@ -221,9 +221,9 @@ let rec encode = x =>
       resolveStatus,
       result,
     }) =>
-    Obi.encode(
+    Obi2.encode(
       "{clientID: string, requestID: u64, ansCount: u64, requestTime: u64, resolveTime: u64, resolveStatus: u32, result: bytes}/{_:u64}",
-      "input",
+      Obi2.Input,
       [
         {fieldName: "clientID", fieldValue: clientID},
         {fieldName: "requestID", fieldValue: requestID->Belt.Int.toString},
@@ -236,9 +236,9 @@ let rec encode = x =>
     )
 
   | IAVLMerklePath({isDataOnRight, subtreeHeight, subtreeSize, subtreeVersion, siblingHash}) =>
-    Obi.encode(
+    Obi2.encode(
       "{isDataOnRight: u8, subtreeHeight: u8, subtreeSize: u64, subtreeVersion: u64, siblingHash: bytes}/{_:u64}",
-      "input",
+      Obi2.Input,
       [
         {fieldName: "isDataOnRight", fieldValue: isDataOnRight ? "1" : "0"},
         {fieldName: "subtreeHeight", fieldValue: subtreeHeight->Belt.Int.toString},
@@ -287,9 +287,9 @@ let rec encode = x =>
       lastResultsHash,
       evidenceAndProposerHash,
     }) =>
-    Obi.encode(
+    Obi2.encode(
       "{versionAndChainIdHash: bytes, timeSecond: u64, timeNanoSecond: u32, lastBlockIDAndOther: bytes, nextValidatorHashAndConsensusHash: bytes, lastResultsHash: bytes, evidenceAndProposerHash: bytes}/{_:u64}",
-      "input",
+      Obi2.Input,
       [
         {
           fieldName: "versionAndChainIdHash",
@@ -317,9 +317,9 @@ let rec encode = x =>
     )
 
   | Signature({r, s, v, signedDataPrefix, signedDataSuffix}) =>
-    Obi.encode(
+    Obi2.encode(
       "{r: bytes, s: bytes, v: u8, signedDataPrefix: bytes, signedDataSuffix: bytes}/{_:u64}",
-      "input",
+      Obi2.Input,
       [
         {fieldName: "r", fieldValue: r->JsBuffer.toHex(~with0x=true)},
         {fieldName: "s", fieldValue: s->JsBuffer.toHex(~with0x=true)},
@@ -360,9 +360,9 @@ let rec encode = x =>
       let encodeReq = encode(RequestPacket(requestPacket))->Belt.Option.getExn
       let encodeRes = encode(ResponsePacket(responsePacket))->Belt.Option.getExn
       let encodeIAVLMerklePaths = encode(IAVLMerklePaths(iavlMerklePaths))->Belt.Option.getExn
-      Obi.encode(
+      Obi2.encode(
         "{blockHeight: u64, multiStore: bytes, blockMerkleParts: bytes, signatures: bytes, packet: bytes, version: u64, iavlPaths: bytes}/{_:u64}",
-        "input",
+        Obi2.Input,
         [
           {fieldName: "blockHeight", fieldValue: blockHeight->Belt.Int.toString},
           {
