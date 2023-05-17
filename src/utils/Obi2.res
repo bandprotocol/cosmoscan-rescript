@@ -60,19 +60,20 @@ let extractFields: (string, string) => option<array<field_key_type_t>> = %raw(`
 
 let encode = (schema, flow, valuePairs) => {
   open BandChainJS.Obi
+
   switch {
     let typePairs = extractFields(schema, flow->flowToString)->Belt.Option.getExn
+
     let dataPairs = typePairs->Belt.Array.map(({fieldName, fieldType}) => {
       let value =
         valuePairs
         ->Belt.Array.keepMap(each => fieldName == each.fieldName ? Some(each.fieldValue) : None)
         ->Belt.Array.getExn(0)
-
       let parsed = value->Js.Json.parseExn
       (fieldName, parsed)
     })
-    let data = Js.Json.object_(Js.Dict.fromArray(dataPairs))
 
+    let data = Js.Json.object_(Js.Dict.fromArray(dataPairs))
     let obi = create(schema)
     switch flow {
     | Input => obi->encodeInput(data)
