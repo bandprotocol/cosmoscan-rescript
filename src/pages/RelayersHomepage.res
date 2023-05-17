@@ -88,7 +88,8 @@ let make = () => {
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
   let chainIDFilterSub = IBCFilterSub.getChainFilterList()
 
-  Js.log(chainIDFilterSub)
+  let (page, setPage) = React.useState(_ => 1)
+  let pageSize = 5
 
   <Section ptSm=32 pbSm=32>
     <div className=CssHelper.container id="ibcSection">
@@ -132,22 +133,27 @@ let make = () => {
         <Col col=Col.Twelve>
           {switch chainIDFilterSub {
           | Data(chainIDList) =>
-            <div>
-              {
-                let filteredRelayers =
-                  searchTerm->Js.String2.length == 0
-                    ? chainIDList
-                    : chainIDList->Belt.Array.keep(relayer => {
-                        relayer.chainID->Js.String2.toLowerCase->Js.String2.includes(searchTerm)
-                      })
+            let filteredRelayers =
+              searchTerm->Js.String2.length == 0
+                ? chainIDList
+                : chainIDList->Belt.Array.keep(relayer => {
+                    relayer.chainID->Js.String2.toLowerCase->Js.String2.includes(searchTerm)
+                  })
 
-                filteredRelayers
-                ->Belt.Array.mapWithIndex((i, channel) => {
-                  <RelayerCard
-                    chainID=channel channelState={showActive} key={i->Belt.Int.toString}
-                  />
-                })
-                ->React.array
+            <div>
+              {filteredRelayers
+              ->Belt.Array.slice(~offset=(page - 1) * pageSize, ~len=pageSize)
+              ->Belt.Array.mapWithIndex((i, channel) => {
+                <RelayerCard chainID=channel channelState={showActive} key={i->Belt.Int.toString} />
+              })
+              ->React.array}
+              {
+                let pageCount = Page.getPageCount(filteredRelayers->Belt.Array.length, pageSize)
+                <Pagination
+                  currentPage=page
+                  pageCount={pageCount}
+                  onPageChange={newPage => setPage(_ => newPage)}
+                />
               }
             </div>
 

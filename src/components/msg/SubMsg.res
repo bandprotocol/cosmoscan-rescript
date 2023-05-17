@@ -142,64 +142,41 @@ let make = (~msg: Msg.result_t) => {
         <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
       | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
+    | CreateClientMsg(_) => React.null
+    | UpgradeClientMsg({clientID})
+    | UpdateClientMsg({clientID})
+    | SubmitClientMisbehaviourMsg({clientID}) => <IBCClientMsg.Client clientID />
+    | ConnectionOpenTryMsg({clientID, counterparty})
+    | ConnectionOpenInitMsg({clientID, counterparty}) => 
+      <IBCConnectionMsg.ConnectionCommon clientID counterpartyClientID={counterparty.clientID} />
+    | ConnectionOpenAckMsg({connectionID, counterpartyConnectionID}) => 
+      <IBCConnectionMsg.ConnectionOpenAck connectionID counterpartyConnectionID />
+    | ConnectionOpenConfirmMsg({connectionID}) =>
+      <IBCConnectionMsg.ConnectionOpenConfirm connectionID />
+    | ChannelOpenInitMsg({portID, channel})
+    | ChannelOpenTryMsg({portID, channel}) =>
+       <IBCChannelMsg.ChannelOpenCommon portID counterpartyPortID={channel.counterparty.portID} />
+    | ChannelOpenAckMsg({channelID, counterpartyChannelID}) =>
+       <IBCChannelMsg.ChannelOpenAck channelID counterpartyChannelID />
+    | ChannelOpenConfirmMsg({channelID})
+    | ChannelCloseInitMsg({channelID})
+    | ChannelCloseConfirmMsg({channelID}) => <IBCChannelMsg.ChannelCloseCommon channelID />
+    | RecvPacketMsg(msg) => switch msg {
+    | Msg.Channel.RecvPacket.Success({packetData}) => switch packetData {
+      | Some({packetType}) => <IBCPacketMsg.Packet packetType />
+      | None => React.null
+    } 
+    | Msg.Channel.RecvPacket.Failure(f) => React.null
+    }
+    | AcknowledgePacketMsg(_)
+    | TimeoutMsg(_)
+    | TimeoutOnCloseMsg(_)
+    | ActivateMsg(_) => React.null
+    | TransferMsg(msg) => switch msg {
+      | Msg.Application.Transfer.Success({receiver, token}) => <IBCTransferMsg.Transfer toAddress=receiver amount={token.amount} denom={token.denom} />
+      | Msg.Application.Transfer.Failure(f) => React.null
+      }
     | ExecMsg(msg) => <ValidatorMsg.Exec messages={msg.msgs} />
-
-    // <OracleMsg.RequestMsg id oracleScriptID oracleScriptName />
-    // | ReceiveMsg({fromAddress, amount}) => <TokenMsg.ReceiveMsg fromAddress amount />
-    // | MultiSendMsgSuccess({inputs, outputs}) => <TokenMsg.MultisendMsg inputs outputs />
-    // | DelegateMsgSuccess({amount}) => <TokenMsg.DelegateMsg amount />
-    // | UndelegateMsgSuccess({amount}) => <TokenMsg.UndelegateMsg amount />
-    // | RedelegateMsgSuccess({amount}) => <TokenMsg.RedelegateMsg amount />
-    // | WithdrawRewardMsgSuccess({amount}) => <TokenMsg.Distribution.WithdrawReward.Msg amount />
-    // | WithdrawCommissionMsgSuccess({amount}) => <TokenMsg.WithdrawCommissionMsg amount />
-    // | CreateDataSourceMsgSuccess({id, name}) => <DataMsg.Oracle.CreateDataSourceMsg id name />
-    // | EditDataSourceMsgSuccess({id, name}) => <DataMsg.EditDataSourceMsg id name />
-    // | CreateOracleScriptMsgSuccess({id, name}) => <DataMsg.CreateOracleScriptMsg id name />
-    // | EditOracleScriptMsgSuccess({id, name}) => <DataMsg.EditOracleScriptMsg id name />
-    // | RequestMsgSuccess({id, oracleScriptID, oracleScriptName}) =>
-    //   <DataMsg.RequestMsg id oracleScriptID oracleScriptName />
-    // | ReportMsgSuccess({requestID}) => <DataMsg.ReportMsg requestID />
-    // | AddReporterMsgSuccess({reporter}) => <ValidatorMsg.AddReporter reporter />
-    // | RemoveReporterMsgSuccess({reporter}) => <ValidatorMsg.RemoveReporter reporter />
-    // | CreateValidatorMsgSuccess({moniker}) => <ValidatorMsg.CreateValidator moniker />
-    // | EditValidatorMsgSuccess({moniker}) => <ValidatorMsg.EditValidator moniker />
-    // | UnjailMsgSuccess(_) => React.null
-    // | SetWithdrawAddressMsgSuccess({withdrawAddress}) =>
-    //   <ValidatorMsg.SetWithdrawAddress withdrawAddress />
-    // | SubmitProposalMsgSuccess({proposalID, title}) =>
-    //   <ProposalMsg.SubmitProposal proposalID title />
-    // | DepositMsgSuccess({amount, proposalID, title}) =>
-    //   <ProposalMsg.Deposit amount proposalID title />
-    // | VoteMsgSuccess({proposalID, title}) => <ProposalMsg.Vote proposalID title />
-    // | ActivateMsgSuccess(_) => React.null
-    // | CreateClientMsg(_) => React.null
-    // | UpdateClientMsg({clientID})
-    // | UpgradeClientMsg({clientID})
-    // | SubmitClientMisbehaviourMsg({clientID}) =>
-    //   <IBCClientMsg.Client clientID />
-    // | ConnectionOpenTryMsg({clientID, counterparty})
-    // | ConnectionOpenInitMsg({clientID, counterparty}) =>
-    //   <IBCConnectionMsg.ConnectionCommon clientID counterpartyClientID=counterparty.clientID />
-    // | ConnectionOpenAckMsg({connectionID, counterpartyConnectionID}) =>
-    //   <IBCConnectionMsg.ConnectionOpenAck connectionID counterpartyConnectionID />
-    // | ConnectionOpenConfirmMsg({connectionID}) =>
-    //   <IBCConnectionMsg.ConnectionOpenConfirm connectionID />
-    // | ChannelOpenInitMsg({portID, channel})
-    // | ChannelOpenTryMsg({portID, channel}) =>
-    //   <IBCChannelMsg.ChannelOpenCommon portID counterpartyPortID=channel.counterparty.portID />
-    // | ChannelOpenAckMsg({channelID, counterpartyChannelID}) =>
-    //   <IBCChannelMsg.ChannelOpenAck channelID counterpartyChannelID />
-    // | ChannelOpenConfirmMsg({channelID}) => <IBCChannelMsg.ChannelCloseCommon channelID />
-    // | ChannelCloseInitMsg({channelID})
-    // | ChannelCloseConfirmMsg({channelID}) =>
-    //   <IBCChannelMsg.ChannelCloseCommon channelID />
-    // | TransferMsg({token, receiver}) =>
-    //   <IBCTransferMsg.Transfer toAddress=receiver amount=token.amount denom=token.denom />
-    // | RecvPacketMsgSuccess({packetData}) => <IBCPacketMsg.Packet packetType=packetData.packetType />
-    // | RecvPacketMsgFail(_)
-    // | AcknowledgePacketMsg(_)
-    // | TimeoutMsg(_)
-    // | TimeoutOnCloseMsg(_)
     | UnknownMsg => React.null
     }}
   </div>

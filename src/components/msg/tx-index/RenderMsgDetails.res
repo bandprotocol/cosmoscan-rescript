@@ -35,6 +35,13 @@ module Calldata = {
   }
 }
 
+module Packet = {
+  @react.component
+  let make = (~packet: Msg.Packet.t) => {
+    <Text value={packet.data} size=Text.Body1 />
+  }
+}
+
 type content_inner_t =
   | PlainText(string)
   | Address(Address.t)
@@ -45,6 +52,7 @@ type content_inner_t =
   | RawReports(Belt.List.t<Msg.Oracle.RawDataReport.t>)
   | Timestamp(MomentRe.Moment.t)
   | ValidatorLink(Address.t, string, string)
+  | Packet(Msg.Packet.t)
   | VoteWeighted(Belt.List.t<Msg.Gov.VoteWeighted.Options.t>)
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
@@ -54,6 +62,104 @@ type content_t = {
   title: string,
   content: content_inner_t,
   order: int,
+  heading?: string
+}
+
+let renderValue = v => {
+  switch v {
+  | Address(address) => <AddressRender position=AddressRender.Subtitle address />
+  | ValidatorAddress(address) =>
+    <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
+  | PlainText(content) => <Text value={content} size=Text.Body1 breakAll=true/>
+  | CoinList(amount) => <AmountRender coins={amount} />
+  | ID(element) => element
+  | Calldata(schema, data) => <Calldata schema calldata=data />
+  | RawReports(data) =>
+    <KVTable
+      headers=["External Id", "Exit Code", "Value"]
+      rows={data
+      ->Belt.List.toArray
+      ->Belt.Array.map(rawReport => [
+        KVTable.Value(rawReport.externalDataID->string_of_int),
+        KVTable.Value(rawReport.exitCode->string_of_int),
+        KVTable.Value(rawReport.data->JsBuffer.toUTF8),
+      ])}
+    />
+  | Timestamp(timestamp) => <Timestamp time={timestamp} size=Text.Body1 />
+  | ValidatorLink(address, moniker, identity) =>
+    <ValidatorMonikerLink
+      validatorAddress={address}
+      moniker={moniker}
+      identity={identity}
+      width={#percent(100.)}
+      avatarWidth=20
+      size=Text.Body1
+    />
+  | VoteWeighted(options) =>
+    <>
+      {options
+      ->Belt.List.mapWithIndex((index, {weight, option}) => {
+        let optionCount = options->Belt.List.toArray->Belt_Array.length
+        let mb = index == optionCount ? 0 : 8
+
+        <div
+          key={index->string_of_int ++ weight->Js.Float.toString ++ option}
+          className={CssHelper.flexBox(
+            ~justify=#flexStart,
+            ~align=#center,
+            ~direction=#row,
+            ~wrap=#wrap,
+            (),
+          )}>
+          <Text size=Text.Body1 value=option />
+          <HSpacing size=Spacing.sm />
+          <Text size=Text.Body1 value={weight->Js.Float.toString} />
+          {index == optionCount - 1 ? React.null : <HSpacing size=Spacing.md />}
+        </div>
+      })
+      ->Belt.List.toArray
+      ->React.array}
+    </>
+  | Packet(packet) => <Packet packet/>
+  | MultiSendInputList(inputs) =>
+    <KVTable
+      headers=["Address", "Amount (BAND)"]
+      rows={inputs
+      ->Belt.List.toArray
+      ->Belt.Array.map(input => [
+        KVTable.Value(
+          // <AddressRender address={input.address} />
+          input.address->Address.toBech32,
+        ),
+        KVTable.Value(
+          // <AmountRender coins={input.coins} />
+          input.coins
+          ->Coin.getBandAmountFromCoins
+          ->Belt.Float.toString,
+        ),
+      ])}
+    />
+  | MultiSendOutputList(outputs) =>
+    <KVTable
+      headers=["Address", "Amount (BAND)"]
+      rows={outputs
+      ->Belt.List.toArray
+      ->Belt.Array.map(output => [
+        KVTable.Value(
+          // <AddressRender address={output.address} />
+          output.address->Address.toBech32,
+        ),
+        KVTable.Value(
+          // <AmountRender coins={output.coins} />
+          output.coins
+          ->Coin.getBandAmountFromCoins
+          ->Belt.Float.toString,
+        ),
+      ])}
+    />
+  // Noted: We support only 1 level of exec (no recursion)
+  | ExecList(msgs) => React.null
+  }
 }
 
 module CreateDataSource = {
@@ -827,6 +933,784 @@ module MultiSend = {
   ]
 }
 
+module RecvPacket = {
+  let factory = (msg: Msg.Channel.RecvPacket.t<'a>, firsts) => 
+    firsts->Belt.Array.concat([
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 2,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 3,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 4,
+      },
+      {
+        heading: "Packet",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Source Port",
+        content: PlainText(msg.packet.sourcePort),
+        order: 6,
+      },
+      {
+        title: "Destination Port",
+        content: PlainText(msg.packet.destinationPort),
+        order: 7,
+      },
+      {
+        title: "Source Channel",
+        content: PlainText(msg.packet.sourceChannel),
+        order: 8,
+      },
+      {
+        title: "Destination Channel",
+        content: PlainText(msg.packet.destinationChannel),
+        order: 9,
+      },
+      {
+        title: "Data",
+        content: PlainText(msg.packet.data),
+        order: 10,
+      },
+      {
+        title: "Timeout Timestamp",
+        content: Timestamp(msg.packet.timeoutTimestamp),
+        order: 11,
+      },
+    ])
+
+  let success = (msg: Msg.Channel.RecvPacket.success_t) =>
+    msg->factory(switch msg.packetData {
+      | Some(packetData) => switch packetData.packetDetail {
+        | OracleRequestPacket(details) => [
+          {
+            heading: "Packet Data",
+            title: "",
+            content: PlainText(""),
+            order: 12,
+          },
+          {
+            title: "Request ID",
+            content: ID(<TypeID.Request position=TypeID.Subtitle id=details.requestID />),
+            order: 13,
+          },
+          {
+            title: "Oracle Script",
+            content: ID(<TypeID.OracleScript position=TypeID.Subtitle id=details.oracleScriptID />),
+            order: 14,
+          },
+          {
+            title: "Prepare Gas",
+            content: PlainText(details.prepareGas->Belt.Int.toString),
+            order: 15,
+          },
+          {
+            title: "Execute Gas",
+            content: PlainText(details.executeGas->Belt.Int.toString),
+            order: 16,
+          },
+          {
+            title: "Calldata",
+            content: Calldata(details.schema, details.calldata),
+            order: 17,
+          },
+          {
+            title: "Request Validator Count",
+            content: PlainText(details.askCount->Belt.Int.toString),
+            order: 18,
+          },
+          {
+            title: "Sufficient Validator Count",
+            content: PlainText(details.minCount->Belt.Int.toString),
+            order: 19,
+          },
+        ]
+        | FungibleTokenPacket(details) => [
+          {
+            heading: "Packet Data",
+            title: "",
+            content: PlainText(""),
+            order: 12,
+          },
+          {
+            title: "Sender",
+            content: PlainText(details.sender),
+            order: 13,
+          },
+          {
+            title: "Receiver",
+            content: PlainText(details.receiver),
+            order: 14,
+          },
+          {
+            title: "Amount",
+            content: PlainText(details.amount->Belt.Int.toString),
+            order: 15,
+          },
+         
+        ]
+        | Unknown => []
+        } 
+      | None => []
+      })
+
+  let failed = (msg: Msg.Channel.RecvPacket.fail_t) => msg->factory([])
+}
+
+module AcknowledgePacket = {
+  let factory = (msg: Msg.Channel.AcknowledgePacket.t) => {[
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 2,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 3,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 4,
+      },
+      {
+        heading: "Packet",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Source Port",
+        content: PlainText(msg.packet.sourcePort),
+        order: 6,
+      },
+      {
+        title: "Destination Port",
+        content: PlainText(msg.packet.destinationPort),
+        order: 7,
+      },
+      {
+        title: "Source Channel",
+        content: PlainText(msg.packet.sourceChannel),
+        order: 8,
+      },
+      {
+        title: "Destination Channel",
+        content: PlainText(msg.packet.destinationChannel),
+        order: 9,
+      },
+      {
+        title: "Data",
+        content: PlainText(msg.packet.data),
+        order: 10,
+      },
+      {
+        title: "Timeout Timestamp",
+        content: Timestamp(msg.packet.timeoutTimestamp),
+        order: 11,
+      },
+    ]}
+}
+
+module Timeout = {
+  let factory = (msg: Msg.Channel.Timeout.t) => {[
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 2,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 3,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 4,
+      },
+      {
+        heading: "Packet",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Source Port",
+        content: PlainText(msg.packet.sourcePort),
+        order: 6,
+      },
+      {
+        title: "Destination Port",
+        content: PlainText(msg.packet.destinationPort),
+        order: 7,
+      },
+      {
+        title: "Source Channel",
+        content: PlainText(msg.packet.sourceChannel),
+        order: 8,
+      },
+      {
+        title: "Destination Channel",
+        content: PlainText(msg.packet.destinationChannel),
+        order: 9,
+      },
+      {
+        title: "Data",
+        content: PlainText(msg.packet.data),
+        order: 10,
+      },
+      {
+        title: "Timeout Timestamp",
+        content: Timestamp(msg.packet.timeoutTimestamp),
+        order: 11,
+      },
+    ]}
+}
+
+module CreateClient = {
+  let factory = (msg: Msg.Client.Create.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+    ]
+  }
+}
+
+module Client = {
+  let factory = (msg: Msg.Client.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.clientID),
+        order: 2,
+      },
+    ]
+  }
+}
+
+module ConnectionOpenInit = {
+  let factory = (msg: Msg.Connection.ConnectionOpenInit.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.clientID),
+        order: 2,
+      },
+      {
+        title: "Delay Period",
+        content: PlainText(msg.delayPeriod->Belt.Int.toString ++ "ns"),
+        order: 3,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 4,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.counterparty.clientID),
+        order: 5,
+      },
+    ]
+  }
+}
+
+module ConnectionOpenTry = {
+  let factory = (msg: Msg.Connection.ConnectionOpenTry.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.clientID),
+        order: 2,
+      },
+       {
+        title: "Delay Period",
+        content: PlainText(msg.delayPeriod->Belt.Int.toString ++ "ns"),
+        order: 3,
+      },
+       {
+        title: "Previous Connection ID",
+        content: PlainText(msg.previousConnectionID),
+        order: 4,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Client ID",
+        content: PlainText(msg.counterparty.clientID),
+        order: 6,
+      },
+      {
+        title: "Connection ID",
+        content: PlainText(msg.counterparty.connectionID),
+        order: 7,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 8,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 9,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 10,
+      },
+      {
+        heading: "Consensus Height",
+        title: "",
+        content: PlainText(""),
+        order: 11,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.consensusHeight.revisionHeight->Belt.Int.toString),
+        order: 12,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.consensusHeight.revisionNumber->Belt.Int.toString),
+        order: 13,
+      },
+    ]
+  }
+}
+
+module ConnectionOpenAck = {
+  let factory = (msg: Msg.Connection.ConnectionOpenAck.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Connection ID",
+        content: PlainText(msg.connectionID),
+        order: 2,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 3,
+      },
+      {
+        title: "Connection ID",
+        content: PlainText(msg.counterpartyConnectionID),
+        order: 4,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 6,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 7,
+      },
+      {
+        heading: "Consensus Height",
+        title: "",
+        content: PlainText(""),
+        order: 8,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.consensusHeight.revisionHeight->Belt.Int.toString),
+        order: 9,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.consensusHeight.revisionNumber->Belt.Int.toString),
+        order: 10,
+      },
+    ]
+  }
+}
+
+module ConnectionOpenConfirm = {
+  let factory = (msg: Msg.Connection.ConnectionOpenConfirm.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Connection ID",
+        content: PlainText(msg.connectionID),
+        order: 2,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 3,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 4,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 5,
+      },
+    ]
+  }
+}
+
+module ChannelOpenInit = {
+  let factory = (msg: Msg.Channel.ChannelOpenInit.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.portID),
+        order: 2,
+      },
+      {
+        title: "State",
+        content: PlainText(msg.channel.state),
+        order: 3,
+      },
+      {
+        title: "Order",
+        content: PlainText(msg.channel.ordering),
+        order: 4,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.channel.counterparty.portID),
+        order: 6,
+      },
+      
+    ]
+  }
+}
+
+module ChannelOpenTry = {
+  let factory = (msg: Msg.Channel.ChannelOpenTry.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.portID),
+        order: 2,
+      },
+      {
+        title: "State",
+        content: PlainText(msg.channel.state),
+        order: 3,
+      },
+      {
+        title: "Order",
+        content: PlainText(msg.channel.ordering),
+        order: 4,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 5,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 6,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 7,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 8,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.channel.counterparty.portID),
+        order: 9,
+      },
+      {
+        title: "Channel ID",
+        content: PlainText(msg.channel.counterparty.channelID),
+        order: 9,
+      },
+    ]
+  }
+}
+
+module ChannelOpenAck = {
+  let factory = (msg: Msg.Channel.ChannelOpenAck.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.portID),
+        order: 2,
+      },
+      {
+        title: "Channel ID",
+        content: PlainText(msg.channelID),
+        order: 3,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 4,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 5,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 6,
+      },
+      {
+        heading: "Counterparty",
+        title: "",
+        content: PlainText(""),
+        order: 7,
+      },
+      {
+        title: "Channel ID",
+        content: PlainText(msg.counterpartyChannelID),
+        order: 8,
+      },
+    ]
+  }
+}
+
+module ChannelOpenConfirm = {
+  let factory = (msg: Msg.Channel.ChannelOpenConfirm.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.portID),
+        order: 2,
+      },
+      {
+        title: "Channel ID",
+        content: PlainText(msg.channelID),
+        order: 3,
+      },
+      {
+        heading: "Proof Height",
+        title: "",
+        content: PlainText(""),
+        order: 4,
+      },
+      {
+        title: "Revision Height",
+        content: PlainText(msg.proofHeight.revisionHeight->Belt.Int.toString),
+        order: 5,
+      },
+      {
+        title: "Revision Number",
+        content: PlainText(msg.proofHeight.revisionNumber->Belt.Int.toString),
+        order: 6,
+      },
+    ]
+  }
+}
+
+module ChannelCloseInit = {
+  let factory = (msg: Msg.Channel.ChannelCloseInit.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.portID),
+        order: 2,
+      },
+      {
+        title: "Channel ID",
+        content: PlainText(msg.channelID),
+        order: 3,
+      },
+    ]
+  }
+}
+
+module ChannelCloseConfirm = {
+  let factory = (msg: Msg.Channel.ChannelCloseConfirm.t) => {
+    [
+      {
+        title: "Signer",
+        content: Address(msg.signer),
+        order: 1,
+      },
+      {
+        title: "Port ID",
+        content: PlainText(msg.portID),
+        order: 2,
+      },
+      {
+        title: "Channel ID",
+        content: PlainText(msg.channelID),
+        order: 3,
+      },
+    ]
+  }
+}
+
+module Activate = {
+  let factory = (msg: Msg.Activate.t) => {
+    [
+      {
+        title: "Validator",
+        content: Address(msg.validatorAddress),
+        order: 1,
+      },
+    ]
+  }
+}
+
+module Transfer = {
+  let factory = (msg: Msg.Application.Transfer.t<'a>, firsts) =>
+    firsts->Belt.Array.concat([
+      {
+        title: "Sender",
+        content: Address(msg.sender),
+        order: 1,
+      },
+      {
+        title: "Receiver",
+        content: PlainText(msg.receiver),
+        order: 2,
+      },
+      {
+        title: "Source Port",
+        content: PlainText(msg.sourcePort),
+        order: 3,
+      },
+      {
+        title: "Source Channel",
+        content: PlainText(msg.sourceChannel),
+        order: 4,
+      },
+      {
+        title: "Timeout Timestamp",
+        content: Timestamp(msg.timeoutTimestamp),
+        order: 6,
+      },
+    ])
+
+  let success = (msg: Msg.Application.Transfer.success_t) =>
+    msg->factory([
+      {
+        title: "Token",
+        content: CoinList(list{msg.token}),
+        order: 5,
+      },
+    ])
+
+  let failed = (msg: Msg.Application.Transfer.fail_t) =>
+    msg->factory([])
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -902,6 +1786,34 @@ let getContent = msg => {
     | Msg.Gov.VoteWeighted.Success(data) => VoteWeighted.success(data)
     | Msg.Gov.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
+  | Msg.CreateClientMsg(data) => CreateClient.factory(data)
+  | Msg.UpdateClientMsg(data) 
+  | Msg.UpgradeClientMsg(data)
+  | Msg.SubmitClientMisbehaviourMsg(data) => Client.factory(data)
+  | Msg.RecvPacketMsg(m) =>
+    switch m {
+    | Msg.Channel.RecvPacket.Success(data) => RecvPacket.success(data)
+    | Msg.Channel.RecvPacket.Failure(data) => RecvPacket.failed(data)
+    }
+  | Msg.AcknowledgePacketMsg(data) => AcknowledgePacket.factory(data)
+  | Msg.TimeoutMsg(data) => Timeout.factory(data)
+  | Msg.TimeoutOnCloseMsg(data) => Timeout.factory(data)
+  | Msg.ConnectionOpenInitMsg(data) => ConnectionOpenInit.factory(data)
+  | Msg.ConnectionOpenTryMsg(data) => ConnectionOpenTry.factory(data)
+  | Msg.ConnectionOpenAckMsg(data) => ConnectionOpenAck.factory(data)
+  | Msg.ConnectionOpenConfirmMsg(data) => ConnectionOpenConfirm.factory(data)
+  | Msg.ChannelOpenInitMsg(data) => ChannelOpenInit.factory(data)
+  | Msg.ChannelOpenTryMsg(data) => ChannelOpenTry.factory(data)
+  | Msg.ChannelOpenAckMsg(data) => ChannelOpenAck.factory(data)
+  | Msg.ChannelOpenConfirmMsg(data) => ChannelOpenConfirm.factory(data)
+  | Msg.ChannelCloseInitMsg(data) => ChannelCloseInit.factory(data)
+  | Msg.ChannelCloseConfirmMsg(data) => ChannelCloseConfirm.factory(data)
+  | Msg.ActivateMsg(data) => Activate.factory(data)
+  | Msg.TransferMsg(m) =>
+    switch m {
+    | Msg.Application.Transfer.Success(data) => Transfer.success(data)
+    | Msg.Application.Transfer.Failure(data) => Transfer.failed(data)
+    }
   | Msg.MultiSendMsg(data) => MultiSend.factory(data)
   | Msg.ExecMsg(msg) => [
       {
@@ -916,87 +1828,6 @@ let getContent = msg => {
       },
     ]
   | Msg.UnknownMsg => []
-  }
-}
-
-let renderValue = v => {
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-  switch v {
-  | Address(address) => <AddressRender position=AddressRender.Subtitle address />
-  | ValidatorAddress(address) =>
-    <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
-  | PlainText(content) => <Text value={content} size=Text.Body1 />
-  | CoinList(amount) => <AmountRender coins={amount} />
-  | ID(element) => element
-  | Calldata(schema, data) => <Calldata schema calldata=data />
-  | RawReports(data) =>
-    <KVTable
-      headers=["External Id", "Exit Code", "Value"]
-      rows={data
-      ->Belt.List.toArray
-      ->Belt.Array.map(rawReport => [
-        KVTable.Value(rawReport.externalDataID->string_of_int),
-        KVTable.Value(rawReport.exitCode->string_of_int),
-        KVTable.Value(rawReport.data->JsBuffer.toUTF8),
-      ])}
-    />
-  | Timestamp(timestamp) => <Timestamp time={timestamp} size=Text.Body1 />
-  | ValidatorLink(address, moniker, identity) =>
-    <ValidatorMonikerLink
-      validatorAddress={address}
-      moniker={moniker}
-      identity={identity}
-      width={#percent(100.)}
-      avatarWidth=20
-      size=Text.Body1
-    />
-  | VoteWeighted(options) =>
-    <>
-      {options
-      ->Belt.List.mapWithIndex((index, {weight, option}) => {
-        let optionCount = options->Belt.List.toArray->Belt_Array.length
-        let mb = index == optionCount ? 0 : 8
-
-        <div
-          key={index->string_of_int ++ weight->Js.Float.toString ++ option}
-          className={CssHelper.flexBox(
-            ~justify=#flexStart,
-            ~align=#center,
-            ~direction=#row,
-            ~wrap=#wrap,
-            (),
-          )}>
-          <Text size=Text.Body1 value=option />
-          <HSpacing size=Spacing.sm />
-          <Text size=Text.Body1 value={weight->Js.Float.toString} />
-          {index == optionCount - 1 ? React.null : <HSpacing size=Spacing.md />}
-        </div>
-      })
-      ->Belt.List.toArray
-      ->React.array}
-    </>
-  | MultiSendInputList(inputs) =>
-    <KVTable
-      headers=["Address", "Amount (BAND)"]
-      rows={inputs
-      ->Belt.List.toArray
-      ->Belt.Array.map(input => [
-        KVTable.Value(input.address->Address.toBech32),
-        KVTable.Value(input.coins->Coin.getBandAmountFromCoins->Belt.Float.toString),
-      ])}
-    />
-  | MultiSendOutputList(outputs) =>
-    <KVTable
-      headers=["Address", "Amount (BAND)"]
-      rows={outputs
-      ->Belt.List.toArray
-      ->Belt.Array.map(output => [
-        KVTable.Value(output.address->Address.toBech32),
-        KVTable.Value(output.coins->Coin.getBandAmountFromCoins->Belt.Float.toString),
-      ])}
-    />
-  // Noted: We support only 1 level of exec (no recursion)
-  | ExecList(msgs) => React.null
   }
 }
 
