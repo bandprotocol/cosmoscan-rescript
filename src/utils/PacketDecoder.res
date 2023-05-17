@@ -42,7 +42,7 @@ module FungibleTokenPacket = {
 
   open JsonUtils.Decode
   let decode = buildObject(json => {
-    amount: json.required(list{"amount"}, int),
+    amount: json.required(list{"amount"}, intstr),
     denom: json.required(list{"denom"}, string),
     receiver: json.required(list{"receiver"}, string),
     sender: json.required(list{"sender"}, string),
