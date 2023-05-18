@@ -24,10 +24,18 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Cache node_modules
+        id: scan-node-modules-cache
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules
+          key: ${{ runner.OS }}-scan-test-${{ hashFiles('**/yarn.lock') }}
 
       - name: Yarn install deps with node_modules cache
         run: |
-          yarn install
+          yarn install --frozen-lockfile
 
       - name: Build ReScript
         env:
@@ -37,8 +45,8 @@ jobs:
           GRPC: 'https://laozi-testnet6.bandchain.org/grpc-web'
           FAUCET_URL: 'https://laozi-testnet6.bandchain.org/faucet'
         run: |
-          run: yarn build
+          yarn build
 
       - name: Yarn test
         run: |
-          run: yarn test
+          yarn test
