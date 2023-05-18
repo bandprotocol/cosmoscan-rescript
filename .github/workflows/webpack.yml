@@ -38,14 +38,15 @@ jobs:
           yarn install --frozen-lockfile
 
       - name: Build ReScript
-        run: |
-          run: yarn build
         env:
           RPC_URL: 'https://laozi-testnet6.bandchain.org/api'
           GRAPHQL_URL: 'graphql-lt6.bandchain.org/v1/graphql'
           LAMBDA_URL: 'https://asia-southeast1-testnet-instances.cloudfunctions.net/executer-cosmoscan'
           GRPC: 'https://laozi-testnet6.bandchain.org/grpc-web'
           FAUCET_URL: 'https://laozi-testnet6.bandchain.org/faucet'
+        run: |
+          run: yarn run build
+
       - name: Yarn test
         run: |
           run: yarn test
