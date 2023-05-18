@@ -16,6 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
+    - name: Setup yarn
+      run: npm install -g yarn
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
