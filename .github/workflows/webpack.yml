@@ -15,19 +15,27 @@ jobs:
         node-version: [16, 18]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup yarn
         run: npm install -g yarn
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
 
-      - name: Install dependencies
+      - name: Cache node_modules
+        id: scan-node-modules-cache
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules
+          key: ${{ runner.OS }}-scan-test-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Yarn install deps with node_modules cache
         run: |
-          run: yarn install
+          yarn install --frozen-lockfile
 
       - name: Build ReScript
         run: |
