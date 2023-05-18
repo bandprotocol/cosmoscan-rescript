@@ -2,9 +2,9 @@ name: Cosmoscan Build Workflow
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 jobs:
   build:
@@ -12,32 +12,32 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x]
+        node-version: [16, 18]
 
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Setup yarn
-      run: npm install -g yarn
+      - uses: actions/checkout@v2
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Setup yarn
+        run: npm install -g yarn
 
-    - name: Install dependencies
-      run: |
-        run: yarn install
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Build ReScript
-      run: |
-        run: yarn build
-      env:
-          RPC_URL: "https://laozi-testnet6.bandchain.org/api"
-          GRAPHQL_URL: "graphql-lt6.bandchain.org/v1/graphql"
-          LAMBDA_URL: "https://asia-southeast1-testnet-instances.cloudfunctions.net/executer-cosmoscan"
-          GRPC: "https://laozi-testnet6.bandchain.org/grpc-web"
-          FAUCET_URL: "https://laozi-testnet6.bandchain.org/faucet"
-    - name: Yarn test
-      run: |
-        run: yarn test
+      - name: Install dependencies
+        run: |
+          run: yarn install
+
+      - name: Build ReScript
+        run: |
+          run: yarn build
+        env:
+          RPC_URL: 'https://laozi-testnet6.bandchain.org/api'
+          GRAPHQL_URL: 'graphql-lt6.bandchain.org/v1/graphql'
+          LAMBDA_URL: 'https://asia-southeast1-testnet-instances.cloudfunctions.net/executer-cosmoscan'
+          GRPC: 'https://laozi-testnet6.bandchain.org/grpc-web'
+          FAUCET_URL: 'https://laozi-testnet6.bandchain.org/faucet'
+      - name: Yarn test
+        run: |
+          run: yarn test
