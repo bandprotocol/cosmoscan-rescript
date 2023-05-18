@@ -1,0 +1,40 @@
+name: Cosmoscan Build Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Yarn install deps with node_modules cache
+      run: |
+        run: yarn install --frozen-lockfile
+
+    - name: Yarn build
+      run: |
+        run: yarn build
+      env:
+          RPC_URL: "https://laozi-testnet6.bandchain.org/api"
+          GRAPHQL_URL: "graphql-lt6.bandchain.org/v1/graphql"
+          LAMBDA_URL: "https://asia-southeast1-testnet-instances.cloudfunctions.net/executer-cosmoscan"
+          GRPC: "https://laozi-testnet6.bandchain.org/grpc-web"
+          FAUCET_URL: "https://laozi-testnet6.bandchain.org/faucet"
+    - name: Yarn test
+      run: |
+        run: yarn test
