@@ -293,10 +293,7 @@ let getValidatorMoniker = (~address, ()) => {
   result
   ->Query.fromData
   ->Query.map(({validators_by_pk}) => {
-    switch validators_by_pk {
-    | Some(validator) => Query.resolve(validator)
-    | None => Query.NoData
-    }
+    validators_by_pk
   })
 }
 

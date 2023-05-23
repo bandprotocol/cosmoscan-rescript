@@ -62,15 +62,36 @@ type content_t = {
   title: string,
   content: content_inner_t,
   order: int,
-  heading?: string
+  heading?: string,
 }
 
 let renderValue = v => {
   switch v {
   | Address(address) => <AddressRender position=AddressRender.Subtitle address />
-  | ValidatorAddress(address) =>
-    <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
-  | PlainText(content) => <Text value={content} size=Text.Body1 breakAll=true/>
+  | ValidatorAddress(address) => {
+      let valinfo = SearchBarQuery.getValidatorMoniker(~address, ())
+
+      switch valinfo {
+      | Data(val) =>
+        switch val {
+        | Some({moniker, identity}) =>
+          <ValidatorMonikerLink
+            validatorAddress={address}
+            moniker={moniker}
+            identity={identity}
+            width={#percent(100.)}
+            avatarWidth=20
+            size=Text.Body1
+          />
+        | _ => <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
+        }
+
+      | Loading => <LoadingCensorBar width=150 height=15 />
+      | _ => React.null
+      }
+    }
+
+  | PlainText(content) => <Text value={content} size=Text.Body1 breakAll=true />
   | CoinList(amount) => <AmountRender coins={amount} />
   | ID(element) => element
   | Calldata(schema, data) => <Calldata schema calldata=data />
@@ -120,7 +141,7 @@ let renderValue = v => {
       ->Belt.List.toArray
       ->React.array}
     </>
-  | Packet(packet) => <Packet packet/>
+  | Packet(packet) => <Packet packet />
   | MultiSendInputList(inputs) =>
     <KVTable
       headers=["Address", "Amount (BAND)"]
@@ -934,7 +955,7 @@ module MultiSend = {
 }
 
 module RecvPacket = {
-  let factory = (msg: Msg.Channel.RecvPacket.t<'a>, firsts) => 
+  let factory = (msg: Msg.Channel.RecvPacket.t<'a>, firsts) =>
     firsts->Belt.Array.concat([
       {
         title: "Signer",
@@ -996,85 +1017,90 @@ module RecvPacket = {
     ])
 
   let success = (msg: Msg.Channel.RecvPacket.success_t) =>
-    msg->factory(switch msg.packetData {
-      | Some(packetData) => switch packetData.packetDetail {
+    msg->factory(
+      switch msg.packetData {
+      | Some(packetData) =>
+        switch packetData.packetDetail {
         | OracleRequestPacket(details) => [
-          {
-            heading: "Packet Data",
-            title: "",
-            content: PlainText(""),
-            order: 12,
-          },
-          {
-            title: "Request ID",
-            content: ID(<TypeID.Request position=TypeID.Subtitle id=details.requestID />),
-            order: 13,
-          },
-          {
-            title: "Oracle Script",
-            content: ID(<TypeID.OracleScript position=TypeID.Subtitle id=details.oracleScriptID />),
-            order: 14,
-          },
-          {
-            title: "Prepare Gas",
-            content: PlainText(details.prepareGas->Belt.Int.toString),
-            order: 15,
-          },
-          {
-            title: "Execute Gas",
-            content: PlainText(details.executeGas->Belt.Int.toString),
-            order: 16,
-          },
-          {
-            title: "Calldata",
-            content: Calldata(details.schema, details.calldata),
-            order: 17,
-          },
-          {
-            title: "Request Validator Count",
-            content: PlainText(details.askCount->Belt.Int.toString),
-            order: 18,
-          },
-          {
-            title: "Sufficient Validator Count",
-            content: PlainText(details.minCount->Belt.Int.toString),
-            order: 19,
-          },
-        ]
+            {
+              heading: "Packet Data",
+              title: "",
+              content: PlainText(""),
+              order: 12,
+            },
+            {
+              title: "Request ID",
+              content: ID(<TypeID.Request position=TypeID.Subtitle id=details.requestID />),
+              order: 13,
+            },
+            {
+              title: "Oracle Script",
+              content: ID(
+                <TypeID.OracleScript position=TypeID.Subtitle id=details.oracleScriptID />,
+              ),
+              order: 14,
+            },
+            {
+              title: "Prepare Gas",
+              content: PlainText(details.prepareGas->Belt.Int.toString),
+              order: 15,
+            },
+            {
+              title: "Execute Gas",
+              content: PlainText(details.executeGas->Belt.Int.toString),
+              order: 16,
+            },
+            {
+              title: "Calldata",
+              content: Calldata(details.schema, details.calldata),
+              order: 17,
+            },
+            {
+              title: "Request Validator Count",
+              content: PlainText(details.askCount->Belt.Int.toString),
+              order: 18,
+            },
+            {
+              title: "Sufficient Validator Count",
+              content: PlainText(details.minCount->Belt.Int.toString),
+              order: 19,
+            },
+          ]
         | FungibleTokenPacket(details) => [
-          {
-            heading: "Packet Data",
-            title: "",
-            content: PlainText(""),
-            order: 12,
-          },
-          {
-            title: "Sender",
-            content: PlainText(details.sender),
-            order: 13,
-          },
-          {
-            title: "Receiver",
-            content: PlainText(details.receiver),
-            order: 14,
-          },
-          {
-            title: "Amount",
-            content: PlainText(details.amount->Belt.Int.toString),
-            order: 15,
-          },
-         
-        ]
+            {
+              heading: "Packet Data",
+              title: "",
+              content: PlainText(""),
+              order: 12,
+            },
+            {
+              title: "Sender",
+              content: PlainText(details.sender),
+              order: 13,
+            },
+            {
+              title: "Receiver",
+              content: PlainText(details.receiver),
+              order: 14,
+            },
+            {
+              title: "Amount",
+              content: PlainText(details.amount->Belt.Int.toString),
+              order: 15,
+            },
+          ]
         | Unknown => []
-        } 
+        }
       | None => []
-      })
+      },
+    )
 
   let failed = (msg: Msg.Channel.RecvPacket.fail_t) => msg->factory([])
 }
 
 module AcknowledgePacket = {
-  let factory = (msg: Msg.Channel.AcknowledgePacket.t) => {[
+  let factory = (msg: Msg.Channel.AcknowledgePacket.t) => {
+    [
       {
         title: "Signer",
         content: Address(msg.signer),
@@ -1132,11 +1158,13 @@ module AcknowledgePacket = {
         content: Timestamp(msg.packet.timeoutTimestamp),
         order: 11,
       },
-    ]}
+    ]
+  }
 }
 
 module Timeout = {
-  let factory = (msg: Msg.Channel.Timeout.t) => {[
+  let factory = (msg: Msg.Channel.Timeout.t) => {
+    [
       {
         title: "Signer",
         content: Address(msg.signer),
@@ -1194,7 +1222,8 @@ module Timeout = {
         content: Timestamp(msg.packet.timeoutTimestamp),
         order: 11,
       },
-    ]}
+    ]
+  }
 }
 
 module CreateClient = {
@@ -1272,12 +1301,12 @@ module ConnectionOpenTry = {
         content: PlainText(msg.clientID),
         order: 2,
       },
-       {
+      {
         title: "Delay Period",
         content: PlainText(msg.delayPeriod->Belt.Int.toString ++ "ns"),
         order: 3,
       },
-       {
+      {
         title: "Previous Connection ID",
         content: PlainText(msg.previousConnectionID),
         order: 4,
@@ -1461,7 +1490,6 @@ module ChannelOpenInit = {
         content: PlainText(msg.channel.counterparty.portID),
         order: 6,
       },
-      
     ]
   }
 }
@@ -1707,8 +1735,7 @@ module Transfer = {
       },
     ])
 
-  let failed = (msg: Msg.Application.Transfer.fail_t) =>
-    msg->factory([])
+  let failed = (msg: Msg.Application.Transfer.fail_t) => msg->factory([])
 }
 
 let getContent = msg => {
@@ -1787,9 +1814,10 @@ let getContent = msg => {
     | Msg.Gov.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
   | Msg.CreateClientMsg(data) => CreateClient.factory(data)
-  | Msg.UpdateClientMsg(data) 
+  | Msg.UpdateClientMsg(data)
   | Msg.UpgradeClientMsg(data)
-  | Msg.SubmitClientMisbehaviourMsg(data) => Client.factory(data)
+  | Msg.SubmitClientMisbehaviourMsg(data) =>
+    Client.factory(data)
   | Msg.RecvPacketMsg(m) =>
     switch m {
     | Msg.Channel.RecvPacket.Success(data) => RecvPacket.success(data)
