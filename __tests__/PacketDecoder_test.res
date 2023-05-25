@@ -3,15 +3,22 @@ open! PacketDecoder
 open Expect
 
 describe("Expect getPacketTypeText function work correctly", () => {
-  test("oracle_request", () =>expect("oracle_request"->getPacketTypeText)->toEqual("Oracle Request"))
-  test("oracle_response", () =>expect("oracle_response"->getPacketTypeText)->toEqual("Oracle Response"))
-  test("fungible_token", () =>expect("fungible_token"->getPacketTypeText)->toEqual("Fungible Token"))
-  test("Unknown", () =>expect("test"->getPacketTypeText)->toEqual("Unknown"))
+  test("oracle_request", () =>
+    expect("oracle_request"->getPacketTypeText)->toEqual("Oracle Request")
+  )
+  test("oracle_response", () =>
+    expect("oracle_response"->getPacketTypeText)->toEqual("Oracle Response")
+  )
+  test("fungible_token", () =>
+    expect("fungible_token"->getPacketTypeText)->toEqual("Fungible Token")
+  )
+  test("Unknown", () => expect("test"->getPacketTypeText)->toEqual("Unknown"))
 })
 
 describe("Expect decodeAction function to work correctly", () => {
-  test("type oracle_request", () => expect({
-    let json = `
+  test("type oracle_request", () =>
+    expect({
+      let json = `
   {
   "msg": {
     "decoded_data": {
@@ -54,26 +61,28 @@ describe("Expect decodeAction function to work correctly", () => {
   "type": "/ibc.core.channel.v1.MsgRecvPacket"
 }`->Js.Json.parseExn
 
-    json->JsonUtils.Decode.mustDecode(decodeAction)
-  })->toEqual({
-    packetDetail: OracleRequestPacket({
-      requestID: 1448951->ID.Request.fromInt,
-      oracleScriptID: 372->ID.OracleScript.fromInt,
-      oracleScriptName: "Get Cosmos Prices",
-      clientID: "fetch_price_id",
-      calldata: "AAAAFgAAAARBVE9NAAAABENNRFgAAAAEQ01TVAAAAARPU01PAAAAB0FYTFVTREMAAAAHQVhMV0VUSAAAAAZTVEFUT00AAAAESlVOTwAAAAdBWExXQlRDAAAABkFYTERBSQAAAAZXTUFUSUMAAAAFR1VTREMAAAAHQVhMV0JOQgAAAAVFVk1PUwAAAAVDQU5UTwAAAARMVU5BAAAABFhQUlQAAAADQUtUAAAABlNUT1NNTwAAAAdBWExXRlRNAAAABE1OVEwAAAAER0RBSQAAAAAAD0JA"->JsBuffer.fromBase64,
-      askCount: 4,
-      minCount: 3,
-      feeLimit: "250000uband",
-      executeGas: 600000,
-      prepareGas: 600000,
-      schema: "{symbols:[string],multiplier:u64}/{rates:[u64]}",
-    }),
-    packetType: "Oracle Request",
-  }))
+      json->JsonUtils.Decode.mustDecode(decodeAction)
+    })->toEqual({
+      packetDetail: OracleRequestPacket({
+        requestID: 1448951->ID.Request.fromInt,
+        oracleScriptID: 372->ID.OracleScript.fromInt,
+        oracleScriptName: "Get Cosmos Prices",
+        clientID: "fetch_price_id",
+        calldata: "AAAAFgAAAARBVE9NAAAABENNRFgAAAAEQ01TVAAAAARPU01PAAAAB0FYTFVTREMAAAAHQVhMV0VUSAAAAAZTVEFUT00AAAAESlVOTwAAAAdBWExXQlRDAAAABkFYTERBSQAAAAZXTUFUSUMAAAAFR1VTREMAAAAHQVhMV0JOQgAAAAVFVk1PUwAAAAVDQU5UTwAAAARMVU5BAAAABFhQUlQAAAADQUtUAAAABlNUT1NNTwAAAAdBWExXRlRNAAAABE1OVEwAAAAER0RBSQAAAAAAD0JA"->JsBuffer.fromBase64,
+        askCount: 4,
+        minCount: 3,
+        feeLimit: "250000uband",
+        executeGas: 600000,
+        prepareGas: 600000,
+        schema: "{symbols:[string],multiplier:u64}/{rates:[u64]}",
+      }),
+      packetType: "Oracle Request",
+    })
+  )
 
-  test("type fungible_token", () => expect({
-    let json = `{
+  test("type fungible_token with amount type string", () =>
+    expect({
+      let json = `{
   "msg": {
     "decoded_data": {
       "amount": "1000000",
@@ -99,19 +108,61 @@ describe("Expect decodeAction function to work correctly", () => {
   "type": "/ibc.applications.transfer.v1.MsgTransfer"
 }`->Js.Json.parseExn
 
-    json->JsonUtils.Decode.mustDecode(decodeAction)
-  })->toEqual({
-    packetDetail: FungibleTokenPacket({
-      amount: 1000000,
-      denom: "uband",
-      receiver: "osmo16hetkn089m2s8nsjwppwhjed4ecp4dqtsc0p6f",
-      sender: "band1jj4fup0pl6pvyra7kga8yrlrjww0yzrjftpsjs",
-    }),
-    packetType: "Fungible Token",
-  }))
+      json->JsonUtils.Decode.mustDecode(decodeAction)
+    })->toEqual({
+      packetDetail: FungibleTokenPacket({
+        amount: 1000000,
+        denom: "uband",
+        receiver: "osmo16hetkn089m2s8nsjwppwhjed4ecp4dqtsc0p6f",
+        sender: "band1jj4fup0pl6pvyra7kga8yrlrjww0yzrjftpsjs",
+      }),
+      packetType: "Fungible Token",
+    })
+  )
 
-  test("type unknown", () => expect({
-    let json = `{
+  test("type fungible_token with amount type int", () =>
+    expect({
+      let json = `{
+  "msg": {
+    "decoded_data": {
+      "amount": 1000000,
+      "denom": "uband",
+      "receiver": "osmo16hetkn089m2s8nsjwppwhjed4ecp4dqtsc0p6f",
+      "sender": "band1jj4fup0pl6pvyra7kga8yrlrjww0yzrjftpsjs"
+    },
+    "packet_type": "fungible_token",
+    "receiver": "osmo16hetkn089m2s8nsjwppwhjed4ecp4dqtsc0p6f",
+    "sender": "band1jj4fup0pl6pvyra7kga8yrlrjww0yzrjftpsjs",
+    "source_channel": "channel-303",
+    "source_port": "transfer",
+    "timeout_height": {
+      "revision_height": 0,
+      "revision_number": 0
+    },
+    "timeout_timestamp": 1679571169881000000,
+    "token": {
+      "denom": "uband",
+      "amount": "1000000"
+    }
+  },
+  "type": "/ibc.applications.transfer.v1.MsgTransfer"
+}`->Js.Json.parseExn
+
+      json->JsonUtils.Decode.mustDecode(decodeAction)
+    })->toEqual({
+      packetDetail: FungibleTokenPacket({
+        amount: 1000000,
+        denom: "uband",
+        receiver: "osmo16hetkn089m2s8nsjwppwhjed4ecp4dqtsc0p6f",
+        sender: "band1jj4fup0pl6pvyra7kga8yrlrjww0yzrjftpsjs",
+      }),
+      packetType: "Fungible Token",
+    })
+  )
+
+  test("type unknown", () =>
+    expect({
+      let json = `{
   "msg": {
     "decoded_data": {
       "test": "test"
@@ -120,9 +171,7 @@ describe("Expect decodeAction function to work correctly", () => {
   }
 }`->Js.Json.parseExn
 
-    json->JsonUtils.Decode.mustDecode(decodeAction)
-  })->toEqual({packetDetail: Unknown, packetType: "Unknown"}))
-
-
+      json->JsonUtils.Decode.mustDecode(decodeAction)
+    })->toEqual({packetDetail: Unknown, packetType: "Unknown"})
+  )
 })
-
