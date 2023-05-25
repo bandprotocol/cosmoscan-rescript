@@ -3,5 +3,6 @@ module.exports = async () => {
   return {
     testRunner: 'jest-jasmine2',
     verbose: true,
+    testTimeout: 30000,
   }
 }

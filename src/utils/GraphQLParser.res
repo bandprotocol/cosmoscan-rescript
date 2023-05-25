@@ -82,6 +82,7 @@ let coinStr = str => {
 }
 
 let coinRegEx = "([0-9]+)([a-z][a-z0-9/]{2,31})"->Js.Re.fromString
+
 let coins = str => {
   str
   ->Js.String2.split(",")
@@ -112,7 +113,6 @@ let coins = str => {
       }
     }
   })
-
   // let result = Js.Re.exec_(coinRegEx, coin)->Belt.Option.getExn->Js.Re.captures
 
   // Some({
@@ -121,8 +121,20 @@ let coins = str => {
   // })
 }
 
+
+let coinSerialize = coins => {
+  coins
+  ->Belt.List.map(Coin.getUBandAmountFromCoin)
+  ->Belt.List.map(x => x->Belt.Float.toString->Js.String2.concat("uband"))
+  ->Belt.List.reduceWithIndex("", (acc, item, index) => acc ++ {switch index {
+    | 0 => ""
+    | _ => ", "
+  }} ++ item)
+}
+
+
 let addressExn = strOpt => strOpt->Belt.Option.getExn->Address.fromBech32
-let addressOpt = strOpt => strOpt->Belt.Option.map(_, Address.fromBech32)
+let addressOpt = strOpt => strOpt->Belt.Option.map(Address.fromBech32)
 
 let numberWithDefault = jsonOpt =>
   jsonOpt->Belt.Option.flatMap(Js.Json.decodeNumber)->Belt.Option.getWithDefault(_, 0.0)
