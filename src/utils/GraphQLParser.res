@@ -60,7 +60,11 @@ let hash = json =>
 let intToCoin = int_ => int_->Belt.Float.fromInt->Coin.newUBANDFromAmount
 
 let coin = json =>
-  json->Js.Json.decodeString->Belt.Option.flatMap(Belt.Float.fromString)->Belt.Option.getExn->Coin.newUBANDFromAmount
+  json
+  ->Js.Json.decodeString
+  ->Belt.Option.flatMap(Belt.Float.fromString)
+  ->Belt.Option.getExn
+  ->Coin.newUBANDFromAmount
 
 let coinExn = jsonOpt =>
   jsonOpt
@@ -117,21 +121,23 @@ let coins = str => {
 
   // Some({
   //   Coin.denom: result[2]->Js.Nullable.toOption->Belt.Option.getExn,
-  //   amount: result[1]->Js.Nullable.toOption->Belt.Option.getExn->float_of_string,
+  //   amount: result[1]->Js.Nullable.toOption->Belt.Option.flatMap(Belt.Float.fromString)->Belt.Option.getExn
   // })
 }
-
 
 let coinSerialize = coins => {
   coins
   ->Belt.List.map(Coin.getUBandAmountFromCoin)
   ->Belt.List.map(x => x->Belt.Float.toString->Js.String2.concat("uband"))
-  ->Belt.List.reduceWithIndex("", (acc, item, index) => acc ++ {switch index {
+  ->Belt.List.reduceWithIndex("", (acc, item, index) =>
+    acc ++
+    switch index {
     | 0 => ""
     | _ => ", "
-  }} ++ item)
+    } ++
+    item
+  )
 }
-
 
 let addressExn = strOpt => strOpt->Belt.Option.getExn->Address.fromBech32
 let addressOpt = strOpt => strOpt->Belt.Option.map(Address.fromBech32)
@@ -145,6 +151,7 @@ let floatWithDefault = jsonOpt =>
   ->Belt.Option.flatMap(Belt.Float.fromString)
   ->Belt.Option.getWithDefault(0.)
 
-let floatString = json => json->Js.Json.decodeString->Belt.Option.flatMap(Belt.Float.fromString)->Belt.Option.getExn
+let floatString = json =>
+  json->Js.Json.decodeString->Belt.Option.flatMap(Belt.Float.fromString)->Belt.Option.getExn
 
 let floatExn = json => json->Js.Json.decodeNumber->Belt.Option.getExn

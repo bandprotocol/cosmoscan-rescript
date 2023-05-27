@@ -108,7 +108,10 @@ module SubmitTxStep = {
       </div>
       <div className={Styles.advancedOptions(show, theme)}>
         <ValueInput
-          value={gasInput->string_of_int} setValue=setGasInput title="Gas Limit" inputType="number"
+          value={gasInput->Belt.Int.toString}
+          setValue=setGasInput
+          title="Gas Limit"
+          inputType="number"
         />
       </div>
       <SeperatedLine />

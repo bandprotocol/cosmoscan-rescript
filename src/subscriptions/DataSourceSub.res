@@ -47,7 +47,9 @@ let toExternal = ({
   description,
   executable,
   fee,
-  accumulatedRevenue: list{accumulatedRevenue->float_of_string->Coin.newUBANDFromAmount},
+  accumulatedRevenue: list{
+    accumulatedRevenue->Belt.Float.fromString->Belt.Option.getExn->Coin.newUBANDFromAmount,
+  },
   timestamp: txOpt->Belt.Option.map(tx => tx.block.timestamp),
   requestCount: requestStatOpt->Belt.Option.mapWithDefault(0, ({count}) => count),
 }

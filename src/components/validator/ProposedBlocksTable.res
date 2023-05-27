@@ -112,7 +112,11 @@ let make = (~consensusAddress) => {
           <Row alignItems=Row.Center>
             <Col col=Col.Two>
               <Text
-                block=true value="Block" weight=Text.Semibold transform=Text.Uppercase size=Text.Caption
+                block=true
+                value="Block"
+                weight=Text.Semibold
+                transform=Text.Uppercase
+                size=Text.Caption
               />
             </Col>
             <Col col=Col.Seven>
@@ -163,8 +167,8 @@ let make = (~consensusAddress) => {
       Belt.Array.make(pageSize, Sub.NoData)
       ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile key={string_of_int(i)} reserveIndex=i blockSub=noData />
-          : <RenderBody key={string_of_int(i)} blockSub=noData />
+          ? <RenderBodyMobile key={Belt.Int.toString(i)} reserveIndex=i blockSub=noData />
+          : <RenderBody key={Belt.Int.toString(i)} blockSub=noData />
       )
       ->React.array
     }}

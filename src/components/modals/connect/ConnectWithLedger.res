@@ -126,17 +126,18 @@ let make = (~chainID, ~ledgerApp) => {
         <select
           className={Styles.selectContent(theme)}
           onChange={event => {
-            let newAccountIndex = ReactEvent.Form.target(event)["value"]->int_of_string
+            let newAccountIndex =
+              ReactEvent.Form.target(event)["value"]->Belt.Int.fromString->Belt.Option.getExn
             setAccountIndex(_ => newAccountIndex)
           }}>
           {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
           ->Belt.Array.map(index =>
-            <option key={index->string_of_int} value={index->string_of_int}>
+            <option key={index->Belt.Int.toString} value={index->Belt.Int.toString}>
               {
                 let prefixPath = switch ledgerApp {
                 | Ledger.Cosmos => "44/118/0/0/"
                 }
-                (prefixPath ++ index->string_of_int)->React.string
+                (prefixPath ++ index->Belt.Int.toString)->React.string
               }
             </option>
           )
