@@ -57,7 +57,6 @@ module DesktopRender = {
                       color=theme.neutral_900
                       special=true
                     />
-                    <br />
                     <Text
                       value="Cosmoscan"
                       nowrap=true
@@ -148,7 +147,7 @@ module MobileRender = {
       </Row>
       <Row marginTop=20>
         <Col colSm=Col.Twelve>
-          <ChainIDBadge dropdown=true />
+          <ChainIDBadge />
         </Col>
       </Row>
       <Row marginTop=20>

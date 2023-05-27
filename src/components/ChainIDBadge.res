@@ -1,46 +1,49 @@
 module Styles = {
   open CssJs
 
-  let buttonContainer = style(. [
-    Media.mobile([
-      width(#percent(100.)),
-      marginTop(#px(16)),
-      marginBottom(#px(24)),
+  let version = (theme: Theme.t) =>
+    style(. [
+      display(#flex),
+      borderRadius(#px(8)),
+      border(#px(1), #solid, theme.neutral_600),
+      backgroundColor(theme.neutral_000),
+      padding2(~v=#px(8), ~h=#px(10)),
+      minWidth(#px(153)),
+      justifyContent(#spaceBetween),
+      alignItems(#center),
+      position(#relative),
+      cursor(#pointer),
+      zIndex(5),
+      Media.mobile([padding2(~v=#px(5), ~h=#px(10))]),
+      Media.smallMobile([minWidth(#px(90))]),
     ])
-    ]);
-  let link = style(. [Media.mobile([flexBasis(#percent(50.))])])
-  let baseBtn =
-    style(. [
-      textAlign(#center),
-      Media.mobile([width(#percent(100.)), flexGrow(0.), flexShrink(0.), flexBasis(#percent(50.))]),
-    ]);
 
-  let leftBtn = (state, theme: Theme.t, isDarkMode) => {
+  let dropdown = (show, theme: Theme.t) =>
     style(. [
-      borderTopRightRadius(#zero),
-      borderBottomRightRadius(#zero),
-      backgroundColor(state ? theme.neutral_900 : theme.neutral_000),
-      color(state ? theme.neutral_100 : theme.neutral_500),
-      hover([
-        backgroundColor(state ? theme.neutral_900 : theme.neutral_100),
-        color(state ? theme.neutral_100 : theme.neutral_500),
-      ]),
-    ]);
-  };
-  let rightBtn = (state, theme: Theme.t, isDarkMode) => {
-    style(. [
-      borderTopLeftRadius(#zero),
-      borderBottomLeftRadius(#zero),
-      color(state ? theme.neutral_500 : theme.neutral_100),
-      backgroundColor(state ? theme.neutral_000 : theme.neutral_900),
-      hover([
-        backgroundColor(state ? theme.neutral_100 : theme.neutral_900),
-        color(state ? theme.neutral_500 : theme.neutral_100),
-      ]),
-    ]);
-  };
-};
+      position(#absolute),
+      width(#percent(100.)),
+      border(#px(1), #solid, theme.neutral_600),
+      backgroundColor(theme.neutral_000),
+      borderRadius(#px(8)),
+      transition(~duration=200, "all"),
+      top(#percent(110.)),
+      left(#zero),
+      height(#auto),
+      opacity(show ? 1. : 0.),
+      pointerEvents(show ? #auto : #none),
+      overflow(#hidden),
+      Media.mobile([top(#px(35))]),
+    ])
 
+  let link = (theme: Theme.t) =>
+    style(. [
+      textDecoration(#none),
+      backgroundColor(theme.neutral_000),
+      display(#block),
+      padding2(~v=#px(5), ~h=#px(10)),
+      hover([backgroundColor(theme.neutral_100)]),
+    ])
+}
 
 type chainID =
   | WenchangTestnet
@@ -52,7 +55,7 @@ type chainID =
   | LaoziTestnet
   | LaoziMainnet
   | LaoziPOA
-  | Unknown;
+  | Unknown
 
 let parseChainID = x =>
   switch x {
@@ -62,11 +65,13 @@ let parseChainID = x =>
   | "band-guanyu-devnet6"
   | "band-guanyu-devnet7"
   | "band-guanyu-devnet8"
-  | "bandchain" => GuanYuDevnet
+  | "bandchain" =>
+    GuanYuDevnet
   | "band-guanyu-testnet1"
   | "band-guanyu-testnet2"
   | "band-guanyu-testnet3"
-  | "band-guanyu-testnet4" => GuanYuTestnet
+  | "band-guanyu-testnet4" =>
+    GuanYuTestnet
   | "band-guanyu-poa" => GuanYuPOA
   | "band-guanyu-mainnet" => GuanYuMainnet
   | "band-laozi-testnet1"
@@ -74,7 +79,8 @@ let parseChainID = x =>
   | "band-laozi-testnet3"
   | "band-laozi-testnet4"
   | "band-laozi-testnet5"
-  | "band-laozi-testnet6" => LaoziTestnet
+  | "band-laozi-testnet6" =>
+    LaoziTestnet
   | "laozi-mainnet" => LaoziMainnet
   | "band-laozi-poa" => LaoziPOA
   | _ => Unknown
@@ -101,7 +107,7 @@ let getName = x =>
   | GuanYuDevnet => "guanyu-devnet"
   | GuanYuTestnet => "guanyu-testnet"
   | GuanYuPOA => "guanyu-poa"
-  | GuanYuMainnet => "guanyu-mainnet"
+  | GuanYuMainnet => "legacy-guanyu"
   | LaoziTestnet => "laozi-testnet"
   | LaoziMainnet => "laozi-mainnet"
   | LaoziPOA => "laozi-poa"
@@ -109,51 +115,41 @@ let getName = x =>
   }
 
 @react.component
-let make = (~dropdown=false) => {
-    let isMobile = Media.isMobile()
-    let currentRouteString = RescriptReactRouter.useUrl() -> Route.fromUrl -> Route.toString
-    let (show, setShow) = React.useState(_ => false)
-    let trackingSub = TrackingSub.use()
-    let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-    
-    
-    switch trackingSub {
-      | Data(tracking) =>  {
-        let currentChainID = tracking.chainID->parseChainID;
-        let networkNames = [LaoziMainnet, LaoziTestnet] -> Belt.Array.map(chainID => chainID->getName)
-        let isMainnet = (currentChainID->getName) == "laozi-mainnet"
+let make = () => {
+  let (show, setShow) = React.useState(_ => false)
+  let trackingSub = TrackingSub.use()
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-        <div className={Css.merge(list{CssHelper.flexBox(), Styles.buttonContainer})}>
-          <AbsoluteLink 
-            className=Styles.link
-            href={isMainnet ? "" : getLink(LaoziMainnet) ++ currentRouteString} 
-            noNewTab=true
-          >
-            <Button
-              px=16
-              py=8
-              variant=Button.Outline
-              style={Css.merge(list{Styles.baseBtn, Styles.leftBtn(isMainnet, theme, isDarkMode)})}>
-              {networkNames[0]  -> React.string}
-            </Button>
-          </AbsoluteLink>
-          <AbsoluteLink 
-            className=Styles.link
-            href={isMainnet ? getLink(LaoziTestnet) ++ currentRouteString: ""} 
-            noNewTab=true
-          >
-            <Button
-              px=16
-              py=8
-              variant=Button.Outline
-              style={Css.merge(list{Styles.baseBtn, Styles.rightBtn(isMainnet, theme, isDarkMode)})}>
-              {networkNames[1] -> React.string}
-            </Button>
-          </AbsoluteLink>
+  switch trackingSub {
+  | Data({chainID}) => {
+      let currentChainID = chainID->parseChainID
+      <div
+        className={Styles.version(theme)}
+        onClick={event => {
+          setShow(oldVal => !oldVal)
+          ReactEvent.Mouse.stopPropagation(event)
+        }}>
+        <Text
+          value={currentChainID->getName} color={theme.neutral_900} nowrap=true weight=Text.Semibold
+        />
+        <HSpacing size=Spacing.sm />
+        {show
+          ? <Icon name="far fa-angle-up" color={theme.neutral_600} />
+          : <Icon name="far fa-angle-down" color={theme.neutral_600} />}
+        <div className={Styles.dropdown(show, theme)}>
+          {[LaoziMainnet, LaoziTestnet]
+          ->Belt.Array.keep(chainID => chainID != currentChainID)
+          ->Belt.Array.map(chainID => {
+            let name = chainID->getName
+            <AbsoluteLink href={getLink(chainID)} key=name className={Styles.link(theme)}>
+              <Text value=name color={theme.neutral_600} nowrap=true weight=Text.Semibold />
+            </AbsoluteLink>
+          })
+          ->React.array}
         </div>
-      }
-      | _ =>  <div className=Styles.buttonContainer> 
-        <LoadingCensorBar width={isMobile ? 310 : 310} height=30 />
       </div>
     }
+
+  | _ => <LoadingCensorBar width=153 height=30 />
   }
+}
