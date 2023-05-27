@@ -186,5 +186,6 @@ let make = (~chainID, ~ledgerApp) => {
           }}>
           {"Connect to Ledger"->React.string}
         </Button>}
+    <VSpacing size=Spacing.lg />
   </div>
 }
