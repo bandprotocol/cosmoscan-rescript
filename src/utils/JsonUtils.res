@@ -12,12 +12,11 @@ module Decode = {
   let strWithDefault = string->option->map((. a) => a->Belt.Option.getWithDefault(_, ""))
   let bufferFromHex = string->map((. a) => JsBuffer.fromHex(a))
   let bufferFromBase64 = string->map((. a) => JsBuffer.fromBase64(a))
-  let timeNS = float->map((. n) =>
-    (n /. 1e6)->MomentRe.momentWithTimestampMS->MomentRe.Moment.defaultUtc
-  )
+  let timeNS =
+    float->map((. n) => (n /. 1e6)->MomentRe.momentWithTimestampMS->MomentRe.Moment.defaultUtc)
   let timeString = string->map((. s) => s->MomentRe.momentUtcDefaultFormat)
 
-  let stringOrInt = oneOf([int, string->map((. a) => a->int_of_string)])
+  let stringOrInt = oneOf([int, string->map((. a) => a->Belt.Int.fromString->Belt.Option.getExn)])
 
   let rec at = (fields, decoder) => {
     switch fields {

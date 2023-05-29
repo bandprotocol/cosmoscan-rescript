@@ -68,17 +68,6 @@ let make = (~request: RequestSub.t) => {
           pySm=10
           pxSm=12
         />
-        {let nonEVMProofOpt = proof.jsonProof->NonEVMProof.createProofFromJson;
-         switch (nonEVMProofOpt) {
-         | Some(proof) =>
-           <CopyButton
-             data={proof -> JsBuffer.toHex(~with0x=false)}
-             title={isMobile ? "non-EVM" : "Copy non-EVM proof"}
-             py=10
-             px=14
-           />
-         | _ => React.null
-         }}
       </div>
       {showProof
          ? <div className=Styles.scriptContainer>

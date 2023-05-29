@@ -1085,7 +1085,7 @@ module RecvPacket = {
             },
             {
               title: "Amount",
-              content: PlainText(details.amount->Belt.Int.toString),
+              content: PlainText(details.amount->Belt.Int.toString ++ " " ++ details.denom),
               order: 15,
             },
           ]
