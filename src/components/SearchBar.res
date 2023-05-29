@@ -124,7 +124,7 @@ module RenderMonikerLink = {
       {switch validator {
       | Data(validator') =>
         switch validator' {
-        | Data({moniker, identity}) =>
+        | Some({moniker, identity}) =>
           <div className={CssHelper.flexBox(~align=#center, ())}>
             <Avatar moniker identity width=20 />
             <HSpacing size=Spacing.sm />
