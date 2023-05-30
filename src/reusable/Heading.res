@@ -46,8 +46,15 @@ module Styles = {
     }
   let textColor = color_ => style(. [color(color_)])
   let mb = (~mb, ~mbSm, ()) =>
-    style(. [marginBottom(#px(mb)), Media.mobile([marginBottom(#px(mbSm))])])
-  let mt = (~mt, ~mtSm, ()) => style(. [marginTop(#px(mt)), Media.mobile([marginTop(#px(mtSm))])])
+    style(. [
+      marginBottom(#px(mb)),
+      Media.mobile([marginBottom(#px(mbSm->Belt.Option.getWithDefault(mb)))]),
+    ])
+  let mt = (~mt, ~mtSm, ()) =>
+    style(. [
+      marginTop(#px(mt)),
+      Media.mobile([marginTop(#px(mtSm->Belt.Option.getWithDefault(mt)))]),
+    ])
   let mono = style(. [fontFamilies([#custom("Roboto Mono"), #monospace])])
 }
 
@@ -58,9 +65,9 @@ let make = (
   ~weight=Semibold,
   ~size=H1,
   ~marginTop=0,
-  ~marginTopSm=0,
+  ~marginTopSm=?,
   ~marginBottom=0,
-  ~marginBottomSm=0,
+  ~marginBottomSm=?,
   ~style="",
   ~color=?,
   ~mono=false,
