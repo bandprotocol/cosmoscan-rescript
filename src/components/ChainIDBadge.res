@@ -7,14 +7,13 @@ module Styles = {
       borderRadius(#px(8)),
       border(#px(1), #solid, theme.neutral_600),
       backgroundColor(theme.neutral_000),
-      padding2(~v=#px(8), ~h=#px(10)),
+      padding2(~v=#px(8), ~h=#px(24)),
       minWidth(#px(153)),
       justifyContent(#spaceBetween),
       alignItems(#center),
       position(#relative),
       cursor(#pointer),
       zIndex(5),
-      Media.mobile([padding2(~v=#px(5), ~h=#px(10))]),
       Media.smallMobile([minWidth(#px(90))]),
     ])
 
@@ -32,7 +31,7 @@ module Styles = {
       opacity(show ? 1. : 0.),
       pointerEvents(show ? #auto : #none),
       overflow(#hidden),
-      Media.mobile([top(#px(35))]),
+      Media.mobile([top(#px(40))]),
     ])
 
   let link = (theme: Theme.t) =>
@@ -40,7 +39,7 @@ module Styles = {
       textDecoration(#none),
       backgroundColor(theme.neutral_000),
       display(#block),
-      padding2(~v=#px(5), ~h=#px(10)),
+      padding2(~v=#px(8), ~h=#px(24)),
       hover([backgroundColor(theme.neutral_100)]),
     ])
 }
@@ -130,7 +129,11 @@ let make = () => {
           ReactEvent.Mouse.stopPropagation(event)
         }}>
         <Text
-          value={currentChainID->getName} color={theme.neutral_900} nowrap=true weight=Text.Semibold
+          value={currentChainID->getName}
+          color={theme.neutral_900}
+          nowrap=true
+          weight=Text.Semibold
+          size=Text.Body1
         />
         <HSpacing size=Spacing.sm />
         {show
@@ -142,7 +145,13 @@ let make = () => {
           ->Belt.Array.map(chainID => {
             let name = chainID->getName
             <AbsoluteLink href={getLink(chainID)} key=name className={Styles.link(theme)}>
-              <Text value=name color={theme.neutral_600} nowrap=true weight=Text.Semibold />
+              <Text
+                value=name
+                color={theme.neutral_600}
+                nowrap=true
+                weight=Text.Semibold
+                size=Text.Body1
+              />
             </AbsoluteLink>
           })
           ->React.array}
