@@ -31,6 +31,7 @@ module Styles = {
 
   let copyButtonContainer = style(. [position(#absolute), right(#em(1.)), top(#em(1.))])
   let copyButton = style(. [
+    cursor(#pointer),
     borderRadius(#px(4)),
     backgroundColor(#transparent),
     color(white),
