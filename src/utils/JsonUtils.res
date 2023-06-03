@@ -5,7 +5,7 @@ module Decode = {
   let hashFromHex = string->map((. a) => Hash.fromHex(a))
   let address = string->map((. a) => Address.fromBech32(a))
   let moment = string->map((. a) => a->MomentRe.moment)
-  let floatstr = string->map((. a) => a->float_of_string)
+  let floatstr = string->map((. a) => a->Belt.Float.fromString->Belt.Option.getExn)
   let intWithDefault = v => int->option->map((. a) => a->Belt.Option.getWithDefault(v))
   let bufferWithDefault =
     string->option->map((. a) => a->Belt.Option.getWithDefault(_, "")->JsBuffer.fromBase64)

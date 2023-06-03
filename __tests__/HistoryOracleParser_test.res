@@ -6,7 +6,7 @@ let getDayAgo = days =>
   MomentRe.momentNow()
   ->MomentRe.Moment.defaultUtc
   ->MomentRe.Moment.startOf(#day, _)
-  ->MomentRe.Moment.subtract(~duration=MomentRe.duration(days->float_of_int, #days))
+  ->MomentRe.Moment.subtract(~duration=MomentRe.duration(days->Belt.Int.toFloat, #days))
   ->MomentRe.Moment.toUnix
 
 describe("Expect HistoryOracleParser works correctly", () => {

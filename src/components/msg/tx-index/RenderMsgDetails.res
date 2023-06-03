@@ -101,8 +101,8 @@ let renderValue = v => {
       rows={data
       ->Belt.List.toArray
       ->Belt.Array.map(rawReport => [
-        KVTable.Value(rawReport.externalDataID->string_of_int),
-        KVTable.Value(rawReport.exitCode->string_of_int),
+        KVTable.Value(rawReport.externalDataID->Belt.Int.toString),
+        KVTable.Value(rawReport.exitCode->Belt.Int.toString),
         KVTable.Value(rawReport.data->JsBuffer.toUTF8),
       ])}
     />
@@ -124,7 +124,7 @@ let renderValue = v => {
         let mb = index == optionCount ? 0 : 8
 
         <div
-          key={index->string_of_int ++ weight->Js.Float.toString ++ option}
+          key={index->Belt.Int.toString ++ weight->Js.Float.toString ++ option}
           className={CssHelper.flexBox(
             ~justify=#flexStart,
             ~align=#center,
@@ -1915,7 +1915,7 @@ let make = (~contents: array<content_t>) => {
   contents
   ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
   ->Belt.Array.mapWithIndex((i, {content, title}) => {
-    <MessageItem key={i->string_of_int} title={title} content={content} />
+    <MessageItem key={i->Belt.Int.toString} title={title} content={content} />
   })
   ->React.array
 }

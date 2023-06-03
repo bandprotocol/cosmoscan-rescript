@@ -21,9 +21,9 @@ module Styles = {
       "height": "100%",
       "borderRadius": "50%",
       "& > circle": {
-        "fill": theme.neutral_100 -> Css_AtomicTypes.Color.toString,
+        "fill": theme.neutral_100->Css_AtomicTypes.Color.toString,
         "strokeWidth": "16px",
-        "stroke": theme.primary_600 -> Css_AtomicTypes.Color.toString,
+        "stroke": theme.primary_600->Css_AtomicTypes.Color.toString,
         "strokeDasharray": j`calc($percent * 653.45 / 100) 653.45`,
         "transform": "rotate(-90deg) translateX(-100%)",
       },
@@ -35,9 +35,7 @@ let make = (~percent) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   <div className=Styles.chartContainer>
-    <svg
-      className={Styles.emoCircle(percent->int_of_float->Belt.Int.toString, theme)}
-      viewBox="0 0 208 208">
+    <svg className={Styles.emoCircle(percent->Belt.Float.toString, theme)} viewBox="0 0 208 208">
       <circle r="104" cx="104" cy="104" />
     </svg>
     <div

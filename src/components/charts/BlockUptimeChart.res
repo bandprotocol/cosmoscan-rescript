@@ -102,7 +102,7 @@ let make = (~consensusAddress) => {
               <Text block=true value="Proposed" weight=Text.Semibold />
             </div>
             {switch getUptimeSub {
-            | Data({proposedCount}) => <Text block=true value={proposedCount->string_of_int} />
+            | Data({proposedCount}) => <Text block=true value={proposedCount->Belt.Int.toString} />
             | _ => <LoadingCensorBar width=20 height=14 />
             }}
           </div>
@@ -115,7 +115,7 @@ let make = (~consensusAddress) => {
               <Text block=true value="Signed" weight=Text.Semibold />
             </div>
             {switch getUptimeSub {
-            | Data({signedCount}) => <Text block=true value={signedCount->string_of_int} />
+            | Data({signedCount}) => <Text block=true value={signedCount->Belt.Int.toString} />
             | _ => <LoadingCensorBar width=20 height=14 />
             }}
           </div>
@@ -128,7 +128,7 @@ let make = (~consensusAddress) => {
               <Text block=true value="Missed" weight=Text.Semibold />
             </div>
             {switch getUptimeSub {
-            | Data({missedCount}) => <Text block=true value={missedCount->string_of_int} />
+            | Data({missedCount}) => <Text block=true value={missedCount->Belt.Int.toString} />
             | _ => <LoadingCensorBar width=20 height=14 />
             }}
           </div>

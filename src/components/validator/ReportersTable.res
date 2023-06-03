@@ -149,8 +149,8 @@ let make = (~address) => {
       Belt.Array.make(pageSize, Sub.NoData)
       ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
-          ? <RenderBodyMobile key={string_of_int(i)} reserveIndex=i reporterSub=noData />
-          : <RenderBody key={string_of_int(i)} reporterSub=noData />
+          ? <RenderBodyMobile key={Belt.Int.toString(i)} reserveIndex=i reporterSub=noData />
+          : <RenderBody key={Belt.Int.toString(i)} reporterSub=noData />
       )
       ->React.array
     }}

@@ -76,7 +76,7 @@ module Exec = {
     <BadgeWrapper>
       {messages
       ->Belt.List.mapWithIndex((index, msg) => {
-        <Text key={index->string_of_int} value={Msg.getBadge(msg).name} />
+        <Text key={index->Belt.Int.toString} value={Msg.getBadge(msg).name} />
       })
       ->Belt.List.toArray
       ->React.array}

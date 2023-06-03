@@ -63,7 +63,7 @@ module ConnectionListDesktop = {
           <Row alignItems=Row.Center>
             <Col col=Col.One>
               <div className={CssHelper.flexBox(~justify=#flexStart, ())}>
-                <Text value={"#" ++ string_of_int(index + 1)} />
+                <Text value={"#" ++ Belt.Int.toString(index + 1)} />
               </div>
             </Col>
             <Col col=Col.Four>
@@ -441,10 +441,7 @@ let make = (~counterpartyChainID, ~state) => {
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 2
 
-  let connectionCountSub = ConnectionSub.getCount(
-    ~counterpartyChainID,
-    (),
-  )
+  let connectionCountSub = ConnectionSub.getCount(~counterpartyChainID, ())
 
   let conntectionsSub = ConnectionSub.getList(
     ~counterpartyChainID,

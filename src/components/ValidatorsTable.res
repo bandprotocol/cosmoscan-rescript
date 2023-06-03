@@ -59,7 +59,7 @@ let compareString = (a, b) => {
   // let removeEmojiRegex = %re("/([\u2700-\u27BF]|[\uE000-\uF8FF]|/g")
   let a_ = a->Js.String2.replaceByRe(removeEmojiRegex, "")
   let b_ = b->Js.String2.replaceByRe(removeEmojiRegex, "")
-  Js.String2.localeCompare(a_, b_)->int_of_float
+  Js.String2.localeCompare(a_, b_)->Belt.Float.toInt
 }
 
 let defaultCompare = (a: ValidatorSub.t, b: ValidatorSub.t) =>
@@ -108,7 +108,7 @@ let addUptimeOnValidators = (
       )
       ->Belt.Array.get(0)
       ->Belt.Option.mapWithDefault(0, ({count}) => count)
-      ->float_of_int
+      ->Belt.Int.toFloat
 
     let missedBlock =
       votesBlock
@@ -117,7 +117,7 @@ let addUptimeOnValidators = (
       )
       ->Belt.Array.get(0)
       ->Belt.Option.mapWithDefault(0, ({count}) => count)
-      ->float_of_int
+      ->Belt.Int.toFloat
 
     {
       ...validator,
@@ -341,7 +341,11 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
           <Row alignItems=Row.Center>
             <Col col=Col.One>
               <Text
-                block=true value="Rank" weight=Text.Semibold transform=Text.Uppercase size=Text.Caption
+                block=true
+                value="Rank"
+                weight=Text.Semibold
+                transform=Text.Uppercase
+                size=Text.Caption
               />
             </Col>
             <Col col=Col.Two>
