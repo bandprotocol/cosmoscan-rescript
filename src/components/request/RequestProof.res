@@ -1,67 +1,77 @@
 module Styles = {
   open CssJs
 
-  let proofContainer =
-    style(. [
-      selector(
-        "> button + button",
-        [
-          marginLeft(#px(24)),
-          Media.mobile([marginLeft(#px(16))]),
-          Media.smallMobile([marginLeft(#px(10))]),
-        ],
-      ),
-    ]);
+  let proofContainer = style(. [
+    selector(
+      "> button + button",
+      [
+        marginLeft(#px(24)),
+        Media.mobile([marginLeft(#px(16))]),
+        Media.smallMobile([marginLeft(#px(10))]),
+      ],
+    ),
+  ])
 
-  let scriptContainer =
-    style(. [
-      fontSize(#px(12)),
-      lineHeight(#px(20)),
-      fontFamilies([
-        #custom("IBM Plex Mono"),
-        #custom("cousine"),
-        #custom("sfmono-regular"),
-        #custom("Consolas"),
-        #custom("Menlo"),
-        #custom("liberation mono"),
-        #custom("ubuntu mono"),
-        #custom("Courier"),
-        #monospace,
-      ]),
-    ]);
+  let scriptContainer = style(. [
+    position(#relative),
+    fontSize(#px(12)),
+    lineHeight(#px(20)),
+    fontFamilies([
+      #custom("IBM Plex Mono"),
+      #custom("cousine"),
+      #custom("sfmono-regular"),
+      #custom("Consolas"),
+      #custom("Menlo"),
+      #custom("liberation mono"),
+      #custom("ubuntu mono"),
+      #custom("Courier"),
+      #monospace,
+    ]),
+  ])
 
-  let padding = style(. [padding(#px(20))]);
-};
+  let copyButtonContainer = style(. [position(#absolute), right(#em(1.)), top(#em(1.))])
+  let copyButton = style(. [
+    cursor(#pointer),
+    borderRadius(#px(4)),
+    backgroundColor(#transparent),
+    color(white),
+    border(#px(1), #solid, hex("6C7889")),
+    selector("i", [color(hex("6C7889"))]),
+    hover([
+      borderColor(white),
+      backgroundColor(#transparent),
+      color(white),
+      selector("i", [color(white)]),
+    ]),
+  ])
+
+  let padding = style(. [padding(#px(20))])
+}
 
 @react.component
 let make = (~request: RequestSub.t) => {
-  let (proofOpt, reload) = ProofHook.get(request.id);
-  let (showProof, setShowProof) = React.useState(_ => false);
-  let isMobile = Media.isMobile();
+  let (proofOpt, reload) = ProofHook.get(request.id)
+  let (showProof, setShowProof) = React.useState(_ => false)
+  let (copied, setCopy) = React.useState(_ => false)
+  let isMobile = Media.isMobile()
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  React.useEffect1(
-    () => {
-      let intervalID =
-        Js.Global.setInterval(
-          () =>
-            if (proofOpt == None) {
-              reload((), ());
-            },
-          2000,
-        );
-      Some(() => Js.Global.clearInterval(intervalID));
-    },
-    [proofOpt],
-  );
+  React.useEffect1(() => {
+    let intervalID = Js.Global.setInterval(() =>
+      if proofOpt == None {
+        reload((), ())
+      }
+    , 2000)
+    Some(() => Js.Global.clearInterval(intervalID))
+  }, [proofOpt])
 
-  switch (proofOpt) {
+  switch proofOpt {
   | Some(proof) =>
     <>
       <div className={Css.merge(list{CssHelper.flexBox(), Styles.proofContainer})}>
         <ShowProofButton showProof setShowProof />
         <CopyButton
-          data={proof.evmProofBytes -> JsBuffer.toHex(~with0x=false)}
+          data={proof.evmProofBytes->JsBuffer.toHex(~with0x=false)}
           title={isMobile ? "EVM" : "Copy EVM proof"}
           py=12
           px=20
@@ -69,23 +79,34 @@ let make = (~request: RequestSub.t) => {
           pxSm=12
         />
       </div>
+      <VSpacing size=Spacing.lg />
       {showProof
-         ? <div className=Styles.scriptContainer>
-             <ReactHighlight className=Styles.padding>
-               {proof.jsonProof -> Js.Json.stringifyWithSpace(2) -> React.string}
-             </ReactHighlight>
-           </div>
-         : React.null}
+        ? <div className=Styles.scriptContainer>
+            <ReactHighlight className=Styles.padding>
+              {proof.jsonProof->Js.Json.stringifyWithSpace(2)->React.string}
+            </ReactHighlight>
+            <div className=Styles.copyButtonContainer>
+              <button
+                className=Styles.copyButton
+                onClick={_ => {
+                  Copy.copy(proof.jsonProof->Js.Json.stringifyWithSpace(2))
+                  setCopy(_ => true)
+                  let _ = Js.Global.setTimeout(() => setCopy(_ => false), 1400)
+                }}>
+                {copied
+                  ? <Icon name="fal fa-check" size=12 />
+                  : <Icon name="far fa-clone" size=12 />}
+              </button>
+            </div>
+          </div>
+        : React.null}
     </>
   | None =>
     <EmptyContainer height={#px(130)} backgroundColor={theme.neutral_100}>
       <LoadingCensorBar.CircleSpin size=30 height=80 />
       <Heading
-        size=Heading.H4
-        value="Waiting for proof"
-        align=Heading.Center
-        weight=Heading.Regular
+        size=Heading.H4 value="Waiting for proof" align=Heading.Center weight=Heading.Regular
       />
     </EmptyContainer>
-  };
-};
+  }
+}
