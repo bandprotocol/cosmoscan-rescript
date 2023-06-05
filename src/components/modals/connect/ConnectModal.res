@@ -1,15 +1,15 @@
 module Styles = {
   open CssJs
 
-  let container = (theme: Theme.t, isDarkMode) => 
-  style(. [
-    display(#flex),
-    justifyContent(#center),
-    position(#relative),
-    width(#px(800)),
-    height(#px(520)),
-    background(isDarkMode ? theme.neutral_100 : theme.neutral_000)
-  ])
+  let container = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      display(#flex),
+      justifyContent(#center),
+      position(#relative),
+      width(#px(800)),
+      height(#px(560)),
+      background(isDarkMode ? theme.neutral_100 : theme.neutral_000),
+    ])
 
   let innerContainer = style(. [display(#flex), flexDirection(#column), width(#percent(100.))])
 
@@ -51,8 +51,8 @@ module Styles = {
       overflow(#hidden),
     ])
 
-  let loginSelectionBackground = (theme: Theme.t, isDarkMode) => 
-    style(. [background(isDarkMode ? theme.neutral_000 : theme.neutral_100)]);
+  let loginSelectionBackground = (theme: Theme.t, isDarkMode) =>
+    style(. [background(isDarkMode ? theme.neutral_000 : theme.neutral_100)])
 
   let ledgerIcon = style(. [height(#px(28)), width(#px(28)), transform(translateY(#px(3)))])
   let ledgerImageContainer = active => style(. [opacity(active ? 1.0 : 0.5), marginRight(#px(15))])
@@ -95,14 +95,21 @@ module LoginMethod = {
 
 @react.component
 let make = (~chainID) => {
-  let (loginMethod, setLoginMethod) = React.useState(_ => Mnemonic)
+  let (loginMethod, setLoginMethod) = React.useState(_ =>
+    chainID == "laozi-mainnet" ? LedgerWithCosmos : Mnemonic
+  )
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  <div className=Styles.container(theme, isDarkMode)>
+  let loginMethodArray = switch chainID {
+  | "laozi-mainnet" => [LedgerWithCosmos]
+  | _ => [Mnemonic, LedgerWithCosmos]
+  }
+
+  <div className={Styles.container(theme, isDarkMode)}>
     <div className=Styles.innerContainer>
       <div className={Styles.modalTitle(theme)}>
         <Heading value="Connect with your wallet" size=Heading.H4 />
-        {chainID == "band-guanyu-mainnet"
+        {chainID == "laozi-mainnet"
           ? <>
               <VSpacing size=Spacing.md />
               <div className={CssHelper.flexBox()}>
@@ -126,8 +133,7 @@ let make = (~chainID) => {
               <VSpacing size=Spacing.xl />
               <Heading size=Heading.H5 value="Select your connection method" />
               <VSpacing size=Spacing.md />
-              // TODO: disable Mnemonic when live on mainnet
-              {[Mnemonic, LedgerWithCosmos]
+              {loginMethodArray
               ->Belt.Array.map(method =>
                 <React.Fragment key={method |> toLoginMethodString}>
                   <VSpacing size=Spacing.lg />

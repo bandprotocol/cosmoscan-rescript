@@ -24,6 +24,8 @@ module Styles = {
 
   let chainIDContainer = style(. [marginLeft(#px(24))])
 
+  let chainIDContainerMobile = style(. [margin(#zero)])
+
   let boxShadow = style(. [
     boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.08)))),
     position(#relative),
@@ -57,7 +59,6 @@ module DesktopRender = {
                       color=theme.neutral_900
                       special=true
                     />
-                    <br />
                     <Text
                       value="Cosmoscan"
                       nowrap=true
@@ -146,10 +147,8 @@ module MobileRender = {
           </div>
         </Col>
       </Row>
-      <Row marginTop=20>
-        <Col colSm=Col.Twelve>
-          <ChainIDBadge dropdown=true />
-        </Col>
+      <Row marginTopSm=24 marginBottomSm=24 style={Styles.chainIDContainerMobile}>
+        <ChainIDBadge />
       </Row>
       <Row marginTop=20>
         <Col colSm=Col.Twelve>

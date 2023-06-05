@@ -12,7 +12,6 @@ let make = () =>
             <ModalContext.Provider>
               <AccountContext.Provider>
                 <App />
-                <Modal />
               </AccountContext.Provider>
             </ModalContext.Provider>
           </ThemeContext.Provider>
