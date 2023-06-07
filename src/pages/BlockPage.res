@@ -1,14 +1,12 @@
 module BodyDesktop = {
   @react.component
   let make = (~reserveIndex, ~blockSub: Sub.variant<BlockSub.t>) => {
-    let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <TBody
-      key={
-        switch blockSub {
-        | Data({height}) => height -> ID.Block.toString
-        | Error(_) | Loading | NoData => reserveIndex -> string_of_int
-        }
-      }>
+      key={switch blockSub {
+      | Data({height}) => height->ID.Block.toString
+      | Error(_) | Loading | NoData => reserveIndex->Belt.Int.toString
+      }}>
       <Row alignItems=Row.Center>
         <Col col=Col.Two>
           {switch blockSub {
@@ -20,7 +18,7 @@ module BodyDesktop = {
           {switch blockSub {
           | Data({hash}) =>
             <Text
-              value={hash -> Hash.toHex(~upper=true)}
+              value={hash->Hash.toHex(~upper=true)}
               weight=Text.Medium
               block=true
               code=true
@@ -46,10 +44,7 @@ module BodyDesktop = {
             {switch blockSub {
             | Data({txn}) =>
               <Text
-                value={txn -> Format.iPretty}
-                code=true
-                weight=Text.Medium
-                color={theme.neutral_900}
+                value={txn->Format.iPretty} code=true weight=Text.Medium color={theme.neutral_900}
               />
             | Error(_) | Loading | NoData => <LoadingCensorBar width=40 height=15 />
             }}
@@ -88,8 +83,8 @@ module BodyMobile = {
             ("Timestamp", Timestamp(timestamp)),
           ]
         }
-        key={height -> ID.Block.toString}
-        idx={height -> ID.Block.toString}
+        key={height->ID.Block.toString}
+        idx={height->ID.Block.toString}
       />
     | Error(_) | Loading | NoData =>
       <MobileCard
@@ -103,8 +98,8 @@ module BodyMobile = {
             ("Txn", Loading(20)),
           ]
         }
-        key={reserveIndex -> string_of_int}
-        idx={reserveIndex -> string_of_int}
+        key={reserveIndex->Belt.Int.toString}
+        idx={reserveIndex->Belt.Int.toString}
       />
     }
   }
@@ -115,7 +110,7 @@ let make = () => {
   let blocksSub = BlockSub.getList(~pageSize=10, ~page=1)
   let isMobile = Media.isMobile()
 
-  let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   <Section ptSm=32 pbSm=32>
     <div className=CssHelper.container id="blocksSection">
@@ -126,13 +121,10 @@ let make = () => {
             {switch blocksSub {
             | Data(blocks) =>
               <Heading
-                value={
-                  blocks
-                  ->Belt.Array.get(0)
-                  ->Belt.Option.mapWithDefault(0, ({height}) => height -> ID.Block.toInt)
-                  ->Format.iPretty
-                  ++ " In total"
-                }
+                value={blocks
+                ->Belt.Array.get(0)
+                ->Belt.Option.mapWithDefault(0, ({height}) => height->ID.Block.toInt)
+                ->Format.iPretty ++ " In total"}
                 size=Heading.H3
                 weight=Heading.Thin
                 color={theme.neutral_600}
@@ -194,27 +186,27 @@ let make = () => {
                     />
                   </Col>
                 </Row>
-              </THead>
-            }
+              </THead>}
           {switch blocksSub {
-           | Data(blocks) =>
-              blocks
-              ->Belt.Array.mapWithIndex((i, e) =>
-                  isMobile ? <BodyMobile reserveIndex=i blockSub=Sub.resolve(e)/>
-                  : <BodyDesktop reserveIndex=i blockSub=Sub.resolve(e)/>
-                )
-              ->React.array
-           | Error(_) | Loading | NoData =>
-              Belt.Array.make(10, React.null)
-              ->Belt.Array.mapWithIndex((i, _) =>
-                  isMobile ? <BodyMobile reserveIndex=i blockSub=Sub.NoData/>
-                  : <BodyDesktop reserveIndex=i blockSub=Sub.NoData/>
-                )
-              ->React.array
-           }}
+          | Data(blocks) =>
+            blocks
+            ->Belt.Array.mapWithIndex((i, e) =>
+              isMobile
+                ? <BodyMobile reserveIndex=i blockSub={Sub.resolve(e)} />
+                : <BodyDesktop reserveIndex=i blockSub={Sub.resolve(e)} />
+            )
+            ->React.array
+          | Error(_) | Loading | NoData =>
+            Belt.Array.make(10, React.null)
+            ->Belt.Array.mapWithIndex((i, _) =>
+              isMobile
+                ? <BodyMobile reserveIndex=i blockSub=Sub.NoData />
+                : <BodyDesktop reserveIndex=i blockSub=Sub.NoData />
+            )
+            ->React.array
+          }}
         </Table>
       </div>
     </div>
   </Section>
 }
-

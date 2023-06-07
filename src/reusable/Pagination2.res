@@ -107,7 +107,7 @@ let make = (
           onChange={event => {
             let newVal = ReactEvent.Form.target(event)["value"]
             setInputPage(_ => newVal)
-            onChangeCurrentPage(newVal->int_of_string)
+            onChangeCurrentPage(newVal->Belt.Int.fromString->Belt.Option.getExn)
           }}
         />
         <div

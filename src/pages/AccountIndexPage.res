@@ -317,7 +317,7 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
                     description="Balance currently delegated to validators"
                     amount={amount->Coin.getBandAmountFromCoin}
                     usdPrice=financial.usdPrice
-                    color=theme.primary_200
+                    color=theme.primary_500
                   />
                 | _ => <BalanceDetailLoading />
                 }}
@@ -330,7 +330,7 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
                     description="Amount undelegated from validators awaiting 21 days lockup period"
                     amount={unbonding->Coin.getBandAmountFromCoin}
                     usdPrice=financial.usdPrice
-                    color=theme.primary_100
+                    color=theme.primary_200
                   />
                 | _ => <BalanceDetailLoading />
                 }}

@@ -113,6 +113,11 @@ module RenderMobile = {
       "Switch to " ++ mode
     }
 
+    React.useEffect1(_ => {
+      setShow(_ => false)
+      None
+    }, [currentRoute])
+
     <>
       <div className=Styles.menuContainer onClick={_ => setShow(prev => !prev)}>
         {show

@@ -68,8 +68,29 @@ type content_t = {
 let renderValue = v => {
   switch v {
   | Address(address) => <AddressRender position=AddressRender.Subtitle address />
-  | ValidatorAddress(address) =>
-    <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
+  | ValidatorAddress(address) => {
+      let valinfo = SearchBarQuery.getValidatorMoniker(~address, ())
+
+      switch valinfo {
+      | Data(val) =>
+        switch val {
+        | Some({moniker, identity}) =>
+          <ValidatorMonikerLink
+            validatorAddress={address}
+            moniker={moniker}
+            identity={identity}
+            width={#percent(100.)}
+            avatarWidth=20
+            size=Text.Body1
+          />
+        | _ => <AddressRender position=AddressRender.Subtitle address accountType={#validator} />
+        }
+
+      | Loading => <LoadingCensorBar width=150 height=15 />
+      | _ => React.null
+      }
+    }
+
   | PlainText(content) => <Text value={content} size=Text.Body1 breakAll=true />
   | CoinList(amount) => <AmountRender coins={amount} />
   | ID(element) => element
@@ -80,8 +101,8 @@ let renderValue = v => {
       rows={data
       ->Belt.List.toArray
       ->Belt.Array.map(rawReport => [
-        KVTable.Value(rawReport.externalDataID->string_of_int),
-        KVTable.Value(rawReport.exitCode->string_of_int),
+        KVTable.Value(rawReport.externalDataID->Belt.Int.toString),
+        KVTable.Value(rawReport.exitCode->Belt.Int.toString),
         KVTable.Value(rawReport.data->JsBuffer.toUTF8),
       ])}
     />
@@ -103,7 +124,7 @@ let renderValue = v => {
         let mb = index == optionCount ? 0 : 8
 
         <div
-          key={index->string_of_int ++ weight->Js.Float.toString ++ option}
+          key={index->Belt.Int.toString ++ weight->Js.Float.toString ++ option}
           className={CssHelper.flexBox(
             ~justify=#flexStart,
             ~align=#center,
@@ -1064,7 +1085,7 @@ module RecvPacket = {
             },
             {
               title: "Amount",
-              content: PlainText(details.amount->Belt.Int.toString),
+              content: PlainText(details.amount->Belt.Int.toString ++ " " ++ details.denom),
               order: 15,
             },
           ]
@@ -1894,7 +1915,7 @@ let make = (~contents: array<content_t>) => {
   contents
   ->Belt.SortArray.stableSortBy((a, b) => a.order - b.order)
   ->Belt.Array.mapWithIndex((i, {content, title}) => {
-    <MessageItem key={i->string_of_int} title={title} content={content} />
+    <MessageItem key={i->Belt.Int.toString} title={title} content={content} />
   })
   ->React.array
 }

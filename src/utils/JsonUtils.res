@@ -5,19 +5,18 @@ module Decode = {
   let hashFromHex = string->map((. a) => Hash.fromHex(a))
   let address = string->map((. a) => Address.fromBech32(a))
   let moment = string->map((. a) => a->MomentRe.moment)
-  let floatstr = string->map((. a) => a->float_of_string)
+  let floatstr = string->map((. a) => a->Belt.Float.fromString->Belt.Option.getExn)
   let intWithDefault = v => int->option->map((. a) => a->Belt.Option.getWithDefault(v))
   let bufferWithDefault =
     string->option->map((. a) => a->Belt.Option.getWithDefault(_, "")->JsBuffer.fromBase64)
   let strWithDefault = string->option->map((. a) => a->Belt.Option.getWithDefault(_, ""))
   let bufferFromHex = string->map((. a) => JsBuffer.fromHex(a))
   let bufferFromBase64 = string->map((. a) => JsBuffer.fromBase64(a))
-  let timeNS = float->map((. n) =>
-    (n /. 1e6)->MomentRe.momentWithTimestampMS->MomentRe.Moment.defaultUtc
-  )
+  let timeNS =
+    float->map((. n) => (n /. 1e6)->MomentRe.momentWithTimestampMS->MomentRe.Moment.defaultUtc)
   let timeString = string->map((. s) => s->MomentRe.momentUtcDefaultFormat)
 
-  let stringOrInt = oneOf([int, string->map((. a) => a->int_of_string)])
+  let stringOrInt = oneOf([int, string->map((. a) => a->Belt.Int.fromString->Belt.Option.getExn)])
 
   let rec at = (fields, decoder) => {
     switch fields {

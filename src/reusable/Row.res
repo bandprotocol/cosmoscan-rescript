@@ -30,11 +30,16 @@ module Styles = {
 
   let minHeight = mh => style(. [minHeight(mh)])
   let rowBase = style(. [display(#flex), margin2(~v=#zero, ~h=#px(-12))])
-
-  let mb = size => style(. [marginBottom(#px(size))])
-  let mbSm = size => style(. [Media.mobile([marginBottom(#px(size))])])
-  let mt = size => style(. [marginTop(#px(size))])
-  let mtSm = size => style(. [Media.mobile([marginTop(#px(size))])])
+  let mb = (~mb, ~mbSm, ()) =>
+    style(. [
+      marginBottom(#px(mb)),
+      Media.mobile([marginBottom(#px(mbSm->Belt.Option.getWithDefault(mb)))]),
+    ])
+  let mt = (~mt, ~mtSm, ()) =>
+    style(. [
+      marginTop(#px(mt)),
+      Media.mobile([marginTop(#px(mtSm->Belt.Option.getWithDefault(mt)))]),
+    ])
 }
 
 @react.component
@@ -46,9 +51,9 @@ let make = (
   ~style="",
   ~children,
   ~marginBottom=0,
-  ~marginBottomSm=0,
+  ~marginBottomSm=?,
   ~marginTop=0,
-  ~marginTopSm=0,
+  ~marginTopSm=?,
 ) =>
   <div
     className={CssJs.merge(. [
@@ -56,10 +61,8 @@ let make = (
       Styles.justify(justify),
       Styles.minHeight(minHeight),
       Styles.alignItems(alignItems),
-      Styles.mb(marginBottom),
-      Styles.mbSm(marginBottomSm),
-      Styles.mt(marginTop),
-      Styles.mtSm(marginTopSm),
+      Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),
+      Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
       wrap ? Styles.wrap : "",
       style,
     ])}>

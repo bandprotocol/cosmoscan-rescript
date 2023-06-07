@@ -272,7 +272,7 @@ let make = (~proposalID) => {
                       />
                     </Col>
                     <Col col=Col.Eight>
-                      <Text value={height->string_of_int} size=Text.Body1 block=true />
+                      <Text value={height->Belt.Int.toString} size=Text.Body1 block=true />
                     </Col>
                   </Row>
                 </>
@@ -283,7 +283,7 @@ let make = (~proposalID) => {
                       <div className={Styles.parameterChanges(theme, isDarkMode)}>
                         {parameters
                         ->Belt.Array.mapWithIndex((i, value) =>
-                          <div key={i->string_of_int}>
+                          <div key={i->Belt.Int.toString}>
                             <Text
                               value={value.subspace ++ "." ++ value.key ++ ": " ++ value.value}
                               size=Text.Body1
