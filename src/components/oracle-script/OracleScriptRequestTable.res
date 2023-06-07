@@ -8,7 +8,7 @@ module Styles = {
 
 module RenderBody = {
   @react.component
-  let make = (~requestsSub: Sub.variant<RequestSub.Mini.t>) => {
+  let make = (~requestsSub: Sub.variant<RequestSub.Mini.request_os_t>) => {
     <TBody>
       <Row alignItems=Row.Center>
         <Col col=Col.Two>
@@ -66,7 +66,7 @@ module RenderBody = {
 
 module RenderBodyMobile = {
   @react.component
-  let make = (~reserveIndex, ~requestsSub: Sub.variant<RequestSub.Mini.t>) => {
+  let make = (~reserveIndex, ~requestsSub: Sub.variant<RequestSub.Mini.request_os_t>) => {
     switch requestsSub {
     | Data({id, txTimestamp, txHash, minCount, askCount, reportsCount, resolveStatus}) =>
       <MobileCard

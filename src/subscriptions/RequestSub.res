@@ -54,8 +54,16 @@ module Mini = {
     rawDataRequests: array<raw_request_t>,
   }
 
+  type request_os_internal_t = {
+    id: ID.Request.t,
+    minCount: int,
+    reportsAggregate: aggregate_wrapper_intenal_t,
+    requestedValidatorsAggregate: aggregate_wrapper_intenal_t,
+    resolveStatus: resolve_status_t,
+    transactionOpt: option<TxSub.Mini.t>,
+  }
+
   type raw_request_internal_t = {request: request_internal}
-  type oracle_script_requests_t = {requests: array<request_internal>}
 
   type t = {
     id: ID.Request.t,
@@ -75,6 +83,16 @@ module Mini = {
     resolveStatus: resolve_status_t,
     result: option<JsBuffer.t>,
     feeEarned: Coin.t,
+  }
+
+  type request_os_t = {
+    id: ID.Request.t,
+    txHash: option<Hash.t>,
+    txTimestamp: option<MomentRe.Moment.t>,
+    reportsCount: int,
+    minCount: int,
+    askCount: int,
+    resolveStatus: resolve_status_t,
   }
 
   module MultiMiniByDataSourceConfig = %graphql(`
@@ -123,21 +141,8 @@ module Mini = {
 
   module MultiMiniByOracleScriptConfig = %graphql(`
       subscription RequestsMiniByOracleScript($id: Int!, $limit: Int!, $offset: Int!) {
-        oracle_scripts_by_pk(
-          id: $id
-        ) @ppxAs(type: "oracle_script_requests_t") {
-          requests(limit: $limit, offset: $offset, order_by: [{ id: desc }]) @ppxAs(type: "request_internal") {
+        requests( where: { oracle_script_id: { _eq: $id } } limit: $limit, offset: $offset, order_by: [{ id: desc }]) @ppxAs(type: "request_os_internal_t") {
             id @ppxCustom(module: "GraphQLParserModule.RequestID")
-            clientID: client_id
-            requestTime: request_time @ppxCustom(module: "GraphQLParserModule.FromUnixSecond")
-            resolveTime: resolve_time @ppxCustom(module: "GraphQLParserModule.FromUnixSecond")
-            sender @ppxCustom(module: "GraphQLParserModule.Address")
-            calldata @ppxCustom(module: "GraphQLParserModule.Buffer")
-            oracleScript: oracle_script @ppxAs(type: "oracle_script_internal_t") {
-              scriptID: id @ppxCustom(module: "GraphQLParserModule.OracleScriptID")
-              name
-              schema
-            }
             transactionOpt: transaction @ppxAs(type: "transactionOpt_t") {
               hash @ppxCustom(module: "GraphQLParserModule.Hash")
               blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
@@ -158,12 +163,7 @@ module Mini = {
                 count
               }
             }
-            result @ppxCustom(module: "GraphQLParserModule.Buffer")
-            rawDataRequests: raw_requests(order_by: [{external_id: asc}]) @ppxAs(type: "raw_request_t") {
-              fee @ppxCustom(module: "GraphQLParserModule.Coin")
-            }
           }
-        }
       }
 `)
 
@@ -250,6 +250,27 @@ module Mini = {
     ->Coin.newUBANDFromAmount,
   }
 
+  let toRequestExternal = ({
+    id,
+    transactionOpt,
+    reportsAggregate,
+    minCount,
+    resolveStatus,
+    requestedValidatorsAggregate,
+  }) => {
+    id,
+    txHash: transactionOpt->Belt.Option.map(({hash}) => hash),
+    txTimestamp: transactionOpt->Belt.Option.map(({block}) => block.timestamp),
+    reportsCount: reportsAggregate.aggregate
+    ->Belt.Option.map(({count}) => count)
+    ->Belt.Option.getExn,
+    minCount,
+    askCount: requestedValidatorsAggregate.aggregate
+    ->Belt.Option.map(({count}) => count)
+    ->Belt.Option.getExn,
+    resolveStatus,
+  }
+
   let getListByDataSource = (id, ~page, ~pageSize) => {
     let offset = (page - 1) * pageSize
     let result = MultiMiniByDataSourceConfig.use({
@@ -273,14 +294,7 @@ module Mini = {
       offset,
     })
 
-    result
-    ->Sub.fromData
-    ->Sub.map(x => {
-      switch x.oracle_scripts_by_pk {
-      | Some({requests}) => requests->Belt.Array.map(toExternal)
-      | None => []
-      }
-    })
+    result->Sub.fromData->Sub.map(x => x.requests->Belt.Array.map(toRequestExternal))
   }
 
   let getListByTxHash = (txHash: Hash.t) => {
