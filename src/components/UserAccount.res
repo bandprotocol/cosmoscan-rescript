@@ -16,7 +16,7 @@ module Styles = {
     ])
 
   let logo = style(. [width(#px(12))])
-  let fullWidth = style(. [width(#percent(100.))]);
+  let fullWidth = style(. [width(#percent(100.))])
 
   let profileCard = (show, theme: Theme.t) =>
     style(. [

@@ -111,12 +111,11 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     | None => NotFound
     }
   | (list{"proposals"}, _) => ProposalPage
-  | (list{"proposal", proposalID}, _) => {
-    switch proposalID->Belt.Int.fromString {
+  | (list{"proposal", proposalID}, _) => switch proposalID->Belt.Int.fromString {
     | Some(proposal) => ProposalDetailsPage(proposal)
     | None => NotFound
     }
-    }
+
   | (list{"relayers"}, _) => RelayersHomepage
   | (list{"relayers", counterparty, port, channelID}, _) =>
     ChannelDetailsPage(counterparty, port, channelID)

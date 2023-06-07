@@ -71,24 +71,16 @@ module Styles = {
             pointerEvents(#none),
             color(theme.primary_600),
           ]),
-        ]
+        ],
       ),
       selector(
         "ol > li",
-        [
-          fontSize(#px(14)),
-          paddingLeft(#px(15)),
-          position(#relative),
-          lineHeight(#em(1.42)),
-        ],
+        [fontSize(#px(14)), paddingLeft(#px(15)), position(#relative), lineHeight(#em(1.42))],
       ),
       selector(
         "ol > li::marker",
-        [
-          fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
-          fontVariant(#inherit_)
-        ],
-      )
+        [fontFamilies([#custom("Montserrat"), #custom("sans-serif")]), fontVariant(#inherit_)],
+      ),
     ])
 }
 

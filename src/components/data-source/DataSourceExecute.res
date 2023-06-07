@@ -156,7 +156,7 @@ let make = (~executable: JsBuffer.t) => {
   let params = ExecutableParser.parseExecutableScript(executable)->Belt.Option.getWithDefault([])
   let numParams = params->Belt.Array.length
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-  
+
   let (callDataList, setCalldataList) = React.useState(_ => Belt.List.make(numParams, ""))
 
   let (result, setResult) = React.useState(_ => Nothing)

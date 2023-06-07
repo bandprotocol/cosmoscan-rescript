@@ -1,12 +1,11 @@
 module Styles = {
   open CssJs
 
-  let buttonContainer = style(. [Media.mobile([width(#percent(100.))])]);
-  let baseBtn =
-    style(. [
-      textAlign(#center),
-      Media.mobile([flexGrow(0.), flexShrink(0.), flexBasis(#percent(50.))]),
-    ]);
+  let buttonContainer = style(. [Media.mobile([width(#percent(100.))])])
+  let baseBtn = style(. [
+    textAlign(#center),
+    Media.mobile([flexGrow(0.), flexShrink(0.), flexBasis(#percent(50.))]),
+  ])
 
   let leftBtn = (state, theme: Theme.t, isDarkMode) => {
     style(. [
@@ -18,8 +17,8 @@ module Styles = {
         backgroundColor(state ? theme.neutral_900 : theme.neutral_100),
         color(state ? theme.neutral_100 : theme.neutral_900),
       ]),
-    ]);
-  };
+    ])
+  }
   let rightBtn = (state, theme: Theme.t, isDarkMode) => {
     style(. [
       borderTopLeftRadius(#zero),
@@ -30,13 +29,13 @@ module Styles = {
         backgroundColor(state ? theme.neutral_100 : theme.neutral_900),
         color(state ? theme.neutral_900 : theme.neutral_100),
       ]),
-    ]);
-  };
-};
+    ])
+  }
+}
 
 @react.component
 let make = (~state, ~setState, ~nameArray) => {
-  let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <div className={Css.merge(list{CssHelper.flexBox(), Styles.buttonContainer})}>
     <Button
@@ -45,7 +44,7 @@ let make = (~state, ~setState, ~nameArray) => {
       variant=Button.Outline
       onClick={_ => setState(_ => true)}
       style={Css.merge(list{Styles.baseBtn, Styles.leftBtn(state, theme, isDarkMode)})}>
-      {nameArray[0]  -> React.string}
+      {nameArray[0]->React.string}
     </Button>
     <Button
       px=16
@@ -53,7 +52,7 @@ let make = (~state, ~setState, ~nameArray) => {
       variant=Button.Outline
       onClick={_ => setState(_ => false)}
       style={Css.merge(list{Styles.baseBtn, Styles.rightBtn(state, theme, isDarkMode)})}>
-      {nameArray[1] -> React.string}
+      {nameArray[1]->React.string}
     </Button>
-  </div>;
-};
+  </div>
+}

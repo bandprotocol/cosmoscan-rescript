@@ -36,22 +36,22 @@ describe("Expect parse from string to Address", () => {
   })
 
   test("notBandAddress should parse correctly", () => {
-    expect(Result.Ok(Address.fromBech32OptNotBandPrefix("cosmos1pdvm6paaenlelmga2qkr50thpkrzwxy33lrh7c")->Belt.Option.getExn))->toEqual(
-      notBandAddress("cosmos1pdvm6paaenlelmga2qkr50thpkrzwxy33lrh7c")
-    )
+    expect(
+      Result.Ok(
+        Address.fromBech32OptNotBandPrefix(
+          "cosmos1pdvm6paaenlelmga2qkr50thpkrzwxy33lrh7c",
+        )->Belt.Option.getExn,
+      ),
+    )->toEqual(notBandAddress("cosmos1pdvm6paaenlelmga2qkr50thpkrzwxy33lrh7c"))
   })
 
   test("notBandAddress shouldn't parse invalid address", () => {
-    expect(Result.Err("Invalid address"))->toEqual(
-      notBandAddress("1")
-    )
+    expect(Result.Err("Invalid address"))->toEqual(notBandAddress("1"))
   })
 })
 
 describe("Expect parse from string to Int", () => {
   test("mustParseInt should parse correctly", () => {
-    expect(123)->toEqual(
-      mustParseInt("123")
-    )
+    expect(123)->toEqual(mustParseInt("123"))
   })
 })

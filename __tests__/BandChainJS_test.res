@@ -50,7 +50,10 @@ describe("Expect BandChainJS PubKey Module binding work correctly", () => {
 
   test("toBech32", () =>
     expect(
-      mnemonic->PrivateKey.fromMnemonic("m/44'/494'/0'/0/0")->PrivateKey.toPubkey->PubKey.toBech32("band"),
+      mnemonic
+      ->PrivateKey.fromMnemonic("m/44'/494'/0'/0/0")
+      ->PrivateKey.toPubkey
+      ->PubKey.toBech32("band"),
     )->toEqual("band1addwnpepqt79xhl2m49qfpre5jf9td3q64y8r9cxwm26fmzaug2vsrfcwsg0v70ls97")
   )
 

@@ -3,8 +3,8 @@ module Styles = {
 
   let containerBase = (height_, theme: Theme.t, isDarkMode) =>
     style(. [
-      backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000), 
-      selector("> div", [height(#px(height_))])
+      backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
+      selector("> div", [height(#px(height_))]),
     ])
 }
 

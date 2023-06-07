@@ -889,7 +889,6 @@ module Client = {
   }
 }
 
-
 module Height = {
   type t = {
     revisionHeight: int,
@@ -932,7 +931,7 @@ module Packet = {
   }
 }
 
-let getStateText = state => 
+let getStateText = state =>
   switch state {
   | 0 => "Uninitialized"
   | 1 => "Init"
@@ -942,7 +941,7 @@ let getStateText = state =>
   | _ => "Unknown"
   }
 
-let getOrderText = order => 
+let getOrderText = order =>
   switch order {
   | 0 => "None"
   | 1 => "Unordered"
@@ -1156,7 +1155,6 @@ module Channel = {
   }
 }
 
-
 module Deposit = {
   type t<'a> = {
     depositor: Address.t,
@@ -1219,7 +1217,7 @@ module Connection = {
     let decode = {
       open JsonUtils.Decode
       buildObject(json => {
-        signer: json.required(list{"msg", "signer"}, string) -> Address.fromBech32,
+        signer: json.required(list{"msg", "signer"}, string)->Address.fromBech32,
         clientID: json.required(list{"msg", "client_id"}, string),
         delayPeriod: json.required(list{"msg", "delay_period"}, int),
         counterparty: json.required(list{"msg", "counterparty"}, ConnectionCounterParty.decode),
@@ -1288,7 +1286,6 @@ module Connection = {
   }
 }
 
-
 module Activate = {
   type t = {validatorAddress: Address.t}
   let decode = {
@@ -1308,7 +1305,7 @@ module Application = {
       sourceChannel: string,
       timeoutHeight: Height.t,
       timeoutTimestamp: MomentRe.Moment.t,
-      token: 'a
+      token: 'a,
     }
 
     type success_t = t<Coin.t>
@@ -1327,7 +1324,7 @@ module Application = {
         sourceChannel: json.required(list{"msg", "source_channel"}, string),
         timeoutHeight: json.required(list{"msg", "timeout_height"}, Height.decode),
         timeoutTimestamp: json.required(list{"msg", "timeout_timestamp"}, timeNS),
-        token: json->tokenD
+        token: json->tokenD,
       })
     }
 
@@ -1664,6 +1661,7 @@ let rec decodeMsg = (json, isSuccess) => {
             let msg = json->mustDecode(Gov.VoteWeighted.decodeFail)
             (VoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
           }
+
     | "/ibc.core.client.v1.MsgCreateClient" =>
       let msg = json->mustDecode(Client.Create.decode)
       (CreateClientMsg(msg), msg.signer, true)
@@ -1686,6 +1684,7 @@ let rec decodeMsg = (json, isSuccess) => {
             let msg = json->mustDecode(Channel.RecvPacket.decodeFail)
             (RecvPacketMsg(Failure(msg)), msg.signer, true)
           }
+
     | "/ibc.core.channel.v1.MsgAcknowledgement" =>
       let msg = json->mustDecode(Channel.AcknowledgePacket.decode)
       (AcknowledgePacketMsg(msg), msg.signer, true)
@@ -1731,7 +1730,7 @@ let rec decodeMsg = (json, isSuccess) => {
     | "/ibc.applications.transfer.v1.MsgTransfer" =>
       isSuccess
         ? {
-            let msg = json->mustDecode(Application.Transfer.decodeSuccess) 
+            let msg = json->mustDecode(Application.Transfer.decodeSuccess)
             (TransferMsg(Success(msg)), msg.sender, true)
           }
         : {

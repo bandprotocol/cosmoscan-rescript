@@ -71,4 +71,3 @@ describe("Expect Format module to work correctly", () => {
     expect(10000000->iPretty)->toBe("10,000,000")
   })
 })
-

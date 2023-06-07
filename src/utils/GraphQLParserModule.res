@@ -1,4 +1,4 @@
-// As you can see we need to define a type t and two functions, parse and serialize. 
+// As you can see we need to define a type t and two functions, parse and serialize.
 // These two functions are to go from Js.Json.t to t and how to go from t back to Js.Json.t.
 // see https://beta.graphql-ppx.com/docs/directives#ppxcustom
 
@@ -75,14 +75,15 @@ module CoinWithDefault = {
     coin
     ->Coin.getUBandAmountFromCoin
     ->(amount => amount->Belt.Float.toString ++ "uband")
-    ->Js.Json.string
+    ->Js.Json.string,
   )
 }
 
 module Coin = {
   type t = Coin.t
   let parse = json => json->GraphQLParser.coin
-  let serialize = coin => coin
+  let serialize = coin =>
+    coin
     ->Coin.getUBandAmountFromCoin
     ->(amount => amount->Belt.Float.toString ++ "uband")
     ->Js.Json.string
@@ -97,7 +98,8 @@ module Buffer = {
 module BufferOpt = {
   type t = option<JsBuffer.t>
   let parse = jsonOpt => jsonOpt->GraphQLParser.optionBuffer
-  let serialize = buffOpt => buffOpt->Belt.Option.map(buff => ("0x" ++ buff->JsBuffer.toHex)->Js.Json.string)
+  let serialize = buffOpt =>
+    buffOpt->Belt.Option.map(buff => ("0x" ++ buff->JsBuffer.toHex)->Js.Json.string)
 }
 
 module BlockID = {

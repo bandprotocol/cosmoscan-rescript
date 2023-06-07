@@ -8,21 +8,20 @@ module Styles = {
       backgroundColor(theme.neutral_100),
       borderRadius(#px(4)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(0, 0, 0, #num(0.1)))),
-    ]);
-  let linkToHome = style(. [display(#flex), alignItems(#center), cursor(#pointer)]);
-  let rightArrow = style(. [width(#px(20)), filter([#saturate(50.0), #brightness(70.0)])]);
-  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))]);
-  let kvTableContainer = style(. [padding(#px(1))]);
-  let kvTableHeader =
-    style(. [
-      padding4(~top=#px(16), ~left=#px(24), ~right=#px(24), ~bottom=#px(12)),
-      Media.mobile([padding2(~v=#px(14), ~h=#px(12))]),
-    ]);
+    ])
+  let linkToHome = style(. [display(#flex), alignItems(#center), cursor(#pointer)])
+  let rightArrow = style(. [width(#px(20)), filter([#saturate(50.0), #brightness(70.0)])])
+  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
+  let kvTableContainer = style(. [padding(#px(1))])
+  let kvTableHeader = style(. [
+    padding4(~top=#px(16), ~left=#px(24), ~right=#px(24), ~bottom=#px(12)),
+    Media.mobile([padding2(~v=#px(14), ~h=#px(12))]),
+  ])
 
-  let kvTableMobile = style(. [margin(#zero), boxShadow(#none)]);
-  let addressContainer = style(. [Media.mobile([width(#px(260))])]);
-  let validatorReportStatus = style(. [marginBottom(#px(13))]);
-  let noPaddingBottom = style(. [paddingBottom(#zero), Media.mobile([paddingBottom(#zero)])]);
+  let kvTableMobile = style(. [margin(#zero), boxShadow(#none)])
+  let addressContainer = style(. [Media.mobile([width(#px(260))])])
+  let validatorReportStatus = style(. [marginBottom(#px(13))])
+  let noPaddingBottom = style(. [paddingBottom(#zero), Media.mobile([paddingBottom(#zero)])])
   let ibcBadge = (theme: Theme.t) =>
     style(. [
       display(#flex),
@@ -30,7 +29,7 @@ module Styles = {
       background(theme.primary_600),
       borderRadius(#px(10)),
       marginLeft(#px(8)),
-    ]);
+    ])
   let reasonSection = (theme: Theme.t) =>
     style(. [
       padding2(~v=#px(24), ~h=#px(40)),
@@ -39,72 +38,62 @@ module Styles = {
       marginTop(#px(40)),
       display(#flex),
       alignItems(#center),
-    ]);
-  let notFoundLogo = style(. [width(#px(120))]);
-};
+    ])
+  let notFoundLogo = style(. [width(#px(120))])
+}
 
 module ValidatorReportStatus = {
   @react.component
   let make = (~moniker, ~isReport, ~resolveStatus, ~operatorAddress) => {
-    let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div
       className={Css.merge(list{
         CssHelper.flexBox(~align=#center, ~wrap=#nowrap, ()),
         Styles.validatorReportStatus,
       })}>
       {switch (isReport, resolveStatus) {
-       | (true, _) => <Icon name="fas fa-check-circle" color={theme.success_600} />
-       | (false, _) => <Icon name="fas fa-times-circle" color={theme.error_600} />
-       }}
+      | (true, _) => <Icon name="fas fa-check-circle" color={theme.success_600} />
+      | (false, _) => <Icon name="fas fa-times-circle" color={theme.error_600} />
+      }}
       <HSpacing size=Spacing.sm />
       <ValidatorMonikerLink
-        validatorAddress=operatorAddress
-        moniker
-        size=Text.Body2
-        width={#px(150)}
+        validatorAddress=operatorAddress moniker size=Text.Body2 width={#px(150)}
       />
-    </div>;
-  };
-};
+    </div>
+  }
+}
 
 module KVTableContainer = {
   module TableHeader = {
     @react.component
     let make = () => {
-      let ({ThemeContext.theme}, _) = React.useContext(ThemeContext.context);
+      let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
       <THead>
         <Row alignItems=Row.Center>
           <Col col=Col.Three>
-            <Heading
-              value="KEY"
-              size=Heading.H5
-              weight=Heading.Medium
-              color={theme.neutral_600}
-            />
+            <Heading value="KEY" size=Heading.H5 weight=Heading.Medium color={theme.neutral_600} />
           </Col>
           <Col col=Col.Nine>
             <Heading
-              value="VALUE"
-              size=Heading.H5
-              weight=Heading.Medium
-              color={theme.neutral_600}
+              value="VALUE" size=Heading.H5 weight=Heading.Medium color={theme.neutral_600}
             />
           </Col>
         </Row>
-      </THead>;
-    };
-  };
+      </THead>
+    }
+  }
 
   module Loading = {
     @react.component
     let make = () => {
-      let isMobile = Media.isMobile();
+      let isMobile = Media.isMobile()
 
       isMobile
         ? <MobileCard
             values={
               open InfoMobileCard
-              [("Key", Loading(60)), ("Value", Loading(60))]}
+              [("Key", Loading(60)), ("Value", Loading(60))]
+            }
             idx="1"
             styles=Styles.kvTableMobile
           />
@@ -112,61 +101,67 @@ module KVTableContainer = {
             <TableHeader />
             <TBody>
               <Row alignItems=Row.Center minHeight={#px(30)}>
-                <Col col=Col.Three> <LoadingCensorBar width=60 height=15 /> </Col>
-                <Col col=Col.Nine> <LoadingCensorBar width=100 height=15 /> </Col>
+                <Col col=Col.Three>
+                  <LoadingCensorBar width=60 height=15 />
+                </Col>
+                <Col col=Col.Nine>
+                  <LoadingCensorBar width=100 height=15 />
+                </Col>
               </Row>
             </TBody>
             <TBody>
               <Row alignItems=Row.Center minHeight={#px(30)}>
-                <Col col=Col.Three> <LoadingCensorBar width=60 height=15 /> </Col>
-                <Col col=Col.Nine> <LoadingCensorBar width=100 height=15 /> </Col>
+                <Col col=Col.Three>
+                  <LoadingCensorBar width=60 height=15 />
+                </Col>
+                <Col col=Col.Nine>
+                  <LoadingCensorBar width=100 height=15 />
+                </Col>
               </Row>
             </TBody>
-          </>;
-    };
-  };
+          </>
+    }
+  }
 
   @react.component
   let make = (~decodesOpt) => {
-    let isMobile = Media.isMobile();
-    let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+    let isMobile = Media.isMobile()
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-    switch (decodesOpt) {
+    switch decodesOpt {
     | Some(decodes) =>
       isMobile
         ? decodes
-          ->Belt.Array.map(({Obi.fieldName, fieldValue}) =>
-              <MobileCard
-                values={
-                  open InfoMobileCard
-                  [("Key", Text(fieldName)), ("Value", Text(fieldValue))]}
-                key={fieldName ++ fieldValue}
-                idx={fieldName ++ fieldValue}
-                styles=Styles.kvTableMobile
-              />
-            )
+          ->Belt.Array.map(({Obi.fieldName: fieldName, fieldValue}) =>
+            <MobileCard
+              values={
+                open InfoMobileCard
+                [("Key", Text(fieldName)), ("Value", Text(fieldValue))]
+              }
+              key={fieldName ++ fieldValue}
+              idx={fieldName ++ fieldValue}
+              styles=Styles.kvTableMobile
+            />
+          )
           ->React.array
         : <>
             <TableHeader />
             {decodes
-             ->Belt.Array.map(({Obi.fieldName, fieldValue}) => {
-                 <TBody key={fieldName ++ fieldValue}>
-                   <Row alignItems=Row.Center minHeight={#px(30)}>
-                     <Col col=Col.Three>
-                       <Text value=fieldName color={theme.neutral_600} weight=Text.Thin />
-                     </Col>
-                     <Col col=Col.Nine>
-                       <Text
-                         value=fieldValue
-                         color={theme.neutral_600}
-                         weight=Text.Thin
-                         breakAll=true
-                       />
-                     </Col>
-                   </Row>
-                 </TBody>
-               })
-             ->React.array}
+            ->Belt.Array.map(({Obi.fieldName: fieldName, fieldValue}) => {
+              <TBody key={fieldName ++ fieldValue}>
+                <Row alignItems=Row.Center minHeight={#px(30)}>
+                  <Col col=Col.Three>
+                    <Text value=fieldName color={theme.neutral_600} weight=Text.Thin />
+                  </Col>
+                  <Col col=Col.Nine>
+                    <Text
+                      value=fieldValue color={theme.neutral_600} weight=Text.Thin breakAll=true
+                    />
+                  </Col>
+                </Row>
+              </TBody>
+            })
+            ->React.array}
           </>
     | None =>
       <EmptyContainer height={#px(200)}>
@@ -183,18 +178,18 @@ module KVTableContainer = {
           color={theme.neutral_600}
         />
       </EmptyContainer>
-    };
-  };
-};
+    }
+  }
+}
 
 @react.component
 let make = (~reqID) => {
-  let requestSub = RequestSub.get(reqID);
-  let isMobile = Media.isMobile();
+  let requestSub = RequestSub.get(reqID)
+  let isMobile = Media.isMobile()
 
-  let ({ThemeContext.theme, isDarkMode}, _) = React.useContext(ThemeContext.context);
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  switch (requestSub) {
+  switch requestSub {
   | NoData
   | Error(_) =>
     <Section>
@@ -217,10 +212,7 @@ let make = (~reqID) => {
           <VSpacing size=Spacing.lg />
           <Link className=Styles.linkToHome route=Route.HomePage>
             <Text
-              value="Back to Homepage"
-              weight=Text.Bold
-              size=Text.Body2
-              color={theme.neutral_600}
+              value="Back to Homepage" weight=Text.Bold size=Text.Body2 color={theme.neutral_600}
             />
             <HSpacing size=Spacing.md />
             <img alt="Right Arrow Icon" src=Images.rightArrow className=Styles.rightArrow />
@@ -235,18 +227,18 @@ let make = (~reqID) => {
         <Row marginBottom=40 marginBottomSm=16>
           <Col>
             <Heading value="Request Details" size=Heading.H2 marginBottom=40 marginBottomSm=24 />
-            {switch (requestSub) {
-             | Data({id, isIBC}) =>
-               <div className={CssHelper.flexBox()}>
-                 <TypeID.Request id position=TypeID.Title />
-                 {isIBC
-                    ? <div className=Styles.ibcBadge(theme)>
-                        <Text value="IBC" color={theme.white} weight=Text.Semibold />
-                      </div>
-                    : React.null}
-               </div>
-             | _ => <LoadingCensorBar width=150 height=23 />
-             }}
+            {switch requestSub {
+            | Data({id, isIBC}) =>
+              <div className={CssHelper.flexBox()}>
+                <TypeID.Request id position=TypeID.Title />
+                {isIBC
+                  ? <div className={Styles.ibcBadge(theme)}>
+                      <Text value="IBC" color={theme.white} weight=Text.Semibold />
+                    </div>
+                  : React.null}
+              </div>
+            | _ => <LoadingCensorBar width=150 height=23 />
+            }}
           </Col>
         </Row>
         <Row marginBottom=24>
@@ -264,87 +256,77 @@ let make = (~reqID) => {
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (requestSub) {
-                   | Data({oracleScript: {oracleScriptID, name}}) =>
-                     <div className={CssHelper.flexBox()}>
-                       <TypeID.OracleScript id=oracleScriptID position=TypeID.Subtitle />
-                       <HSpacing size=Spacing.sm />
-                       <Text value=name size=Text.Body1 />
-                     </div>
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({oracleScript: {oracleScriptID, name}}) =>
+                    <div className={CssHelper.flexBox()}>
+                      <TypeID.OracleScript id=oracleScriptID position=TypeID.Subtitle />
+                      <HSpacing size=Spacing.sm />
+                      <Text value=name size=Text.Body1 />
+                    </div>
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Sender"
-                    size=Heading.H4
-                    weight=Heading.Thin
-                    color={theme.neutral_600}
+                    value="Sender" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (requestSub) {
-                   | Data({requester}) =>
-                     switch (requester) {
-                     | Some(requester') =>
-                       <div className=Styles.addressContainer>
-                         <AddressRender address=requester' position=AddressRender.Subtitle />
-                       </div>
-                     | None => <Text value="Syncing" />
-                     }
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({requester}) =>
+                    switch requester {
+                    | Some(requester') =>
+                      <div className=Styles.addressContainer>
+                        <AddressRender address=requester' position=AddressRender.Subtitle />
+                      </div>
+                    | None => <Text value="Syncing" />
+                    }
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="TX Hash"
-                    size=Heading.H4
-                    weight=Heading.Thin
-                    color={theme.neutral_600}
+                    value="TX Hash" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (requestSub) {
-                   | Data({transactionOpt}) =>
-                     switch (transactionOpt) {
-                     | Some({hash}) => <TxLink txHash=hash width={isMobile ? 260 : 360} />
-                     | None => <Text value="Syncing" />
-                     }
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({transactionOpt}) =>
+                    switch transactionOpt {
+                    | Some({hash}) => <TxLink txHash=hash width={isMobile ? 260 : 360} />
+                    | None => <Text value="Syncing" />
+                    }
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Tx Fee"
-                    size=Heading.H4
-                    weight=Heading.Thin
-                    color={theme.neutral_600}
+                    value="Tx Fee" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (requestSub) {
-                   | Data({transactionOpt}) =>
-                     switch (transactionOpt) {
-                     | Some({gasFee}) =>
-                       <Text
-                         block=true
-                         value={
-                           (gasFee -> Coin.getBandAmountFromCoins -> Format.fPretty(~digits=6))
-                           ++ " BAND"
-                         }
-                         size=Text.Body1
-                         color={theme.neutral_600}
-                       />
-                     | None => <Text value="Syncing" />
-                     }
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({transactionOpt}) =>
+                    switch transactionOpt {
+                    | Some({gasFee}) =>
+                      <Text
+                        block=true
+                        value={gasFee
+                        ->Coin.getBandAmountFromCoins
+                        ->Format.fPretty(~digits=6) ++ " BAND"}
+                        size=Text.Body1
+                        color={theme.neutral_600}
+                      />
+                    | None => <Text value="Syncing" />
+                    }
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
@@ -357,16 +339,16 @@ let make = (~reqID) => {
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (requestSub) {
-                   | Data({prepareGas}) =>
-                     <Text
-                       block=true
-                       value={prepareGas -> Belt.Int.toString}
-                       size=Text.Body1
-                       color={theme.neutral_600}
-                     />
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({prepareGas}) =>
+                    <Text
+                      block=true
+                      value={prepareGas->Belt.Int.toString}
+                      size=Text.Body1
+                      color={theme.neutral_600}
+                    />
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
@@ -379,41 +361,37 @@ let make = (~reqID) => {
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (requestSub) {
-                   | Data({executeGas}) =>
-                     <Text
-                       block=true
-                       value={executeGas -> Belt.Int.toString}
-                       size=Text.Body1
-                       color={theme.neutral_600}
-                     />
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({executeGas}) =>
+                    <Text
+                      block=true
+                      value={executeGas->Belt.Int.toString}
+                      size=Text.Body1
+                      color={theme.neutral_600}
+                    />
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Fee Limit"
-                    size=Heading.H4
-                    weight=Heading.Thin
-                    color={theme.neutral_600}
+                    value="Fee Limit" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (requestSub) {
-                   | Data({feeLimit}) =>
-                     <Text
-                       block=true
-                       value={
-                         (feeLimit -> Coin.getBandAmountFromCoins -> Format.fPretty(~digits=6))
-                         ++ " BAND"
-                       }
-                       size=Text.Body1
-                       color={theme.neutral_600}
-                     />
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({feeLimit}) =>
+                    <Text
+                      block=true
+                      value={feeLimit
+                      ->Coin.getBandAmountFromCoins
+                      ->Format.fPretty(~digits=6) ++ " BAND"}
+                      size=Text.Body1
+                      color={theme.neutral_600}
+                    />
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
@@ -426,23 +404,21 @@ let make = (~reqID) => {
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (requestSub) {
-                   | Data({feeUsed, feeLimit}) =>
-                     let feeUsed_ = feeUsed -> Coin.getBandAmountFromCoins;
-                     let feeLimit_ = feeLimit -> Coin.getBandAmountFromCoins;
-                     let usedRatio =
-                       ((feeLimit_ == 0. ? 0. : feeUsed_ /. feeLimit_) *. 100.)
-                       -> Format.fPercent(~digits=2)
-                     <Text
-                       block=true
-                       value={
-                         (feeUsed_ -> Format.fPretty(~digits=6)) ++ " BAND " ++ {j`($usedRatio)`}
-                       }
-                       size=Text.Body1
-                       color={theme.neutral_600}
-                     />;
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({feeUsed, feeLimit}) =>
+                    let feeUsed_ = feeUsed->Coin.getBandAmountFromCoins
+                    let feeLimit_ = feeLimit->Coin.getBandAmountFromCoins
+                    let usedRatio =
+                      ((feeLimit_ == 0. ? 0. : feeUsed_ /. feeLimit_) *. 100.)
+                        ->Format.fPercent(~digits=2)
+                    <Text
+                      block=true
+                      value={feeUsed_->Format.fPretty(~digits=6) ++ " BAND " ++ {j`($usedRatio)`}}
+                      size=Text.Body1
+                      color={theme.neutral_600}
+                    />
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <SeperatedLine mt=32 mb=24 />
@@ -456,14 +432,14 @@ let make = (~reqID) => {
                   />
                 </Col>
                 <Col col=Col.Four>
-                  {switch (requestSub) {
-                   | Data({transactionOpt}) =>
-                     switch (transactionOpt) {
-                     | Some({blockHeight}) => <TypeID.Block id=blockHeight />
-                     | None => <Text value="Genesis" size=Text.Body1 />
-                     }
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({transactionOpt}) =>
+                    switch transactionOpt {
+                    | Some({blockHeight}) => <TypeID.Block id=blockHeight />
+                    | None => <Text value="Genesis" size=Text.Body1 />
+                    }
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
@@ -476,15 +452,15 @@ let make = (~reqID) => {
                   />
                 </Col>
                 <Col col=Col.Four>
-                  {switch (requestSub) {
-                   | Data({minCount, requestedValidators, reports}) =>
-                     <ProgressBar
-                       reportedValidators={reports->Belt.Array.size}
-                       minimumValidators=minCount
-                       requestValidators={requestedValidators->Belt.Array.size}
-                     />
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({minCount, requestedValidators, reports}) =>
+                    <ProgressBar
+                      reportedValidators={reports->Belt.Array.size}
+                      minimumValidators=minCount
+                      requestValidators={requestedValidators->Belt.Array.size}
+                    />
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
@@ -497,77 +473,70 @@ let make = (~reqID) => {
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  {switch (requestSub) {
-                   | Data({resolveStatus, resolveHeight}) =>
-                     <div className={CssHelper.flexBox()}>
-                       <RequestStatus resolveStatus display=RequestStatus.Full />
-                       {switch (resolveHeight) {
-                        | Some(height) =>
-                          <>
-                            <HSpacing size=Spacing.md />
-                            <Text value=" (" block=true size=Text.Body1 color={theme.neutral_900} />
-                            <TypeID.Block id=height />
-                            <Text value=")" block=true size=Text.Body1 color={theme.neutral_900} />
-                          </>
-                        | None => React.null
-                        }}
-                     </div>
-                   | _ => <LoadingCensorBar width=200 height=15 />
-                   }}
+                  {switch requestSub {
+                  | Data({resolveStatus, resolveHeight}) =>
+                    <div className={CssHelper.flexBox()}>
+                      <RequestStatus resolveStatus display=RequestStatus.Full />
+                      {switch resolveHeight {
+                      | Some(height) =>
+                        <>
+                          <HSpacing size=Spacing.md />
+                          <Text value=" (" block=true size=Text.Body1 color={theme.neutral_900} />
+                          <TypeID.Block id=height />
+                          <Text value=")" block=true size=Text.Body1 color={theme.neutral_900} />
+                        </>
+                      | None => React.null
+                      }}
+                    </div>
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
                 </Col>
               </Row>
               <Row alignItems=Row.Start>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Request to"
-                    size=Heading.H4
-                    weight=Heading.Thin
-                    color={theme.neutral_600}
+                    value="Request to" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
                   <Row wrap=true>
-                    {switch (requestSub) {
-                     | Data({requestedValidators, resolveStatus, reports}) =>
-                       requestedValidators
-                       ->Belt.Array.map(
-                           ({validator: {moniker, consensusAddress, operatorAddress}}) => {
-                           let isReport =
-                             reports->Belt.Array.some(({reportValidator}) =>
-                               consensusAddress == reportValidator.consensusAddress
-                             );
-                           <Col col=Col.Three colSm=Col.Six key=moniker>
-                             <ValidatorReportStatus
-                               moniker
-                               isReport
-                               resolveStatus
-                               operatorAddress
-                             />
-                           </Col>;
-                         })
-                       ->React.array
-                     | _ =>
-                       <Col>
-                         <LoadingCensorBar width=200 height=15 />
-                         <VSpacing size={#px(isMobile ? 5 : 11)} />
-                       </Col>
-                     }}
+                    {switch requestSub {
+                    | Data({requestedValidators, resolveStatus, reports}) =>
+                      requestedValidators
+                      ->Belt.Array.map(({
+                        validator: {moniker, consensusAddress, operatorAddress},
+                      }) => {
+                        let isReport =
+                          reports->Belt.Array.some(({reportValidator}) =>
+                            consensusAddress == reportValidator.consensusAddress
+                          )
+                        <Col col=Col.Three colSm=Col.Six key=moniker>
+                          <ValidatorReportStatus moniker isReport resolveStatus operatorAddress />
+                        </Col>
+                      })
+                      ->React.array
+                    | _ =>
+                      <Col>
+                        <LoadingCensorBar width=200 height=15 />
+                        <VSpacing size={#px(isMobile ? 5 : 11)} />
+                      </Col>
+                    }}
                   </Row>
                 </Col>
               </Row>
-              {switch (requestSub) {
-               | Data({reason}) =>
-                 switch (reason) {
-                 | Some(reason') when reason' !== "" =>
-                   <div className=Styles.reasonSection(theme)>
-                     <img alt="Fail Icon" src=Images.fail />
-                     <HSpacing size=Spacing.md />
-                     <Text value=reason' color={theme.neutral_900} />
-                   </div>
-                 | _ => React.null
-                 }
-               | _ => React.null
-               }}
+              {switch requestSub {
+              | Data({reason}) =>
+                switch reason {
+                | Some(reason') if reason' !== "" =>
+                  <div className={Styles.reasonSection(theme)}>
+                    <img alt="Fail Icon" src=Images.fail />
+                    <HSpacing size=Spacing.md />
+                    <Text value=reason' color={theme.neutral_900} />
+                  </div>
+                | _ => React.null
+                }
+              | _ => React.null
+              }}
             </InfoContainer>
           </Col>
         </Row>
@@ -577,24 +546,22 @@ let make = (~reqID) => {
             <InfoContainer style=Styles.noPaddingBottom>
               <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
                 <Heading value="Calldata" size=Heading.H4 />
-                {switch (requestSub) {
-                 | Data({calldata}) =>
-                   <CopyButton
-                     data={calldata -> JsBuffer.toHex(~with0x=false)}
-                     title="Copy as bytes"
-                     width=125
-                   />
-                 | _ => <LoadingCensorBar width=125 height=28 />
-                 }}
+                {switch requestSub {
+                | Data({calldata}) =>
+                  <CopyButton
+                    data={calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
+                  />
+                | _ => <LoadingCensorBar width=125 height=28 />
+                }}
               </div>
               <SeperatedLine mt=32 />
               <div className=Styles.kvTableContainer>
-                {switch (requestSub) {
-                 | Data({oracleScript: {schema}, calldata}) =>
-                   let decodesOpt = Obi.decode(schema, "input", calldata);
-                   <KVTableContainer decodesOpt />;
-                 | _ => <KVTableContainer.Loading />
-                 }}
+                {switch requestSub {
+                | Data({oracleScript: {schema}, calldata}) =>
+                  let decodesOpt = Obi.decode(schema, "input", calldata)
+                  <KVTableContainer decodesOpt />
+                | _ => <KVTableContainer.Loading />
+                }}
               </div>
             </InfoContainer>
           </Col>
@@ -605,56 +572,54 @@ let make = (~reqID) => {
             <InfoContainer style=Styles.noPaddingBottom>
               <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
                 <Heading value="Result" size=Heading.H4 />
-                {switch (requestSub) {
-                 | Data({result: resultOpt, resolveStatus}) =>
-                   switch (resultOpt, resolveStatus) {
-                   | (Some(result), Success) =>
-                     <CopyButton
-                       data={result -> JsBuffer.toHex(~with0x=false)}
-                       title="Copy as bytes"
-                       width=125
-                     />
-                   | (_, _) => React.null
-                   }
-                 | _ => <LoadingCensorBar width=125 height=28 />
-                 }}
+                {switch requestSub {
+                | Data({result: resultOpt, resolveStatus}) =>
+                  switch (resultOpt, resolveStatus) {
+                  | (Some(result), Success) =>
+                    <CopyButton
+                      data={result->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
+                    />
+                  | (_, _) => React.null
+                  }
+                | _ => <LoadingCensorBar width=125 height=28 />
+                }}
               </div>
               <SeperatedLine mt=32 />
-              {switch (requestSub) {
-               | Data({oracleScript: {schema}, result: resultOpt, resolveStatus}) =>
-                 switch (resolveStatus, resultOpt) {
-                 | (RequestSub.Success, Some(result)) =>
-                   let decodesOpt = Obi.decode(schema, "output", result);
-                   <KVTableContainer decodesOpt />;
-                 | (Pending, _) =>
-                   <EmptyContainer height={#px(200)}>
-                     <LoadingCensorBar.CircleSpin size=50 height=70 />
-                     <Heading
-                       size=Heading.H4
-                       value="Waiting for result"
-                       align=Heading.Center
-                       weight=Heading.Regular
-                       color={theme.neutral_600}
-                     />
-                   </EmptyContainer>
-                 | (_, _) =>
-                   <EmptyContainer height={#px(200)}>
-                     <img
-                       alt="Not Found"
-                       src={isDarkMode ? Images.noDataDark : Images.noDataLight}
-                       className=Styles.noDataImage
-                     />
-                     <Heading
-                       size=Heading.H4
-                       value="This request hasn't resolved"
-                       align=Heading.Center
-                       weight=Heading.Regular
-                       color={theme.neutral_600}
-                     />
-                   </EmptyContainer>
-                 }
-               | _ => <KVTableContainer.Loading />
-               }}
+              {switch requestSub {
+              | Data({oracleScript: {schema}, result: resultOpt, resolveStatus}) =>
+                switch (resolveStatus, resultOpt) {
+                | (RequestSub.Success, Some(result)) =>
+                  let decodesOpt = Obi.decode(schema, "output", result)
+                  <KVTableContainer decodesOpt />
+                | (Pending, _) =>
+                  <EmptyContainer height={#px(200)}>
+                    <LoadingCensorBar.CircleSpin size=50 height=70 />
+                    <Heading
+                      size=Heading.H4
+                      value="Waiting for result"
+                      align=Heading.Center
+                      weight=Heading.Regular
+                      color={theme.neutral_600}
+                    />
+                  </EmptyContainer>
+                | (_, _) =>
+                  <EmptyContainer height={#px(200)}>
+                    <img
+                      alt="Not Found"
+                      src={isDarkMode ? Images.noDataDark : Images.noDataLight}
+                      className=Styles.noDataImage
+                    />
+                    <Heading
+                      size=Heading.H4
+                      value="This request hasn't resolved"
+                      align=Heading.Center
+                      weight=Heading.Regular
+                      color={theme.neutral_600}
+                    />
+                  </EmptyContainer>
+                }
+              | _ => <KVTableContainer.Loading />
+              }}
             </InfoContainer>
           </Col>
         </Row>
@@ -674,39 +639,39 @@ let make = (~reqID) => {
                 </AbsoluteLink>
               </div>
               <SeperatedLine mt=32 />
-              {switch (requestSub) {
-               | Data(request) =>
-                 switch (request.resolveStatus) {
-                 | Success => <RequestProof request />
-                 | Pending =>
-                   <EmptyContainer height={#px(200)}>
-                     <LoadingCensorBar.CircleSpin size=50 height=70 />
-                     <Heading
-                       size=Heading.H4
-                       value="Waiting for result"
-                       align=Heading.Center
-                       weight=Heading.Regular
-                       color={theme.neutral_600}
-                     />
-                   </EmptyContainer>
-                 | _ =>
-                   <EmptyContainer height={#px(200)}>
-                     <img
-                       alt="Not Found"
-                       src={isDarkMode ? Images.noDataDark : Images.noDataLight}
-                       className=Styles.noDataImage
-                     />
-                     <Heading
-                       size=Heading.H4
-                       value="This request hasn't resolved"
-                       align=Heading.Center
-                       weight=Heading.Regular
-                       color={theme.neutral_600}
-                     />
-                   </EmptyContainer>
-                 }
-               | _ => <LoadingCensorBar fullWidth=true height=100 />
-               }}
+              {switch requestSub {
+              | Data(request) =>
+                switch request.resolveStatus {
+                | Success => <RequestProof request />
+                | Pending =>
+                  <EmptyContainer height={#px(200)}>
+                    <LoadingCensorBar.CircleSpin size=50 height=70 />
+                    <Heading
+                      size=Heading.H4
+                      value="Waiting for result"
+                      align=Heading.Center
+                      weight=Heading.Regular
+                      color={theme.neutral_600}
+                    />
+                  </EmptyContainer>
+                | _ =>
+                  <EmptyContainer height={#px(200)}>
+                    <img
+                      alt="Not Found"
+                      src={isDarkMode ? Images.noDataDark : Images.noDataLight}
+                      className=Styles.noDataImage
+                    />
+                    <Heading
+                      size=Heading.H4
+                      value="This request hasn't resolved"
+                      align=Heading.Center
+                      weight=Heading.Regular
+                      color={theme.neutral_600}
+                    />
+                  </EmptyContainer>
+                }
+              | _ => <LoadingCensorBar fullWidth=true height=100 />
+              }}
             </InfoContainer>
           </Col>
         </Row>
@@ -718,127 +683,135 @@ let make = (~reqID) => {
               <SeperatedLine mt=32 />
               <div className=Styles.kvTableContainer>
                 {isMobile
-                   ? React.null
-                   : <THead>
-                       <Row alignItems=Row.Center>
-                         <Col col=Col.Two>
-                           <Heading
-                             value="EXTERNAL ID"
-                             size=Heading.H5
-                             weight=Heading.Regular
-                             color={theme.neutral_600}
-                           />
-                         </Col>
-                         <Col col=Col.Two>
-                           <Heading
-                             value="FEE"
-                             size=Heading.H5
-                             weight=Heading.Regular
-                             color={theme.neutral_600}
-                           />
-                         </Col>
-                         <Col col=Col.Four>
-                           <Heading
-                             value="DATA SOURCE"
-                             size=Heading.H5
-                             weight=Heading.Regular
-                             color={theme.neutral_600}
-                           />
-                         </Col>
-                         <Col col=Col.Four>
-                           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                             <Heading
-                               value="PARAM"
-                               size=Heading.H5
-                               weight=Heading.Regular
-                               color={theme.neutral_600}
-                             />
-                           </div>
-                         </Col>
-                       </Row>
-                     </THead>}
-                {switch (requestSub) {
-                 | Data({rawDataRequests}) =>
-                   rawDataRequests
-                   ->Belt.Array.map(
-                       ({externalID, fee, dataSource: {dataSourceID, name}, calldata}) => {
-                       isMobile
-                         ? <MobileCard
-                             values={
-                              open InfoMobileCard
-                              [
-                               ("External ID", Text(externalID)),
-                               ("Fee\n(BAND)", Coin({value: list{fee}, hasDenom: false})),
-                               ("Data Source", DataSource(dataSourceID, name)),
-                               ("Param", Text(calldata -> JsBuffer.toUTF8)),
-                             ]}
-                             key={externalID ++ name}
-                             idx={externalID ++ name}
-                             styles=Styles.kvTableMobile
-                           />
-                         : <TBody key=externalID>
-                             <Row alignItems=Row.Center minHeight={#px(30)}>
-                               <Col col=Col.Two>
-                                 <Text
-                                   value=externalID
-                                   color={theme.neutral_600}
-                                   weight=Text.Thin
-                                 />
-                               </Col>
-                               <Col col=Col.Two>
-                                 <div className={CssHelper.flexBox()}>
-                                   <AmountRender coins=list{fee} color=theme.neutral_900 />
-                                 </div>
-                               </Col>
-                               <Col col=Col.Four>
-                                 <div className={CssHelper.flexBox()}>
-                                   <TypeID.DataSource id=dataSourceID position=TypeID.Text />
-                                   <HSpacing size=Spacing.sm />
-                                   <Text value=name color={theme.neutral_600} weight=Text.Thin />
-                                 </div>
-                               </Col>
-                               <Col col=Col.Four>
-                                 <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                                   <Text
-                                     value={calldata->JsBuffer.toUTF8}
-                                     color={theme.neutral_600}
-                                     weight=Text.Thin
-                                     align=Text.Right
-                                     breakAll=true
-                                   />
-                                 </div>
-                               </Col>
-                             </Row>
-                           </TBody>
-                     })
-                   ->React.array
-                 | _ =>
-                   isMobile
-                     ? <MobileCard
-                         values={
+                  ? React.null
+                  : <THead>
+                      <Row alignItems=Row.Center>
+                        <Col col=Col.Two>
+                          <Heading
+                            value="EXTERNAL ID"
+                            size=Heading.H5
+                            weight=Heading.Regular
+                            color={theme.neutral_600}
+                          />
+                        </Col>
+                        <Col col=Col.Two>
+                          <Heading
+                            value="FEE"
+                            size=Heading.H5
+                            weight=Heading.Regular
+                            color={theme.neutral_600}
+                          />
+                        </Col>
+                        <Col col=Col.Four>
+                          <Heading
+                            value="DATA SOURCE"
+                            size=Heading.H5
+                            weight=Heading.Regular
+                            color={theme.neutral_600}
+                          />
+                        </Col>
+                        <Col col=Col.Four>
+                          <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+                            <Heading
+                              value="PARAM"
+                              size=Heading.H5
+                              weight=Heading.Regular
+                              color={theme.neutral_600}
+                            />
+                          </div>
+                        </Col>
+                      </Row>
+                    </THead>}
+                {switch requestSub {
+                | Data({rawDataRequests}) =>
+                  rawDataRequests
+                  ->Belt.Array.map(({
+                    externalID,
+                    fee,
+                    dataSource: {dataSourceID, name},
+                    calldata,
+                  }) => {
+                    isMobile
+                      ? <MobileCard
+                          values={
+                            open InfoMobileCard
+                            [
+                              ("External ID", Text(externalID)),
+                              ("Fee\n(BAND)", Coin({value: list{fee}, hasDenom: false})),
+                              ("Data Source", DataSource(dataSourceID, name)),
+                              ("Param", Text(calldata->JsBuffer.toUTF8)),
+                            ]
+                          }
+                          key={externalID ++ name}
+                          idx={externalID ++ name}
+                          styles=Styles.kvTableMobile
+                        />
+                      : <TBody key=externalID>
+                          <Row alignItems=Row.Center minHeight={#px(30)}>
+                            <Col col=Col.Two>
+                              <Text value=externalID color={theme.neutral_600} weight=Text.Thin />
+                            </Col>
+                            <Col col=Col.Two>
+                              <div className={CssHelper.flexBox()}>
+                                <AmountRender coins=list{fee} color=theme.neutral_900 />
+                              </div>
+                            </Col>
+                            <Col col=Col.Four>
+                              <div className={CssHelper.flexBox()}>
+                                <TypeID.DataSource id=dataSourceID position=TypeID.Text />
+                                <HSpacing size=Spacing.sm />
+                                <Text value=name color={theme.neutral_600} weight=Text.Thin />
+                              </div>
+                            </Col>
+                            <Col col=Col.Four>
+                              <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+                                <Text
+                                  value={calldata->JsBuffer.toUTF8}
+                                  color={theme.neutral_600}
+                                  weight=Text.Thin
+                                  align=Text.Right
+                                  breakAll=true
+                                />
+                              </div>
+                            </Col>
+                          </Row>
+                        </TBody>
+                  })
+                  ->React.array
+                | _ =>
+                  isMobile
+                    ? <MobileCard
+                        values={
                           open InfoMobileCard
                           [
-                           ("External ID", Loading(60)),
-                           ("Fee\n(BAND)", Loading(60)),
-                           ("Data Source", Loading(60)),
-                           ("Param", Loading(60)),
-                         ]}
-                         idx="1"
-                         styles=Styles.kvTableMobile
-                       />
-                     : <TBody>
-                         <Row alignItems=Row.Center minHeight={#px(30)}>
-                           <Col col=Col.Two> <LoadingCensorBar width=60 height=15 /> </Col>
-                           <Col col=Col.Two> <LoadingCensorBar width=60 height=15 /> </Col>
-                           <Col col=Col.Four> <LoadingCensorBar width=100 height=15 /> </Col>
-                           <Col col=Col.Four>
-                             <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                               <LoadingCensorBar width=50 height=15 />
-                             </div>
-                           </Col>
-                         </Row>
-                       </TBody>
-                 }}
+                            ("External ID", Loading(60)),
+                            ("Fee\n(BAND)", Loading(60)),
+                            ("Data Source", Loading(60)),
+                            ("Param", Loading(60)),
+                          ]
+                        }
+                        idx="1"
+                        styles=Styles.kvTableMobile
+                      />
+                    : <TBody>
+                        <Row alignItems=Row.Center minHeight={#px(30)}>
+                          <Col col=Col.Two>
+                            <LoadingCensorBar width=60 height=15 />
+                          </Col>
+                          <Col col=Col.Two>
+                            <LoadingCensorBar width=60 height=15 />
+                          </Col>
+                          <Col col=Col.Four>
+                            <LoadingCensorBar width=100 height=15 />
+                          </Col>
+                          <Col col=Col.Four>
+                            <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+                              <LoadingCensorBar width=50 height=15 />
+                            </div>
+                          </Col>
+                        </Row>
+                      </TBody>
+                }}
               </div>
             </InfoContainer>
           </Col>
@@ -850,15 +823,15 @@ let make = (~reqID) => {
               <Heading value="Data Report" size=Heading.H4 />
               <SeperatedLine mt=32 />
               <div className=Styles.kvTableContainer>
-                {switch (requestSub) {
-                 | Data({reports}) => <DataReports reports />
-                 | _ => <LoadingCensorBar.CircleSpin height=200 />
-                 }}
+                {switch requestSub {
+                | Data({reports}) => <DataReports reports />
+                | _ => <LoadingCensorBar.CircleSpin height=200 />
+                }}
               </div>
             </InfoContainer>
           </Col>
         </Row>
       </div>
     </Section>
-  };
-};
+  }
+}

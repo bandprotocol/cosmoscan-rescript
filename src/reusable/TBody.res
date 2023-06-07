@@ -13,5 +13,7 @@ module Styles = {
 @react.component
 let make = (~children, ~paddingV=#px(20), ~paddingH=#zero) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-  <div className={CssJs.merge(. [Styles.containerBase(paddingV, paddingH, theme, isDarkMode)])}> children </div>
+  <div className={CssJs.merge(. [Styles.containerBase(paddingV, paddingH, theme, isDarkMode)])}>
+    children
+  </div>
 }

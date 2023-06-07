@@ -22,11 +22,7 @@ let fromData = result =>
   | {data: None, error: None, loading: false} => NoData
   }
 
-let fromData2 = (
-  result1,
-  result2,
-  f
-) =>
+let fromData2 = (result1, result2, f) =>
   switch (result1, result2) {
   | (Data(data1), Data(data2)) => Data(f(data1, data2))
   | (Loading, _) => Loading
@@ -57,11 +53,7 @@ let map = (result, f) =>
   | NoData => NoData
   }
 
-let map2 = (
-  result1,
-  result2,
-  f,
-) =>
+let map2 = (result1, result2, f) =>
   switch (result1, result2) {
   | (Data(data1), Data(data2)) => Data(f(data1, data2))
   | (Loading, _) => Loading

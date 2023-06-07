@@ -48,7 +48,6 @@
 @module("./bgleft-dark.png") external bgLeftDark: string = "default"
 @module("./bgleft-light.png") external bgLeftLight: string = "default"
 
-
 // IBC
 @module("./tx-ibc-icon.svg") external ibcIcon: string = "default"
 @module("./unknown-chain.svg") external unknownChain: string = "default"

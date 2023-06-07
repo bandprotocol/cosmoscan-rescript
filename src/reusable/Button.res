@@ -99,7 +99,7 @@ let make = (
   ~fsize=12,
   ~pySm=8,
   ~pxSm=16,
-  ~onClick=_=>(),
+  ~onClick=_ => (),
   ~style="",
   ~disabled=false,
   ~fullWidth=false,
@@ -108,7 +108,7 @@ let make = (
 
   <button
     className={CssJs.merge(. [
-      Styles.btn(~variant, ~px, ~py, ~pxSm, ~pySm, ~fsize, ~fullWidth=fullWidth, theme, isDarkMode, ()),
+      Styles.btn(~variant, ~px, ~py, ~pxSm, ~pySm, ~fsize, ~fullWidth, theme, isDarkMode, ()),
       CssHelper.flexBox(~align=#center, ~justify=#center, ()),
       style,
     ])}

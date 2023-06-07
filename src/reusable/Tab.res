@@ -46,7 +46,11 @@ module Route = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.container>
-      <div className={CssJs.merge(. [Styles.header(theme, isDarkMode), CssHelper.flexBox(~wrap=#nowrap, ())])}>
+      <div
+        className={CssJs.merge(. [
+          Styles.header(theme, isDarkMode),
+          CssHelper.flexBox(~wrap=#nowrap, ()),
+        ])}>
         {tabs
         ->Belt.Array.map(({name, route}) => button(~name, ~route, ~active=route == currentRoute))
         ->React.array}
@@ -70,7 +74,11 @@ module State = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.container>
-      <div className={CssJs.merge(. [Styles.header(theme, isDarkMode), CssHelper.flexBox(~wrap=#nowrap, ())])}>
+      <div
+        className={CssJs.merge(. [
+          Styles.header(theme, isDarkMode),
+          CssHelper.flexBox(~wrap=#nowrap, ()),
+        ])}>
         {tabs
         ->Belt.Array.mapWithIndex((index, name) =>
           button(~name, ~active=index == tabIndex, ~setTab=() => setTab(index))
