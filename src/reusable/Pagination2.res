@@ -32,7 +32,7 @@ module Styles = {
       pointerEvents(active ? #auto : #none),
       opacity(active ? 1. : 0.5),
       hover([
-        backgroundColor(isDarkMode ? hex("21262C") : hex("F3F4F6")), // TODO: Change to theme color
+        backgroundColor(theme.clickableHover),
         selector("> i", [color(isDarkMode ? theme.white : theme.black)]),
       ]),
     ])

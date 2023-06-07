@@ -134,7 +134,6 @@ module Balance = {
 
 @react.component
 let make = () => {
-  // TODO: Will patch later
   let trackingSub = TrackingSub.use()
   let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
   let (_, dispatchModal) = React.useContext(ModalContext.context)

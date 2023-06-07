@@ -95,9 +95,9 @@ let getPrices = () =>
     })
   )
 
-let getBandInfo = _ => {
+let getBandInfo = client => {
   //TODO: Will uncomment after, we have bandchainjs
-  // let ratesPromise = client->BandChainJS.getReferenceData([|"BAND/USD", "BAND/BTC"|]);
+  // let ratesPromise = client->BandChainJS.Client.getReferenceData(["BAND/USD", "BAND/BTC"], 10, 16)
   let ratesPromise = getPrices()
   let supplyPromise = getCirculatingSupply()
   let usd24HrChangePromise = getBandUsd24Change()

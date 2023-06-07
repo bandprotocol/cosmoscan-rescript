@@ -105,16 +105,17 @@ module ProposalStatus = {
     | _ => raise(NotFound("The proposal status is not existing"))
     }
   }
-  //TODO: implement for status
-  let serialize = status =>
-    switch status {
-    | Deposit => "DepositPeriod"->Js.Json.string
-    | Voting => "VotingPeriod"->Js.Json.string
-    | Passed => "Passed"->Js.Json.string
-    | Rejected => "Rejected"->Js.Json.string
-    | Failed => "Failed"->Js.Json.string
-    | Inactive => "Inactive"->Js.Json.string
+  let serialize = status => {
+    let str = switch status {
+    | Deposit => "DepositPeriod"
+    | Voting => "VotingPeriod"
+    | Passed => "Passed"
+    | Rejected => "Rejected"
+    | Failed => "Failed"
+    | Inactive => "Inactive"
     }
+    str->Js.Json.string
+  }
 }
 
 type account_t = {address: Address.t}
