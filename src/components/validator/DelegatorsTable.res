@@ -82,8 +82,8 @@ let make = (~address) => {
   let pageSize = 10
 
   let delegatorsSub = DelegationSub.getDelegatorsByValidator(address, ~pageSize, ~page, ())
+
   let delegatorCountSub = DelegationSub.getDelegatorCountByValidator(address)
-  Js.log(delegatorCountSub)
 
   let allSub = Sub.all2(delegatorsSub, delegatorCountSub)
 
