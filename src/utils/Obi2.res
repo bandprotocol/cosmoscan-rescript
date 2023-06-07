@@ -18,51 +18,38 @@ let flowToString = x =>
   | Output => "output"
   }
 
-type data_type_t =
-  | Params
-  | Result
-
 let dataTypeToString = dataType =>
   switch dataType {
-  | Params => "Params"
-  | Result => "Result"
+  | Input => "Params"
+  | Output => "Result"
   }
 
-let dataTypeToSchemaField = dataType =>
-  switch dataType {
-  | Params => "input"
-  | Result => "output"
-  }
+let extractFields = (schema, flow) => {
+  try {
+    let normalizedSchema = schema->Js.String2.replaceByRe(%re("/\s+/g"), "")
 
-let extractFields: (string, string) => option<array<field_key_type_t>> = %raw(`
-  function(schema, t) {
-    try {
-      const normalizedSchema = schema.replace(/\s+/g, '')
-      const tokens = normalizedSchema.split('/')
-      let val
-      if (t === 'input') {
-        val = tokens[0]
-      } else if (t === 'output') {
-        val = tokens[1]
-      } else {
-        return undefined
-      }
-      let specs = val.slice(1, val.length - 1).split(',')
-      return specs.map((spec) => {
-        let x = spec.split(':')
-        return {fieldName: x[0], fieldType: x[1]}
-      })
-    } catch {
-      return undefined
+    let tokens = normalizedSchema->Js.String2.split("/")
+    let val = switch flow {
+    | Input => tokens[0]
+    | Output => tokens[1]
     }
+    let specs = val->Js.String2.slice(~from=1, ~to_=val->String.length - 1)->Js.String2.split(",")
+    Some(
+      specs->Belt.Array.map(spec => {
+        let x = spec->Js.String2.split(":")
+        {fieldName: x[0], fieldType: x[1]}
+      }),
+    )
+  } catch {
+  | _ => None
   }
-`)
+}
 
 let encode = (schema, flow, valuePairs) => {
   open BandChainJS.Obi
 
   switch {
-    let typePairs = extractFields(schema, flow->flowToString)->Belt.Option.getExn
+    let typePairs = extractFields(schema, flow)->Belt.Option.getExn
 
     let dataPairs = typePairs->Belt.Array.map(({fieldName, fieldType}) => {
       let value =
@@ -216,7 +203,7 @@ let optionsAll = options =>
 
 let generateDecodeLibSolidity = (schema, dataType) => {
   let dataTypeString = dataType->dataTypeToString
-  let name = dataType->dataTypeToSchemaField
+  let name = dataType
   let template = (structs, functions) =>
     `library ${dataTypeString}Decoder {
     using Obi for Obi.Data;
@@ -259,8 +246,8 @@ let generateDecoderSolidity = schema => {
 import "./Obi.sol";
 
 `
-  let paramsCodeOpt = generateDecodeLibSolidity(schema, Params)
-  let resultCodeOpt = generateDecodeLibSolidity(schema, Result)
+  let paramsCodeOpt = generateDecodeLibSolidity(schema, Input)
+  let resultCodeOpt = generateDecodeLibSolidity(schema, Output)
 
   paramsCodeOpt->Belt.Option.flatMap(paramsCode => {
     resultCodeOpt->Belt.Option.flatMap(resultCode => Some(template ++ paramsCode ++ resultCode))
@@ -310,12 +297,11 @@ let resultGo = ({name}) => {
   j`$capitalizedName: $name`
 }
 
-// TODO: Implement input/params decoding
 let generateDecoderGo = (packageName, schema, dataType) => {
   switch dataType {
-  | Params => Some("Code is not available.")
-  | Result =>
-    let name = dataType->dataTypeToSchemaField
+  | Input => Some("Code is not available.")
+  | Output =>
+    let name = dataType
     let template = (structs, functions, results) =>
       j`package $packageName
 

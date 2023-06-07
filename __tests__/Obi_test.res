@@ -4,16 +4,12 @@ open Expect
 
 describe("Expect Obi to extract fields correctly", () => {
   test("should be able to extract fields from bytes correctly", () => {
-    expect(extractFields(`{symbol:string,multiplier:u64}/{volume:u64}`, "input"))->toEqual(
+    expect(extractFields(`{symbol:string,multiplier:u64}/{volume:u64}`, Input))->toEqual(
       Some([
         {fieldName: "symbol", fieldType: "string"},
         {fieldName: "multiplier", fieldType: "u64"},
       ]),
     )
-  })
-
-  test("should return None on invalid type", () => {
-    expect(extractFields(`{symbol:string,multiplier:u64}/{volume:u64}`, "Input"))->toEqual(None)
   })
 })
 
@@ -249,12 +245,12 @@ describe("should be able to generate go code correctly", () => {
   // TODO: Change to real generated code once golang ParamsDecode is implemented
   test("should be able to generate go code 1", () => {
     expect(
-      generateDecoderGo("main", `{symbol:string,multiplier:u64}/{px:u64}`, Obi2.Params),
+      generateDecoderGo("main", `{symbol:string,multiplier:u64}/{px:u64}`, Obi2.Input),
     )->toEqual(Some(`Code is not available.`))
   })
   test("should be able to generate go code 2", () => {
     expect(
-      generateDecoderGo("test", `{symbol:string,multiplier:u64}/{px:u64}`, Obi2.Result),
+      generateDecoderGo("test", `{symbol:string,multiplier:u64}/{px:u64}`, Obi2.Output),
     )->toEqual(
       Some(`package test
 
@@ -286,7 +282,7 @@ func DecodeResult(data []byte) (Result, error) {
 
 describe("should be able to generate encode go code correctly", () => {
   test("should be able to generate encode go code 1", () => {
-    expect(generateEncodeGo("main", `{symbol:string,multiplier:u64}/{px:u64}`, "input"))->toEqual(
+    expect(generateEncodeGo("main", `{symbol:string,multiplier:u64}/{px:u64}`, Input))->toEqual(
       Some(`package main
 
 import "github.com/bandchain/chain/pkg/obi"
@@ -307,7 +303,7 @@ func(result *Result) EncodeResult() []byte {
     )
   })
   test("should be able to generate encode go code 2", () => {
-    expect(generateEncodeGo("test", `{symbol:string,multiplier:u64}/{px:u64}`, "output"))->toEqual(
+    expect(generateEncodeGo("test", `{symbol:string,multiplier:u64}/{px:u64}`, Output))->toEqual(
       Some(`package test
 
 import "github.com/bandchain/chain/pkg/obi"

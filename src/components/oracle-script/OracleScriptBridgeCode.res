@@ -270,6 +270,6 @@ let make = (~schema) => {
       </Col>
     </Row>
     <div className=Styles.tableLowerContainer> {schema->renderCode} </div>
-    <GenerateDecodeCode language schema dataType=Obi2.Params />
+    <GenerateDecodeCode language schema dataType=Obi2.Input />
   </div>
 }

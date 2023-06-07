@@ -473,7 +473,7 @@ module ExecutionPart = {
 @react.component
 let make = (~id: ID.OracleScript.t, ~schema: string) =>
   {
-    let paramsInput = schema->Obi2.extractFields("input")->Belt.Option.getExn
+    let paramsInput = schema->Obi2.extractFields(Input)->Belt.Option.getExn
     Some(<ExecutionPart id schema paramsInput />)
   }->Belt.Option.getWithDefault(
     <MobileBlock>
