@@ -55,6 +55,7 @@ module Mini = {
   }
 
   type raw_request_internal_t = {request: request_internal}
+  type oracle_script_requests_t = {requests: array<request_internal>}
 
   type t = {
     id: ID.Request.t,
@@ -122,46 +123,45 @@ module Mini = {
 
   module MultiMiniByOracleScriptConfig = %graphql(`
       subscription RequestsMiniByOracleScript($id: Int!, $limit: Int!, $offset: Int!) {
-        requests(
-          where: {oracle_script_id: {_eq: $id}}
-          limit: $limit
-          offset: $offset
-          order_by: [{id: desc}]
-        ) @ppxAs(type: "request_internal") {
-          id @ppxCustom(module: "GraphQLParserModule.RequestID")
-          clientID: client_id
-          requestTime: request_time @ppxCustom(module: "GraphQLParserModule.FromUnixSecond")
-          resolveTime: resolve_time @ppxCustom(module: "GraphQLParserModule.FromUnixSecond")
-          sender @ppxCustom(module: "GraphQLParserModule.Address")
-          calldata @ppxCustom(module: "GraphQLParserModule.Buffer")
-          oracleScript: oracle_script @ppxAs(type: "oracle_script_internal_t") {
-            scriptID: id @ppxCustom(module: "GraphQLParserModule.OracleScriptID")
-            name
-            schema
-          }
-          transactionOpt: transaction @ppxAs(type: "transactionOpt_t") {
-            hash @ppxCustom(module: "GraphQLParserModule.Hash")
-            blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
-            block @ppxAs(type: "block_t") {
-              timestamp @ppxCustom(module: "GraphQLParserModule.Date")
+        oracle_scripts_by_pk(
+          id: $id
+        ) @ppxAs(type: "oracle_script_requests_t") {
+          requests(limit: $limit, offset: $offset, order_by: [{ id: desc }]) @ppxAs(type: "request_internal") {
+            id @ppxCustom(module: "GraphQLParserModule.RequestID")
+            clientID: client_id
+            requestTime: request_time @ppxCustom(module: "GraphQLParserModule.FromUnixSecond")
+            resolveTime: resolve_time @ppxCustom(module: "GraphQLParserModule.FromUnixSecond")
+            sender @ppxCustom(module: "GraphQLParserModule.Address")
+            calldata @ppxCustom(module: "GraphQLParserModule.Buffer")
+            oracleScript: oracle_script @ppxAs(type: "oracle_script_internal_t") {
+              scriptID: id @ppxCustom(module: "GraphQLParserModule.OracleScriptID")
+              name
+              schema
             }
-            gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
-          }
-          reportsAggregate: reports_aggregate @ppxAs(type: "aggregate_wrapper_intenal_t") {
-            aggregate @ppxAs(type: "aggregate_t") {
-              count
+            transactionOpt: transaction @ppxAs(type: "transactionOpt_t") {
+              hash @ppxCustom(module: "GraphQLParserModule.Hash")
+              blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
+              block @ppxAs(type: "block_t") {
+                timestamp @ppxCustom(module: "GraphQLParserModule.Date")
+              }
+              gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
             }
-          }
-          resolveStatus: resolve_status  @ppxCustom(module: "ResolveStatus")
-          minCount: min_count
-          requestedValidatorsAggregate: val_requests_aggregate @ppxAs(type: "aggregate_wrapper_intenal_t") {
-            aggregate @ppxAs(type: "aggregate_t") {
-              count
+            reportsAggregate: reports_aggregate @ppxAs(type: "aggregate_wrapper_intenal_t") {
+              aggregate @ppxAs(type: "aggregate_t") {
+                count
+              }
             }
-          }
-          result @ppxCustom(module: "GraphQLParserModule.Buffer")
-          rawDataRequests: raw_requests(order_by: [{external_id: asc}]) @ppxAs(type: "raw_request_t") {
-            fee @ppxCustom(module: "GraphQLParserModule.Coin")
+            resolveStatus: resolve_status  @ppxCustom(module: "ResolveStatus")
+            minCount: min_count
+            requestedValidatorsAggregate: val_requests_aggregate @ppxAs(type: "aggregate_wrapper_intenal_t") {
+              aggregate @ppxAs(type: "aggregate_t") {
+                count
+              }
+            }
+            result @ppxCustom(module: "GraphQLParserModule.Buffer")
+            rawDataRequests: raw_requests(order_by: [{external_id: asc}]) @ppxAs(type: "raw_request_t") {
+              fee @ppxCustom(module: "GraphQLParserModule.Coin")
+            }
           }
         }
       }
@@ -273,7 +273,14 @@ module Mini = {
       offset,
     })
 
-    result->Sub.fromData->Sub.map(x => x.requests->Belt.Array.map(toExternal))
+    result
+    ->Sub.fromData
+    ->Sub.map(x => {
+      switch x.oracle_scripts_by_pk {
+      | Some({requests}) => requests->Belt.Array.map(toExternal)
+      | None => []
+      }
+    })
   }
 
   let getListByTxHash = (txHash: Hash.t) => {
