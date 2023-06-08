@@ -155,8 +155,6 @@ let make = (~info) => {
   // TODO: do it later
   // <TxMessages txHash messages success errMsg />
   | Badge(_) => React.null
-  // TODO: do it later
-  // <MsgBadge name />
   | VotingPower(tokens, votingPercent) =>
     <div className=Styles.vFlex>
       <Text value={tokens->Coin.getBandAmountFromCoin->Format.fPretty(~digits=0)} block=true />
