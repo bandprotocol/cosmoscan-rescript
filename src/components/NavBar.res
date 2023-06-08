@@ -24,14 +24,16 @@ module RenderDesktop = {
 
     <div className={CssHelper.flexBox(~justify=#spaceBetween, ())} id="navigationBar">
       {routes
-      ->Belt.List.map(((v, route)) => <>
-        <div key=v className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
-          <Link className={Styles.nav(currentRoute == route, theme)} route>
-            {v->React.string}
-          </Link>
-        </div>
-        {last->Belt.List.has(v, (a, b) => a == b) ? <Divider /> : React.null}
-      </>)
+      ->Belt.List.map(((v, route)) =>
+        <React.Fragment key=v>
+          <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
+            <Link className={Styles.nav(currentRoute == route, theme)} route>
+              {v->React.string}
+            </Link>
+          </div>
+          {last->Belt.List.has(v, (a, b) => a == b) ? <Divider key={`${v}-divider`} /> : React.null}
+        </React.Fragment>
+      )
       ->Array.of_list
       ->React.array}
     </div>
