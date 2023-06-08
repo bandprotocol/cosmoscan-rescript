@@ -26,7 +26,7 @@ type t =
   | RequestStatus(RequestSub.resolve_status_t, string)
   | ProgressBar(request_count_t)
   | Float(float, option<int>)
-  | KVTableReport(array<string>, array<MsgDecoder.RawDataReport.t>)
+  | KVTableReport(array<string>, array<Msg.Oracle.RawDataReport.t>)
   | KVTableRequest(option<array<Obi.field_key_value_t>>)
   | CopyButton(JsBuffer.t)
   | Percentage(float, option<int>)

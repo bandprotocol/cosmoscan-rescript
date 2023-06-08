@@ -5,15 +5,14 @@ module Styles = {
 }
 
 let transform = (account, msg: Msg.result_t) => {
-  // TODO: Bring it back when defind ReceiveMsg
-  // let transformDecoded = switch decoded {
-  // | SendMsg({toAddress, fromAddress, amount}) if Address.isEqual(toAddress, account) =>
-  //   MsgDecoder.ReceiveMsg({toAddress, fromAddress, amount})
-  // | _ => decoded
-  // }
-  // open MsgDecoder
-  // {raw, decoded: transformDecoded, isIBC: transformDecoded->MsgDecoder.isIBC}
-  msg
+  let transformDecoded = switch msg.decoded {
+  | SendMsg({toAddress, fromAddress, amount}) if Address.isEqual(toAddress, account) =>
+    Msg.ReceiveMsg({toAddress, fromAddress, amount})
+  | _ => msg.decoded
+  }
+
+  open Msg
+  {raw: msg.raw, decoded: transformDecoded, sender: msg.sender, isIBC: msg.isIBC}
 }
 
 @react.component
