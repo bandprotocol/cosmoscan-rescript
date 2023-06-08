@@ -215,7 +215,7 @@ module RenderDataSourceWithNameLink = {
       | Data({id, name}) =>
         <TypeID.DataSourceLink id={id}>
           <div className={Css.merge(list{CssHelper.flexBox()})}>
-            <TypeID.DataSource id={id} position=TypeID.Subtitle />
+            <TypeID.DataSource id={id} position=TypeID.Subtitle isNotLink=true />
             <HSpacing size=Spacing.sm />
             <Heading size=Heading.H4 value=name weight=Heading.Thin />
           </div>
@@ -238,7 +238,7 @@ module RenderOracleScriptWithNameLink = {
       | Data({id, name}) =>
         <TypeID.OracleScriptLink id={id}>
           <div className={Css.merge(list{CssHelper.flexBox()})}>
-            <TypeID.OracleScript id={id} position=TypeID.Subtitle />
+            <TypeID.OracleScript id={id} position=TypeID.Subtitle isNotLink=true />
             <HSpacing size=Spacing.sm />
             <Heading size=Heading.H4 value=name weight=Heading.Thin />
           </div>
@@ -478,7 +478,9 @@ module RenderSearchResult = {
                         <div className={Styles.innerResultItem}>
                           <TypeID.OracleScriptLink id={result.id}>
                             <div className={Css.merge(list{CssHelper.flexBox()})}>
-                              <TypeID.OracleScript id={result.id} position=TypeID.Subtitle />
+                              <TypeID.OracleScript
+                                id={result.id} position=TypeID.Subtitle isNotLink=true
+                              />
                               <HSpacing size=Spacing.sm />
                               <HighLightText title={result.name} searchTerm=trimSearchTerm />
                             </div>
@@ -508,7 +510,9 @@ module RenderSearchResult = {
                         <div className={Styles.innerResultItem}>
                           <TypeID.DataSourceLink id={result.id}>
                             <div className={Css.merge(list{CssHelper.flexBox()})}>
-                              <TypeID.DataSource id={result.id} position=TypeID.Subtitle />
+                              <TypeID.DataSource
+                                id={result.id} position=TypeID.Subtitle isNotLink=true
+                              />
                               <HSpacing size=Spacing.sm />
                               <HighLightText title={result.name} searchTerm=trimSearchTerm />
                             </div>
@@ -538,7 +542,9 @@ module RenderSearchResult = {
                         <div className={Styles.innerResultItem} key={i->Belt.Int.toString}>
                           <TypeID.ProposalLink id={result.id}>
                             <div className={Css.merge(list{CssHelper.flexBox()})}>
-                              <TypeID.Proposal id={result.id} position=TypeID.Subtitle />
+                              <TypeID.Proposal
+                                id={result.id} position=TypeID.Subtitle isNotLink=true
+                              />
                               <HSpacing size=Spacing.sm />
                               <HighLightText title={result.title} searchTerm=trimSearchTerm />
                             </div>
