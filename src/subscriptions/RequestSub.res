@@ -10,17 +10,25 @@ type resolve_status_t =
 
 module ResolveStatus = {
   let parse = json => {
-    let status = json->Js.Json.decodeString->Belt.Option.getExn
-    switch status {
-    | "Open" => Pending
-    | "Success" => Success
-    | "Failure" => Failure
-    | "Expired" => Expired
-    | _ => Unknown
+    let statusOpt = json->Js.Json.decodeString
+    switch statusOpt {
+    | Some("Open") => Pending
+    | Some("Success") => Success
+    | Some("Failure") => Failure
+    | Some("Expired") => Expired
+    | Some(_) | None => Unknown
     }
   }
-  // TODO: Impelement serialize
-  let serialize = _ => "status"->Js.Json.string
+  let serialize = (status: resolve_status_t) => {
+    let str = switch status {
+    | Pending => "Open"
+    | Success => "Success"
+    | Failure => "Failure"
+    | Expired => "Expired"
+    | Unknown => "Unknown"
+    }
+    str->Js.Json.string
+  }
 }
 
 module Mini = {

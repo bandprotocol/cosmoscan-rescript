@@ -42,7 +42,6 @@ type t =
   | ChannelDetailsPage(string, string, string)
 
 let fromUrl = (url: RescriptReactRouter.url) =>
-  // TODO: We'll handle the NotFound case for Datasources and Oraclescript later
   switch (url.path, url.hash) {
   | (list{"data-sources"}, _) => DataSourcePage
   | (list{"data-source", dataSourceID}, hash) =>
@@ -111,7 +110,8 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     | None => NotFound
     }
   | (list{"proposals"}, _) => ProposalPage
-  | (list{"proposal", proposalID}, _) => switch proposalID->Belt.Int.fromString {
+  | (list{"proposal", proposalID}, _) =>
+    switch proposalID->Belt.Int.fromString {
     | Some(proposal) => ProposalDetailsPage(proposal)
     | None => NotFound
     }

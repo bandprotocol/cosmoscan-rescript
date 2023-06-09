@@ -5,8 +5,6 @@ module Styles = {
 
 @react.component
 let make = (~name, ~fromAddress) =>
-  // TODO: Remove msgType
-  // let make = (~msgType, ~name, ~fromAddress) =>
   <div className={Css.merge(list{CssHelper.flexBox(~wrap=#nowrap, ())})}>
     <div className=Styles.addressWrapper>
       <AddressRender address=fromAddress />

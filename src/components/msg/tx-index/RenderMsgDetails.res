@@ -1759,6 +1759,7 @@ let getContent = msg => {
     | Msg.Oracle.Request.Failure(data) => Request.failed(data)
     }
   | Msg.SendMsg(data) => Send.factory(data)
+  | Msg.ReceiveMsg(data) => Send.factory(data)
   | Msg.ReportMsg(data) => Report.factory(data)
   | Msg.GrantMsg(data) => Grant.factory(data)
   | Msg.RevokeMsg(data) => Revoke.factory(data)

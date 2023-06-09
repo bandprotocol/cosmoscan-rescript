@@ -59,43 +59,87 @@ module ComponentCreator = (RawID: ID.IDSig) => {
     ~weight=Text.Regular,
     ~details="",
     ~block=false,
+    ~isNotLink=false,
   ) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-    <Link
-      className={Css.merge(list{Styles.link(theme, details != ""), Styles.pointerEvents(position)})}
-      route={id->RawID.getRoute}>
-      <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
-        <Text
-          value={id->RawID.toString}
-          size={switch size {
-          | Some(s) => s
-          | None => position->fontSize
-          }}
-          weight
-          height={position->lineHeight}
-          nowrap=true
-          code=true
-          block
-          color=theme.primary_600
-        />
-        {details != ""
-          ? <>
-              <HSpacing size=Spacing.sm />
-              <Text
-                value=details
-                size={switch size {
-                | Some(s) => s
-                | None => position->fontSize
-                }}
-                weight=Text.Regular
-                color=theme.neutral_900
-                ellipsis=true
-              />
-            </>
-          : React.null}
+    switch isNotLink {
+    | true =>
+      <div
+        className={Css.merge(list{
+          Styles.link(theme, details != ""),
+          Styles.pointerEvents(position),
+        })}>
+        <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
+          <Text
+            value={id->RawID.toString}
+            size={switch size {
+            | Some(s) => s
+            | None => position->fontSize
+            }}
+            weight
+            height={position->lineHeight}
+            nowrap=true
+            code=true
+            block
+            color=theme.primary_600
+          />
+          {details != ""
+            ? <>
+                <HSpacing size=Spacing.sm />
+                <Text
+                  value=details
+                  size={switch size {
+                  | Some(s) => s
+                  | None => position->fontSize
+                  }}
+                  weight=Text.Regular
+                  color=theme.neutral_900
+                  ellipsis=true
+                />
+              </>
+            : React.null}
+        </div>
       </div>
-    </Link>
+    | false =>
+      <Link
+        className={Css.merge(list{
+          Styles.link(theme, details != ""),
+          Styles.pointerEvents(position),
+        })}
+        route={id->RawID.getRoute}>
+        <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
+          <Text
+            value={id->RawID.toString}
+            size={switch size {
+            | Some(s) => s
+            | None => position->fontSize
+            }}
+            weight
+            height={position->lineHeight}
+            nowrap=true
+            code=true
+            block
+            color=theme.primary_600
+          />
+          {details != ""
+            ? <>
+                <HSpacing size=Spacing.sm />
+                <Text
+                  value=details
+                  size={switch size {
+                  | Some(s) => s
+                  | None => position->fontSize
+                  }}
+                  weight=Text.Regular
+                  color=theme.neutral_900
+                  ellipsis=true
+                />
+              </>
+            : React.null}
+        </div>
+      </Link>
+    }
   }
 }
 

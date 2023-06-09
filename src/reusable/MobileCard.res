@@ -103,11 +103,10 @@ let make = (~values, ~idx, ~status=?, ~requestStatus=?, ~styles="", ~panels=[]) 
       />
     | None => React.null
     }}
-    //  TODO: do it later
-    // {switch (requestStatus) {
-    //  | Some(resolveStatus) => <RequestStatus resolveStatus style=Styles.logo />
-    //  | None => React.null
-    //  }}
+    {switch requestStatus {
+    | Some(resolveStatus) => <RequestStatus resolveStatus style=Styles.logo />
+    | None => React.null
+    }}
     <InnerPanel values idx />
     {panels->Belt.Array.length > 0
       ? <>

@@ -1364,6 +1364,7 @@ module Input = {
 type rec msg_t =
   | SendMsg(Bank.Send.decoded_t)
   | MultiSendMsg(Bank.MultiSend.t)
+  | ReceiveMsg(Bank.Send.decoded_t)
   | CreateDataSourceMsg(Oracle.CreateDataSource.t)
   | EditDataSourceMsg(Oracle.EditDataSource.t)
   | CreateOracleScriptMsg(Oracle.CreateOracleScript.decoded_t)
@@ -1434,6 +1435,7 @@ let getBadge = msg => {
   switch msg {
   | SendMsg(_) => {name: "Send", category: TokenMsg}
   | MultiSendMsg(_) => {name: "Multi Send", category: TokenMsg}
+  | ReceiveMsg(_) => {name: "Receive", category: TokenMsg}
   | CreateDataSourceMsg(_) => {name: "Create Data Source", category: OracleMsg}
   | EditDataSourceMsg(_) => {name: "Edit Data Source", category: OracleMsg}
   | CreateOracleScriptMsg(_) => {name: "Create Oracle Script", category: OracleMsg}

@@ -73,8 +73,8 @@ type acknowledgement_t = {
 
 module PacketType = {
   type t = packet_type_t
-  let parse = packetT => {
-    switch packetT {
+  let parse = packetTOpt => {
+    switch packetTOpt {
     | Some("oracle_request") => OracleRequest
     | Some("oracle response") => OracleResponse
     | Some("fungible_token") => FungibleToken
@@ -82,8 +82,15 @@ module PacketType = {
     | _ => Unknown
     }
   }
-  // TODO: Impelement serialize
-  let serialize = packetType => packetType->Js.Json.serializeExn
+  let serialize = packetType => {
+    switch packetType {
+    | OracleRequest => Some("oracle_request")
+    | OracleResponse => Some("oracle response")
+    | FungibleToken => Some("fungible_token")
+    | InterchainAccount => Some("interchain_account")
+    | Unknown => None
+    }
+  }
 }
 
 let getPacketTypeText = packetTypeText => {

@@ -149,7 +149,6 @@ module Deposit = {
 module Voting = {
   @react.component
   let make = (~percent, ~label, ~amount) => {
-    // TODO: Remove after using param
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div>
@@ -158,10 +157,9 @@ module Voting = {
           CssHelper.flexBox(~justify=#spaceBetween, ()),
           CssHelper.mb(~size=8, ()),
         ])}>
-        // TODO: do it after
-        // <Heading
-        //   value={VoteSub.toString(label, ~withSpace=true)} size=Heading.H4 weight=Heading.Thin
-        // />
+        <Heading
+          value={VoteSub.toString(label, ~withSpace=true)} size=Heading.H4 weight=Heading.Thin
+        />
         <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
           <Text value={percent->Format.fPercent(~digits=2)} size=Text.Body1 block=true />
           {isMobile

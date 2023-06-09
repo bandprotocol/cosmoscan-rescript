@@ -41,6 +41,8 @@ type t = {
   neutral_700: color_t,
   neutral_800: color_t,
   neutral_900: color_t,
+  // custom
+  clickableHover: color_t,
 }
 
 let toString = col => col->Types.Color.toString
@@ -87,6 +89,8 @@ let get = mode =>
       neutral_700: hex("4A5568"),
       neutral_800: hex("323A43"),
       neutral_900: hex("202327"),
+      // custom
+      clickableHover: hex("F3F4F6"),
     }
   | Dark => {
       white,
@@ -122,5 +126,7 @@ let get = mode =>
       neutral_700: hex("A0AEC0"),
       neutral_800: hex("CBD5E0"),
       neutral_900: hex("FFFFFF"),
+      // custom
+      clickableHover: hex("21262C"),
     }
   }

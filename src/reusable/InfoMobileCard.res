@@ -26,7 +26,7 @@ type t =
   | RequestStatus(RequestSub.resolve_status_t, string)
   | ProgressBar(request_count_t)
   | Float(float, option<int>)
-  | KVTableReport(array<string>, array<MsgDecoder.RawDataReport.t>)
+  | KVTableReport(array<string>, array<Msg.Oracle.RawDataReport.t>)
   | KVTableRequest(option<array<Obi.field_key_value_t>>)
   | CopyButton(JsBuffer.t)
   | Percentage(float, option<int>)
@@ -129,9 +129,8 @@ let make = (~info) => {
         block=true
       />
     }
-  | CopyButton(_) => React.null
-  // TODO: do it later
-  // CopyButton(calldata) => <CopyButton data={calldata -> JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125 />
+  | CopyButton(calldata) =>
+    <CopyButton data={calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125 />
   | Percentage(value, digits) => <Text value={value->Format.fPercent(~digits?)} />
   | Text(text) => <Text value=text spacing={Text.Em(0.02)} nowrap=true ellipsis=true block=true />
   | Timestamp(time) => <Timestamp time size=Text.Body2 weight=Text.Regular />
@@ -152,11 +151,7 @@ let make = (~info) => {
     />
   | Messages(txHash, messages, success, errMsg) => <TxMessages txHash messages success errMsg />
   | MsgBadgeGroup(txHash, messages) => <MsgBadgeGroup txHash messages />
-  // TODO: do it later
-  // <TxMessages txHash messages success errMsg />
   | Badge(_) => React.null
-  // TODO: do it later
-  // <MsgBadge name />
   | VotingPower(tokens, votingPercent) =>
     <div className=Styles.vFlex>
       <Text value={tokens->Coin.getBandAmountFromCoin->Format.fPretty(~digits=0)} block=true />
