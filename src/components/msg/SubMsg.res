@@ -183,9 +183,8 @@ let make = (~msg: Msg.result_t) => {
         <IBCTransferMsg.Transfer toAddress=receiver amount={token.amount} denom={token.denom} />
       | Msg.Application.Transfer.Failure(f) => React.null
       }
-    // TODO: will uncomment once https://github.com/bandprotocol/chain/pull/308 is merged
-    // | ExecMsg(msg) => <ValidatorMsg.Exec messages={msg.msgs} />
-    | ExecMsg(msg) => React.null
+    | ExecMsg(msg) => <ValidatorMsg.Exec messages={msg.msgs} />
+    // | ExecMsg(msg) => React.null
     | UnknownMsg => React.null
     }}
   </div>
