@@ -1864,16 +1864,17 @@ let getContent = msg => {
         content: Address(msg.grantee),
         order: 1,
       },
-      {
-        title: "Messages ( " ++ msg.msgs->Belt.List.length->Belt.Int.toString ++ " )",
-        content: None,
-        order: 2,
-      },
-      {
-        title: "Executed Messages",
-        content: ExecList(msg.msgs),
-        order: 2,
-      },
+      // TODO: will uncomment once https://github.com/bandprotocol/chain/pull/308 is merged
+      // {
+      //   title: "Messages ( " ++ msg.msgs->Belt.List.length->Belt.Int.toString ++ " )",
+      //   content: None,
+      //   order: 2,
+      // },
+      // {
+      //   title: "Executed Messages",
+      //   content: ExecList(msg.msgs),
+      //   order: 2,
+      // },
     ]
   | Msg.UnknownMsg => []
   }

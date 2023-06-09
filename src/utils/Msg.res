@@ -296,7 +296,8 @@ module Authz = {
   module Exec = {
     type t<'a> = {
       grantee: Address.t,
-      msgs: list<'a>,
+      // TODO: will uncomment once https://github.com/bandprotocol/chain/pull/308 is merged
+      // msgs: list<'a>,
     }
   }
 }
@@ -1752,10 +1753,11 @@ and decodeExecMsg = isSuccess => {
   open JsonUtils.Decode
   let f: fd_type => Authz.Exec.t<msg_t> = json => {
     grantee: json.required(list{"msg", "grantee"}, address),
-    msgs: json.required(
-      list{"msg", "msgs"},
-      list(custom((. json) => decodeMsg(json, isSuccess).decoded)),
-    ),
+    // TODO: will uncomment once https://github.com/bandprotocol/chain/pull/308 is merged
+    // msgs: json.required(
+    //   list{"msg", "msgs"},
+    //   list(custom((. json) => decodeMsg(json, isSuccess).decoded)),
+    // ),
   }
   buildObject(f)
 }
