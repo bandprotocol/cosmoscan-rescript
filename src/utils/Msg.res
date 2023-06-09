@@ -493,8 +493,8 @@ module Staking = {
     let decodeSuccess: JsonUtils.Decode.t<success_t> = {
       open JsonUtils.Decode
       decodeFactory(
-        json => json.required(list{"msg", "moniker"}, string),
-        json => json.required(list{"msg", "identity"}, string),
+        json => json.optional(list{"msg", "moniker"}, string)->Belt.Option.getWithDefault(""),
+        json => json.optional(list{"msg", "identity"}, string)->Belt.Option.getWithDefault(""),
       )
     }
   }

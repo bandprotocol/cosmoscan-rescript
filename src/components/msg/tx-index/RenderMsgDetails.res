@@ -3,6 +3,14 @@ module Styles = {
 
   let execContainers = (theme: Theme.t) =>
     style(. [padding(#px(20)), backgroundColor(theme.neutral_100), borderRadius(#px(4))])
+
+  let subMsgContainer = (theme: Theme.t) =>
+    style(. [
+      padding2(~v=#px(20), ~h=#px(10)),
+      backgroundColor(theme.neutral_100),
+      borderRadius(#px(4)),
+      marginBottom(#px(10)),
+    ])
 }
 module Calldata = {
   @react.component
@@ -57,6 +65,7 @@ type content_inner_t =
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | ExecList(list<Msg.msg_t>)
+  | None
 
 type content_t = {
   title: string,
@@ -108,14 +117,18 @@ let renderValue = v => {
     />
   | Timestamp(timestamp) => <Timestamp time={timestamp} size=Text.Body1 />
   | ValidatorLink(address, moniker, identity) =>
-    <ValidatorMonikerLink
-      validatorAddress={address}
-      moniker={moniker}
-      identity={identity}
-      width={#percent(100.)}
-      avatarWidth=20
-      size=Text.Body1
-    />
+    switch (moniker, identity) {
+    | ("", "") => <AddressRender position={Subtitle} address accountType={#validator} />
+    | (_, _) =>
+      <ValidatorMonikerLink
+        validatorAddress={address}
+        moniker={moniker}
+        identity={identity}
+        width={#percent(100.)}
+        avatarWidth=20
+        size=Text.Body1
+      />
+    }
   | VoteWeighted(options) =>
     <>
       {options
@@ -180,6 +193,7 @@ let renderValue = v => {
     />
   // Noted: We support only 1 level of exec (no recursion)
   | ExecList(msgs) => React.null
+  | None => React.null
   }
 }
 
@@ -1851,6 +1865,11 @@ let getContent = msg => {
         order: 1,
       },
       {
+        title: "Messages ( " ++ msg.msgs->Belt.List.length->Belt.Int.toString ++ " )",
+        content: None,
+        order: 2,
+      },
+      {
         title: "Executed Messages",
         content: ExecList(msg.msgs),
         order: 2,
@@ -1869,28 +1888,53 @@ module MessageItem = {
       {switch content {
       | ExecList(msgs) =>
         <Col col=Col.Twelve>
-          {msgs
-          ->Belt.List.toArray
-          ->Belt.Array.mapWithIndex((i, msg) => {
-            let contents = getContent(msg)
-            contents
-            ->Belt.Array.map(c => {
-              <Row marginBottom=0 marginBottomSm=24>
-                <Col col=Col.Three mb=16 mbSm=8>
-                  <Heading
-                    value={c.title}
-                    size=Heading.H4
-                    weight=Heading.Regular
-                    marginBottom=8
-                    color=theme.neutral_600
-                  />
-                </Col>
-                <Col col=Col.Nine mb=16 mbSm=8> {renderValue(c.content)} </Col>
-              </Row>
+          <div>
+            {msgs
+            ->Belt.List.toArray
+            ->Belt.Array.mapWithIndex((i, msg) => {
+              let contents = getContent(msg)
+              <div className={Styles.subMsgContainer(theme)}>
+                <Row marginBottom=0 marginBottomSm=24>
+                  <Col col=Col.Three mb=16 mbSm=8>
+                    <Heading
+                      value="Executed Message"
+                      size=Heading.H4
+                      weight=Heading.Regular
+                      marginBottom=8
+                      color=theme.neutral_600
+                    />
+                  </Col>
+                  <Col col=Col.Nine mb=16 mbSm=8>
+                    <Text
+                      value={
+                        let badge = msg->Msg.getBadge
+                        badge.name
+                      }
+                      size=Text.Body1
+                      breakAll=true
+                    />
+                  </Col>
+                </Row>
+                {contents
+                ->Belt.Array.map(c => {
+                  <Row marginBottom=0 marginBottomSm=24>
+                    <Col col=Col.Three mb=16 mbSm=8>
+                      <Heading
+                        value={c.title}
+                        size=Heading.H4
+                        weight=Heading.Regular
+                        marginBottom=8
+                        color=theme.neutral_600
+                      />
+                    </Col>
+                    <Col col=Col.Nine mb=16 mbSm=8> {renderValue(c.content)} </Col>
+                  </Row>
+                })
+                ->React.array}
+              </div>
             })
-            ->React.array
-          })
-          ->React.array}
+            ->React.array}
+          </div>
         </Col>
 
       | _ =>
