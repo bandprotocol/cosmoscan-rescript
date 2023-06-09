@@ -108,6 +108,7 @@ let renderValue = v => {
     <KVTable
       headers=["External Id", "Exit Code", "Value"]
       rows={data
+      ->Belt.List.sort((a, b) => a.externalDataID - b.externalDataID)
       ->Belt.List.toArray
       ->Belt.Array.map(rawReport => [
         KVTable.Value(rawReport.externalDataID->Belt.Int.toString),
