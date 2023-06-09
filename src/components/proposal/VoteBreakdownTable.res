@@ -65,7 +65,9 @@ module RenderBody = {
             | Data({timestampOpt}) =>
               switch timestampOpt {
               | Some(timestamp) =>
-                <Timestamp time=timestamp size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
+                <Timestamp
+                  time=timestamp size=Text.Body2 weight=Text.Regular textAlign=Text.Right
+                />
               | None => <Text value="Created on Wenchang" />
               }
             | _ => <LoadingCensorBar width=80 height=15 />

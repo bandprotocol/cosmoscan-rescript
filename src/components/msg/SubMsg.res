@@ -145,35 +145,41 @@ let make = (~msg: Msg.result_t) => {
     | CreateClientMsg(_) => React.null
     | UpgradeClientMsg({clientID})
     | UpdateClientMsg({clientID})
-    | SubmitClientMisbehaviourMsg({clientID}) => <IBCClientMsg.Client clientID />
+    | SubmitClientMisbehaviourMsg({clientID}) =>
+      <IBCClientMsg.Client clientID />
     | ConnectionOpenTryMsg({clientID, counterparty})
-    | ConnectionOpenInitMsg({clientID, counterparty}) => 
+    | ConnectionOpenInitMsg({clientID, counterparty}) =>
       <IBCConnectionMsg.ConnectionCommon clientID counterpartyClientID={counterparty.clientID} />
-    | ConnectionOpenAckMsg({connectionID, counterpartyConnectionID}) => 
+    | ConnectionOpenAckMsg({connectionID, counterpartyConnectionID}) =>
       <IBCConnectionMsg.ConnectionOpenAck connectionID counterpartyConnectionID />
     | ConnectionOpenConfirmMsg({connectionID}) =>
       <IBCConnectionMsg.ConnectionOpenConfirm connectionID />
     | ChannelOpenInitMsg({portID, channel})
     | ChannelOpenTryMsg({portID, channel}) =>
-       <IBCChannelMsg.ChannelOpenCommon portID counterpartyPortID={channel.counterparty.portID} />
+      <IBCChannelMsg.ChannelOpenCommon portID counterpartyPortID={channel.counterparty.portID} />
     | ChannelOpenAckMsg({channelID, counterpartyChannelID}) =>
-       <IBCChannelMsg.ChannelOpenAck channelID counterpartyChannelID />
+      <IBCChannelMsg.ChannelOpenAck channelID counterpartyChannelID />
     | ChannelOpenConfirmMsg({channelID})
     | ChannelCloseInitMsg({channelID})
-    | ChannelCloseConfirmMsg({channelID}) => <IBCChannelMsg.ChannelCloseCommon channelID />
-    | RecvPacketMsg(msg) => switch msg {
-    | Msg.Channel.RecvPacket.Success({packetData}) => switch packetData {
-      | Some({packetType}) => <IBCPacketMsg.Packet packetType />
-      | None => React.null
-    } 
-    | Msg.Channel.RecvPacket.Failure(f) => React.null
-    }
+    | ChannelCloseConfirmMsg({channelID}) =>
+      <IBCChannelMsg.ChannelCloseCommon channelID />
+    | RecvPacketMsg(msg) =>
+      switch msg {
+      | Msg.Channel.RecvPacket.Success({packetData}) =>
+        switch packetData {
+        | Some({packetType}) => <IBCPacketMsg.Packet packetType />
+        | None => React.null
+        }
+      | Msg.Channel.RecvPacket.Failure(f) => React.null
+      }
     | AcknowledgePacketMsg(_)
     | TimeoutMsg(_)
     | TimeoutOnCloseMsg(_)
     | ActivateMsg(_) => React.null
-    | TransferMsg(msg) => switch msg {
-      | Msg.Application.Transfer.Success({receiver, token}) => <IBCTransferMsg.Transfer toAddress=receiver amount={token.amount} denom={token.denom} />
+    | TransferMsg(msg) =>
+      switch msg {
+      | Msg.Application.Transfer.Success({receiver, token}) =>
+        <IBCTransferMsg.Transfer toAddress=receiver amount={token.amount} denom={token.denom} />
       | Msg.Application.Transfer.Failure(f) => React.null
       }
     | ExecMsg(msg) => <ValidatorMsg.Exec messages={msg.msgs} />

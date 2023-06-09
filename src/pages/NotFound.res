@@ -33,7 +33,7 @@ let make = () => {
       <div className={Styles.pageContainer(theme)}>
         <div className={CssHelper.flexBox()}>
           <img
-            src={isDarkMode ? Images.noOracleDark : Images.noOracleLight} 
+            src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
             alt="Not Found"
             className=Styles.logo
           />

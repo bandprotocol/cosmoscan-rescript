@@ -30,7 +30,7 @@ module TxNotFound = {
         <div className={Styles.notfoundContainer(theme)}>
           <div className={CssHelper.flexBox()}>
             <img
-              src={isDarkMode ? Images.noTxDark : Images.noTxLight} 
+              src={isDarkMode ? Images.noTxDark : Images.noTxLight}
               alt="No Transaction"
               className=Styles.notfoundLogo
             />
@@ -58,7 +58,7 @@ module TxSyncing = {
         <div className={Styles.notfoundContainer(theme)}>
           <div className={CssHelper.flexBox()}>
             <img
-              src={isDarkMode ? Images.noTxDark : Images.noTxLight} 
+              src={isDarkMode ? Images.noTxDark : Images.noTxLight}
               alt="No Transaction"
               className=Styles.notfoundLogo
             />
@@ -147,10 +147,10 @@ let make = (~txHash: Hash.t) => {
               {switch txSub {
               | Data({success}) =>
                 <>
-                  <img 
-                    src={success ? Images.success : Images.fail} 
+                  <img
+                    src={success ? Images.success : Images.fail}
                     alt={success ? "Success" : "Failed"}
-                    className=Styles.successLogo 
+                    className=Styles.successLogo
                   />
                   <Text
                     value={success ? "Success" : "Failed"}

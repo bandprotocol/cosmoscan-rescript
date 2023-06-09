@@ -15,12 +15,12 @@ module Styles = {
 @react.component
 let make = (~children, ~px=32, ~py=32, ~style="") => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-  <div 
+  <div
     className={Css.merge(list{
       Styles.infoContainer(theme, isDarkMode, px, py),
-      style, 
-      CommonStyles.card(theme,isDarkMode)
-    })}> 
-    children 
+      style,
+      CommonStyles.card(theme, isDarkMode),
+    })}>
+    children
   </div>
 }

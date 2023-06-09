@@ -25,7 +25,11 @@ let make = (~height=#px(300), ~display=true, ~backgroundColor=?, ~boxShadow=fals
       Styles.emptyContainer,
       Styles.height(height),
       Styles.display(display),
-      Styles.backgroundColor(backgroundColor->Belt.Option.getWithDefault(isDarkMode ? theme.neutral_100 : theme.neutral_000)),
+      Styles.backgroundColor(
+        backgroundColor->Belt.Option.getWithDefault(
+          isDarkMode ? theme.neutral_100 : theme.neutral_000,
+        ),
+      ),
       boxShadow ? Styles.boxShadow : "",
     ])}>
     children

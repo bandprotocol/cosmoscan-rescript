@@ -181,39 +181,40 @@ let make = (~address) => {
           </Row>
         </THead>}
     {switch unbondingListSub {
-    | Data(unbondingList) => unbondingList->Belt.Array.length > 0 ?
-      unbondingList
-      ->Belt.Array.mapWithIndex((i, e) =>
-        isMobile
-          ? <RenderBodyMobile
-              key={e.validator.operatorAddress->Address.toBech32 ++
-                (e.completionTime->MomentRe.Moment.toISOString ++
-                i->Belt.Int.toString)}
-              reserveIndex=i
-              unbondingListSub={Sub.resolve(e)}
+    | Data(unbondingList) =>
+      unbondingList->Belt.Array.length > 0
+        ? unbondingList
+          ->Belt.Array.mapWithIndex((i, e) =>
+            isMobile
+              ? <RenderBodyMobile
+                  key={e.validator.operatorAddress->Address.toBech32 ++
+                    (e.completionTime->MomentRe.Moment.toISOString ++
+                    i->Belt.Int.toString)}
+                  reserveIndex=i
+                  unbondingListSub={Sub.resolve(e)}
+                />
+              : <RenderBody
+                  key={e.validator.operatorAddress->Address.toBech32 ++
+                    (e.completionTime->MomentRe.Moment.toISOString ++
+                    i->Belt.Int.toString)}
+                  unbondingListSub={Sub.resolve(e)}
+                />
+          )
+          ->React.array
+        : <EmptyContainer>
+            <img
+              src={isDarkMode ? Images.noDataDark : Images.noDataLight}
+              alt="No Data"
+              className=Styles.noDataImage
             />
-          : <RenderBody
-              key={e.validator.operatorAddress->Address.toBech32 ++
-                (e.completionTime->MomentRe.Moment.toISOString ++
-                i->Belt.Int.toString)}
-              unbondingListSub={Sub.resolve(e)}
+            <Heading
+              size=Heading.H4
+              value="No Unbonding"
+              align=Heading.Center
+              weight=Heading.Regular
+              color=theme.neutral_600
             />
-      )
-      ->React.array
-    : <EmptyContainer>
-        <img
-          src={isDarkMode ? Images.noDataDark : Images.noDataLight}
-          alt="No Data"
-          className=Styles.noDataImage
-        />
-        <Heading
-          size=Heading.H4
-          value="No Unbonding"
-          align=Heading.Center
-          weight=Heading.Regular
-          color=theme.neutral_600
-        />
-      </EmptyContainer>
+          </EmptyContainer>
     | _ =>
       Belt.Array.make(pageSize, Sub.NoData)
       ->Belt.Array.mapWithIndex((i, noData) =>

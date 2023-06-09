@@ -426,7 +426,7 @@ module ExecutionPart = {
                                   feeLimit
                                   ->Belt.Float.fromString
                                   ->Belt.Option.getExn
-                                  ->Coin.newUBANDFromAmount
+                                  ->Coin.newUBANDFromAmount,
                                 },
                                 prepareGas,
                                 executeGas,

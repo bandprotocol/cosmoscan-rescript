@@ -45,7 +45,9 @@ module Turnout = {
             weight=Heading.Thin
           />
           <Text
-            value={turnoutRate->Format.fPercent(~digits=2)} size=Text.Body1 color={theme.neutral_900}
+            value={turnoutRate->Format.fPercent(~digits=2)}
+            size=Text.Body1
+            color={theme.neutral_900}
           />
         </Col>
       | _ => React.null
@@ -73,9 +75,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
             | Data({id, name}) =>
               <>
                 <TypeID.Proposal id position=TypeID.Title />
-                <Heading
-                  size=Heading.H3 value=name color={theme.neutral_600} weight=Heading.Thin
-                />
+                <Heading size=Heading.H3 value=name color={theme.neutral_600} weight=Heading.Thin />
               </>
             | _ =>
               isMobile

@@ -152,7 +152,11 @@ module RenderBody = {
           </Col>
           <Col col=Col.Two>
             <Text
-              block=true value="Param" weight=Text.Semibold transform=Text.Uppercase size=Text.Caption
+              block=true
+              value="Param"
+              weight=Text.Semibold
+              transform=Text.Uppercase
+              size=Text.Caption
             />
           </Col>
           <Col col=Col.Two>

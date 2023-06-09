@@ -94,7 +94,9 @@ module RenderBody = {
             | Data({timestamp: timestampOpt}) =>
               switch timestampOpt {
               | Some(timestamp') =>
-                <Timestamp time=timestamp' size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
+                <Timestamp
+                  time=timestamp' size=Text.Body2 weight=Text.Regular textAlign=Text.Right
+                />
               | None => <Text value="Genesis" />
               }
             | _ => <LoadingCensorBar width=80 height=15 />
@@ -261,47 +263,48 @@ let make = () => {
                 </Row>
               </THead>}
           {switch allSub {
-          | Data((dataSources, dataSourcesCount)) => dataSources->Belt.Array.length > 0 ?
-            {
-              let pageCount = Page.getPageCount(dataSourcesCount, pageSize)
-              <>
-                {dataSources
-                ->sorting(sortedBy)
-                ->Belt.Array.mapWithIndex((i, e) =>
-                  isMobile
-                    ? <RenderBodyMobile
-                        key={e.id->ID.DataSource.toString}
-                        reserveIndex=i
-                        dataSourcesSub={Sub.resolve(e)}
-                      />
-                    : <RenderBody
-                        key={e.id->ID.DataSource.toString}
-                        reserveIndex=i
-                        dataSourcesSub={Sub.resolve(e)}
-                      />
-                )
-                ->React.array}
-                {isMobile
-                  ? React.null
-                  : <Pagination
-                      currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
-                    />}
-              </>
-            }
-            : <EmptyContainer>
-              <img
-                src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
-                className=Styles.noDataImage
-                alt="No Data Source"
-              />
-              <Heading
-                size=Heading.H4
-                value="No Data Source"
-                align=Heading.Center
-                weight=Heading.Regular
-                color={theme.neutral_600}
-              />
-            </EmptyContainer>
+          | Data((dataSources, dataSourcesCount)) =>
+            dataSources->Belt.Array.length > 0
+              ? {
+                  let pageCount = Page.getPageCount(dataSourcesCount, pageSize)
+                  <>
+                    {dataSources
+                    ->sorting(sortedBy)
+                    ->Belt.Array.mapWithIndex((i, e) =>
+                      isMobile
+                        ? <RenderBodyMobile
+                            key={e.id->ID.DataSource.toString}
+                            reserveIndex=i
+                            dataSourcesSub={Sub.resolve(e)}
+                          />
+                        : <RenderBody
+                            key={e.id->ID.DataSource.toString}
+                            reserveIndex=i
+                            dataSourcesSub={Sub.resolve(e)}
+                          />
+                    )
+                    ->React.array}
+                    {isMobile
+                      ? React.null
+                      : <Pagination
+                          currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+                        />}
+                  </>
+                }
+              : <EmptyContainer>
+                  <img
+                    src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
+                    className=Styles.noDataImage
+                    alt="No Data Source"
+                  />
+                  <Heading
+                    size=Heading.H4
+                    value="No Data Source"
+                    align=Heading.Center
+                    weight=Heading.Regular
+                    color={theme.neutral_600}
+                  />
+                </EmptyContainer>
           | _ =>
             Belt.Array.makeBy(10, i =>
               isMobile

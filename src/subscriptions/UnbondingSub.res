@@ -110,12 +110,14 @@ let getUnbondingBalanceByValidator = (delegatorAddress, operatorAddress, current
   ->Sub.fromData
   ->Sub.flatMap(data =>
     switch data.accounts_by_pk {
-    | Some(account) => Sub.resolve((
-      switch account.unbonding_delegations_aggregate.aggregate {
-      | Some(aggregate') => (aggregate'.sum->Belt.Option.getExn).amount->GraphQLParser.coinWithDefault
-      | None => Coin.newUBANDFromAmount(0.)
-      }
-    ))
+    | Some(account) =>
+      Sub.resolve(
+        switch account.unbonding_delegations_aggregate.aggregate {
+        | Some(aggregate') =>
+          (aggregate'.sum->Belt.Option.getExn).amount->GraphQLParser.coinWithDefault
+        | None => Coin.newUBANDFromAmount(0.)
+        },
+      )
     | None => Sub.resolve(Coin.newUBANDFromAmount(0.))
     }
   )

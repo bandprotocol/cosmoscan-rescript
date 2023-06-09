@@ -31,6 +31,7 @@ let make = (~checked) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   <div className=Styles.container>
-    <div className={Styles.slide(checked)} /> <div className={Styles.button(checked, theme)} />
+    <div className={Styles.slide(checked)} />
+    <div className={Styles.button(checked, theme)} />
   </div>
 }

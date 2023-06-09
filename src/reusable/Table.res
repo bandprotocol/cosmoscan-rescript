@@ -12,5 +12,8 @@ module Styles = {
 @react.component
 let make = (~children) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-  <div className={Css.merge(list{Styles.containerBase(theme), CommonStyles.card(theme,isDarkMode)})}> children </div>
+  <div
+    className={Css.merge(list{Styles.containerBase(theme), CommonStyles.card(theme, isDarkMode)})}>
+    children
+  </div>
 }
