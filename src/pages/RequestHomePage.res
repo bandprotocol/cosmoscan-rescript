@@ -51,13 +51,16 @@ module RenderBody = {
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch requestsSub {
             | Data({transactionOpt}) =>
-              switch transactionOpt {
-              | Some(transaction) =>
-                <Timestamp
-                  time={transaction.block.timestamp} textAlign=Text.Right size=Text.Body2
-                />
-              | None => <Text value="Syncing" />
-              }
+              // switch transactionOpt {
+              // | Some(transaction) =>
+              //   <Timestamp
+              //     time={transaction.block.timestamp} textAlign=Text.Right size=Text.Body2
+              //   />
+              // | None => <Text value="Syncing" />
+              // }
+              <Timestamp
+                time={transactionOpt.block.timestamp} textAlign=Text.Right size=Text.Body2
+              />
             | _ => <LoadingCensorBar width=80 height=15 />
             }}
           </div>
@@ -100,10 +103,11 @@ module RenderBodyMobile = {
             ),
             (
               "Timestamp",
-              switch transactionOpt {
-              | Some(transaction) => Timestamp(transaction.block.timestamp)
-              | None => Text("Syncing")
-              },
+              // switch transactionOpt {
+              // | Some(transaction) => Timestamp(transaction.block.timestamp)
+              // | None => Text("Syncing")
+              // },
+              Timestamp(transactionOpt.block.timestamp),
             ),
           ]
         }

@@ -296,10 +296,11 @@ let make = (~reqID) => {
                 <Col col=Col.Eight>
                   {switch requestSub {
                   | Data({transactionOpt}) =>
-                    switch transactionOpt {
-                    | Some({hash}) => <TxLink txHash=hash width={isMobile ? 260 : 360} />
-                    | None => <Text value="Syncing" />
-                    }
+                    // switch transactionOpt {
+                    // | Some({hash}) => <TxLink txHash=hash width={isMobile ? 260 : 360} />
+                    // | None => <Text value="Syncing" />
+                    // }
+                    <TxLink txHash={transactionOpt.hash} width={isMobile ? 260 : 360} />
                   | _ => <LoadingCensorBar width=200 height=15 />
                   }}
                 </Col>
@@ -313,18 +314,26 @@ let make = (~reqID) => {
                 <Col col=Col.Eight>
                   {switch requestSub {
                   | Data({transactionOpt}) =>
-                    switch transactionOpt {
-                    | Some({gasFee}) =>
-                      <Text
-                        block=true
-                        value={gasFee
-                        ->Coin.getBandAmountFromCoins
-                        ->Format.fPretty(~digits=6) ++ " BAND"}
-                        size=Text.Body1
-                        color={theme.neutral_600}
-                      />
-                    | None => <Text value="Syncing" />
-                    }
+                    // switch transactionOpt {
+                    // | Some({gasFee}) =>
+                    //   <Text
+                    //     block=true
+                    //     value={gasFee
+                    //     ->Coin.getBandAmountFromCoins
+                    //     ->Format.fPretty(~digits=6) ++ " BAND"}
+                    //     size=Text.Body1
+                    //     color={theme.neutral_600}
+                    //   />
+                    // | None => <Text value="Syncing" />
+                    // }
+                    <Text
+                      block=true
+                      value={transactionOpt.gasFee
+                      ->Coin.getBandAmountFromCoins
+                      ->Format.fPretty(~digits=6) ++ " BAND"}
+                      size=Text.Body1
+                      color={theme.neutral_600}
+                    />
                   | _ => <LoadingCensorBar width=200 height=15 />
                   }}
                 </Col>
@@ -434,10 +443,11 @@ let make = (~reqID) => {
                 <Col col=Col.Four>
                   {switch requestSub {
                   | Data({transactionOpt}) =>
-                    switch transactionOpt {
-                    | Some({blockHeight}) => <TypeID.Block id=blockHeight />
-                    | None => <Text value="Genesis" size=Text.Body1 />
-                    }
+                    // switch transactionOpt {
+                    // | Some({blockHeight}) => <TypeID.Block id=blockHeight />
+                    // | None => <Text value="Genesis" size=Text.Body1 />
+                    // }
+                    <TypeID.Block id={transactionOpt.blockHeight} />
                   | _ => <LoadingCensorBar width=200 height=15 />
                   }}
                 </Col>
