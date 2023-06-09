@@ -53,7 +53,7 @@ module Mini = {
     resolveTime: option<MomentRe.Moment.t>,
     calldata: JsBuffer.t,
     oracleScript: oracle_script_internal_t,
-    transactionOpt: option<TxSub.Mini.t>,
+    transactionOpt: TxSub.Mini.t,
     reportsAggregate: aggregate_wrapper_intenal_t,
     minCount: int,
     resolveStatus: resolve_status_t,
@@ -68,7 +68,7 @@ module Mini = {
     reportsAggregate: aggregate_wrapper_intenal_t,
     requestedValidatorsAggregate: aggregate_wrapper_intenal_t,
     resolveStatus: resolve_status_t,
-    transactionOpt: option<TxSub.Mini.t>,
+    transactionOpt: TxSub.Mini.t,
   }
 
   type raw_request_internal_t = {request: request_internal}
@@ -241,9 +241,9 @@ module Mini = {
     calldata,
     oracleScriptID: oracleScript.scriptID,
     oracleScriptName: oracleScript.name,
-    txHash: transactionOpt->Belt.Option.map(({hash}) => hash),
-    txTimestamp: transactionOpt->Belt.Option.map(({block}) => block.timestamp),
-    blockHeight: transactionOpt->Belt.Option.map(({blockHeight}) => blockHeight),
+    txHash: Some(transactionOpt.hash),
+    txTimestamp: Some(transactionOpt.block.timestamp),
+    blockHeight: Some(transactionOpt.blockHeight),
     reportsCount: reportsAggregate.aggregate
     ->Belt.Option.map(({count}) => count)
     ->Belt.Option.getExn,
@@ -267,8 +267,8 @@ module Mini = {
     requestedValidatorsAggregate,
   }) => {
     id,
-    txHash: transactionOpt->Belt.Option.map(({hash}) => hash),
-    txTimestamp: transactionOpt->Belt.Option.map(({block}) => block.timestamp),
+    txHash: Some(transactionOpt.hash),
+    txTimestamp: Some(transactionOpt.block.timestamp),
     reportsCount: reportsAggregate.aggregate
     ->Belt.Option.map(({count}) => count)
     ->Belt.Option.getExn,
@@ -335,7 +335,7 @@ type report_detail_t = {
 }
 
 type report_t = {
-  transactionOpt: option<TxSub.Mini.t>,
+  transactionOpt: TxSub.Mini.t,
   reportDetails: array<report_detail_t>,
   reportValidator: ValidatorSub.Mini.t,
 }
@@ -381,7 +381,7 @@ type internal_t = {
   minCount: int,
   resolveStatus: resolve_status_t,
   sender: option<Address.t>,
-  transactionOpt: option<TxSub.Mini.t>,
+  transactionOpt: TxSub.Mini.t,
   rawDataRequests: array<raw_data_request_t>,
   reports: array<report_t>,
   result: option<JsBuffer.t>,
@@ -405,7 +405,7 @@ type t = {
   minCount: int,
   resolveStatus: resolve_status_t,
   requester: option<Address.t>,
-  transactionOpt: option<TxSub.Mini.t>,
+  transactionOpt: TxSub.Mini.t,
   rawDataRequests: array<raw_data_request_t>,
   reports: array<report_t>,
   result: option<JsBuffer.t>,
