@@ -66,7 +66,7 @@ module ConnectionListDesktop = {
                 <Text value={"#" ++ Belt.Int.toString(index + 1)} />
               </div>
             </Col>
-            <Col col=Col.Four>
+            <Col col=Col.Five>
               <Row alignItems=Row.Center>
                 <Col col=Col.Four>
                   {
@@ -103,15 +103,15 @@ module ConnectionListDesktop = {
                 </Col>
               </Row>
             </Col>
-            <Col col=Col.One offset=Col.One>
-              <div className={CssHelper.flexBox(~justify=#center, ~align=#center, ())}>
-                <Text
-                  value={channel.totalPacketsCount->Format.iPretty}
-                  color={theme.neutral_900}
-                  code=true
-                />
-              </div>
-            </Col>
+            // <Col col=Col.One offset=Col.One>
+            //   <div className={CssHelper.flexBox(~justify=#center, ~align=#center, ())}>
+            //     <Text
+            //       value={channel.totalPacketsCount->Format.iPretty}
+            //       color={theme.neutral_900}
+            //       code=true
+            //     />
+            //   </div>
+            // </Col>
             <Col col=Col.Two>
               <div className={CssHelper.flexBox(~justify=#center, ~align=#center, ())}>
                 {channel.lastUpdate->MomentRe.Moment.year == 1970
@@ -199,12 +199,12 @@ module ConnectionListDesktop = {
                         <Col col=Col.One>
                           <Text value="No." color=theme.neutral_600 />
                         </Col>
-                        <Col col=Col.Four>
+                        <Col col=Col.Five>
                           <Text value="Port & Channel" color=theme.neutral_600 align={Center} />
                         </Col>
-                        <Col col=Col.One offset=Col.One>
-                          <Text value="Transactions" color=theme.neutral_600 align={Center} />
-                        </Col>
+                        // <Col col=Col.One offset=Col.One>
+                        //   <Text value="Transactions" color=theme.neutral_600 align={Center} />
+                        // </Col>
                         <Col col=Col.Two>
                           <Text value="Last Update" color=theme.neutral_600 align={Center} />
                         </Col>
@@ -296,17 +296,17 @@ module ChannelItemMobile = {
         </Col>
       </Row>
       <Row marginTopSm=10>
-        <Col colSm=Col.Six mbSm=10>
-          <Text value="Transactions" color=theme.neutral_600 size={Body1} />
-        </Col>
-        <Col colSm=Col.Six mbSm=10>
-          <Text
-            size={Body1}
-            value={channel.totalPacketsCount->Format.iPretty}
-            color={theme.neutral_900}
-            code=true
-          />
-        </Col>
+        // <Col colSm=Col.Six mbSm=10>
+        //   <Text value="Transactions" color=theme.neutral_600 size={Body1} />
+        // </Col>
+        // <Col colSm=Col.Six mbSm=10>
+        //   <Text
+        //     size={Body1}
+        //     value={channel.totalPacketsCount->Format.iPretty}
+        //     color={theme.neutral_900}
+        //     code=true
+        //   />
+        // </Col>
         <Col colSm=Col.Six mbSm=10>
           <Text size={Body1} value="Last Update" color=theme.neutral_600 />
         </Col>
@@ -439,13 +439,13 @@ let make = (~counterpartyChainID, ~state) => {
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
   let isMobile = Media.isMobile()
   let (page, setPage) = React.useState(_ => 1)
-  let pageSize = 2
+  let pageSize = 10
 
   let connectionCountSub = ConnectionSub.getCount(~counterpartyChainID, ())
 
   let conntectionsSub = ConnectionSub.getList(
     ~counterpartyChainID,
-    ~connectionID=searchTerm,
+    // ~connectionID=searchTerm,
     ~pageSize,
     ~page,
     ~state,
