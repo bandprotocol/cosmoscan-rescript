@@ -101,7 +101,7 @@ module Uptime = {
     let color = if percent == 100. {
       theme.primary_600
     } else if percent < 100. && percent >= 79. {
-      theme.primary_200
+      theme.primary_600
     } else {
       theme.error_600
     }
