@@ -6,7 +6,7 @@ module Styles = {
 
   let subMsgContainer = (theme: Theme.t) =>
     style(. [
-      padding2(~v=#px(20), ~h=#px(10)),
+      padding3(~top=#px(20), ~h=#px(20), ~bottom=#zero),
       backgroundColor(theme.neutral_100),
       borderRadius(#px(4)),
       marginBottom(#px(10)),
@@ -1864,17 +1864,16 @@ let getContent = msg => {
         content: Address(msg.grantee),
         order: 1,
       },
-      // TODO: will uncomment once https://github.com/bandprotocol/chain/pull/308 is merged
-      // {
-      //   title: "Messages ( " ++ msg.msgs->Belt.List.length->Belt.Int.toString ++ " )",
-      //   content: None,
-      //   order: 2,
-      // },
-      // {
-      //   title: "Executed Messages",
-      //   content: ExecList(msg.msgs),
-      //   order: 2,
-      // },
+      {
+        title: "Messages ( " ++ msg.msgs->Belt.List.length->Belt.Int.toString ++ " )",
+        content: None,
+        order: 2,
+      },
+      {
+        title: "Executed Messages",
+        content: ExecList(msg.msgs),
+        order: 2,
+      },
     ]
   | Msg.UnknownMsg => []
   }
