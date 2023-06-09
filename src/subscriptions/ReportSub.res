@@ -30,7 +30,7 @@ module ValidatorReport = {
 
   type internal_t = {
     request: request_t,
-    transaction: option<transaction_t>,
+    transaction: transaction_t,
     reportDetails: array<report_details_t>,
   }
 
@@ -41,7 +41,7 @@ module ValidatorReport = {
   }
 
   let toExternal = ({request, transaction, reportDetails}) => {
-    txHash: transaction->Belt.Option.map(({hash}) => hash),
+    txHash: Some(transaction.hash),
     request,
     reportDetails,
   }
