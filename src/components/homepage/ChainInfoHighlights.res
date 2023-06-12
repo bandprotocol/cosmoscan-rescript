@@ -126,10 +126,10 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
   let last24RequestCountSub = RequestQuery.countOffset(~timestamp=prevUnixTime)
   let latestBlock = BlockSub.getLatest()
   let avgBlockTimeSub = BlockSub.getAvgBlockTime(prevDayTime, currentTime)
-  let avgCommissionSub = ValidatorSub.avgCommission(~isActive=true, ())
 
   let validatorInfoSub = Sub.all3(activeValidatorCountSub, bondedTokenCountSub, avgBlockTimeSub)
   let infoBondSub = Sub.all2(infoSub, bondedTokenCountSub)
+  let aprSub = Sub.all3(infoSub, bondedTokenCountSub, latestBlock)
 
   React.useEffect0(() => {
     let timeOutID = Js.Global.setInterval(() => {
@@ -413,14 +413,18 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                   (),
                 ),
               })}>
-              {switch avgCommissionSub {
-              | Data(avgCommission) =>
+              {switch aprSub {
+              | Data({financial}, bondedTokenCount, {inflation}) =>
                 <>
                   <div className=Styles.pb>
                     <Text value="Staking APR" size=Text.Body1 weight=Text.Regular />
                   </div>
                   <Text
-                    value={avgCommission->Format.fPretty(~digits=2) ++ "%"}
+                    value={
+                      let bondedRatio =
+                        bondedTokenCount->Coin.getBandAmountFromCoin /. financial.totalSupply
+                      (inflation /. bondedRatio *. 100.)->Format.fPretty(~digits=2) ++ "%"
+                    }
                     size=Text.Xxl
                     weight=Text.Bold
                     height={Text.Px(20)}
@@ -457,7 +461,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                     <div className=Styles.mr2>
                       <Text
                         value={(bondedTokenCount->Coin.getBandAmountFromCoin /.
-                        financial.circulatingSupply *. 100.)->Format.fPretty(~digits=2) ++ "%"}
+                        financial.totalSupply *. 100.)->Format.fPretty(~digits=2) ++ "%"}
                         size=Text.Xxl
                         weight=Text.Bold
                         color=theme.neutral_900
@@ -468,7 +472,7 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
                       value={"( " ++
                       bondedTokenCount->Coin.getBandAmountFromCoin->Format.fCurrency ++
                       "/" ++
-                      financial.circulatingSupply->Format.fCurrency ++ " BAND )"}
+                      financial.totalSupply->Format.fCurrency ++ " BAND )"}
                       size=Text.Body2
                       weight=Text.Regular
                       height={Text.Px(20)}
