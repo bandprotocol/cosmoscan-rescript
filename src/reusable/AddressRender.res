@@ -13,9 +13,9 @@ module Styles = {
       ? style(. [
           pointerEvents(#auto),
           transition(~duration=200, "all"),
-          color(theme.neutral_900),
-          hover([color(theme.primary_600)]),
-          active([color(theme.primary_600)]),
+          color(theme.primary_600),
+          hover([color(theme.primary_800)]),
+          active([color(theme.primary_800)]),
         ])
       : style(. [
           pointerEvents(#none),
@@ -52,11 +52,6 @@ module Styles = {
     | Title => style(. [Media.mobile([width(#percent(90.))])])
     | _ => ""
     }
-
-  let mobileWidth = style(. [
-    width(#calc(#sub, #percent(100.), #px(45))),
-    Media.mobile([width(#calc(#sub, #percent(100.), #px(20)))]),
-  ])
 }
 
 @react.component
@@ -77,14 +72,13 @@ let make = (
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  <>
+  <div className={Styles.container}>
     <Link
       className={CssJs.merge(. [
         Styles.container,
         Styles.clickable(clickable, theme),
         Text.Styles.code,
         Styles.setWidth(position),
-        copy ? Styles.mobileWidth : "",
       ])}
       route={isValidator
         ? Route.ValidatorDetailsPage(address, Route.Reports)
@@ -103,7 +97,7 @@ let make = (
       ? <>
           {switch position {
           | Title => <HSpacing size=Spacing.md />
-          | _ => <HSpacing size=Spacing.sm />
+          | _ => <HSpacing size=Spacing.xs />
           }}
           <CopyRender
             width={switch position {
@@ -114,5 +108,5 @@ let make = (
           />
         </>
       : React.null}
-  </>
+  </div>
 }

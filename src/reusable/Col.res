@@ -77,18 +77,53 @@ module Styles = {
     | Twelve => style(. [])
     }
 
-  let marginBottom = (~mb, ~mbSm, ()) =>
-    style(. [marginBottom(#px(mb)), Media.mobile([marginBottom(#px(mbSm))])])
+  let mb = (~mb, ~mbSm, ()) =>
+    style(. [
+      marginBottom(#px(mb)),
+      Media.mobile([marginBottom(#px(mbSm->Belt.Option.getWithDefault(mb)))]),
+    ])
+  let mt = (~mt, ~mtSm, ()) =>
+    style(. [
+      marginTop(#px(mt)),
+      Media.mobile([marginTop(#px(mtSm->Belt.Option.getWithDefault(mt)))]),
+    ])
+  let ml = (~ml, ~mlSm, ()) =>
+    style(. [
+      marginLeft(#px(ml)),
+      Media.mobile([marginLeft(#px(mlSm->Belt.Option.getWithDefault(ml)))]),
+    ])
+  let mr = (~mr, ~mrSm, ()) =>
+    style(. [
+      marginRight(#px(mr)),
+      Media.mobile([marginRight(#px(mrSm->Belt.Option.getWithDefault(mr)))]),
+    ])
 }
 @react.component
-let make = (~col=Twelve, ~colSm=Twelve, ~offset=Twelve, ~mb=0, ~mbSm=0, ~style="", ~children) =>
+let make = (
+  ~col=Twelve,
+  ~colSm=Twelve,
+  ~offset=Twelve,
+  ~mb=0,
+  ~mbSm=?,
+  ~mt=0,
+  ~mtSm=?,
+  ~ml=0,
+  ~mlSm=?,
+  ~mr=0,
+  ~mrSm=?,
+  ~style="",
+  ~children,
+) =>
   <div
     className={CssJs.merge(. [
       Styles.colGridBase,
       Styles.colGrid(col),
       Styles.colOffset(offset),
       Styles.colSmGrid(colSm),
-      Styles.marginBottom(~mb, ~mbSm, ()),
+      Styles.mt(~mt, ~mtSm, ()),
+      Styles.mb(~mb, ~mbSm, ()),
+      Styles.ml(~ml, ~mlSm, ()),
+      Styles.mr(~mr, ~mrSm, ()),
       style,
     ])}>
     children

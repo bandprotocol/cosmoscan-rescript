@@ -40,6 +40,16 @@ module Styles = {
       marginTop(#px(mt)),
       Media.mobile([marginTop(#px(mtSm->Belt.Option.getWithDefault(mt)))]),
     ])
+  let ml = (~ml, ~mlSm, ()) =>
+    style(. [
+      marginLeft(#px(ml)),
+      Media.mobile([marginLeft(#px(mlSm->Belt.Option.getWithDefault(ml)))]),
+    ])
+  let mr = (~mr, ~mrSm, ()) =>
+    style(. [
+      marginRight(#px(mr)),
+      Media.mobile([marginRight(#px(mrSm->Belt.Option.getWithDefault(mr)))]),
+    ])
 }
 
 @react.component
@@ -54,6 +64,10 @@ let make = (
   ~marginBottomSm=?,
   ~marginTop=0,
   ~marginTopSm=?,
+  ~marginLeft=0,
+  ~marginLeftSm=?,
+  ~marginRight=0,
+  ~marginRightSm=?,
 ) =>
   <div
     className={CssJs.merge(. [
@@ -63,6 +77,8 @@ let make = (
       Styles.alignItems(alignItems),
       Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),
       Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
+      Styles.ml(~ml=marginLeft, ~mlSm=marginLeftSm, ()),
+      Styles.mr(~mr=marginRight, ~mrSm=marginRightSm, ()),
       wrap ? Styles.wrap : "",
       style,
     ])}>
