@@ -37,7 +37,7 @@ let make = (~chainID, ~channel, ~port) => {
   let (page, setPage) = React.useState(_ => 1)
   let (packetType, setPacketType) = React.useState(_ => "All")
 
-  // let packetCountSub = IBCSub.incomingCount(~port, ~channel, ~packetType, ())
+  let packetCountSub = IBCSub.incomingCount(~port, ~channel, ~packetType, ())
   let pageSize = 5
 
   let packetsSub = IBCQuery.getList(
@@ -133,16 +133,16 @@ let make = (~chainID, ~channel, ~port) => {
         </div>
       }}
     </Row>
-    // {switch packetCountSub {
-    // | Data(packetCount) =>
-    //   let pageCount = Page.getPageCount(packetCount, pageSize)
-    //   <Pagination2
-    //     currentPage=page
-    //     pageCount
-    //     onPageChange={newPage => setPage(_ => newPage)}
-    //     onChangeCurrentPage={newPage => setPage(_ => newPage)}
-    //   />
-    // | _ => React.null
-    // }}
+    {switch packetCountSub {
+    | Data(packetCount) =>
+      let pageCount = Page.getPageCount(packetCount, pageSize)
+      <Pagination2
+        currentPage=page
+        pageCount
+        onPageChange={newPage => setPage(_ => newPage)}
+        onChangeCurrentPage={newPage => setPage(_ => newPage)}
+      />
+    | _ => React.null
+    }}
   </div>
 }

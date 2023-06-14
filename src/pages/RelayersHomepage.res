@@ -77,17 +77,7 @@ module RelayerCard = {
           <Heading size={H3} value={chainID.chainID} weight={Semibold} />
         </div>
         <div>
-          <Text
-            value={chainID.connections
-            ->Belt.Array.reduce(0., (acc, {channels}) => {
-              let openChannels = channels->Belt.Array.keep(channel => {
-                channel.lastUpdate->MomentRe.Moment.year != 1970
-              })
-              acc +. openChannels->Belt.Array.length->Belt.Float.fromInt
-            })
-            ->Belt.Float.toString}
-            weight={Semibold}
-          />
+          <Text value={chainID.activeChannel->Belt.Int.toString} weight={Semibold} />
         </div>
         <div>
           <div className=Styles.toggleButton onClick={_ => toggle()}>
@@ -115,7 +105,7 @@ let make = () => {
   let (showActive, setShowActive) = React.useState(() => true)
 
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
-  let chainIDFilterSub = IBCFilterSub.getChainFilterList(~lastUpdate=showActive, ())
+  let chainIDFilterSub = IBCFilterSub.getChainFilterList(~state=showActive, ~channel=searchTerm, ())
 
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 5

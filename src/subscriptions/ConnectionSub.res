@@ -119,14 +119,14 @@ module Order = {
 }
 
 module MultiConfig = %graphql(`
-  subscription Connections($limit: Int!, $offset: Int!, $chainID: String!, $lastUpdate: timestamp_comparison_exp ) {
-    connections(offset: $offset, limit: $limit, where: {counterparty_chain_id: {_eq: $chainID},  channels: { last_update: $lastUpdate } }) @ppxAs(type: "internal_t") {
+  subscription Connections($limit: Int!, $offset: Int!, $chainID: String!, $state: Int_comparison_exp ) {
+    connections(offset: $offset, limit: $limit, where: {counterparty_chain_id: {_eq: $chainID}, channels: { channel: { _is_null: false } } }) @ppxAs(type: "internal_t") {
       connectionID: connection_id
       clientID: client_id
       counterpartyClientID: counterparty_client_id
       counterpartyChainID: counterparty_chain_id
       counterpartyConnectionID: counterparty_connection_id
-      channels @ppxAs(type: "channel_t") {
+      channels (where: { state: $state}) @ppxAs(type: "channel_t") {
         channelID: channel
         counterpartyPort: counterparty_port
         counterpartyChannelID: counterparty_channel
@@ -151,8 +151,8 @@ module MultiConfig = %graphql(`
 `)
 
 module ConnectionCountConfig = %graphql(`
-    subscription ConnectionCount($chainID: String!, $lastUpdate: timestamp_comparison_exp){
-       connections_aggregate(where: {counterparty_chain: {chain_id: {_eq: $chainID}}, channels: {last_update: $lastUpdate}  }) {
+    subscription ConnectionCount($chainID: String!, $state: Int_comparison_exp){
+       connections_aggregate(where: {counterparty_chain: {chain_id: {_eq: $chainID}}, channels: {state: $state}  }) {
         aggregate {
           count
         }
@@ -163,7 +163,7 @@ module ConnectionCountConfig = %graphql(`
 let getList = (~counterpartyChainID, ~page, ~pageSize, ~state, ()) => {
   let offset = (page - 1) * pageSize
 
-  let parseState = state ? Some(Js.Json.string("1970-01-01T00:00:00")) : None
+  let parseState = state ? Some(3) : None
   let result = MultiConfig.use({
     chainID: counterpartyChainID !== "" ? counterpartyChainID : "%%",
     // connectionID: j`%$connectionID%`,
@@ -178,9 +178,9 @@ let getList = (~counterpartyChainID, ~page, ~pageSize, ~state, ()) => {
     //   _neq: None,
     //   _nin: None,
     // }),
-    lastUpdate: Some({
-      _gt: parseState,
-      _eq: None,
+    state: Some({
+      _gt: None,
+      _eq: parseState,
       _gte: None,
       _in: None,
       _is_null: None,
@@ -197,12 +197,12 @@ let getList = (~counterpartyChainID, ~page, ~pageSize, ~state, ()) => {
 }
 
 let getCount = (~counterpartyChainID, ~state, ()) => {
-  let parseState = state ? Some(Js.Json.string("1970-01-01T00:00:00")) : None
+  let parseState = state ? Some(3) : None
   let result = ConnectionCountConfig.use({
     chainID: counterpartyChainID !== "" ? counterpartyChainID : "%%",
-    lastUpdate: Some({
-      _gt: parseState,
-      _eq: None,
+    state: Some({
+      _gt: None,
+      _eq: parseState,
       _gte: None,
       _in: None,
       _is_null: None,

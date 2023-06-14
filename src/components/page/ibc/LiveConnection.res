@@ -493,6 +493,7 @@ let make = (~counterpartyChainID, ~state) => {
         {switch connectionCountSub {
         | Data(connectionCount) =>
           let pageCount = Page.getPageCount(connectionCount, pageSize)
+
           pageCount > 1
             ? <Pagination2
                 currentPage=page
@@ -501,6 +502,7 @@ let make = (~counterpartyChainID, ~state) => {
                 onChangeCurrentPage={newPage => setPage(_ => newPage)}
               />
             : React.null
+
         | _ => React.null
         }}
       </>

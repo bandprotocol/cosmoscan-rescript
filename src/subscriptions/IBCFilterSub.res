@@ -1,7 +1,7 @@
 type filter_channel_t = {
   port: string,
   channel: string,
-  lastUpdate: MomentRe.Moment.t,
+  state: int,
 }
 
 type filter_connection_t = {channels: array<filter_channel_t>}
@@ -9,29 +9,32 @@ type filter_connection_t = {channels: array<filter_channel_t>}
 type filter_counterparty_t = {
   chainID: string,
   connections: array<filter_connection_t>,
+  activeChannel: int,
 }
 
 module CounterpartyConfig = %graphql(`
-  subscription Counterparty( $lastUpdate: timestamp_comparison_exp) {
-    counterparty_chains {
+  subscription Counterparty( $state: Int_comparison_exp, $channel: String_comparison_exp) {
+    counterparty_chains (
+		where: { connections: { channels: { channel: $channel } } }
+	){
       chainID: chain_id
-      connections (where: { channels: { last_update: $lastUpdate } }){
+      connections (where: { channels: { state: $state } }){
         channels {
           channel
           port
-          lastUpdate: last_update @ppxCustom(module: "GraphQLParserModule.Date")
+          state
         }
       }
     }
   }
 `)
 
-let getChainFilterList = (~lastUpdate, ()) => {
-  let parseState = lastUpdate ? Some(Js.Json.string("1970-01-01T00:00:00")) : None
+let getChainFilterList = (~state, ~channel, ()) => {
+  let parseState = state ? Some(3) : None
   let result = CounterpartyConfig.use({
-    lastUpdate: Some({
-      _gt: parseState,
-      _eq: None,
+    state: Some({
+      _gt: None,
+      _eq: parseState,
       _gte: None,
       _in: None,
       _is_null: None,
@@ -39,6 +42,28 @@ let getChainFilterList = (~lastUpdate, ()) => {
       _lte: None,
       _neq: None,
       _nin: None,
+    }),
+    channel: Some({
+      _regex: None,
+      // _eq: channel == "" ? None : Some(channel),
+      _eq: None,
+      _gt: None,
+      _gte: None,
+      _in: None,
+      _iregex: None,
+      _is_null: None,
+      _like: None,
+      _ilike: None,
+      _lt: None,
+      _lte: None,
+      _neq: None,
+      _nilike: None,
+      _nin: None,
+      _niregex: None,
+      _nlike: None,
+      _nregex: None,
+      _nsimilar: None,
+      _similar: None,
     }),
   })
 
@@ -52,14 +77,24 @@ let getChainFilterList = (~lastUpdate, ()) => {
         let connectionArray = connections->Belt.Array.map(
           ({channels}) => {
             let channelArray = channels->Belt.Array.map(
-              ({port, channel, lastUpdate}) => {
-                {port, channel, lastUpdate}
+              ({port, channel, state}) => {
+                {port, channel, state}
               },
             )
             {channels: channelArray}
           },
         )
-        {chainID, connections: connectionArray}
+
+        let activeChannel =
+          connections
+          ->Belt.Array.map(
+            ({channels}) => {
+              channels->Belt.Array.keep(({state}) => state === 3)->Belt.Array.length
+            },
+          )
+          ->Belt.Array.reduce(0, (acc, x) => acc + x)
+
+        {chainID, connections: connectionArray, activeChannel}
       })
       ->Belt.List.fromArray
       ->Belt.List.sort((a, b) => {
@@ -70,36 +105,3 @@ let getChainFilterList = (~lastUpdate, ()) => {
     Sub.resolve(chainIDArray)
   })
 }
-
-// let getFilterList = () => {
-//   let result = CounterpartyConfig.use(
-
-//   )
-//   result
-//   ->Sub.fromData
-//   ->Sub.map(internal => {
-//     let portDict = Js.Dict.empty()
-//     let chainIDList = internal.counterparty_chains
-
-//     let connectionsList = chainIDList->Belt.Array.reduce([], (acc, {connections}) => {
-//       acc->Belt.Array.concat(connections)
-//     })
-
-//     let channelsList = connectionsList->Belt.Array.reduce([], (acc, {channels}) => {
-//       acc->Belt.Array.concat(channels)
-//     })
-
-//     let keys = ["oracle", "transfer", "icahost"]
-
-//     keys->Belt_Array.forEach(key => {
-//       let channelArray: array<string> =
-//         channelsList->Belt.Array.reduce(
-//           [],
-//           (acc, {port, channel}) => port === key ? acc->Belt.Array.concat([channel]) : acc,
-//         )
-//       portDict->Js.Dict.set(key, channelArray)
-//     })
-
-//     portDict
-//   })
-// }
