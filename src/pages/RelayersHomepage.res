@@ -123,7 +123,9 @@ let make = () => {
       </Row>
       <Row marginTop=24 marginBottom=24 marginBottomSm={24}>
         <Col col=Col.Twelve>
-          <SearchInput placeholder="Search relayer" onChange=setSearchTerm maxWidth=370 />
+          <SearchInput
+            placeholder="Search relayer or channel" onChange=setSearchTerm maxWidth=370
+          />
         </Col>
       </Row>
       <Row marginTop=24 marginBottom=24 marginBottomSm={24}>
