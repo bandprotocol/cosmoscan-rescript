@@ -119,8 +119,8 @@ module Order = {
 }
 
 module MultiConfig = %graphql(`
-  subscription Connections($limit: Int!, $offset: Int!, $chainID: String!, $state: Int_comparison_exp ) {
-    connections(offset: $offset, limit: $limit, where: {counterparty_chain_id: {_eq: $chainID},  channels: { state: $state } }) @ppxAs(type: "internal_t") {
+  subscription Connections($limit: Int!, $offset: Int!, $chainID: String!, $lastUpdate: timestamp_comparison_exp ) {
+    connections(offset: $offset, limit: $limit, where: {counterparty_chain_id: {_eq: $chainID},  channels: { last_update: $lastUpdate } }) @ppxAs(type: "internal_t") {
       connectionID: connection_id
       clientID: client_id
       counterpartyClientID: counterparty_client_id
@@ -151,8 +151,8 @@ module MultiConfig = %graphql(`
 `)
 
 module ConnectionCountConfig = %graphql(`
-    subscription ConnectionCount($chainID: String!){
-       connections_aggregate(where: {counterparty_chain: {chain_id: {_eq: $chainID}}}) {
+    subscription ConnectionCount($chainID: String!, $lastUpdate: timestamp_comparison_exp){
+       connections_aggregate(where: {counterparty_chain: {chain_id: {_eq: $chainID}}, channels: {last_update: $lastUpdate}  }) {
         aggregate {
           count
         }
@@ -163,13 +163,24 @@ module ConnectionCountConfig = %graphql(`
 let getList = (~counterpartyChainID, ~page, ~pageSize, ~state, ()) => {
   let offset = (page - 1) * pageSize
 
-  let parseState = state ? Some(3) : None
+  let parseState = state ? Some(Js.Json.string("1970-01-01T00:00:00")) : None
   let result = MultiConfig.use({
     chainID: counterpartyChainID !== "" ? counterpartyChainID : "%%",
     // connectionID: j`%$connectionID%`,
-    state: Some({
-      _eq: parseState,
-      _gt: None,
+    // state: Some({
+    //   _eq: None,
+    //   _gt: parseState,
+    //   _gte: None,
+    //   _in: None,
+    //   _is_null: None,
+    //   _lt: None,
+    //   _lte: None,
+    //   _neq: None,
+    //   _nin: None,
+    // }),
+    lastUpdate: Some({
+      _gt: parseState,
+      _eq: None,
       _gte: None,
       _in: None,
       _is_null: None,
@@ -185,9 +196,21 @@ let getList = (~counterpartyChainID, ~page, ~pageSize, ~state, ()) => {
   result->Sub.fromData->Sub.map(internal => internal.connections->Belt.Array.map(toExternal))
 }
 
-let getCount = (~counterpartyChainID, ()) => {
+let getCount = (~counterpartyChainID, ~state, ()) => {
+  let parseState = state ? Some(Js.Json.string("1970-01-01T00:00:00")) : None
   let result = ConnectionCountConfig.use({
     chainID: counterpartyChainID !== "" ? counterpartyChainID : "%%",
+    lastUpdate: Some({
+      _gt: parseState,
+      _eq: None,
+      _gte: None,
+      _in: None,
+      _is_null: None,
+      _lt: None,
+      _lte: None,
+      _neq: None,
+      _nin: None,
+    }),
   })
 
   result

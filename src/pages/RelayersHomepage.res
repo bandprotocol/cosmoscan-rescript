@@ -13,7 +13,24 @@ module Styles = {
     ])
 
   let relayerTitleWrapper = (theme: Theme.t, isDarkMode) =>
-    style(. [padding(#px(24)), Media.mobile([padding(#px(16))])])
+    style(. [
+      padding(#px(24)),
+      Media.mobile([padding(#px(16))]),
+      selector(
+        "> div:nth-child(1)",
+        [width(#percent(50.)), display(#flex), justifyContent(#flexStart), alignItems(#center)],
+      ),
+      selector(
+        "> div:nth-child(2)",
+        [width(#percent(25.)), display(#flex), justifyContent(#center), alignItems(#center)],
+      ),
+      selector(
+        "> div:last-child",
+        [width(#percent(25.)), display(#flex), justifyContent(#flexEnd), alignItems(#center)],
+      ),
+    ])
+
+  let relayerTableHead = style(. [padding2(~h=#px(24), ~v=#px(8)), Media.mobile([display(#none)])])
   let chainLogo = style(. [width(#px(24)), height(#px(24)), objectFit(#cover)])
   let relayerDetailsWrapper = (theme: Theme.t, isDarkMode, isOpen) =>
     style(. [
@@ -28,7 +45,7 @@ module Styles = {
     style(. [
       display(#flex),
       width(#percent(100.)),
-      justifyContent(#center),
+      justifyContent(#flexEnd),
       alignItems(#center),
       cursor(#pointer),
       padding2(~v=#px(10), ~h=#zero),
@@ -54,11 +71,23 @@ module RelayerCard = {
           Styles.relayerTitleWrapper(theme, isDarkMode),
           "chain",
         })}>
-        <div
-          className={Css.merge(list{CssHelper.flexBox(~justify=#flexStart, ~align=#center, ())})}>
+        <div>
           <Avatar moniker={chainID.chainID} identity={chainID.chainID} width=40 />
           <HSpacing size=Spacing.lg />
           <Heading size={H3} value={chainID.chainID} weight={Semibold} />
+        </div>
+        <div>
+          <Text
+            value={chainID.connections
+            ->Belt.Array.reduce(0., (acc, {channels}) => {
+              let openChannels = channels->Belt.Array.keep(channel => {
+                channel.lastUpdate->MomentRe.Moment.year != 1970
+              })
+              acc +. openChannels->Belt.Array.length->Belt.Float.fromInt
+            })
+            ->Belt.Float.toString}
+            weight={Semibold}
+          />
         </div>
         <div>
           <div className=Styles.toggleButton onClick={_ => toggle()}>
@@ -86,7 +115,7 @@ let make = () => {
   let (showActive, setShowActive) = React.useState(() => true)
 
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
-  let chainIDFilterSub = IBCFilterSub.getChainFilterList()
+  let chainIDFilterSub = IBCFilterSub.getChainFilterList(~lastUpdate=showActive, ())
 
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 5
@@ -141,7 +170,20 @@ let make = () => {
                   })
 
             <div>
+              <div className={Styles.relayerTableHead}>
+                <Row alignItems=Row.Center>
+                  <Col col=Col.Six>
+                    <Text value="Chain ID" weight={Semibold} />
+                  </Col>
+                  <Col col=Col.Three>
+                    <Text value="Active Channels" weight={Semibold} align={Center} />
+                  </Col>
+                </Row>
+              </div>
               {filteredRelayers
+              ->Belt.Array.keep(relayer => {
+                relayer.connections->Belt.Array.length > 0
+              })
               ->Belt.Array.slice(~offset=(page - 1) * pageSize, ~len=pageSize)
               ->Belt.Array.mapWithIndex((i, channel) => {
                 <RelayerCard chainID=channel channelState={showActive} key={i->Belt.Int.toString} />
