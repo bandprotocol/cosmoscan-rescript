@@ -1,6 +1,8 @@
 module Styles = {
   open CssJs
 
+  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
+
   let relayerItem = (theme: Theme.t, isDarkMode) =>
     style(. [
       backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
@@ -154,42 +156,52 @@ let make = () => {
         <Col col=Col.Twelve>
           {switch chainIDFilterSub {
           | Data(chainIDList) =>
-            let filteredRelayers =
-              searchTerm->Js.String2.length == 0
-                ? chainIDList
-                : chainIDList->Belt.Array.keep(relayer => {
-                    relayer.chainID->Js.String2.toLowerCase->Js.String2.includes(searchTerm)
+            chainIDList->Belt.Array.length > 0
+              ? <div>
+                  <div className={Styles.relayerTableHead}>
+                    <Row alignItems=Row.Center>
+                      <Col col=Col.Six>
+                        <Text value="Chain ID" weight={Semibold} />
+                      </Col>
+                      <Col col=Col.Three>
+                        <Text value="Active Channels" weight={Semibold} align={Center} />
+                      </Col>
+                    </Row>
+                  </div>
+                  {chainIDList
+                  ->Belt.Array.keep(relayer => {
+                    relayer.connections->Belt.Array.length > 0
                   })
-
-            <div>
-              <div className={Styles.relayerTableHead}>
-                <Row alignItems=Row.Center>
-                  <Col col=Col.Six>
-                    <Text value="Chain ID" weight={Semibold} />
-                  </Col>
-                  <Col col=Col.Three>
-                    <Text value="Active Channels" weight={Semibold} align={Center} />
-                  </Col>
-                </Row>
-              </div>
-              {chainIDList
-              ->Belt.Array.keep(relayer => {
-                relayer.connections->Belt.Array.length > 0
-              })
-              ->Belt.Array.slice(~offset=(page - 1) * pageSize, ~len=pageSize)
-              ->Belt.Array.mapWithIndex((i, channel) => {
-                <RelayerCard chainID=channel channelState={showActive} key={i->Belt.Int.toString} />
-              })
-              ->React.array}
-              {
-                let pageCount = Page.getPageCount(chainIDList->Belt.Array.length, pageSize)
-                <Pagination
-                  currentPage=page
-                  pageCount={pageCount}
-                  onPageChange={newPage => setPage(_ => newPage)}
-                />
-              }
-            </div>
+                  ->Belt.Array.slice(~offset=(page - 1) * pageSize, ~len=pageSize)
+                  ->Belt.Array.mapWithIndex((i, channel) => {
+                    <RelayerCard
+                      chainID=channel channelState={showActive} key={i->Belt.Int.toString}
+                    />
+                  })
+                  ->React.array}
+                  {
+                    let pageCount = Page.getPageCount(chainIDList->Belt.Array.length, pageSize)
+                    <Pagination
+                      currentPage=page
+                      pageCount={pageCount}
+                      onPageChange={newPage => setPage(_ => newPage)}
+                    />
+                  }
+                </div>
+              : <EmptyContainer>
+                  <img
+                    alt="No Relayer Found"
+                    src={isDarkMode ? Images.noDelegatorDark : Images.noDelegatorLight}
+                    className=Styles.noDataImage
+                  />
+                  <Heading
+                    size=Heading.H4
+                    value="No Relayer Found"
+                    align=Heading.Center
+                    weight=Heading.Regular
+                    color={theme.neutral_600}
+                  />
+                </EmptyContainer>
 
           | _ => <LoadingCensorBar width=285 height=37 radius=8 />
           }}
