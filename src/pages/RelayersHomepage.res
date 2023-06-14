@@ -105,7 +105,7 @@ let make = () => {
   let (showActive, setShowActive) = React.useState(() => true)
 
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
-  let chainIDFilterSub = IBCFilterSub.getChainFilterList(~state=showActive, ~channel=searchTerm, ())
+  let chainIDFilterSub = IBCFilterSub.getChainFilterList(~state=showActive, ~search=searchTerm, ())
 
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 5
@@ -170,7 +170,7 @@ let make = () => {
                   </Col>
                 </Row>
               </div>
-              {filteredRelayers
+              {chainIDList
               ->Belt.Array.keep(relayer => {
                 relayer.connections->Belt.Array.length > 0
               })
@@ -180,7 +180,7 @@ let make = () => {
               })
               ->React.array}
               {
-                let pageCount = Page.getPageCount(filteredRelayers->Belt.Array.length, pageSize)
+                let pageCount = Page.getPageCount(chainIDList->Belt.Array.length, pageSize)
                 <Pagination
                   currentPage=page
                   pageCount={pageCount}

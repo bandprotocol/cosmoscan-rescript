@@ -13,9 +13,16 @@ type filter_counterparty_t = {
 }
 
 module CounterpartyConfig = %graphql(`
-  subscription Counterparty( $state: Int_comparison_exp, $channel: String_comparison_exp) {
+  subscription Counterparty( $state: Int_comparison_exp, $search: String!, ) {
     counterparty_chains (
-		where: { connections: { channels: { channel: $channel } } }
+		where: { _or: [
+      {connections: { channels: { channel: {_ilike: $search } } }},
+      {
+        chain_id: {
+          _ilike: $search
+        }
+      }
+    ] }
 	){
       chainID: chain_id
       connections (where: { channels: { state: $state } }){
@@ -29,7 +36,7 @@ module CounterpartyConfig = %graphql(`
   }
 `)
 
-let getChainFilterList = (~state, ~channel, ()) => {
+let getChainFilterList = (~state, ~search, ()) => {
   let parseState = state ? Some(3) : None
   let result = CounterpartyConfig.use({
     state: Some({
@@ -43,28 +50,7 @@ let getChainFilterList = (~state, ~channel, ()) => {
       _neq: None,
       _nin: None,
     }),
-    channel: Some({
-      _regex: None,
-      // _eq: channel == "" ? None : Some(channel),
-      _eq: None,
-      _gt: None,
-      _gte: None,
-      _in: None,
-      _iregex: None,
-      _is_null: None,
-      _like: None,
-      _ilike: None,
-      _lt: None,
-      _lte: None,
-      _neq: None,
-      _nilike: None,
-      _nin: None,
-      _niregex: None,
-      _nlike: None,
-      _nregex: None,
-      _nsimilar: None,
-      _similar: None,
-    }),
+    search: {j`%$search%`},
   })
 
   result
