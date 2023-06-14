@@ -33,6 +33,7 @@ module Styles = {
       opacity(isLoading ? 0.8 : 1.),
       cursor(isLoading ? #auto : #pointer),
       marginTop(#px(16)),
+      padding2(~v=#px(8), ~h=#px(56)),
     ])
 
   let withWH = (w, h) =>
@@ -101,7 +102,7 @@ module ParameterInput = {
 
     <div className=Styles.listContainer key=fieldName>
       <div className={CssHelper.flexBox()}>
-        <Text value=fieldName weight=Text.Semibold transform=Text.Capitalize />
+        <Text value=fieldName size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
         <HSpacing size=Spacing.xs />
         <Text value={j`($fieldType)`} weight=Text.Semibold />
       </div>
@@ -122,8 +123,15 @@ module ParameterInput = {
 
 module CountInputs = {
   @react.component
-  let make = (~askCount, ~setAskCount, ~setMinCount, ~validatorCount) => {
+  let make = (~askCount, ~setAskCount, ~minCount, ~setMinCount, ~validatorCount) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
+    React.useEffect1(_ => {
+      if minCount->Belt.Int.fromString > askCount->Belt.Int.fromString {
+        setMinCount(_ => askCount)
+      }
+      None
+    }, [askCount])
 
     <Row marginBottom=24>
       <Col col=Col.Two colSm=Col.Six>
@@ -136,22 +144,21 @@ module CountInputs = {
             <Icon name="fal fa-info-circle" size=10 />
           </CTooltip>
         </div>
-        <div className={CssHelper.selectWrapper(~fontColor=theme.neutral_900, ())}>
-          <select
-            className={Styles.input(theme)}
-            onChange={event => {
-              let newVal = ReactEvent.Form.target(event)["value"]
-              setAskCount(_ => newVal)
-            }}>
-            {Belt.Array.makeBy(validatorCount, i => i + 1)
-            ->Belt.Array.map(index =>
-              <option key={index->Belt.Int.toString ++ "askCount"} value={index->Belt.Int.toString}>
-                {index->Belt.Int.toString->React.string}
-              </option>
+        <input
+          className={Styles.input(theme)}
+          type_="number"
+          min="1"
+          max={validatorCount}
+          onChange={event => {
+            let newVal = ReactEvent.Form.target(event)["value"]
+            setAskCount(_ =>
+              newVal->Belt.Int.fromString > validatorCount->Belt.Int.fromString
+                ? validatorCount
+                : newVal
             )
-            ->React.array}
-          </select>
-        </div>
+          }}
+          value=askCount
+        />
       </Col>
       <Col col=Col.Two colSm=Col.Six>
         <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
@@ -163,22 +170,19 @@ module CountInputs = {
             <Icon name="fal fa-info-circle" size=10 />
           </CTooltip>
         </div>
-        <div className={CssHelper.selectWrapper(~fontColor=theme.neutral_900, ())}>
-          <select
-            className={Styles.input(theme)}
-            onChange={event => {
-              let newVal = ReactEvent.Form.target(event)["value"]
-              setMinCount(_ => newVal)
-            }}>
-            {Belt.Array.makeBy(askCount->Parse.mustParseInt, i => i + 1)
-            ->Belt.Array.map(index =>
-              <option key={index->Belt.Int.toString ++ "minCount"} value={index->Belt.Int.toString}>
-                {index->Belt.Int.toString->React.string}
-              </option>
+        <input
+          className={Styles.input(theme)}
+          type_="number"
+          min="1"
+          max={askCount}
+          onChange={event => {
+            let newVal = ReactEvent.Form.target(event)["value"]
+            setMinCount(_ =>
+              newVal->Belt.Int.fromString > askCount->Belt.Int.fromString ? askCount : newVal
             )
-            ->React.array}
-          </select>
-        </div>
+          }}
+          value=minCount
+        />
       </Col>
     </Row>
   }
@@ -191,7 +195,7 @@ module ClientIDInput = {
 
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
-        <Text value="Client ID" weight=Text.Semibold transform=Text.Capitalize />
+        <Text value="Client ID" size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
         <HSpacing size=Spacing.xs />
         <Text value="(default value is from_scan)" weight=Text.Semibold />
       </div>
@@ -216,7 +220,7 @@ module ValueInput = {
 
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
-        <Text value=title weight=Text.Semibold transform=Text.Capitalize />
+        <Text value=title size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
         <HSpacing size=Spacing.xs />
         <Text value={info->Belt.Option.getWithDefault("")} weight=Text.Semibold />
       </div>
@@ -301,14 +305,15 @@ module ExecutionPart = {
 
     let validatorCount = ValidatorSub.countByActive(true)
 
+    // set parameter default value here
     let (callDataArr, setCallDataArr) = React.useState(_ => Belt.Array.make(numParams, ""))
     let (clientID, setClientID) = React.useState(_ => "from_scan")
     let (feeLimit, setFeeLimit) = React.useState(_ => "200")
     let (prepareGas, setPrepareGas) = React.useState(_ => 20000)
     let (executeGas, setExecuteGas) = React.useState(_ => 100000)
     let (gaslimit, setGaslimit) = React.useState(_ => 2000000)
-    let (askCount, setAskCount) = React.useState(_ => "1")
-    let (minCount, setMinCount) = React.useState(_ => "1")
+    let (askCount, setAskCount) = React.useState(_ => "16")
+    let (minCount, setMinCount) = React.useState(_ => "10")
     let (result, setResult) = React.useState(_ => Nothing)
 
     // TODO: Change when input can be empty
@@ -335,18 +340,6 @@ module ExecutionPart = {
               {isUnused
                 ? React.null
                 : <div>
-                    <div className={Css.merge(list{CssHelper.flexBox(), Styles.upperTextCotainer})}>
-                      <Text value="This oracle script requires the following" size=Text.Body1 />
-                      <HSpacing size=Spacing.sm />
-                      {numParams == 0
-                        ? React.null
-                        : <Text
-                            value={numParams > 1 ? "parameters" : "parameter"}
-                            weight=Text.Bold
-                            size=Text.Body1
-                          />}
-                    </div>
-                    <VSpacing size=Spacing.lg />
                     <div className={CssHelper.flexBox(~direction=#column, ())}>
                       {paramsInput
                       ->Belt.Array.mapWithIndex((i, params) =>
@@ -357,8 +350,22 @@ module ExecutionPart = {
                       ->React.array}
                     </div>
                   </div>}
-              <ClientIDInput clientID setClientID />
               <ValueInput value=feeLimit setValue=setFeeLimit title="Fee Limit" info="(uband)" />
+              {switch validatorCount {
+              | Data(count) =>
+                let limitCount = count > 16 ? 16 : count
+                <CountInputs
+                  askCount
+                  setAskCount
+                  minCount
+                  setMinCount
+                  validatorCount={limitCount->Belt.Int.toString}
+                />
+              | _ => React.null
+              }}
+              <SwitchV2 checked=true />
+              <SeperatedLine />
+              <ClientIDInput clientID setClientID />
               <ValueInput
                 value={prepareGas->Belt.Int.toString}
                 setValue=setPrepareGas
@@ -377,13 +384,6 @@ module ExecutionPart = {
                 title="Gas Limit"
                 inputType="number"
               />
-              <SeperatedLine />
-              {switch validatorCount {
-              | Data(count) =>
-                let limitCount = count > 16 ? 16 : count
-                <CountInputs askCount setAskCount setMinCount validatorCount=limitCount />
-              | _ => React.null
-              }}
               {switch accountOpt {
               | Some(account) =>
                 <>
