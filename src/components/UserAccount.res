@@ -176,7 +176,14 @@ let make = () => {
             <Balance address />
             <VSpacing size=#px(16) />
             <div className={CssHelper.flexBox(~direction=#row, ~justify=#spaceBetween, ())}>
-              <FaucetBtn address />
+              {switch trackingSub {
+              | Data({chainID}) => {
+                  let currentChainID = chainID->ChainIDBadge.parseChainID
+                  currentChainID == LaoziTestnet ? <FaucetBtn address /> : React.null
+                }
+
+              | _ => React.null
+              }}
               <SendBtn send />
             </div>
           </div>
