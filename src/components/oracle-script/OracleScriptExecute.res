@@ -38,9 +38,9 @@ module Styles = {
   let withWH = (w, h) =>
     style(. [width(w), height(h), display(#flex), justifyContent(#center), alignItems(#center)])
 
-  let gasContainer = (theme: Theme.t) =>
+  let gasContainer = (theme: Theme.t, isDarkMode) =>
     style(. [
-      backgroundColor(theme.neutral_100),
+      backgroundColor(isDarkMode ? theme.neutral_200 : theme.neutral_100),
       padding2(~v=px(16), ~h=px(24)),
       borderRadius(#px(8)),
     ])
@@ -111,6 +111,7 @@ module ParameterInput = {
         <Text value=fieldName size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
         <HSpacing size=Spacing.xs />
         <Text value={j`($fieldType)`} weight=Text.Semibold />
+        <Text value="*" size=Text.Body1 weight=Text.Semibold color=theme.error_600 />
       </div>
       <VSpacing size=Spacing.sm />
       <input
@@ -142,7 +143,8 @@ module CountInputs = {
     <Row marginBottom=32>
       <Col col=Col.Two colSm=Col.Six>
         <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
-          <Text value="Ask Count" weight=Text.Semibold transform=Text.Capitalize />
+          <Text value="Ask Count" size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
+          <Text value="*" size=Text.Body1 weight=Text.Semibold color=theme.error_600 />
           <HSpacing size=Spacing.xs />
           <CTooltip
             tooltipPlacementSm=CTooltip.BottomLeft
@@ -168,7 +170,8 @@ module CountInputs = {
       </Col>
       <Col col=Col.Two colSm=Col.Six>
         <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
-          <Text value="Min Count" weight=Text.Semibold transform=Text.Capitalize />
+          <Text value="Min Count" size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
+          <Text value="*" size=Text.Body1 weight=Text.Semibold color=theme.error_600 />
           <HSpacing size=Spacing.xs />
           <CTooltip
             tooltipPlacementSm=CTooltip.BottomLeft
@@ -207,6 +210,12 @@ module ClientIDInput = {
           weight=Text.Semibold
           transform=Text.Capitalize
         />
+        <HSpacing size=Spacing.xs />
+        <CTooltip
+          tooltipPlacementSm=CTooltip.BottomLeft
+          tooltipText="A unique identifier for your application to help track the usage of the oracle script.">
+          <Icon name="fal fa-info-circle" size=10 />
+        </CTooltip>
       </div>
       <VSpacing size=Spacing.sm />
       <input
@@ -224,14 +233,25 @@ module ClientIDInput = {
 
 module ValueInput = {
   @react.component
-  let make = (~value, ~setValue, ~title, ~info=?, ~inputType="text") => {
+  let make = (~value, ~setValue, ~title, ~tooltip=?, ~inputType="text", ~required=false) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
         <Text value=title size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
-        <HSpacing size=Spacing.xs />
-        <Text value={info->Belt.Option.getWithDefault("")} weight=Text.Semibold />
+        {required
+          ? <Text value="*" size=Text.Body1 weight=Text.Semibold color=theme.error_600 />
+          : React.null}
+        {switch tooltip {
+        | Some(text) =>
+          <>
+            <HSpacing size=Spacing.xs />
+            <CTooltip tooltipPlacementSm=CTooltip.BottomLeft tooltipText=text>
+              <Icon name="fal fa-info-circle" size=10 />
+            </CTooltip>
+          </>
+        | None => React.null
+        }}
       </div>
       <VSpacing size=Spacing.sm />
       <input
@@ -304,7 +324,7 @@ module ExecutionPart = {
     let isMobile = Media.isMobile()
 
     let client = React.useContext(ClientContext.context)
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     let (accountOpt, dispatch) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
@@ -360,7 +380,13 @@ module ExecutionPart = {
                       ->React.array}
                     </div>
                   </div>}
-              <ValueInput value=feeLimit setValue=setFeeLimit title="Fee Limit" info="(uband)" />
+              <ValueInput
+                value=feeLimit
+                setValue=setFeeLimit
+                title="Fee Limit (BAND)"
+                tooltip="Maximum amount of BAND tokens that you are willing to pay for the oracle data request. 0.0002 is recommended"
+                required=true
+              />
               {switch validatorCount {
               | Data(count) =>
                 let limitCount = count > 16 ? 16 : count
@@ -381,13 +407,14 @@ module ExecutionPart = {
                 ? <div>
                     <VSpacing size=Spacing.lg />
                     <ClientIDInput clientID setClientID />
-                    <Row style={Styles.gasContainer(theme)}>
+                    <Row style={Styles.gasContainer(theme, isDarkMode)}>
                       <Col col=Col.Twelve>
                         <ValueInput
                           value={gaslimit->Belt.Int.toString}
                           setValue=setGaslimit
                           title="Gas Limit (Optional)"
                           inputType="number"
+                          tooltip="Maximum amount of computational steps that the oracle is allowed to use to fulfill the data request. The gas limit must be greater than or equal to the sum of the prepare gas and execute gas. If omitted, the gas used will be set to xxx."
                         />
                       </Col>
                       <Col col=Col.Six>
@@ -396,6 +423,7 @@ module ExecutionPart = {
                           setValue=setExecuteGas
                           title="Execute Gas (Optional)"
                           inputType="number"
+                          tooltip="Used to execute the transaction. This includes things like calling the contract function and updating the state of the blockchain."
                         />
                       </Col>
                       <Col col=Col.Six>
@@ -404,6 +432,7 @@ module ExecutionPart = {
                           setValue=setPrepareGas
                           title="Prepare Gas (Optional)"
                           inputType="number"
+                          tooltip="Used to prepare the transaction for execution. This includes things like validating the transaction data and checking the signer's account balance."
                         />
                       </Col>
                     </Row>

@@ -48,7 +48,7 @@ let make = (~txResponse: TxCreator.tx_response_t, ~schema: string) =>
           <div className=Styles.labelWrapper>
             <Text value="Tx Hash" color={theme.neutral_600} weight=Text.Regular />
           </div>
-          <TxLink txHash={txResponse.txHash} width=500 />
+          <TxLink txHash={txResponse.txHash} width=500 weight=Text.Regular />
         </div>
         {switch requestOpt {
         | Some({resolveStatus: Success, result: Some(result), id}) =>
