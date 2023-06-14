@@ -5,6 +5,16 @@ module Styles = {
   let containerSpacingSm = style(. [Media.mobile([marginTop(#px(16))])])
   let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
   let noPadding = style(. [padding(#zero)])
+  let info = style(. [borderRadius(#px(16))])
+
+  let buttonStyled = style(. [
+    backgroundColor(#transparent),
+    border(#zero, #solid, #transparent),
+    outlineStyle(#none),
+    cursor(#pointer),
+    padding2(~v=#zero, ~h=#zero),
+    margin4(~top=#zero, ~right=#zero, ~bottom=#px(40), ~left=#zero),
+  ])
 
   let relatedDSContainer = style(. [
     selector("> div + div", [marginTop(#px(16))]),
@@ -21,25 +31,31 @@ module Content = {
 
     <Section>
       <div className=CssHelper.container>
-        <Heading value="Oracle Script" size=Heading.H2 marginBottom=40 marginBottomSm=24 />
-        <Row marginBottom=40 marginBottomSm=24 alignItems=Row.Center>
+        <button
+          className={Css.merge(list{CssHelper.flexBox(), Styles.buttonStyled})}
+          onClick={_ => Route.redirect(OracleScriptPage)}>
+          <Icon name="fa fa-angle-left" mr=8 size=14 />
+          <Text value="Back to all oracle scripts" size=Text.Xl color=theme.neutral_600 />
+        </button>
+        <Row marginBottom=24 marginBottomSm=24 alignItems=Row.Center>
           <Col col=Col.Six>
             <div className={Css.merge(list{CssHelper.flexBox(), Styles.idCointainer})}>
               {switch oracleScriptSub {
               | Data({id, name}) =>
-                <>
-                  <TypeID.OracleScript id position=TypeID.Title />
-                  <HSpacing size=Spacing.sm />
-                  <Heading size=Heading.H3 value=name weight=Heading.Thin />
-                </>
+                <Heading
+                  size=Heading.H1
+                  value={`#O${id->ID.OracleScript.toInt->Belt.Int.toString} ${name}`}
+                  weight=Heading.Bold
+                  mono=true
+                />
               | _ => <LoadingCensorBar width=270 height=15 />
               }}
             </div>
           </Col>
           <Col col=Col.Three colSm=Col.Six>
-            <InfoContainer py=16>
+            <InfoContainer py=16 style=Styles.info>
               <Heading
-                value="Requests"
+                value="24 hr Requests"
                 size=Heading.H4
                 weight=Heading.Thin
                 color={theme.neutral_600}
@@ -48,21 +64,23 @@ module Content = {
               {switch oracleScriptSub {
               | Data({requestCount}) =>
                 <Text
+                  // TODO: change to 24 hours when graphql database is ready
                   value={requestCount->Format.iPretty}
-                  size=Text.Xxxl
+                  size=Text.Xxxxl
                   block=true
                   weight=Text.Bold
                   color={theme.neutral_900}
+                  mono=true
                 />
               | _ => <LoadingCensorBar width=100 height=15 />
               }}
             </InfoContainer>
           </Col>
           <Col col=Col.Three colSm=Col.Six>
-            <InfoContainer py=16>
+            <InfoContainer py=16 style=Styles.info>
               <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
                 <Heading
-                  value="Response time"
+                  value="Response Time"
                   size=Heading.H4
                   weight=Heading.Thin
                   color={theme.neutral_600}
@@ -82,9 +100,10 @@ module Content = {
                     responseTime->Belt.Option.getExn->Format.fPretty(~digits=2)
                   | None => "TBD"
                   }}
-                  size=Text.Xxxl
+                  size=Text.Xxxxl
                   weight=Text.Bold
                   block=true
+                  mono=true
                   color={theme.neutral_900}
                 />
               | Error(_) | Loading | NoData => <LoadingCensorBar width=100 height=15 />
@@ -92,7 +111,7 @@ module Content = {
             </InfoContainer>
           </Col>
         </Row>
-        <Row marginBottom=24>
+        <Row marginBottom=24 marginLeft=0 marginRight=0>
           <Col style=Styles.noPadding>
             <InfoContainer py=24 pySm=24>
               <Row marginBottom=16 alignItems=Row.Center>
@@ -131,7 +150,7 @@ module Content = {
                   </div>
                 </Col>
                 <Col col=Col.Ten>
-                  <Row>
+                  <Row marginLeft=0 marginRight=0>
                     {switch oracleScriptSub {
                     | Data({relatedDataSources}) =>
                       relatedDataSources->Belt.List.size > 0

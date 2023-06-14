@@ -29,7 +29,6 @@ module Styles = {
   let wrap = style(. [flexWrap(#wrap)])
 
   let minHeight = mh => style(. [minHeight(mh)])
-  let rowBase = style(. [display(#flex), margin2(~v=#zero, ~h=#px(-12))])
   let mb = (~mb, ~mbSm, ()) =>
     style(. [
       marginBottom(#px(mb)),
@@ -64,14 +63,14 @@ let make = (
   ~marginBottomSm=?,
   ~marginTop=0,
   ~marginTopSm=?,
-  ~marginLeft=0,
+  ~marginLeft=-12,
   ~marginLeftSm=?,
-  ~marginRight=0,
+  ~marginRight=-12,
   ~marginRightSm=?,
 ) =>
   <div
     className={CssJs.merge(. [
-      Styles.rowBase,
+      CssHelper.flexBox(),
       Styles.justify(justify),
       Styles.minHeight(minHeight),
       Styles.alignItems(alignItems),

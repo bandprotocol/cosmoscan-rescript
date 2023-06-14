@@ -18,8 +18,8 @@ let make = (~children, ~px=32, ~py=32, ~pxSm=16, ~pySm=16, ~style="") => {
   <div
     className={Css.merge(list{
       Styles.infoContainer(theme, isDarkMode, px, py, pxSm, pySm),
-      style,
       CommonStyles.card(theme, isDarkMode),
+      style,
     })}>
     children
   </div>

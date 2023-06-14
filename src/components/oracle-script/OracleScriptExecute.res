@@ -10,17 +10,17 @@ module Styles = {
 
   let listContainer = style(. [width(#percent(100.)), marginBottom(#px(25))])
 
-  let input = (theme: Theme.t, isDarkMode) =>
+  let input = (theme: Theme.t) =>
     style(. [
       width(#percent(100.)),
       height(#px(37)),
       paddingLeft(#px(9)),
       paddingRight(#px(9)),
-      borderRadius(#px(4)),
+      borderRadius(#px(8)),
       fontSize(#px(14)),
       fontWeight(#light),
-      border(#px(1), #solid, isDarkMode ? theme.neutral_200 : theme.neutral_100),
-      backgroundColor(isDarkMode ? theme.neutral_300 : theme.neutral_100),
+      border(#px(1), #solid, theme.neutral_300),
+      backgroundColor(theme.neutral_000),
       outlineStyle(#none),
       color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
@@ -97,7 +97,8 @@ module ParameterInput = {
   let make = (~params: Obi.field_key_type_t, ~index, ~setCallDataArr) => {
     let fieldType = params.fieldType
     let fieldName = params.fieldName->Js.String2.replaceByRe(%re(`/[_]/g`), " ")
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
     <div className=Styles.listContainer key=fieldName>
       <div className={CssHelper.flexBox()}>
         <Text value=fieldName weight=Text.Semibold transform=Text.Capitalize />
@@ -106,7 +107,7 @@ module ParameterInput = {
       </div>
       <VSpacing size=Spacing.sm />
       <input
-        className={Styles.input(theme, isDarkMode)}
+        className={Styles.input(theme)}
         type_="text"
         onChange={event => {
           let newVal: string = ReactEvent.Form.target(event)["value"]
@@ -122,7 +123,7 @@ module ParameterInput = {
 module CountInputs = {
   @react.component
   let make = (~askCount, ~setAskCount, ~setMinCount, ~validatorCount) => {
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <Row marginBottom=24>
       <Col col=Col.Two colSm=Col.Six>
@@ -137,7 +138,7 @@ module CountInputs = {
         </div>
         <div className={CssHelper.selectWrapper(~fontColor=theme.neutral_900, ())}>
           <select
-            className={Styles.input(theme, isDarkMode)}
+            className={Styles.input(theme)}
             onChange={event => {
               let newVal = ReactEvent.Form.target(event)["value"]
               setAskCount(_ => newVal)
@@ -164,7 +165,7 @@ module CountInputs = {
         </div>
         <div className={CssHelper.selectWrapper(~fontColor=theme.neutral_900, ())}>
           <select
-            className={Styles.input(theme, isDarkMode)}
+            className={Styles.input(theme)}
             onChange={event => {
               let newVal = ReactEvent.Form.target(event)["value"]
               setMinCount(_ => newVal)
@@ -186,7 +187,7 @@ module CountInputs = {
 module ClientIDInput = {
   @react.component
   let make = (~clientID, ~setClientID) => {
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
@@ -196,7 +197,7 @@ module ClientIDInput = {
       </div>
       <VSpacing size=Spacing.sm />
       <input
-        className={Styles.input(theme, isDarkMode)}
+        className={Styles.input(theme)}
         type_="text"
         onChange={event => {
           let newVal = ReactEvent.Form.target(event)["value"]
@@ -211,7 +212,7 @@ module ClientIDInput = {
 module ValueInput = {
   @react.component
   let make = (~value, ~setValue, ~title, ~info=?, ~inputType="text") => {
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
@@ -221,7 +222,7 @@ module ValueInput = {
       </div>
       <VSpacing size=Spacing.sm />
       <input
-        className={Styles.input(theme, isDarkMode)}
+        className={Styles.input(theme)}
         type_=inputType
         onChange={event => {
           let newVal = ReactEvent.Form.target(event)["value"]
