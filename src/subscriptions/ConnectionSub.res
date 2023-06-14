@@ -16,8 +16,6 @@ type channel_t = {
   counterpartyChannelID: string,
   state: state_t,
   order: string,
-  // incomingPacketsCount: IBCSub.PacketsAggregate.internal_t,
-  // outgoingPacketsCount: IBCSub.PacketsAggregate.internal_t,
   lastUpdate: MomentRe.Moment.t,
 }
 
@@ -28,7 +26,6 @@ type external_channel_t = {
   counterpartyChannelID: string,
   state: state_t,
   order: string,
-  // totalPacketsCount: int,
   lastUpdate: MomentRe.Moment.t,
 }
 
@@ -66,11 +63,6 @@ let toExternal = (
   counterpartyClientID,
   counterpartyConnectionID,
   channels: channels->Belt.Array.map(channel => {
-    // let incommingCount =
-    //   channel.incomingPacketsCount.aggregate->Belt.Option.mapWithDefault(0, a => a.count)
-    // let outgoingCount =
-    //   channel.outgoingPacketsCount.aggregate->Belt.Option.mapWithDefault(0, a => a.count)
-    // let totalPacketsCount = incommingCount + outgoingCount
     {
       port: channel.port,
       counterpartyPort: channel.counterpartyPort,
@@ -78,7 +70,6 @@ let toExternal = (
       counterpartyChannelID: channel.counterpartyChannelID,
       state: channel.state,
       order: channel.order,
-      // totalPacketsCount: 0,
       lastUpdate: channel.lastUpdate,
     }
   }),
@@ -134,16 +125,6 @@ module MultiConfig = %graphql(`
         state @ppxCustom(module: "State")
         port
         lastUpdate: last_update @ppxCustom(module: "GraphQLParserModule.Date")
-        # incomingPacketsCount: incoming_packets_aggregate @ppxAs(type: "IBCSub.PacketsAggregate.internal_t") {
-        #   aggregate @ppxAs(type: "IBCSub.PacketsAggregate.aggregate_t") {
-        #     count
-        #   }
-        # }
-        # outgoingPacketsCount: outgoing_packets_aggregate @ppxAs(type: "IBCSub.PacketsAggregate.internal_t") {
-        #     aggregate @ppxAs(type: "IBCSub.PacketsAggregate.aggregate_t"){
-        #         count
-        #     }
-        # }
         
       }
     }
