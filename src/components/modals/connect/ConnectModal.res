@@ -124,13 +124,13 @@ let make = (~chainID) => {
               </div>
             </>
           : <VSpacing size=Spacing.sm />}
-        <VSpacing size=Spacing.xl />
+        <VSpacing size=Spacing.xxl />
       </div>
       <div className=Styles.rowContainer>
         <Row style=Styles.row>
           <Col col=Col.Five style={Styles.loginSelectionBackground(theme, isDarkMode)}>
             <div className=Styles.loginSelectionContainer>
-              <VSpacing size=Spacing.xl />
+              <VSpacing size=Spacing.xxl />
               <Heading size=Heading.H5 value="Select your connection method" />
               <VSpacing size=Spacing.md />
               {loginMethodArray

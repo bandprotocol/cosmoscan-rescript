@@ -38,7 +38,7 @@ let make = (~height) => {
   | (NoData, Data(latestBlock)) =>
     <Section>
       <div className=CssHelper.container>
-        <VSpacing size=Spacing.xxl />
+        <VSpacing size=Spacing.xxxl />
         <div
           className={Css.merge(list{
             Styles.pageContainer(theme),
@@ -47,7 +47,7 @@ let make = (~height) => {
           <div className={CssHelper.flexBox()}>
             <img alt="Not Found" src=Images.notFoundBg className=Styles.logo />
           </div>
-          <VSpacing size=Spacing.xxl />
+          <VSpacing size=Spacing.xxxl />
           {height > latestBlock.height
             ? <Text
                 value={j`This block(${height->ID.Block.toString}) hasn't mined yet.`}
@@ -77,7 +77,7 @@ let make = (~height) => {
             <HSpacing size=Spacing.md />
             <img alt="Right Arrow Icon" src=Images.rightArrow className=Styles.rightArrow />
           </Link>
-          <VSpacing size=Spacing.xxl />
+          <VSpacing size=Spacing.xxxl />
         </div>
       </div>
     </Section>

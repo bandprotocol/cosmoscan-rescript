@@ -194,7 +194,7 @@ let make = (~reqID) => {
   | Error(_) =>
     <Section>
       <div className=CssHelper.container>
-        <VSpacing size=Spacing.xxl />
+        <VSpacing size=Spacing.xxxl />
         <div
           className={Css.merge(list{
             Styles.pageContainer(theme),
@@ -207,7 +207,7 @@ let make = (~reqID) => {
               className=Styles.notFoundLogo
             />
           </div>
-          <VSpacing size=Spacing.xxl />
+          <VSpacing size=Spacing.xxxl />
           <Text value="Request ID not found." size=Text.Body1 color={theme.neutral_600} />
           <VSpacing size=Spacing.lg />
           <Link className=Styles.linkToHome route=Route.HomePage>
@@ -217,7 +217,7 @@ let make = (~reqID) => {
             <HSpacing size=Spacing.md />
             <img alt="Right Arrow Icon" src=Images.rightArrow className=Styles.rightArrow />
           </Link>
-          <VSpacing size=Spacing.xxl />
+          <VSpacing size=Spacing.xxxl />
         </div>
       </div>
     </Section>

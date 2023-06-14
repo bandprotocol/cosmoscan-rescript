@@ -32,12 +32,18 @@ module Styles = {
       fontWeight(#num(600)),
       opacity(isLoading ? 0.8 : 1.),
       cursor(isLoading ? #auto : #pointer),
-      marginTop(#px(16)),
       padding2(~v=#px(8), ~h=#px(56)),
     ])
 
   let withWH = (w, h) =>
     style(. [width(w), height(h), display(#flex), justifyContent(#center), alignItems(#center)])
+
+  let gasContainer = (theme: Theme.t) =>
+    style(. [
+      backgroundColor(theme.neutral_100),
+      padding2(~v=px(16), ~h=px(24)),
+      borderRadius(#px(8)),
+    ])
 
   let resultWrapper = (w, h, paddingV, overflowChioce) =>
     style(. [
@@ -133,7 +139,7 @@ module CountInputs = {
       None
     }, [askCount])
 
-    <Row marginBottom=24>
+    <Row marginBottom=32>
       <Col col=Col.Two colSm=Col.Six>
         <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
           <Text value="Ask Count" weight=Text.Semibold transform=Text.Capitalize />
@@ -195,9 +201,12 @@ module ClientIDInput = {
 
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
-        <Text value="Client ID" size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
-        <HSpacing size=Spacing.xs />
-        <Text value="(default value is from_scan)" weight=Text.Semibold />
+        <Text
+          value="Client ID (Optional)"
+          size=Text.Body1
+          weight=Text.Semibold
+          transform=Text.Capitalize
+        />
       </div>
       <VSpacing size=Spacing.sm />
       <input
@@ -255,7 +264,7 @@ let resultRender = (result, schema) => {
   | Nothing => React.null
   | Loading =>
     <>
-      <VSpacing size=Spacing.xl />
+      <VSpacing size=Spacing.xxl />
       {loadingRender(#percent(100.), 30, #px(30))}
       <VSpacing size=Spacing.lg />
     </>
@@ -304,6 +313,7 @@ module ExecutionPart = {
     let numParams = paramsInput->Belt.Array.length
 
     let validatorCount = ValidatorSub.countByActive(true)
+    let (showAdvance, setShowAdvance) = React.useState(_ => false)
 
     // set parameter default value here
     let (callDataArr, setCallDataArr) = React.useState(_ => Belt.Array.make(numParams, ""))
@@ -363,27 +373,43 @@ module ExecutionPart = {
                 />
               | _ => React.null
               }}
-              <SwitchV2 checked=true />
-              <SeperatedLine />
-              <ClientIDInput clientID setClientID />
-              <ValueInput
-                value={prepareGas->Belt.Int.toString}
-                setValue=setPrepareGas
-                title="Prepare Gas"
-                inputType="number"
-              />
-              <ValueInput
-                value={executeGas->Belt.Int.toString}
-                setValue=setExecuteGas
-                title="Execute Gas"
-                inputType="number"
-              />
-              <ValueInput
-                value={gaslimit->Belt.Int.toString}
-                setValue=setGaslimit
-                title="Gas Limit"
-                inputType="number"
-              />
+              <div className={CssHelper.flexBox()}>
+                <SwitchV2 checked=showAdvance onClick={_ => setShowAdvance(_ => !showAdvance)} />
+                <Text value="Advance settings" size=Text.Body1 color=theme.neutral_900 />
+              </div>
+              {showAdvance
+                ? <div>
+                    <VSpacing size=Spacing.lg />
+                    <ClientIDInput clientID setClientID />
+                    <Row style={Styles.gasContainer(theme)}>
+                      <Col col=Col.Twelve>
+                        <ValueInput
+                          value={gaslimit->Belt.Int.toString}
+                          setValue=setGaslimit
+                          title="Gas Limit (Optional)"
+                          inputType="number"
+                        />
+                      </Col>
+                      <Col col=Col.Six>
+                        <ValueInput
+                          value={executeGas->Belt.Int.toString}
+                          setValue=setExecuteGas
+                          title="Execute Gas (Optional)"
+                          inputType="number"
+                        />
+                      </Col>
+                      <Col col=Col.Six>
+                        <ValueInput
+                          value={prepareGas->Belt.Int.toString}
+                          setValue=setPrepareGas
+                          title="Prepare Gas (Optional)"
+                          inputType="number"
+                        />
+                      </Col>
+                    </Row>
+                  </div>
+                : React.null}
+              <VSpacing size=Spacing.xl />
               {switch accountOpt {
               | Some(account) =>
                 <>
@@ -454,6 +480,7 @@ module ExecutionPart = {
                       }}>
                     {(result == Loading ? "Sending Request ... " : "Request")->React.string}
                   </Button>
+                  <SeperatedLine />
                   {resultRender(result, schema)}
                 </>
               | None =>
