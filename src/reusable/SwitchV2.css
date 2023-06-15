@@ -29,7 +29,7 @@
 }
 
 .form-switch:active i::after {
-  width: 28px;
+  width: 16px;
   transform: translate3d(2px, 2px, 0);
 }
 

@@ -407,7 +407,7 @@ module ExecutionPart = {
                 ? <div>
                     <VSpacing size=Spacing.lg />
                     <ClientIDInput clientID setClientID />
-                    <Row style={Styles.gasContainer(theme, isDarkMode)}>
+                    <Row style={Styles.gasContainer(theme, isDarkMode)} marginLeft=0 marginRight=0>
                       <Col col=Col.Twelve>
                         <ValueInput
                           value={gaslimit->Belt.Int.toString}

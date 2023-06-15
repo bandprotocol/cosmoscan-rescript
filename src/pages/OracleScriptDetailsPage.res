@@ -6,6 +6,7 @@ module Styles = {
   let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
   let noPadding = style(. [padding(#zero)])
   let info = style(. [borderRadius(#px(16))])
+  let monoFont = style(. [fontFamilies([#custom("Roboto Mono"), #monospace])])
 
   let buttonStyled = style(. [
     backgroundColor(#transparent),
@@ -42,12 +43,12 @@ module Content = {
             <div className={Css.merge(list{CssHelper.flexBox(), Styles.idCointainer})}>
               {switch oracleScriptSub {
               | Data({id, name}) =>
-                <Heading
-                  size=Heading.H1
-                  value={`#O${id->ID.OracleScript.toInt->Belt.Int.toString} ${name}`}
-                  weight=Heading.Bold
-                  mono=true
-                />
+                <Heading size=Heading.H1 weight=Heading.Bold>
+                  <span className=Styles.monoFont>
+                    {`#O${id->ID.OracleScript.toInt->Belt.Int.toString} `->React.string}
+                  </span>
+                  <span> {name->React.string} </span>
+                </Heading>
               | _ => <LoadingCensorBar width=270 height=15 />
               }}
             </div>
@@ -70,7 +71,7 @@ module Content = {
                   block=true
                   weight=Text.Bold
                   color={theme.neutral_900}
-                  mono=true
+                  code=true
                 />
               | _ => <LoadingCensorBar width=100 height=15 />
               }}
@@ -103,7 +104,7 @@ module Content = {
                   size=Text.Xxxxl
                   weight=Text.Bold
                   block=true
-                  mono=true
+                  code=true
                   color={theme.neutral_900}
                 />
               | Error(_) | Loading | NoData => <LoadingCensorBar width=100 height=15 />
