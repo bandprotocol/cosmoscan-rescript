@@ -282,12 +282,7 @@ let loadingRender = (wDiv, wImg, h) => {
 let resultRender = (result, schema) => {
   switch result {
   | Nothing => React.null
-  | Loading =>
-    <>
-      <VSpacing size=Spacing.xxl />
-      {loadingRender(#percent(100.), 30, #px(30))}
-      <VSpacing size=Spacing.lg />
-    </>
+  | Loading => <OracleScriptExecuteResponse.Loading />
   | Error(err) =>
     <>
       <VSpacing size=Spacing.lg />
@@ -338,7 +333,7 @@ module ExecutionPart = {
     // set parameter default value here
     let (callDataArr, setCallDataArr) = React.useState(_ => Belt.Array.make(numParams, ""))
     let (clientID, setClientID) = React.useState(_ => "from_scan")
-    let (feeLimit, setFeeLimit) = React.useState(_ => "200")
+    let (feeLimit, setFeeLimit) = React.useState(_ => "0.0002")
     let (prepareGas, setPrepareGas) = React.useState(_ => 20000)
     let (executeGas, setExecuteGas) = React.useState(_ => 100000)
     let (gaslimit, setGaslimit) = React.useState(_ => 2000000)
@@ -482,6 +477,7 @@ module ExecutionPart = {
                                   feeLimit
                                   ->Belt.Float.fromString
                                   ->Belt.Option.getExn
+                                  ->(band => band *. 1000000.)
                                   ->Coin.newUBANDFromAmount,
                                 },
                                 prepareGas,
@@ -509,7 +505,7 @@ module ExecutionPart = {
                       }}>
                     {(result == Loading ? "Sending Request ... " : "Request")->React.string}
                   </Button>
-                  <SeperatedLine />
+                  <SeperatedLine mt=40 mb=40 />
                   {resultRender(result, schema)}
                 </>
               | None =>

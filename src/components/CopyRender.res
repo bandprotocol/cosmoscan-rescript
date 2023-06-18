@@ -11,7 +11,7 @@ let make = (~width, ~message) => {
 
   copied
     ? <div>
-        <Icon name="fal fa-check" color=theme.neutral_900 size=width />
+        <Icon name="fal fa-check" color=theme.neutral_600 size=width />
       </div>
     : <div
         className=Styles.copy
@@ -20,6 +20,6 @@ let make = (~width, ~message) => {
           setCopy(_ => true)
           let _ = Js.Global.setTimeout(() => setCopy(_ => false), 700)
         }}>
-        <Icon name="far fa-clone" color=theme.neutral_900 size=width />
+        <Icon name="far fa-clone" color=theme.neutral_600 size=width />
       </div>
 }

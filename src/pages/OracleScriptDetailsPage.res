@@ -2,11 +2,13 @@ module Styles = {
   open CssJs
   let titleSpacing = style(. [marginBottom(#px(4))])
   let idCointainer = style(. [marginBottom(#px(16))])
-  let containerSpacingSm = style(. [Media.mobile([marginTop(#px(16))])])
   let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
   let noPadding = style(. [padding(#zero)])
   let info = style(. [borderRadius(#px(16))])
-  let monoFont = style(. [fontFamilies([#custom("Roboto Mono"), #monospace])])
+  let oracleId = style(. [
+    fontFamilies([#custom("Roboto Mono"), #monospace]),
+    Media.mobile([display(#block), marginBottom(#px(8))]),
+  ])
 
   let buttonStyled = style(. [
     backgroundColor(#transparent),
@@ -28,6 +30,7 @@ module Content = {
   let make = (~oracleScriptSub: Sub.variant<OracleScriptSub.t>, ~oracleScriptID, ~hashtag) => {
     let statSub = OracleScriptSub.getResponseTime(oracleScriptID)
 
+    let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <Section>
@@ -44,7 +47,7 @@ module Content = {
               {switch oracleScriptSub {
               | Data({id, name}) =>
                 <Heading size=Heading.H1 weight=Heading.Bold>
-                  <span className=Styles.monoFont>
+                  <span className=Styles.oracleId>
                     {`#O${id->ID.OracleScript.toInt->Belt.Int.toString} `->React.string}
                   </span>
                   <span> {name->React.string} </span>
@@ -116,10 +119,10 @@ module Content = {
           <Col style=Styles.noPadding>
             <InfoContainer py=24 pySm=24>
               <Row marginBottom=16 alignItems=Row.Center>
-                <Col col=Col.Two mbSm=8>
+                <Col col=Col.Two colSm=Col.Four>
                   <div className={CssHelper.flexBox()}>
                     <Heading
-                      value="Owner" size=Heading.H5 weight=Heading.Thin color={theme.neutral_600}
+                      value="Owner" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                     />
                     <HSpacing size=Spacing.xs />
                     <CTooltip tooltipText="The owner of the oracle script">
@@ -127,20 +130,23 @@ module Content = {
                     </CTooltip>
                   </div>
                 </Col>
-                <Col col=Col.Ten>
+                <Col col=Col.Ten colSm=Col.Eight>
                   {switch oracleScriptSub {
                   | Data({owner}) =>
-                    <AddressRender address=owner position=AddressRender.Subtitle copy=true />
-                  | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
+                    <AddressRender
+                      address=owner position=AddressRender.Subtitle copy=true ellipsis=isMobile
+                    />
+                  | Error(_) | Loading | NoData =>
+                    <LoadingCensorBar width={isMobile ? 170 : 284} height=15 />
                   }}
                 </Col>
               </Row>
               <Row marginBottom=16>
-                <Col col=Col.Two mbSm=8>
-                  <div className={Css.merge(list{CssHelper.flexBox(), Styles.containerSpacingSm})}>
+                <Col col=Col.Two colSm=Col.Four>
+                  <div className={Css.merge(list{CssHelper.flexBox()})}>
                     <Heading
                       value="Data Sources"
-                      size=Heading.H5
+                      size=Heading.H4
                       weight=Heading.Thin
                       color={theme.neutral_600}
                     />
@@ -150,7 +156,7 @@ module Content = {
                     </CTooltip>
                   </div>
                 </Col>
-                <Col col=Col.Ten>
+                <Col col=Col.Ten colSm=Col.Eight>
                   <Row marginLeft=0 marginRight=0>
                     {switch oracleScriptSub {
                     | Data({relatedDataSources}) =>
@@ -188,15 +194,15 @@ module Content = {
                 </Col>
               </Row>
               <Row marginBottom=16>
-                <Col col=Col.Two mbSm=8>
+                <Col col=Col.Two colSm=Col.Four>
                   <Heading
                     value="Created / Last Updated"
-                    size=Heading.H5
+                    size=Heading.H4
                     weight=Heading.Thin
                     color={theme.neutral_600}
                   />
                 </Col>
-                <Col col=Col.Ten>
+                <Col col=Col.Ten colSm=Col.Eight>
                   {switch oracleScriptSub {
                   | Data({timestampOpt}) =>
                     <Text
@@ -206,24 +212,27 @@ module Content = {
                       | None => "N/A"
                       }}
                       size=Text.Body1
+                      weight=Text.Thin
+                      color=theme.neutral_900
                       block=true
+                      code=true
                     />
                   | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
                   }}
                 </Col>
               </Row>
               <Row marginBottom=16>
-                <Col col=Col.Two mbSm=8>
+                <Col col=Col.Two colSm=Col.Four>
                   <Heading
-                    value="Version" size=Heading.H5 weight=Heading.Thin color={theme.neutral_600}
+                    value="Version" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
-                <Col col=Col.Ten>
+                <Col col=Col.Ten colSm=Col.Eight>
                   <div className={CssHelper.flexBox()}>
                     {switch oracleScriptSub {
                     | Data({version}) =>
                       switch version {
-                      | Ok => <Chip value="Upgraded" color=theme.upgraded />
+                      | Ok => <Chip value="Upgraded" color=theme.success_600 />
                       | Redeploy => <Chip value="Redeployment Needed" color=theme.warning_600 />
                       | _ => <Chip value="Unknown" color=theme.neutral_600 />
                       }
@@ -236,14 +245,15 @@ module Content = {
                 <Col col=Col.Two mbSm=8>
                   <Heading
                     value="Description"
-                    size=Heading.H5
+                    size=Heading.H4
                     weight=Heading.Thin
                     color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Ten>
                   {switch oracleScriptSub {
-                  | Data({description}) => <Text value=description size=Text.Body1 block=true />
+                  | Data({description}) =>
+                    <Text value=description size=Text.Body1 color=theme.neutral_900 block=true />
                   | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
                   }}
                 </Col>

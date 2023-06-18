@@ -62,6 +62,7 @@ let make = (
   ~copy=false,
   ~clickable=true,
   ~wordBreak=false,
+  ~ellipsis=false,
 ) => {
   let isValidator = accountType == #validator
   let prefix = isValidator ? "bandvaloper" : "band"
@@ -90,7 +91,9 @@ let make = (
           wordBreak ? Styles.wordBreak : "",
         ])}>
         <span className=Styles.prefix> {prefix->React.string} </span>
-        {noPrefixAddress->React.string}
+        {(
+          ellipsis ? Ellipsis.center(~text=noPrefixAddress, ~limit=8, ()) : noPrefixAddress
+        )->React.string}
       </span>
     </Link>
     {copy

@@ -125,7 +125,7 @@ module RenderMostRequestedCard = {
         <div className=Styles.descriptionBox>
           {switch oracleScriptSub {
           | Data({description}) =>
-            let text = Ellipsis.format(~text=description, ~limit=70, ())
+            let text = Ellipsis.end(~text=description, ~limit=70, ())
             <Text value=text block=true />
           | _ => <LoadingCensorBar width=250 height=15 />
           }}
@@ -206,7 +206,7 @@ module RenderBody = {
         <Col col=Col.Four>
           {switch oracleScriptSub {
           | Data({description}) =>
-            let text = Ellipsis.format(~text=description, ~limit=70, ())
+            let text = Ellipsis.end(~text=description, ~limit=70, ())
             <Text value=text block=true />
           | _ => <LoadingCensorBar width=270 height=15 />
           }}
