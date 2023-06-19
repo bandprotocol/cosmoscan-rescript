@@ -79,7 +79,11 @@ module SortableTHead = {
 
 module RenderBody = {
   @react.component
-  let make = (~oracleScriptSub: Sub.variant<OracleScriptSub.t_with_stats>, ~reserveIndex) => {
+  let make = (
+    ~oracleScriptSub: Sub.variant<OracleScriptSub.t_with_stats>,
+    ~reserveIndex,
+    ~searchTerm,
+  ) => {
     let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = React.useContext(ThemeContext.context)
 
     <div className={Styles.tableItem(theme, isDarkMode)}>
@@ -168,6 +172,63 @@ module RenderBody = {
           | _ => <LoadingCensorBar width=100 height=15 />
           }}
         </div>
+      </div>
+      <div>
+        {searchTerm == ""
+          ? React.null
+          : {
+              switch oracleScriptSub {
+              | Data({relatedDataSources}) =>
+                let datasourceFound =
+                  relatedDataSources->Belt.List.keep(each =>
+                    each.dataSourceName
+                    ->Js.String2.toLowerCase
+                    ->Js.String2.includes(searchTerm->Js.String2.toLowerCase)
+                  )
+
+                datasourceFound->Belt.List.size > 0
+                  ? <div
+                      className={Css.merge(list{CssHelper.flexBox(), CssHelper.mt(~size=8, ())})}>
+                      <Text value={"Data Source Used:"} size={Body1} />
+                      <HSpacing size=Spacing.sm />
+                      {datasourceFound
+                      ->Belt.List.toArray
+                      ->Belt.Array.slice(~offset=0, ~len=3)
+                      ->Belt.Array.mapWithIndex((ind, each) => {
+                        <>
+                          <div
+                            className={CssHelper.flexBox()}
+                            key={each.dataSourceID->ID.DataSource.toInt->Belt.Int.toString}>
+                            <TypeID.DataSource id=each.dataSourceID size={Body1} />
+                            <HSpacing size=Spacing.sm />
+                            <Text
+                              value=each.dataSourceName
+                              ellipsis=true
+                              color={theme.neutral_900}
+                              size={Body1}
+                            />
+                          </div>
+                          {if ind < datasourceFound->Belt.List.size - 1 {
+                            <>
+                              <Text value="," size={Body1} />
+                              <HSpacing size=Spacing.sm />
+                            </>
+                          } else {
+                            React.null
+                          }}
+                        </>
+                      })
+                      ->React.array}
+                      {datasourceFound->Belt.List.size > 2
+                        ? <>
+                            <Text value="..." size={Body1} />
+                          </>
+                        : React.null}
+                    </div>
+                  : React.null
+              | _ => <LoadingCensorBar width=100 height=15 />
+              }
+            }}
       </div>
     </div>
   }
@@ -276,6 +337,7 @@ let make = (~searchTerm) => {
                       key={e.id->ID.OracleScript.toString}
                       oracleScriptSub={Sub.resolve(e)}
                       reserveIndex=i
+                      searchTerm
                     />
               )
               ->React.array}

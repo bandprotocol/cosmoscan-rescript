@@ -204,8 +204,16 @@ module SingleConfig = %graphql(`
 `)
 
 module MultiConfig = %graphql(`
-  subscription OracleScripts($searchTerm: String!) {
-    oracle_scripts(where: {name: {_ilike: $searchTerm}}, order_by: [{request_stat: {count: desc}, transaction: {block: {timestamp: desc}}, id: desc}]) @ppxAs(type: "internal_t") {
+  subscription OracleScripts($searchTerm: String!, $searchID: Int ) {
+    oracle_scripts(where: {_or: [
+        {id: {_eq: $searchID }}
+				{ name: { _ilike: $searchTerm } } 
+				{
+					related_data_source_oracle_scripts: {
+						data_source: { name: { _ilike: $searchTerm } }
+					}
+				}]
+			}, order_by: [{request_stat: {count: desc}, transaction: {block: {timestamp: desc}}, id: desc}]) @ppxAs(type: "internal_t") {
       id @ppxCustom(module: "GraphQLParserModule.OracleScriptID")
       owner @ppxCustom(module: "GraphQLParserModule.Address")
       name
@@ -291,7 +299,10 @@ let get = id => {
 let getList = (~page, ~pageSize, ~searchTerm, ~sortedBy, ()) => {
   let offset = (page - 1) * pageSize
   let keyword = {j`%$searchTerm%`}
-  let lists = MultiConfig.use({searchTerm: keyword})
+  let lists = MultiConfig.use({
+    searchTerm: keyword,
+    searchID: Some(searchTerm->Belt.Int.fromString->Belt.Option.getWithDefault(-1)),
+  })
   let stats = MultiOracleScriptStatLast1DayConfig.use()
 
   let listsSub =

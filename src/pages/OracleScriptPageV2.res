@@ -35,7 +35,7 @@ let make = () => {
     <div className={CssHelper.container}>
       <div className={CssHelper.mb(~size=24, ())} id="oraclescriptsSection">
         <SearchInput
-          placeholder="Search Oracle Script or Data Source Name / ID"
+          placeholder="Search Oracle Script / ID or Data Source Name / ID"
           onChange=setSearchTerm
           maxWidth=460
         />
