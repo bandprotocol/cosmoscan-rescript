@@ -30,6 +30,7 @@ module Styles = {
       marginBottom(#px(8)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
       border(#px(1), #solid, theme.neutral_100),
+      Media.mobile([padding2(~v=#px(16), ~h=#px(16))]),
     ])
 
   let outer = style(. [padding2(~v=#zero, ~h=#px(32))])
@@ -73,6 +74,142 @@ module SortableTHead = {
       } else {
         <Icon name="fas fa-sort" color={theme.neutral_600} />
       }}
+    </div>
+  }
+}
+
+module RenderBodyMobile = {
+  @react.component
+  let make = (
+    ~oracleScriptSub: Sub.variant<OracleScriptSub.t_with_stats>,
+    ~reserveIndex,
+    ~searchTerm,
+  ) => {
+    let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = React.useContext(ThemeContext.context)
+    let isMobile = Media.isMobile()
+
+    <div className={Styles.tableItem(theme, isDarkMode)}>
+      <Row marginBottom={8}>
+        <Col col=Col.Twelve>
+          {switch oracleScriptSub {
+          | Data({id, name}) =>
+            <div className={CssHelper.flexBox()}>
+              <TypeID.OracleScript id weight={Bold} size={Xl} />
+            </div>
+          | _ => <LoadingCensorBar width=20 height=15 />
+          }}
+        </Col>
+      </Row>
+      <Row marginBottom={16}>
+        <Col col=Col.Twelve>
+          {switch oracleScriptSub {
+          | Data({id, name}) =>
+            <Link
+              className={Css.merge(list{Styles.link(theme)})}
+              route={OracleScriptDetailsPage(id->ID.OracleScript.toInt, OracleScriptRequests)}>
+              <Text value=name ellipsis=false color={theme.primary_600} size={Xl} />
+            </Link>
+          | _ => <LoadingCensorBar width=150 height=15 />
+          }}
+        </Col>
+      </Row>
+      <Row marginBottom={16}>
+        <Col colSm=Col.Five>
+          <Text
+            value="Version" ellipsis=false color={theme.neutral_600} size={Body1} weight={Semibold}
+          />
+        </Col>
+        <Col colSm=Col.Seven>
+          {switch oracleScriptSub {
+          | Data({version}) =>
+            <div>
+              {switch version {
+              | Ok => <VersionChip value="Upgraded" color=VersionChip.Success />
+              | Redeploy => <VersionChip value="Redeployment Needed" color=VersionChip.Warning />
+              | Nothing => React.null
+              }}
+            </div>
+          | _ => <LoadingCensorBar width=70 height=15 />
+          }}
+        </Col>
+      </Row>
+      <Row marginBottom={16}>
+        <Col colSm=Col.Five>
+          <Text
+            value="24 hr Requests"
+            ellipsis=false
+            color={theme.neutral_600}
+            size={Body1}
+            weight={Semibold}
+          />
+        </Col>
+        <Col colSm=Col.Seven>
+          {switch oracleScriptSub {
+          | Data({id, stat}) =>
+            <Text
+              value={stat.count->Format.iPretty}
+              block=true
+              color={theme.neutral_900}
+              size={Body1}
+              code=true
+            />
+          | _ => <LoadingCensorBar width=100 height=15 />
+          }}
+        </Col>
+      </Row>
+      <Row marginBottom={16}>
+        <Col colSm=Col.Five>
+          <Text
+            value="Response Time"
+            ellipsis=false
+            color={theme.neutral_600}
+            size={Body1}
+            weight={Semibold}
+          />
+        </Col>
+        <Col colSm=Col.Seven>
+          {switch oracleScriptSub {
+          | Data({id, stat}) =>
+            stat.responseTime == 0.0
+              ? <Text value="TBD" size={Body1} />
+              : <Text
+                  value={stat.responseTime->Format.fPretty(~digits=2) ++ " s"}
+                  block=true
+                  color={theme.neutral_900}
+                  size={Body1}
+                  code=true
+                />
+          | _ => <LoadingCensorBar width=100 height=15 />
+          }}
+        </Col>
+      </Row>
+      <Row marginBottom={16}>
+        <Col colSm=Col.Five>
+          <Text
+            value="Last Requested"
+            ellipsis=false
+            color={theme.neutral_600}
+            size={Body1}
+            weight={Semibold}
+          />
+        </Col>
+        <Col colSm=Col.Seven>
+          {switch oracleScriptSub {
+          | Data({id}) => {
+              let latestTxTimestamp = OracleScriptSub.getLatestRequestTimestampByID(id)
+              switch latestTxTimestamp {
+              | Data(Some({transaction})) =>
+                <TimeAgos time={transaction.block.timestamp} size={Body1} />
+
+              | Data(None) => <Text value="N/A" size={Body1} />
+              | _ => <LoadingCensorBar width=100 height=15 />
+              }
+            }
+
+          | _ => <LoadingCensorBar width=100 height=15 />
+          }}
+        </Col>
+      </Row>
     </div>
   }
 }
@@ -326,13 +463,12 @@ let make = (~searchTerm) => {
               )
               ->Belt.Array.mapWithIndex((i, e) =>
                 isMobile
-                  ? //   ? <RenderBodyMobile
-                    //       key={e.id->ID.OracleScript.toString}
-                    //       reserveIndex=i
-                    //       oracleScriptSub={Sub.resolve(e)}
-                    //       statsSub
-                    //     />
-                    React.null
+                  ? <RenderBodyMobile
+                      key={e.id->ID.OracleScript.toString}
+                      reserveIndex=i
+                      oracleScriptSub={Sub.resolve(e)}
+                      searchTerm
+                    />
                   : <RenderBody
                       key={e.id->ID.OracleScript.toString}
                       oracleScriptSub={Sub.resolve(e)}
@@ -341,11 +477,9 @@ let make = (~searchTerm) => {
                     />
               )
               ->React.array}
-              {isMobile
-                ? React.null
-                : <Pagination
-                    currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
-                  />}
+              <Pagination
+                currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+              />
             </div>
           }
         : <EmptyContainer>
