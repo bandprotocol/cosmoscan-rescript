@@ -13,7 +13,7 @@ let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let client = React.useContext(ClientContext.context)
 
-  let handleClick = async () => {
+  let handleClickCosmostation = async () => {
     open Cosmostation.Cosmos
 
     let provider = await Cosmostation.cosmos()
@@ -55,7 +55,6 @@ let make = () => {
     }
 
     let signResponse = await provider.signDirect("bandtestnet", cosmosStationSignDoc, None)
-    Js.log(signResponse.signature)
 
     let txRawBytes =
       rawTx->BandChainJS.Transaction.getTxData(
@@ -70,7 +69,7 @@ let make = () => {
 
   <Section pt=80 pb=80 bg={theme.neutral_000} style=Styles.root>
     <div>
-      <button onClick={_ => handleClick()->ignore}> {"connect"->React.string} </button>
+      <button onClick={_ => handleClickCosmostation()->ignore}> {"connect"->React.string} </button>
     </div>
   </Section>
 }
