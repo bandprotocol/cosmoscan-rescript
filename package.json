@@ -1,8 +1,7 @@
 {
-  "name": "examples",
-  "version": "0.0.0",
-  "description": "Examples for rescript-apollo-client",
-  "private": true,
+  "name": "cosmoscan",
+  "version": "1.0.0",
+  "description": "Block Explorer for BandChain",
   "scripts": {
     "clean": "rescript clean -with-deps",
     "build": "rm -rf dist/ && rescript build -with-deps && webpack",
