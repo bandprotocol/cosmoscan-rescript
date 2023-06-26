@@ -8,6 +8,34 @@ module Styles = {
   let right = style(. [right(#zero), transform(rotateZ(#deg(180.)))])
 }
 
+let createSendTx = async (client, sender, reciever, pubKey) => {
+  let msgs = [
+    Msg.Input.SendMsg({
+      fromAddress: sender->Address.fromBech32,
+      toAddress: reciever->Address.fromBech32,
+      amount: list{200000.->Coin.newUBANDFromAmount},
+    }),
+  ]
+  let chainID = await client->BandChainJS.Client.getChainId
+
+  let rawTx = await TxCreator.createRawTx(
+    client,
+    sender->Address.fromBech32,
+    msgs,
+    chainID,
+    5000,
+    200000,
+    "",
+  )
+
+  let serializedSignDoc = rawTx->BandChainJS.Transaction.getSignDoc(
+    // account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
+    pubKey,
+  )
+
+  (rawTx, serializedSignDoc->BandChainJS.SignDoc.deserializeBinary)
+}
+
 @react.component
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
@@ -18,40 +46,20 @@ let make = () => {
 
     let provider = await Cosmostation.cosmos()
     let account = await provider.getAccount("bandtestnet")
-    let chainID = await client->BandChainJS.Client.getChainId
-    let defaultFee = 5000 // Hard code fee for sending transaction on cosmoscan
 
-    let msgs = [
-      Msg.Input.SendMsg({
-        fromAddress: "band1zv4qrj04u8v9fg9a59gfpld0l0g6w9xeuypyxr"->Address.fromBech32,
-        toAddress: "band1zv4qrj04u8v9fg9a59gfpld0l0g6w9xeuypyxr"->Address.fromBech32,
-        amount: list{200000.->Coin.newUBANDFromAmount},
-      }),
-    ]
-
-    let rawTx = await TxCreator.createRawTx(
-      client,
-      account.address->Address.fromBech32,
-      msgs,
-      chainID,
-      defaultFee,
-      200000,
-      "",
-    )
-
-    let serializedSignDoc =
-      rawTx->BandChainJS.Transaction.getSignDoc(
+    let (rawTx, signDoc) =
+      await client->createSendTx(
+        account.address,
+        account.address,
         account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
       )
 
     open BandChainJS.SignDoc
-    let deserializedSignDoc = serializedSignDoc->deserializeBinary
-
     let cosmosStationSignDoc = {
-      chain_id: deserializedSignDoc->getChainId,
-      account_number: deserializedSignDoc->getAccountNumber->Belt.Int.toString,
-      auth_info_bytes: deserializedSignDoc->getAuthInfoBytes_asU8,
-      body_bytes: deserializedSignDoc->getBodyBytes_asU8,
+      chain_id: signDoc->getChainId,
+      account_number: signDoc->getAccountNumber->Belt.Int.toString,
+      auth_info_bytes: signDoc->getAuthInfoBytes_asU8,
+      body_bytes: signDoc->getBodyBytes_asU8,
     }
 
     let signResponse = await provider.signDirect("bandtestnet", cosmosStationSignDoc, None)
@@ -67,9 +75,57 @@ let make = () => {
     Js.log(broadcastResponse)
   }
 
+  let handleClickKeplr = async () => {
+    let chainID = await client->BandChainJS.Client.getChainId
+    await Keplr.enable(chainID)
+    let account = await Keplr.getKey(chainID)
+
+    let (rawTx, signDoc) =
+      await client->createSendTx(
+        account.bech32Address,
+        account.bech32Address,
+        account.pubKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
+      )
+
+    open Keplr
+    open BandChainJS.SignDoc
+    let keplrSignDoc = {
+      chainId: signDoc->getChainId,
+      accountNumber: signDoc->getAccountNumber->Long.fromNumber,
+      authInfoBytes: signDoc->getAuthInfoBytes_asU8,
+      bodyBytes: signDoc->getBodyBytes_asU8,
+    }
+
+    let signResponse = await Keplr.signDirect(
+      chainID,
+      account.bech32Address,
+      keplrSignDoc,
+      {
+        preferNoSetFee: true,
+        preferNoSetMemo: false,
+        disableBalanceCheck: false,
+      },
+    )
+
+    Js.log(signResponse)
+
+    let txRawBytes =
+      rawTx->BandChainJS.Transaction.getTxData(
+        signResponse.signature.signature->JsBuffer.fromBase64,
+        account.pubKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
+        1,
+      )
+
+    let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
+    Js.log(broadcastResponse)
+  }
+
   <Section pt=80 pb=80 bg={theme.neutral_000} style=Styles.root>
     <div>
-      <button onClick={_ => handleClickCosmostation()->ignore}> {"connect"->React.string} </button>
+      <button onClick={_ => handleClickCosmostation()->ignore}>
+        {"connect cosmostation"->React.string}
+      </button>
+      <button onClick={_ => handleClickKeplr()->ignore}> {"connect keplr"->React.string} </button>
     </div>
   </Section>
 }
