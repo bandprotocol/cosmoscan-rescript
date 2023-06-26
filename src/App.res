@@ -47,6 +47,7 @@ let make = () => {
       | RelayersHomepage => <RelayersHomepage />
       | ChannelDetailsPage(chainID, port, channel) => <ChannelPage chainID channel port />
       | NotFound => <NotFound />
+      | Example => <Example />
       }}
     </div>
     <Footer />

@@ -9,6 +9,21 @@ type tx_response = {
   code: int,
 }
 
+// import { SignDoc } from '@bandprotocol/bandchain.js/proto/cosmos/tx/v1beta1/tx_pb'
+module SignDoc = {
+  type t
+
+  @send external getChainId: t => string = "getChainId"
+  @send external getBodyBytes_asU8: t => array<int> = "getBodyBytes_asU8"
+  @send external getBodyBytes_asB64: t => string = "getBodyBytes_asB64"
+  @send external getAuthInfoBytes_asU8: t => array<int> = "getAuthInfoBytes_asU8"
+  @send external getAuthInfoBytes_asB64: t => string = "getAuthInfoBytes_asB64"
+  @send external getAccountNumber: t => int = "getAccountNumber"
+
+  @module("@bandprotocol/bandchain.js/proto/cosmos/tx/v1beta1/tx_pb") @scope("SignDoc") @val
+  external deserializeBinary: array<int> => t = "deserializeBinary"
+}
+
 module Client = {
   type t
   type reference_data_t = {
