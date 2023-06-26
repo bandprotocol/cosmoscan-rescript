@@ -37,7 +37,7 @@ let make = (~chainID, ~channel, ~port) => {
   let (page, setPage) = React.useState(_ => 1)
   let (packetType, setPacketType) = React.useState(_ => "All")
 
-  let packetCountSub = IBCSub.incomingCount(~port, ~channel, ~packetType, ())
+  let packetCountSub = IBCPacketQuery.incomingCount(~port, ~channel, ~packetType, ())
   let pageSize = 5
 
   let packetsSub = IBCQuery.getList(

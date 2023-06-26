@@ -71,8 +71,8 @@ let make = (~chainID, ~port, ~channel) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   let channelInfo = ChannelSub.getChannelInfo(~port, ~channel, ())
-  let inComingCount = IBCSub.incomingCount(~port, ~channel, ~packetType="%%", ())
-  let outgoingCount = IBCSub.outgoingCount(~port, ~channel, ~packetType="%%", ())
+  let inComingCount = IBCPacketQuery.incomingCount(~port, ~channel, ~packetType="%%", ())
+  let outgoingCount = IBCPacketQuery.outgoingCount(~port, ~channel, ~packetType="%%", ())
 
   let allQuery = Query.all2(inComingCount, outgoingCount)
 
