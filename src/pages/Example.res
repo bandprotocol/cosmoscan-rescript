@@ -120,6 +120,44 @@ let make = () => {
     Js.log(broadcastResponse)
   }
 
+  let handleClickCosmostationAmino = async () => {
+    open Cosmostation.Cosmos
+
+    let provider = await Cosmostation.cosmos()
+    let account = await provider.getAccount("bandtestnet")
+
+    let (rawTx, signDoc) =
+      await client->createSendTx(
+        account.address,
+        account.address,
+        account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
+      )
+
+    open BandChainJS.SignDoc
+    let cosmosStationSignDoc = {
+      chain_id: signDoc->getChainId,
+      account_number: signDoc->getAccountNumber->Belt.Int.toString,
+      auth_info_bytes: signDoc->getAuthInfoBytes_asU8,
+      body_bytes: signDoc->getBodyBytes_asU8,
+    }
+
+    let signResponse = await provider.signAmino(
+      "bandtestnet",
+      Cosmostation.Cosmos.getAminoSignDocFromTx(rawTx),
+      None,
+    )
+
+    let txRawBytes =
+      rawTx->BandChainJS.Transaction.getTxData(
+        signResponse.signature->JsBuffer.fromBase64,
+        account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
+        127,
+      )
+
+    let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
+    Js.log(broadcastResponse)
+  }
+
   let handleClickKeplrAmino = async () => {
     let chainID = await client->BandChainJS.Client.getChainId
     await Keplr.enable(chainID)
@@ -137,61 +175,10 @@ let make = () => {
     open Keplr
     open BandChainJS.SignDoc
 
-    // type signAminoDoc<'a> = {
-    //   chain_id: string,
-    //   sequence: string,
-    //   account_number: string,
-    //   fee: fee,
-    //   memo: string,
-    //   msgs: array<msg<'a>>,
-    // }
-
-    let msg = BandChainJS.Message.MsgSend.create(
-      account.bech32Address,
-      account.bech32Address,
-      [200000.->Coin.newUBANDFromAmount->Coin.toBandChainJsCoin],
-    )
-
-    Js.log(msg)
-
-    let keplrAminoSignDoc = {
-      chain_id: chainID,
-      account_number: bandChainJsAccount.accountNumber->Belt.Int.toString,
-      sequence,
-      fee: {
-        amount: [
-          {
-            denom: "uband",
-            amount: "5000",
-          },
-        ],
-        gas: "2000000",
-      },
-      memo: "",
-      msgs: [msg->BandChainJS.Message.MsgSend.toJSON],
-    }
-
-    let getSignDoc = (tx: BandChainJS.Transaction.transaction_t) => {
-      account_number: tx.accountNum->Belt.Option.getExn->Belt.Int.toString,
-      chain_id: tx.chainId->Belt.Option.getExn,
-      fee: {
-        amount: tx.fee
-        ->BandChainJS.Fee.getAmountList
-        ->Belt.Array.map(coin => {
-          amount: coin->BandChainJS.Coin.getAmount,
-          denom: coin->BandChainJS.Coin.getDenom,
-        }),
-        gas: tx.fee->BandChainJS.Fee.getGasLimit->Belt.Int.toString,
-      },
-      memo: tx.memo,
-      msgs: tx.msgs->Belt.Array.map(msg => msg->BandChainJS.Message.MsgSend.toJSON),
-      sequence: tx.sequence->Belt.Option.getExn->Belt.Int.toString,
-    }
-
     let signResponse = await Keplr.signAmino(
       chainID,
       account.bech32Address,
-      getSignDoc(rawTx),
+      Keplr.getAminoSignDocFromTx(rawTx),
       {
         preferNoSetFee: true,
         preferNoSetMemo: false,
@@ -220,7 +207,7 @@ let make = () => {
       <button onClick={_ => handleClickKeplr()->ignore}> {"connect keplr"->React.string} </button>
     </div>
     <div>
-      <button onClick={_ => handleClickCosmostation()->ignore}>
+      <button onClick={_ => handleClickCosmostationAmino()->ignore}>
         {"sign cosmostation amino"->React.string}
       </button>
       <button onClick={_ => handleClickKeplrAmino()->ignore}>

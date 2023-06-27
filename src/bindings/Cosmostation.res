@@ -6,6 +6,31 @@ module Cosmos = {
     isLedger: bool,
   }
 
+  type amount = {
+    denom: string,
+    amount: string,
+  }
+
+  type fee = {
+    amount: array<amount>,
+    gas: string,
+  }
+
+  type signAminoDoc = {
+    chain_id: string,
+    sequence: string,
+    account_number: string,
+    fee: fee,
+    memo: string,
+    msgs: array<Js.Json.t>,
+  }
+
+  type signAminoResponse = {
+    signature: string,
+    pub_key: {"type": string, "value": string},
+    signed_doc: signAminoDoc,
+  }
+
   type signDirectDoc = {
     chain_id: string,
     body_bytes: array<int>,
@@ -54,6 +79,7 @@ module Cosmos = {
   type t = {
     getAccount: string => Js.Promise.t<requestAccountResponse>,
     signDirect: (string, signDirectDoc, option<signOptions>) => Js.Promise.t<signDirectResponse>,
+    signAmino: (string, signAminoDoc, option<signOptions>) => Js.Promise.t<signAminoResponse>,
   }
 
   @module("@cosmostation/extension-client/cosmos")
@@ -77,7 +103,31 @@ module Cosmos = {
   ) => Js.Promise.t<signDirectResponse> = "signDirect"
 
   @module("@cosmostation/extension-client/cosmos")
+  external signAmino: (
+    string,
+    signAminoDoc,
+    option<signOptions>,
+  ) => Js.Promise.t<signAminoResponse> = "signAmino"
+
+  @module("@cosmostation/extension-client/cosmos")
   external disconnect: unit => Js.Promise.t<unit> = "disconnect"
+
+  let getAminoSignDocFromTx = (tx: BandChainJS.Transaction.transaction_t) => {
+    account_number: tx.accountNum->Belt.Option.getExn->Belt.Int.toString,
+    chain_id: tx.chainId->Belt.Option.getExn,
+    fee: {
+      amount: tx.fee
+      ->BandChainJS.Fee.getAmountList
+      ->Belt.Array.map(coin => {
+        amount: coin->BandChainJS.Coin.getAmount,
+        denom: coin->BandChainJS.Coin.getDenom,
+      }),
+      gas: tx.fee->BandChainJS.Fee.getGasLimit->Belt.Int.toString,
+    },
+    memo: tx.memo,
+    msgs: tx.msgs->Belt.Array.map(msg => msg->BandChainJS.Message.MsgSend.toJSON),
+    sequence: tx.sequence->Belt.Option.getExn->Belt.Int.toString,
+  }
 }
 
 @module("@cosmostation/extension-client")

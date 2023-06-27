@@ -90,8 +90,19 @@ external signAmino: (
   keplrSignOptions,
 ) => Js.Promise.t<directSignResponse> = "signAmino"
 
-let msgFromJson = (msgSend: Msg.Bank.Send.internal_t): msg<'a> =>
-  {
-    "type": "cosmos-sdk/MsgSend",
-    "value": msgSend,
-  }
+let getAminoSignDocFromTx = (tx: BandChainJS.Transaction.transaction_t) => {
+  account_number: tx.accountNum->Belt.Option.getExn->Belt.Int.toString,
+  chain_id: tx.chainId->Belt.Option.getExn,
+  fee: {
+    amount: tx.fee
+    ->BandChainJS.Fee.getAmountList
+    ->Belt.Array.map(coin => {
+      amount: coin->BandChainJS.Coin.getAmount,
+      denom: coin->BandChainJS.Coin.getDenom,
+    }),
+    gas: tx.fee->BandChainJS.Fee.getGasLimit->Belt.Int.toString,
+  },
+  memo: tx.memo,
+  msgs: tx.msgs->Belt.Array.map(msg => msg->BandChainJS.Message.MsgSend.toJSON),
+  sequence: tx.sequence->Belt.Option.getExn->Belt.Int.toString,
+}
