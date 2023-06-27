@@ -174,7 +174,14 @@ module Message = {
 }
 
 module Transaction = {
-  type transaction_t
+  type transaction_t = {
+    msgs: array<Message.t>,
+    accountNum?: int,
+    sequence?: int,
+    chainId?: string,
+    fee: Fee.t,
+    memo: string,
+  }
 
   @module("@bandprotocol/bandchain.js") @new external create: unit => transaction_t = "Transaction"
   @send external withMessages: (transaction_t, Message.t) => unit = "withMessages"

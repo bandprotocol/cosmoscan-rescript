@@ -19,7 +19,7 @@ type key = {
   isKeystone: bool,
 }
 
-type signDoc = {
+type signDirectDoc = {
   /** SignDoc bodyBytes */
   bodyBytes?: array<int>,
   /** SignDoc authInfoBytes */
@@ -28,6 +28,27 @@ type signDoc = {
   chainId?: string,
   /** SignDoc accountNumber */
   accountNumber?: Long.t,
+}
+
+type amount = {
+  denom: string,
+  amount: string,
+}
+
+type fee = {
+  amount: array<amount>,
+  gas: string,
+}
+
+type msg<'a> = {"type": string, "value": 'a}
+
+type signAminoDoc<'a> = {
+  chain_id: string,
+  sequence: string,
+  account_number: string,
+  fee: fee,
+  memo: string,
+  msgs: array<Js.Json.t>,
 }
 
 type keplrSignOptions = {
@@ -43,7 +64,7 @@ type stdSignature = {
 }
 
 type directSignResponse = {
-  signed: signDoc,
+  signed: signDirectDoc,
   signature: stdSignature,
 }
 
@@ -57,6 +78,20 @@ external getKey: string => Js.Promise.t<key> = "getKey"
 external signDirect: (
   string,
   string,
-  signDoc,
+  signDirectDoc,
   keplrSignOptions,
 ) => Js.Promise.t<directSignResponse> = "signDirect"
+
+@val @scope(("window", "keplr"))
+external signAmino: (
+  string,
+  string,
+  signAminoDoc<'a>,
+  keplrSignOptions,
+) => Js.Promise.t<directSignResponse> = "signAmino"
+
+let msgFromJson = (msgSend: Msg.Bank.Send.internal_t): msg<'a> =>
+  {
+    "type": "cosmos-sdk/MsgSend",
+    "value": msgSend,
+  }
