@@ -70,7 +70,11 @@ module ChainLogo = {
 let make = (~chainID, ~port, ~channel) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  let channelInfo = ChannelQuery.getChannelInfo(~port, ~channel, ())
+  let channelInfo = ChannelSub.getChannelInfo(~port, ~channel, ())
+  let inComingCount = IBCPacketQuery.incomingCount(~port, ~channel, ~packetType="%%", ())
+  let outgoingCount = IBCPacketQuery.outgoingCount(~port, ~channel, ~packetType="%%", ())
+
+  let allQuery = Query.all2(inComingCount, outgoingCount)
 
   <Section ptSm=32 pbSm=32>
     <div className=CssHelper.container id="section_relayer_details">
@@ -152,23 +156,19 @@ let make = (~chainID, ~port, ~channel) => {
             <Text value="Transactions" size=Text.Xl />
             <VSpacing size=Spacing.sm />
             <div>
-              {switch channelInfo {
-              | Data(info) =>
-                switch info {
-                | Data({totalPackets}) =>
-                  <Text
-                    size=Text.Xxxl
-                    value={totalPackets->Format.iPretty}
-                    code=true
-                    color={theme.neutral_900}
-                    weight={Bold}
-                  />
-                | _ =>
-                  <Text
-                    value={"N/A"} code=true color={theme.neutral_900} weight={Bold} size=Text.Xxxl
-                  />
-                }
-
+              {switch allQuery {
+              | Data(inCount, outCount) =>
+                <Text
+                  size=Text.Xxxl
+                  value={(inCount + outCount)->Format.iPretty}
+                  code=true
+                  color={theme.neutral_900}
+                  weight={Bold}
+                />
+              | Error(_) =>
+                <Text
+                  value={"N/A"} code=true color={theme.neutral_900} weight={Bold} size=Text.Xxxl
+                />
               | _ => <LoadingCensorBar width=100 height=20 />
               }}
             </div>

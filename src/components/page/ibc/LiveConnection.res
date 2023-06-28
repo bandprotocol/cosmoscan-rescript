@@ -439,9 +439,9 @@ let make = (~counterpartyChainID, ~state) => {
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
   let isMobile = Media.isMobile()
   let (page, setPage) = React.useState(_ => 1)
-  let pageSize = 10
+  let pageSize = 5
 
-  let connectionCountSub = ConnectionSub.getCount(~counterpartyChainID, ())
+  let connectionCountSub = ConnectionSub.getCount(~counterpartyChainID, ~state, ())
 
   let conntectionsSub = ConnectionSub.getList(
     ~counterpartyChainID,
@@ -493,12 +493,16 @@ let make = (~counterpartyChainID, ~state) => {
         {switch connectionCountSub {
         | Data(connectionCount) =>
           let pageCount = Page.getPageCount(connectionCount, pageSize)
-          <Pagination2
-            currentPage=page
-            pageCount
-            onPageChange={newPage => setPage(_ => newPage)}
-            onChangeCurrentPage={newPage => setPage(_ => newPage)}
-          />
+
+          pageCount > 1
+            ? <Pagination2
+                currentPage=page
+                pageCount
+                onPageChange={newPage => setPage(_ => newPage)}
+                onChangeCurrentPage={newPage => setPage(_ => newPage)}
+              />
+            : React.null
+
         | _ => React.null
         }}
       </>

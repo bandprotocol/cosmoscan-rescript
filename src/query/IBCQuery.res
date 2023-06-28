@@ -219,7 +219,7 @@ let toExternal = ({
 
 module IncomingPacketsConfig = %graphql(`
     query IncomingPackets($limit: Int!, $offset: Int! $packetType: String!,  $port: String!, $channel: String!)  {
-    incoming_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: { _like: $packetType},  dst_port: {_eq: $port}, dst_channel: {_eq: $channel} }) @ppxAs(type: "internal_t"){
+    incoming_packets(limit: $limit, offset: $offset, order_by: [{sequence: desc}], where: {type: { _ilike: $packetType},  dst_port: {_ilike: $port}, dst_channel: {_eq: $channel} }) @ppxAs(type: "internal_t"){
         packetType: type
         srcPort: src_port
         srcChannel: src_channel
@@ -241,7 +241,7 @@ module IncomingPacketsConfig = %graphql(`
 
 module OutgoingPacketsConfig = %graphql(`
     query OutgoingPackets($limit: Int!, $offset: Int!, $packetType: String!, $port: String!, $channel: String!)  {
-        outgoing_packets(limit: $limit, offset: $offset, order_by: [{block_height: desc}], where: {type: { _ilike: $packetType}, src_port: {_eq: $port}, src_channel: {_eq: $channel} }) @ppxAs(type: "internal_t"){
+        outgoing_packets(limit: $limit, offset: $offset, order_by: [{sequence: desc}], where: {type: { _ilike: $packetType}, src_port: {_eq: $port}, src_channel: {_eq: $channel} }) @ppxAs(type: "internal_t"){
             packetType: type
             srcPort: src_port
             srcChannel: src_channel
