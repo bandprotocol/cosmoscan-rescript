@@ -103,11 +103,17 @@ let make = (
         <input
           className={Styles.inputPage(theme)}
           type_="number"
-          value={inputPage}
+          defaultValue={currentPage->Belt.Int.toString}
           onChange={event => {
             let newVal = ReactEvent.Form.target(event)["value"]
             setInputPage(_ => newVal)
-            onChangeCurrentPage(newVal->Belt.Int.fromString->Belt.Option.getExn)
+          }}
+          onKeyDown={event => {
+            let nextIndexCount = 0
+            switch ReactEvent.Keyboard.key(event) {
+            | "Enter" => onChangeCurrentPage(inputPage->Belt.Int.fromString->Belt.Option.getExn)
+            | _ => ()
+            }
           }}
         />
         <div
