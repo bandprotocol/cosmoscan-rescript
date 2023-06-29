@@ -22,6 +22,7 @@ module Styles = {
       height(#px(32)),
       hover([backgroundColor(theme.primary_800)]),
     ])
+  let proposalCardContainer = style(. [maxWidth(#px(932))])
 }
 
 //TODO: Will refactor to have only one Sub
@@ -64,145 +65,83 @@ module ProposalCard = {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    <Col key={reserveIndex->Belt.Int.toString} mb=24 mbSm=16>
+    <Col key={reserveIndex->Belt.Int.toString} style=Styles.proposalCardContainer mb=24 mbSm=16>
       <InfoContainer>
-        <Row marginBottom=18>
-          <Col col=Col.Eleven colSm=Col.Ten>
-            <div
-              className={Css.merge(list{
-                CssHelper.flexBox(),
-                CssHelper.flexBoxSm(~direction=#column, ~align=#flexStart, ()),
-                Styles.idContainer,
-              })}>
-              {switch proposalSub {
-              | Data({id, name}) =>
-                <>
-                  <TypeID.Proposal id position=TypeID.Title />
-                  <Heading
-                    size=Heading.H3 value=name color={theme.neutral_600} weight=Heading.Thin
-                  />
-                </>
-              | _ =>
-                isMobile
-                  ? <>
-                      <LoadingCensorBar width=50 height=15 mbSm=16 />
-                      <LoadingCensorBar width=100 height=15 mbSm=16 />
-                    </>
-                  : <LoadingCensorBar width=270 height=15 />
-              }}
-              <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                {switch proposalSub {
-                | Data({status}) => <ProposalBadge status />
-                | _ =>
-                  <>
-                    {isMobile ? React.null : <HSpacing size={#px(10)} />}
-                    <LoadingCensorBar width=100 height=15 radius=50 />
-                  </>
-                }}
-              </div>
+        <Row>
+          <Col col=Col.Twelve>
+            <div className={CssHelper.flexBox()}>
+              <TypeID.Proposal id={1->ID.Proposal.fromInt} position=TypeID.Title />
+              <Heading
+                size=Heading.H3
+                value="Activate the community pool"
+                color={theme.neutral_900}
+                weight=Heading.Semibold
+              />
             </div>
-          </Col>
-          <Col col=Col.One colSm=Col.Two>
-            <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-              {switch proposalSub {
-              | Data({id}) =>
-                <TypeID.ProposalLink id>
-                  <div
-                    className={Css.merge(list{
-                      Styles.proposalLink(theme),
-                      CssHelper.flexBox(~justify=#center, ()),
-                    })}>
-                    <Icon name="far fa-arrow-right" color={theme.white} />
-                  </div>
-                </TypeID.ProposalLink>
-              | _ => <LoadingCensorBar width=32 height=32 radius=8 />
-              }}
-            </div>
-          </Col>
-        </Row>
-        <Row marginBottom=24>
-          <Col>
-            {switch proposalSub {
-            | Data({description}) => <MarkDown value=description />
-            | _ => <LoadingCensorBar width=270 height=15 />
-            }}
           </Col>
         </Row>
         <SeperatedLine />
         <Row>
-          <Col col=Col.Four mbSm=16>
+          <Col col=Col.Four>
             <Heading
-              value="Proposer"
+              value="Vote by"
               size=Heading.H5
               marginBottom=8
               weight=Heading.Thin
               color={theme.neutral_600}
             />
-            {switch proposalSub {
-            | Data({proposerAddressOpt}) =>
-              switch proposerAddressOpt {
-              | Some(proposerAddress) =>
-                <AddressRender address=proposerAddress position=AddressRender.Subtitle />
-              | None => <Text value="Proposed on Wenchang" />
-              }
-            | _ => <LoadingCensorBar width=270 height=15 />
-            }}
           </Col>
-          <Col col=Col.Four colSm=Col.Seven>
-            <div className={CssHelper.mb(~size=8, ())}>
-              {switch proposalSub {
-              | Data({status}) =>
-                <Heading
-                  value={switch status {
-                  | Deposit => "Deposit End Time"
-                  | Voting
-                  | Passed
-                  | Rejected
-                  | Inactive
-                  | Failed => "Voting End Time"
-                  }}
-                  size=Heading.H5
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
-                />
-              | _ => <LoadingCensorBar width=100 height=15 />
-              }}
-            </div>
-            {switch proposalSub {
-            | Data({depositEndTime, votingEndTime, status}) =>
-              <Timestamp
+          <Col col=Col.Four>
+            <Heading
+              value="Voting End"
+              size=Heading.H5
+              marginBottom=8
+              weight=Heading.Thin
+              color={theme.neutral_600}
+            />
+            <Text
+              value="2023-04-25 06:29:18 +UTC"
+              size=Text.Body1
+              weight=Text.Thin
+              color=theme.neutral_900
+              spacing=Text.Em(0.05)
+              block=true
+              code=true
+            />
+          </Col>
+          <Col col=Col.Three>
+            <Heading
+              value="Yes Vote"
+              size=Heading.H5
+              marginBottom=8
+              weight=Heading.Thin
+              color={theme.neutral_600}
+            />
+            <div className={CssHelper.flexBox()}>
+              <Text
+                value="80.94%"
                 size=Text.Body1
-                time={switch status {
-                | Deposit => depositEndTime
-                | Voting
-                | Passed
-                | Rejected
-                | Inactive
-                | Failed => votingEndTime
-                }}
-                color={theme.neutral_900}
-                suffix=" +UTC"
+                weight=Text.Thin
+                color=theme.neutral_900
+                spacing=Text.Em(0.05)
+                block=true
+                code=true
               />
-            | _ => <LoadingCensorBar width={isMobile ? 120 : 270} height=15 />
-            }}
+              <HSpacing size=Spacing.sm />
+              <ProgressBar.Voting2
+                slots={ProgressBar.Slot.getYesNoSlot(theme, ~yes=1123., ~no=100.)}
+              />
+            </div>
           </Col>
-          {switch proposalSub {
-          | Data({status, id}) =>
-            switch status {
-            | Deposit => React.null
-            | Voting
-            | Passed
-            | Rejected
-            | Inactive
-            | Failed =>
-              <Turnout id />
-            }
-          | _ =>
-            <Col col=Col.Four colSm=Col.Five>
-              <LoadingCensorBar width=100 height=15 mb=8 />
-              <LoadingCensorBar width=50 height=15 />
-            </Col>
-          }}
+          <Col col=Col.One>
+            <Heading
+              value="Veto"
+              size=Heading.H5
+              marginBottom=8
+              weight=Heading.Thin
+              color={theme.neutral_600}
+            />
+          </Col>
         </Row>
       </InfoContainer>
     </Col>
@@ -223,7 +162,7 @@ let make = () => {
           <Heading value="All Proposals" size=Heading.H2 />
         </Col>
       </Row>
-      <Row>
+      <Row style={CssHelper.flexBox(~justify=#center, ())}>
         {switch proposalsSub {
         | Data(proposals) =>
           proposals->Belt.Array.size > 0

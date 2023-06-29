@@ -24,6 +24,22 @@ module Styles = {
       transition(~duration=200, "all"),
       background(success ? theme.primary_600 : theme.error_600),
     ])
+
+  let progressSlotContainer = style(. [
+    width(#px(100)),
+    height(#px(8)),
+    borderRadius(#px(2)),
+    overflow(#hidden),
+  ])
+
+  let progressSlot = (widthPercent, color, isLast, slotLength) =>
+    style(. [
+      width(isLast ? #percent(widthPercent) : #calc(#sub, #percent(widthPercent), #px(1))),
+      height(#percent(100.)),
+      background(color),
+      marginRight(isLast ? #px(0) : #px(1)),
+    ])
+
   let leftText = style(. [
     position(absolute),
     top(zero),
@@ -180,6 +196,77 @@ module Voting = {
       <div className={Styles.progressOuter(theme)}>
         <div className={Styles.progressInner(percent, true, theme)} />
       </div>
+    </div>
+  }
+}
+
+module Slot = {
+  type t = {
+    percent: float,
+    color: Theme.color_t,
+  }
+
+  let getYesNoSlot = (theme: Theme.t, ~yes: float, ~no: float) => [
+    {
+      percent: yes /. (yes +. no) *. 100.,
+      color: theme.success_600,
+    },
+    {
+      percent: no /. (yes +. no) *. 100.,
+      color: theme.error_600,
+    },
+  ]
+
+  let getFullSlot = (
+    theme: Theme.t,
+    ~yes: float,
+    ~no: float,
+    ~noWithVeto: float,
+    ~abstain: float,
+    ~bondedTokenCount: float,
+  ) => [
+    {
+      percent: yes /. bondedTokenCount *. 100.,
+      color: theme.success_600,
+    },
+    {
+      percent: no /. bondedTokenCount *. 100.,
+      color: theme.error_600,
+    },
+    {
+      percent: noWithVeto /. bondedTokenCount *. 100.,
+      color: theme.error_600,
+    },
+    {
+      percent: abstain /. bondedTokenCount *. 100.,
+      color: theme.error_600,
+    },
+    {
+      percent: (yes +. no +. noWithVeto +. abstain) /. bondedTokenCount *. 100.,
+      color: theme.error_600,
+    },
+  ]
+}
+
+module Voting2 = {
+  @react.component
+  let make = (~slots: array<Slot.t>) => {
+    let isMobile = Media.isMobile()
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
+    <div className={CssJs.merge(. [CssHelper.flexBox(), Styles.progressSlotContainer])}>
+      {slots
+      ->Belt.Array.mapWithIndex((index, slot) =>
+        <div
+          className={Styles.progressSlot(
+            slot.percent,
+            slot.color,
+            index == slots->Belt.Array.length - 1,
+            Belt.Array.length,
+          )}
+        />
+      )
+      ->React.array}
     </div>
   }
 }
