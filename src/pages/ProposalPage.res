@@ -25,40 +25,6 @@ module Styles = {
   let proposalCardContainer = style(. [maxWidth(#px(932))])
 }
 
-//TODO: Will refactor to have only one Sub
-module Turnout = {
-  @react.component
-  let make = (~id) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    let voteSub = VoteSub.getVoteStatByProposalID(id)
-    let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
-
-    let allSub = Sub.all2(voteSub, bondedTokenCountSub)
-    <>
-      {switch allSub {
-      | Data(({total}, bondedTokenCount)) =>
-        let turnoutRate = total /. bondedTokenCount->Coin.getBandAmountFromCoin *. 100.
-
-        <Col col=Col.Four colSm=Col.Five>
-          <Heading
-            value="Turnout"
-            size=Heading.H5
-            marginBottom=8
-            color={theme.neutral_600}
-            weight=Heading.Thin
-          />
-          <Text
-            value={turnoutRate->Format.fPercent(~digits=2)}
-            size=Text.Body1
-            color={theme.neutral_900}
-          />
-        </Col>
-      | _ => React.null
-      }}
-    </>
-  }
-}
-
 module ProposalCard = {
   @react.component
   let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
@@ -152,6 +118,7 @@ module ProposalCard = {
 let make = () => {
   let pageSize = 10
   let proposalsSub = ProposalSub.getList(~pageSize, ~page=1, ())
+  let councilProposalSub = CouncilProposalSub.get(1)
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -160,6 +127,15 @@ let make = () => {
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
         <Col col=Col.Twelve>
           <Heading value="All Proposals" size=Heading.H2 />
+        </Col>
+      </Row>
+      <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
+        <Col col=Col.Twelve>
+          {switch councilProposalSub {
+          | Data(data) => <h1> {data->Js.Json.stringifyAny->Belt.Option.getExn->React.string} </h1>
+          | Error(err) => <h1> {err.message->React.string} </h1>
+          | _ => <h1> {"null"->React.string} </h1>
+          }}
         </Col>
       </Row>
       <Row style={CssHelper.flexBox(~justify=#center, ())}>
