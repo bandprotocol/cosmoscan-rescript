@@ -119,6 +119,7 @@ let make = () => {
   let pageSize = 10
   let proposalsSub = ProposalSub.getList(~pageSize, ~page=1, ())
   let councilProposalSub = CouncilProposalSub.get(1)
+  let councilVoteSub = CouncilVoteSub.get(1)
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -131,7 +132,7 @@ let make = () => {
       </Row>
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
         <Col col=Col.Twelve>
-          {switch councilProposalSub {
+          {switch councilVoteSub {
           | Data(data) => <h1> {data->Js.Json.stringifyAny->Belt.Option.getExn->React.string} </h1>
           | Error(err) => <h1> {err.message->React.string} </h1>
           | _ => <h1> {"null"->React.string} </h1>

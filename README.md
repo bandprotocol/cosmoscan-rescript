@@ -23,9 +23,13 @@ npx get-graphql-schema https://graphql-lt6.bandchain.org/v1/graphql -j > graphql
 
 ### installed the dependencies
 
+```sh
 npx get-graphql-schema https://graphql-lm.bandchain.org/v1/graphql -j > graphql_schema.json
+```
 
 # installed the dependencies
+
+```sh
 yarn
 ```
 
