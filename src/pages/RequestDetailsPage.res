@@ -341,7 +341,7 @@ let make = (~reqID) => {
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Prepare Gas"
+                    value="Prepare Gas Used / Prepare Gas"
                     size=Heading.H4
                     weight=Heading.Thin
                     color={theme.neutral_600}
@@ -349,10 +349,13 @@ let make = (~reqID) => {
                 </Col>
                 <Col col=Col.Eight>
                   {switch requestSub {
-                  | Data({prepareGas}) =>
+                  | Data({prepareGas, prepareGasUsed}) =>
                     <Text
                       block=true
-                      value={prepareGas->Belt.Int.toString}
+                      // value={prepareGas->Belt.Int.toString}
+                      value={(prepareGasUsed == 0 ? "-" : prepareGasUsed->Belt.Int.toString) ++
+                      " / " ++
+                      prepareGas->Belt.Int.toString}
                       size=Text.Body1
                       color={theme.neutral_600}
                     />
@@ -363,7 +366,7 @@ let make = (~reqID) => {
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Execute Gas"
+                    value="Execute Gas Used / Execute Gas"
                     size=Heading.H4
                     weight=Heading.Thin
                     color={theme.neutral_600}
@@ -371,10 +374,12 @@ let make = (~reqID) => {
                 </Col>
                 <Col col=Col.Eight>
                   {switch requestSub {
-                  | Data({executeGas}) =>
+                  | Data({executeGas, executeGasUsed}) =>
                     <Text
                       block=true
-                      value={executeGas->Belt.Int.toString}
+                      value={(executeGasUsed == 0 ? "-" : executeGasUsed->Belt.Int.toString) ++
+                      " / " ++
+                      executeGas->Belt.Int.toString}
                       size=Text.Body1
                       color={theme.neutral_600}
                     />

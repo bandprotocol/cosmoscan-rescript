@@ -444,7 +444,7 @@ module ExecutionPart = {
                                 schema: (),
                               }),
                             ],
-                            5000,
+                            (gaslimit->Belt.Int.toFloat *. 0.0025)->Js.Math.ceil_int,
                             gaslimit,
                             "Request via scan",
                           )->Promise.then(res => {
