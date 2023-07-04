@@ -1,5 +1,14 @@
 module Styles = {
   open CssJs
+
+  let descriptionHeader = (theme: Theme.t) =>
+    style(. [
+      fontSize(#px(14)),
+      fontWeight(#num(400)),
+      color(theme.neutral_600),
+      selector("> a", [color(theme.primary_600)]),
+    ])
+
   let idContainer = {
     style(. [
       selector(
@@ -22,7 +31,11 @@ module Styles = {
       height(#px(32)),
       hover([backgroundColor(theme.primary_800)]),
     ])
+
   let proposalCardContainer = style(. [maxWidth(#px(932))])
+
+  let chipContainer = style(. [marginTop(#px(16))])
+  let chipStyle = style(. [borderRadius(#px(20)), marginRight(#px(8))])
 }
 
 module CouncilProposalCard = {
@@ -155,16 +168,60 @@ module CouncilProposalCard = {
 @react.component
 let make = () => {
   let pageSize = 10
+  let (filterStr, setFilterStr) = React.useState(_ => "All")
+
   let proposalsSub = ProposalSub.getList(~pageSize, ~page=1, ())
-  let councilProposalSub = CouncilProposalSub.getList(~pageSize, ~page=1, ())
+  let councilProposalSub = CouncilProposalSub.getList(~filter=filterStr, ~pageSize, ~page=1, ())
+  let councilProposalCount = CouncilProposalSub.count()
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <Section>
     <div className=CssHelper.container id="proposalsSection">
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
+        <Col col=Col.Twelve style={CssHelper.flexBox()}>
+          <Heading value="Council Proposals" size=Heading.H1 />
+          <HSpacing size=Spacing.lg />
+          {switch councilProposalCount {
+          | Data(count) =>
+            <Text
+              value={count->Belt.Int.toString ++ " In Total"}
+              size=Text.Xl
+              weight=Text.Regular
+              color=theme.neutral_600
+              block=true
+            />
+          | _ => React.null
+          }}
+        </Col>
         <Col col=Col.Twelve>
-          <Heading value="All Proposals" size=Heading.H2 />
+          <p className={Styles.descriptionHeader(theme)}>
+            <span> {"All proposals are first discussed on a "->React.string} </span>
+            <AbsoluteLink href="#">
+              <span> {"forum"->React.string} </span>
+            </AbsoluteLink>
+            <span>
+              {" before being submitted to the on-chain proposal system by "->React.string}
+            </span>
+            <AbsoluteLink href="#">
+              <span> {"council members"->React.string} </span>
+            </AbsoluteLink>
+            <span> {" to involve the community and improve decision-making."->React.string} </span>
+          </p>
+        </Col>
+        <Col col=Col.Twelve style={Css.merge(list{CssHelper.flexBox(), Styles.chipContainer})}>
+          {CouncilProposalSub.proposalsTypeStr
+          ->Belt.Array.mapWithIndex((i, pt) =>
+            <ChipButton
+              key={i->Belt.Int.toString}
+              variant={ChipButton.Outline}
+              onClick={_ => setFilterStr(_ => pt)}
+              isActive={pt === filterStr}
+              style={Styles.chipStyle}>
+              {pt->React.string}
+            </ChipButton>
+          )
+          ->React.array}
         </Col>
       </Row>
       <Row style={CssHelper.flexBox(~justify=#center, ())}>

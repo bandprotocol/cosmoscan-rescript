@@ -112,6 +112,8 @@ module VetoProposal = {
     }
 }
 
+type proposal_type_t = Tech | Grant | BandDAO | Unknown
+
 type internal_t = {
   council: council_t,
   id: ID.Proposal.t,
@@ -145,6 +147,7 @@ type t = {
   vetoProposal: option<VetoProposal.t>,
   metadata: string,
   messages: Js.Json.t,
+  proposalType: proposal_type_t,
 }
 
 module SingleConfig = %graphql(`
@@ -178,8 +181,8 @@ module SingleConfig = %graphql(`
 `)
 
 module MultiConfig = %graphql(`
-  subscription CouncilProposal($limit: Int!, $offset: Int!) {
-    council_proposals(limit: $limit, offset: $offset, order_by: [{id: desc}]) @ppxAs(type: "internal_t") {
+  subscription CouncilProposals($filter: String!, $limit: Int!, $offset: Int!) {
+    council_proposals(where: {council: { name: { _ilike: $filter}}}, limit: $limit, offset: $offset, order_by: [{id: desc}]) @ppxAs(type: "internal_t") {
       council @ppxAs(type: "council_t") {
         id
         name @ppxCustom(module: "CouncilSub.CouncilName")
@@ -206,6 +209,34 @@ module MultiConfig = %graphql(`
     }
   }
 `)
+
+module CountConfig = %graphql(`
+    subscription CouncilProposalCount {
+      council_proposals_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+`)
+
+let proposalsTypeStr = ["All", "Tech Proposal", "Grant Proposal", "BandDAO Proposal"]
+let getFilter = str =>
+  switch str {
+  | "All" => "%%"
+  | "Tech Proposal" => "%Tech%"
+  | "Grant Proposal" => "%Grant%"
+  | "BandDAO Proposal" => "%BandDAO%"
+  | _ => ""
+  }
+
+let parseProposalType = councilName =>
+  switch councilName {
+  | CouncilSub.BandDaoCouncil => BandDAO
+  | GrantCouncil => Grant
+  | TechCouncil => Tech
+  | Unknown => Unknown
+  }
 
 let toExternal = (
   {
@@ -242,6 +273,7 @@ let toExternal = (
     messages,
     submitTime,
     totalWeight,
+    proposalType: council.name->parseProposalType,
   }
 }
 
@@ -258,9 +290,19 @@ let get = id => {
   })
 }
 
-let getList = (~page, ~pageSize, ()) => {
+let getList = (~filter, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
-  let result = MultiConfig.use({limit: pageSize, offset})
+  let result = MultiConfig.use({filter: filter->getFilter, limit: pageSize, offset})
 
   result->Sub.fromData->Sub.map(internal => internal.council_proposals->Belt.Array.map(toExternal))
+}
+
+let count = () => {
+  let result = CountConfig.use()
+
+  result
+  ->Sub.fromData
+  ->Sub.map(x =>
+    x.council_proposals_aggregate.aggregate->Belt.Option.mapWithDefault(0, a => a.count)
+  )
 }
