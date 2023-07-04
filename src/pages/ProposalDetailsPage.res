@@ -176,7 +176,8 @@ let make = (~proposalID) => {
               </Col>
               <Col col=Col.Eight>
                 {switch allSub {
-                | Data(({submitTime}, _, _)) => <Timestamp size=Text.Body1 time=submitTime />
+                | Data(({submitTime}, _, _)) =>
+                  <Timestamp size=Text.Body1 timeOpt=Some(submitTime) />
                 | _ => <LoadingCensorBar width={isMobile ? 120 : 270} height=15 />
                 }}
               </Col>
@@ -380,7 +381,7 @@ let make = (~proposalID) => {
                           />
                           {switch MomentRe.diff(
                             MomentRe.momentNow(),
-                            votingEndTime,
+                            votingEndTime->Belt.Option.getWithDefault(MomentRe.momentNow()),
                             #seconds,
                           ) < 0. {
                           | true =>
@@ -407,7 +408,9 @@ let make = (~proposalID) => {
                             marginBottom=4
                           />
                           <Timestamp.Grid
-                            size=Text.Body1 time=votingStartTime color={theme.neutral_900}
+                            size=Text.Body1
+                            time={votingStartTime->Belt.Option.getWithDefault(MomentRe.momentNow())}
+                            color={theme.neutral_900}
                           />
                         </Col>
                         <Col mbSm=0 colSm=Col.Six>
@@ -418,7 +421,9 @@ let make = (~proposalID) => {
                             marginBottom=4
                           />
                           <Timestamp.Grid
-                            size=Text.Body1 time=votingEndTime color={theme.neutral_900}
+                            size=Text.Body1
+                            time={votingEndTime->Belt.Option.getWithDefault(MomentRe.momentNow())}
+                            color={theme.neutral_900}
                           />
                         </Col>
                       </Row>
@@ -526,7 +531,8 @@ let make = (~proposalID) => {
               </Col>
               <Col col=Col.Eight>
                 {switch proposalSub {
-                | Data({depositEndTime}) => <Timestamp size=Text.Body1 time=depositEndTime />
+                | Data({depositEndTime}) =>
+                  <Timestamp size=Text.Body1 timeOpt=Some(depositEndTime) />
                 | _ => <LoadingCensorBar width=90 height=15 />
                 }}
               </Col>

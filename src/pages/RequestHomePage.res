@@ -59,7 +59,7 @@ module RenderBody = {
               // | None => <Text value="Syncing" />
               // }
               <Timestamp
-                time={transactionOpt.block.timestamp} textAlign=Text.Right size=Text.Body2
+                timeOpt={Some(transactionOpt.block.timestamp)} textAlign=Text.Right size=Text.Body2
               />
             | _ => <LoadingCensorBar width=80 height=15 />
             }}

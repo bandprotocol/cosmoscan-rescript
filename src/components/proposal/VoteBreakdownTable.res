@@ -63,13 +63,13 @@ module RenderBody = {
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch voteSub {
             | Data({timestampOpt}) =>
-              switch timestampOpt {
-              | Some(timestamp) =>
-                <Timestamp
-                  time=timestamp size=Text.Body2 weight=Text.Regular textAlign=Text.Right
-                />
-              | None => <Text value="Created on Wenchang" />
-              }
+              <Timestamp
+                timeOpt=timestampOpt
+                size=Text.Body2
+                weight=Text.Regular
+                textAlign=Text.Right
+                defaultText="Created on Wenchang"
+              />
             | _ => <LoadingCensorBar width=80 height=15 />
             }}
           </div>

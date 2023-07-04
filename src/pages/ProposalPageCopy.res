@@ -172,8 +172,8 @@ module ProposalCard = {
             | Data({depositEndTime, votingEndTime, status}) =>
               <Timestamp
                 size=Text.Body1
-                time={switch status {
-                | Deposit => depositEndTime
+                timeOpt={switch status {
+                | Deposit => Some(depositEndTime)
                 | Voting
                 | Passed
                 | Rejected

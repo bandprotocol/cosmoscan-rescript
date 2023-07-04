@@ -91,14 +91,14 @@ module RenderBody = {
         <Col col=Col.Two>
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch dataSourcesSub {
-            | Data({timestamp: timestampOpt}) =>
-              switch timestampOpt {
-              | Some(timestamp') =>
-                <Timestamp
-                  time=timestamp' size=Text.Body2 weight=Text.Regular textAlign=Text.Right
-                />
-              | None => <Text value="Genesis" />
-              }
+            | Data({timestamp: timeOpt}) =>
+              <Timestamp
+                timeOpt
+                size=Text.Body2
+                weight=Text.Regular
+                textAlign=Text.Right
+                defaultText="Genesis"
+              />
             | _ => <LoadingCensorBar width=80 height=15 />
             }}
           </div>

@@ -116,7 +116,7 @@ let renderValue = v => {
         KVTable.Value(rawReport.data->JsBuffer.toUTF8),
       ])}
     />
-  | Timestamp(timestamp) => <Timestamp time={timestamp} size=Text.Body1 />
+  | Timestamp(timestamp) => <Timestamp timeOpt={Some(timestamp)} size=Text.Body1 />
   | ValidatorLink(address, moniker, identity) =>
     switch (moniker, identity) {
     | ("", "") => <AddressRender position={Subtitle} address accountType={#validator} />
