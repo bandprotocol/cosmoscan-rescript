@@ -18,8 +18,13 @@ module Styles = {
     justifyContent(#spaceBetween),
     width(#percent(100.)),
     selector("> div", [width(#percent(16.)), textAlign(#center)]),
-    selector("> div:first-child", [width(#percent(5.))]),
-    selector("> div:nth-child(2)", [width(#percent(37.))]),
+    selector("> div:first-child", [width(#percent(8.))]),
+    selector("> div:nth-child(2)", [width(#percent(44.))]),
+    Media.mobile([
+      selector("> div", [width(#percent(20.))]),
+      selector("> div:first-child", [width(#percent(5.))]),
+      selector("> div:nth-child(2)", [width(#percent(35.))]),
+    ]),
   ])
 
   let tableItem = (theme: Theme.t, isDarkMode) =>
@@ -33,13 +38,157 @@ module Styles = {
       Media.mobile([padding2(~v=#px(16), ~h=#px(16))]),
     ])
 
-  let outer = style(. [padding2(~v=#zero, ~h=#px(32))])
+  let outer = style(. [
+    padding2(~v=#zero, ~h=#px(32)),
+    Media.mobile([padding2(~v=#px(0), ~h=#px(16)), marginTop(#px(16))]),
+  ])
   let link = (theme: Theme.t) =>
     style(. [
       cursor(pointer),
       selector("&:hover span", [color(theme.primary_800)]),
-      selector("> span", [transition(~duration=200, "all")]),
+      selector("> span", [transition(~duration=150, "all")]),
     ])
+}
+
+module SortDropdown = {
+  module StylesDropdown = {
+    open CssJs
+    let dropdownContainer = style(. [
+      position(#relative),
+      display(#flex),
+      alignItems(#center),
+      justifyContent(#center),
+      cursor(#pointer),
+    ])
+
+    let dropdownSelected = style(. [
+      display(#flex),
+      alignItems(#center),
+      padding2(~v=#px(8), ~h=#zero),
+    ])
+
+    let dropdownMenu = (theme: Theme.t, isDarkMode, isShow) =>
+      style(. [
+        position(#absolute),
+        top(#px(40)),
+        left(#px(0)),
+        width(#px(270)),
+        backgroundColor(theme.neutral_000),
+        borderRadius(#px(8)),
+        padding2(~v=#px(8), ~h=#px(0)),
+        zIndex(1),
+        boxShadow(
+          Shadow.box(
+            ~x=#zero,
+            ~y=#px(2),
+            ~blur=#px(4),
+            ~spread=#px(1),
+            rgba(16, 18, 20, #num(0.15)),
+          ),
+        ),
+        selector(" > ul + ul", [borderTop(#px(1), #solid, theme.neutral_300)]),
+        display(isShow ? #block : #none),
+      ])
+
+    let menuItem = (theme: Theme.t, isDarkMode) =>
+      style(. [
+        position(#relative),
+        display(#flex),
+        alignItems(#center),
+        justifyContent(#flexStart),
+        padding4(~top=#px(10), ~right=#px(16), ~bottom=#px(10), ~left=#px(38)),
+        cursor(#pointer),
+        marginTop(#zero),
+        selector("&:hover", [backgroundColor(isDarkMode ? theme.neutral_200 : theme.neutral_100)]),
+        selector(
+          "i",
+          [
+            position(#absolute),
+            left(#px(18)),
+            top(#percent(50.)),
+            transform(#translateY(#percent(-50.))),
+          ],
+        ),
+      ])
+  }
+  @react.component
+  let make = (~sortedBy, ~setSortedBy, ~direction, ~setDirection) => {
+    let (show, setShow) = React.useState(_ => false)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    <div className=StylesDropdown.dropdownContainer>
+      <div
+        className={StylesDropdown.dropdownSelected}
+        onClick={event => {
+          setShow(oldVal => !oldVal)
+          ReactEvent.Mouse.stopPropagation(event)
+        }}>
+        <Text
+          value={sortedBy->DataSourceSub.parseSortString ++
+          "( " ++
+          direction->DataSourceSub.parseDirection ++ " )"}
+          size={Body1}
+          color=theme.neutral_900
+          weight={Semibold}
+        />
+        <HSpacing size=Spacing.sm />
+        {show
+          ? <Icon name="far fa-angle-up" color={theme.neutral_900} />
+          : <Icon name="far fa-angle-down" color={theme.neutral_900} />}
+      </div>
+      <div className={StylesDropdown.dropdownMenu(theme, isDarkMode, show)}>
+        <ul>
+          {[DataSourceSub.ID, DataSourceSub.Name, DataSourceSub.TotalRequest]
+          ->Belt.Array.mapWithIndex((i, each) => {
+            <li
+              key={i->Belt.Int.toString}
+              className={StylesDropdown.menuItem(theme, isDarkMode)}
+              onClick={_ => {
+                setSortedBy(_ => each)
+                setShow(_ => false)
+              }}>
+              {sortedBy == each
+                ? <Icon name="fal fa-check" size=12 color=theme.neutral_900 />
+                : React.null}
+              <Text
+                value={each->DataSourceSub.parseSortString}
+                size={Body1}
+                weight={Semibold}
+                color={theme.neutral_900}
+              />
+            </li>
+          })
+          ->React.array}
+        </ul>
+        <ul>
+          {[DataSourceSub.ASC, DataSourceSub.DESC]
+          ->Belt.Array.mapWithIndex((i, each) => {
+            <li
+              className={StylesDropdown.menuItem(theme, isDarkMode)}
+              key={i->Belt.Int.toString}
+              onClick={_ => {
+                setDirection(_ => each)
+                setShow(_ => false)
+              }}>
+              {direction == each
+                ? <Icon name="fal fa-check" size=12 color=theme.neutral_900 />
+                : React.null}
+              <Text
+                value={switch each {
+                | DataSourceSub.ASC => "Ascending (smallest value first)"
+                | DESC => "Descending (largest value first)"
+                }}
+                size={Body1}
+                weight={Semibold}
+                color={theme.neutral_900}
+              />
+            </li>
+          })
+          ->React.array}
+        </ul>
+      </div>
+    </div>
+  }
 }
 
 module SortableTHead = {
@@ -140,7 +289,7 @@ module RenderBody = {
               size={Body1}
               code=true
             />
-          | _ => <LoadingCensorBar width=100 height=15 />
+          | _ => <LoadingCensorBar width=150 height=15 />
           }}
         </div>
         <div>
@@ -149,9 +298,9 @@ module RenderBody = {
             switch timestampOpt {
             | Some(timestamp') =>
               <Timestamp time=timestamp' size=Text.Body1 weight=Text.Regular textAlign=Text.Right />
-            | None => <Text value="Genesis" />
+            | None => <Text size=Text.Body2 value="Genesis" align={Center} />
             }
-          | _ => <LoadingCensorBar width=100 height=15 />
+          | _ => <LoadingCensorBar width=150 height=15 />
           }}
         </div>
       </div>
@@ -166,8 +315,13 @@ module RenderBodyMobile = {
     let isMobile = Media.isMobile()
 
     <div className={Styles.tableItem(theme, isDarkMode)}>
-      <Row marginBottom={8}>
-        <Col col=Col.Twelve>
+      <Row marginBottom={16} alignItems={Row.Center}>
+        <Col colSm=Col.Five>
+          <Text
+            value="ID" ellipsis=false color={theme.neutral_600} size={Body1} weight={Semibold}
+          />
+        </Col>
+        <Col colSm=Col.Seven>
           {switch datasourceSub {
           | Data({id, name}) =>
             <div className={CssHelper.flexBox()}>
@@ -177,8 +331,17 @@ module RenderBodyMobile = {
           }}
         </Col>
       </Row>
-      <Row marginBottom={16}>
-        <Col col=Col.Twelve>
+      <Row marginBottom={16} alignItems={Row.Center}>
+        <Col colSm=Col.Five>
+          <Text
+            value="Data Source"
+            ellipsis=false
+            color={theme.neutral_600}
+            size={Body1}
+            weight={Semibold}
+          />
+        </Col>
+        <Col colSm=Col.Seven>
           {switch datasourceSub {
           | Data({id, name}) =>
             <Link
@@ -190,8 +353,9 @@ module RenderBodyMobile = {
           }}
         </Col>
       </Row>
-      <Row marginBottom={16}>
+      <Row marginBottom={16} alignItems={Row.Center}>
         <Col colSm=Col.Five>
+          // Fee is string, cannot be sorted
           <Text
             value="Fee (BAND)"
             ellipsis=false
@@ -203,17 +367,17 @@ module RenderBodyMobile = {
         <Col colSm=Col.Seven>
           {switch datasourceSub {
           | Data({fee}) =>
-            <div>
-              <AmountRender coins=fee size={Body1} />
+            <div className={CssHelper.flexBox(~justify=#flexStart, ())}>
+              <AmountRender coins=fee size={Xl} pos={Fee} color={theme.neutral_900} />
             </div>
           | _ => <LoadingCensorBar width=70 height=15 />
           }}
         </Col>
       </Row>
-      <Row marginBottom={16}>
+      <Row marginBottom={16} alignItems={Row.Center}>
         <Col colSm=Col.Five>
           <Text
-            value="24 hr Requests"
+            value="Total Requests"
             ellipsis=false
             color={theme.neutral_600}
             size={Body1}
@@ -223,20 +387,21 @@ module RenderBodyMobile = {
         <Col colSm=Col.Seven>
           {switch datasourceSub {
           | Data({requestCount}) =>
+            /* TODO: change to data_source_requests_aggregate_per_day when data is ready */
             <Text
               value={requestCount->Format.iPretty}
               weight=Text.Medium
               block=true
               ellipsis=true
-              align={Center}
-              size={Body1}
+              align={Left}
+              size={Xl}
               color={theme.neutral_900}
             />
-          | _ => <LoadingCensorBar width=100 height=15 />
+          | _ => <LoadingCensorBar width=150 height=15 />
           }}
         </Col>
       </Row>
-      <Row marginBottom={16}>
+      <Row marginBottom={16} alignItems={Row.Center}>
         <Col colSm=Col.Five>
           <Text
             value="Last Requested"
@@ -247,28 +412,15 @@ module RenderBodyMobile = {
           />
         </Col>
         <Col colSm=Col.Seven>
-          //   {switch datasourceSub {
-          //   | Data({id}) => {
-          //       let latestTxTimestamp = DataSourceSub.getLatestRequestTimestampByID(id)
-          //       switch latestTxTimestamp {
-          //       | Data(Some({transaction})) =>
-          //         <TimeAgos time={transaction.block.timestamp} size={Body1} />
-
-          //       | Data(None) => <Text value="N/A" size={Body1} />
-          //       | _ => <LoadingCensorBar width=100 height=15 />
-          //       }
-          //     }
-
-          //   | _ => <LoadingCensorBar width=100 height=15 />
-          //   }}
           {switch datasourceSub {
           | Data({timestamp: timestampOpt}) =>
+            /* TODO: change to last_request when data is ready */
             switch timestampOpt {
             | Some(timestamp') =>
-              <Timestamp time=timestamp' size=Text.Body2 weight=Text.Regular textAlign=Text.Right />
-            | None => <Text value="Genesis" />
+              <Timestamp time=timestamp' size=Text.Xl weight=Text.Regular textAlign=Text.Right />
+            | None => <Text size=Text.Xl value="Genesis" align={Center} />
             }
-          | _ => <LoadingCensorBar width=100 height=15 />
+          | _ => <LoadingCensorBar width=150 height=15 />
           }}
         </Col>
       </Row>
@@ -278,10 +430,10 @@ module RenderBodyMobile = {
 
 @react.component
 let make = (~searchTerm) => {
-  let isMobile = Media.isMobile()
+  let isMobile = Media.isSmallMobile()
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 10
-  let (sortedBy, setSortedBy) = React.useState(_ => DataSourceSub.ID)
+  let (sortedBy, setSortedBy) = React.useState(_ => DataSourceSub.TotalRequest)
   let (direction, setDirection) = React.useState(_ => DataSourceSub.DESC)
 
   let toggle = (direction, sortValue) => {
@@ -321,7 +473,7 @@ let make = (~searchTerm) => {
       ? <div className={CssHelper.flexBox(~align=#center, ())}>
           <Text value="Sort By" size={Body1} />
           <HSpacing size=Spacing.sm />
-          //   <SortDropdown sortedBy setSortedBy direction setDirection />
+          <SortDropdown sortedBy setSortedBy direction setDirection />
         </div>
       : <div className={Css.merge(list{Styles.tablehead, Styles.outer})}>
           <div>
@@ -333,8 +485,13 @@ let make = (~searchTerm) => {
             />
           </div>
           <div>
-            <SortableTHead
-              title="Fee (BAND)" toggle sortedBy direction isCenter=true value=DataSourceSub.Fee
+            <Text
+              block=true
+              value="Fee (BAND)"
+              size=Text.Caption
+              weight=Text.Semibold
+              transform=Text.Uppercase
+              align={Center}
             />
           </div>
           <div>
@@ -365,13 +522,6 @@ let make = (~searchTerm) => {
             let pageCount = Page.getPageCount(datasourcesCount, pageSize)
             <div className={CssHelper.mt(~size=8, ())}>
               {datasources
-              //   ->SortOSTable.sorting(~sortedBy, ~direction)
-              //   ->Belt.Array.slice(
-              //     ~offset={
-              //       (page - 1) * pageSize
-              //     },
-              //     ~len=pageSize,
-              //   )
               ->Belt.Array.mapWithIndex((i, e) =>
                 isMobile
                   ? <RenderBodyMobile
