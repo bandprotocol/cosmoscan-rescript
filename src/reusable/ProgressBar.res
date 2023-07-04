@@ -32,7 +32,7 @@ module Styles = {
     overflow(#hidden),
   ])
 
-  let progressSlot = (widthPercent, color, isLast, slotLength) =>
+  let progressSlot = (widthPercent, color, isLast) =>
     style(. [
       width(isLast ? #percent(widthPercent) : #calc(#sub, #percent(widthPercent), #px(1))),
       height(#percent(100.)),
@@ -206,16 +206,23 @@ module Slot = {
     color: Theme.color_t,
   }
 
-  let getYesNoSlot = (theme: Theme.t, ~yes: float, ~no: float) => [
-    {
-      percent: yes /. (yes +. no) *. 100.,
-      color: theme.success_600,
-    },
-    {
-      percent: no /. (yes +. no) *. 100.,
-      color: theme.error_600,
-    },
-  ]
+  let getYesNoSlot = (theme: Theme.t, ~yes: float, ~no: float, ~totalWeight: int) => {
+    let totalWeightF = totalWeight->Belt.Float.fromInt
+    [
+      {
+        percent: yes /. totalWeightF *. 100.,
+        color: theme.success_600,
+      },
+      {
+        percent: no /. totalWeightF *. 100.,
+        color: theme.error_600,
+      },
+      {
+        percent: (totalWeightF -. yes -. no) /. totalWeightF *. 100.,
+        color: theme.neutral_300,
+      },
+    ]->Belt.Array.keep(x => x.percent > 0.)
+  }
 
   let getFullSlot = (
     theme: Theme.t,
@@ -224,28 +231,29 @@ module Slot = {
     ~noWithVeto: float,
     ~abstain: float,
     ~bondedTokenCount: float,
-  ) => [
-    {
-      percent: yes /. bondedTokenCount *. 100.,
-      color: theme.success_600,
-    },
-    {
-      percent: no /. bondedTokenCount *. 100.,
-      color: theme.error_600,
-    },
-    {
-      percent: noWithVeto /. bondedTokenCount *. 100.,
-      color: theme.error_600,
-    },
-    {
-      percent: abstain /. bondedTokenCount *. 100.,
-      color: theme.error_600,
-    },
-    {
-      percent: (yes +. no +. noWithVeto +. abstain) /. bondedTokenCount *. 100.,
-      color: theme.error_600,
-    },
-  ]
+  ) =>
+    [
+      {
+        percent: yes /. bondedTokenCount *. 100.,
+        color: theme.success_600,
+      },
+      {
+        percent: no /. bondedTokenCount *. 100.,
+        color: theme.error_600,
+      },
+      {
+        percent: noWithVeto /. bondedTokenCount *. 100.,
+        color: theme.error_600,
+      },
+      {
+        percent: abstain /. bondedTokenCount *. 100.,
+        color: theme.error_600,
+      },
+      {
+        percent: (yes +. no +. noWithVeto +. abstain) /. bondedTokenCount *. 100.,
+        color: theme.error_600,
+      },
+    ]->Belt.Array.keep(x => x.percent > 0.)
 }
 
 module Voting2 = {
@@ -262,7 +270,6 @@ module Voting2 = {
             slot.percent,
             slot.color,
             index == slots->Belt.Array.length - 1,
-            Belt.Array.length,
           )}
         />
       )

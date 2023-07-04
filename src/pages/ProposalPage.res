@@ -25,24 +25,35 @@ module Styles = {
   let proposalCardContainer = style(. [maxWidth(#px(932))])
 }
 
-module ProposalCard = {
+module CouncilProposalCard = {
   @react.component
-  let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
+  let make = (~reserveIndex, ~proposal: CouncilProposalSub.t) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <Col key={reserveIndex->Belt.Int.toString} style=Styles.proposalCardContainer mb=24 mbSm=16>
-      <InfoContainer>
+      <InfoContainer py=24>
         <Row>
           <Col col=Col.Twelve>
             <div className={CssHelper.flexBox()}>
-              <TypeID.Proposal id={1->ID.Proposal.fromInt} position=TypeID.Title />
-              <Heading
-                size=Heading.H3
+              <TypeID.Proposal
+                id={proposal.id}
+                position=TypeID.Title
+                size=Text.Xl
+                weight=Text.Bold
+                color={theme.neutral_900}
+                isNotLink=true
+              />
+              <HSpacing size=Spacing.sm />
+              <Text
+                size=Text.Xl
+                // TODO: change dis wen title ready
                 value="Activate the community pool"
                 color={theme.neutral_900}
-                weight=Heading.Semibold
+                weight=Text.Semibold
               />
+              <HSpacing size=Spacing.sm />
+              <CouncilProposalBadge status=proposal.status />
             </div>
           </Col>
         </Row>
@@ -56,6 +67,14 @@ module ProposalCard = {
               weight=Heading.Thin
               color={theme.neutral_600}
             />
+            <Text
+              value={proposal.council.name->CouncilSub.getCouncilNameString}
+              size=Text.Body1
+              weight=Text.Thin
+              color=theme.primary_600
+              spacing=Text.Em(0.05)
+              block=true
+            />
           </Col>
           <Col col=Col.Four>
             <Heading
@@ -66,7 +85,7 @@ module ProposalCard = {
               color={theme.neutral_600}
             />
             <Text
-              value="2023-04-25 06:29:18 +UTC"
+              value={proposal.votingEndTime->MomentRe.Moment.format("YYYY-MM-DD HH:mm:ss +UTC", _)}
               size=Text.Body1
               weight=Text.Thin
               color=theme.neutral_900
@@ -85,7 +104,8 @@ module ProposalCard = {
             />
             <div className={CssHelper.flexBox()}>
               <Text
-                value="80.94%"
+                value={(proposal.yesVotePercent < 10. ? "0" : "") ++
+                proposal.yesVotePercent->Format.fPretty(~digits=2) ++ "%"}
                 size=Text.Body1
                 weight=Text.Thin
                 color=theme.neutral_900
@@ -95,19 +115,37 @@ module ProposalCard = {
               />
               <HSpacing size=Spacing.sm />
               <ProgressBar.Voting2
-                slots={ProgressBar.Slot.getYesNoSlot(theme, ~yes=1123., ~no=100.)}
+                slots={ProgressBar.Slot.getYesNoSlot(
+                  theme,
+                  ~yes={proposal.yesVote},
+                  ~no={proposal.noVote},
+                  ~totalWeight={proposal.totalWeight},
+                )}
               />
             </div>
           </Col>
-          <Col col=Col.One>
-            <Heading
-              value="Veto"
-              size=Heading.H5
-              marginBottom=8
-              weight=Heading.Thin
-              color={theme.neutral_600}
-            />
-          </Col>
+          {switch proposal.vetoProposal {
+          | Some(vetoProposal) =>
+            <Col col=Col.One>
+              <Heading
+                value="Veto"
+                size=Heading.H5
+                marginBottom=8
+                weight=Heading.Thin
+                color={theme.neutral_600}
+              />
+              <Text
+                value={vetoProposal.status->CouncilProposalSub.VetoProposal.getStatusText}
+                size=Text.Body1
+                weight=Text.Thin
+                color={vetoProposal.status->CouncilProposalSub.VetoProposal.getStatusColor(theme)}
+                spacing=Text.Em(0.05)
+                block=true
+              />
+            </Col>
+
+          | None => React.null
+          }}
         </Row>
       </InfoContainer>
     </Col>
@@ -118,10 +156,7 @@ module ProposalCard = {
 let make = () => {
   let pageSize = 10
   let proposalsSub = ProposalSub.getList(~pageSize, ~page=1, ())
-  let councilProposalSub = CouncilProposalSub.get(1)
-  let councilVoteSub = CouncilVoteSub.get(1)
-  let councilsSub = CouncilSub.get(1)
-  let allCouncilsSub = CouncilSub.getList(~page=1, ~pageSize=5, ())
+  let councilProposalSub = CouncilProposalSub.getList(~pageSize, ~page=1, ())
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -132,24 +167,13 @@ let make = () => {
           <Heading value="All Proposals" size=Heading.H2 />
         </Col>
       </Row>
-      <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
-        <Col col=Col.Twelve>
-          {switch allCouncilsSub {
-          | Data(data) => <h1> {data->Js.Json.stringifyAny->Belt.Option.getExn->React.string} </h1>
-          | Error(err) => <h1> {err.message->React.string} </h1>
-          | _ => <h1> {"null"->React.string} </h1>
-          }}
-        </Col>
-      </Row>
       <Row style={CssHelper.flexBox(~justify=#center, ())}>
-        {switch proposalsSub {
+        {switch councilProposalSub {
         | Data(proposals) =>
           proposals->Belt.Array.size > 0
             ? proposals
               ->Belt.Array.mapWithIndex((i, proposal) => {
-                <ProposalCard
-                  key={i->Belt.Int.toString} reserveIndex=i proposalSub={Sub.resolve(proposal)}
-                />
+                <CouncilProposalCard key={i->Belt.Int.toString} reserveIndex=i proposal />
               })
               ->React.array
             : <EmptyContainer>
@@ -168,9 +192,8 @@ let make = () => {
               </EmptyContainer>
         | _ =>
           Belt.Array.make(pageSize, Sub.NoData)
-          ->Belt.Array.mapWithIndex((i, noData) =>
-            <ProposalCard key={i->Belt.Int.toString} reserveIndex=i proposalSub=noData />
-          )
+          ->Belt.Array.mapWithIndex((i, noData) => React.null)
+          // <CouncilProposalCard key={i->Belt.Int.toString} reserveIndex=i id={1->ID.Proposal.fromInt} />
           ->React.array
         }}
       </Row>

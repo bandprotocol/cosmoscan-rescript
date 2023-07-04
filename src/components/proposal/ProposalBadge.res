@@ -36,7 +36,11 @@ let make = (~status) => {
       CssHelper.flexBox(~justify=#center, ()),
     })}>
     <Text
-      value={getBadgeText(status)} size=Text.Caption transform=Text.Uppercase color=theme.white
+      value={getBadgeText(status)}
+      weight=Text.Semibold
+      size=Text.Caption
+      transform=Text.Uppercase
+      color=theme.white
     />
   </div>
 }

@@ -4,6 +4,8 @@ type account_t = {address: Address.t}
 
 type aggregate_t = {count: int}
 
+type council_name_t = BandDaoCouncil | GrantCouncil | TechCouncil | Unknown
+
 type council_member_aggregate_t = {aggregate: option<aggregate_t>}
 
 type council_member_t = {
@@ -15,7 +17,7 @@ type council_member_t = {
 
 type internal_t = {
   id: int,
-  name: string,
+  name: council_name_t,
   account: account_t,
   councilMembers: array<council_member_t>,
   council_members_aggregate: council_member_aggregate_t,
@@ -25,11 +27,38 @@ type internal_t = {
   createdAt: MomentRe.Moment.t,
 }
 
+module CouncilName = {
+  let parse = str =>
+    switch str {
+    | "BAND_DAO_COUNCIL" => BandDaoCouncil
+    | "GRANT_COUNCIL" => GrantCouncil
+    | "TECH_COUNCIL" => TechCouncil
+    | _ => Unknown
+    }
+
+  let serialize = (councilName: council_name_t) => {
+    switch councilName {
+    | BandDaoCouncil => "BAND_DAO_COUNCIL"
+    | GrantCouncil => "GRANT_COUNCIL"
+    | TechCouncil => "TECH_COUNCIL"
+    | Unknown => "Unknown"
+    }
+  }
+}
+
+let getCouncilNameString = (councilName: council_name_t) =>
+  switch councilName {
+  | BandDaoCouncil => "Band Dao Council"
+  | GrantCouncil => "Grant Council"
+  | TechCouncil => "Tech Council"
+  | Unknown => "Unknown"
+  }
+
 module SingleConfig = %graphql(`
   subscription Councils($id: Int!) {
     councils_by_pk(id: $id) @ppxAs(type: "internal_t") {
       id
-      name
+      name @ppxCustom(module: "CouncilName")
       account @ppxAs(type: "account_t") {
         address @ppxCustom(module:"GraphQLParserModule.Address")
       }
@@ -58,7 +87,7 @@ module MultiConfig = %graphql(`
   subscription Councils($limit: Int!, $offset: Int!)  {
     councils(limit: $limit, offset: $offset) @ppxAs(type: "internal_t") {
       id
-      name
+      name @ppxCustom(module: "CouncilName")
       account @ppxAs(type: "account_t") {
         address @ppxCustom(module:"GraphQLParserModule.Address")
       }
@@ -75,6 +104,7 @@ module MultiConfig = %graphql(`
           count
         }
       }
+      
       version
       percentageThreshold: percentage_threshold @ppxCustom(module:"GraphQLParserModule.IntString")
       lastUpdate: last_update @ppxCustom(module: "GraphQLParserModule.Date")
