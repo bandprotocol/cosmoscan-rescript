@@ -44,6 +44,9 @@ module CouncilProposalCard = {
   let make = (~reserveIndex, ~proposal: CouncilProposalSub.t) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+
+    let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
     <Col key={reserveIndex->Belt.Int.toString} style=Styles.proposalCardContainer mb=24 mbSm=16>
       <InfoContainer py=24>
@@ -81,14 +84,16 @@ module CouncilProposalCard = {
               weight=Heading.Thin
               color={theme.neutral_600}
             />
-            <Text
-              value={proposal.council.name->CouncilSub.getCouncilNameString}
-              size=Text.Body1
-              weight=Text.Thin
-              color=theme.primary_600
-              spacing=Text.Em(0.05)
-              block=true
-            />
+            <div className={CssHelper.clickable} onClick={_ => openMembers()}>
+              <Text
+                value={proposal.council.name->CouncilSub.getCouncilNameString}
+                size=Text.Body1
+                weight=Text.Thin
+                color=theme.primary_600
+                spacing=Text.Em(0.05)
+                block=true
+              />
+            </div>
           </Col>
           <Col col=Col.Four>
             <Heading

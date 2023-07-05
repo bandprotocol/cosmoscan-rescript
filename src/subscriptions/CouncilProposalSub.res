@@ -1,6 +1,17 @@
+type account_t = {address: Address.t}
+
+type council_member_t = {
+  account: account_t,
+  weight: int,
+  metadata: string,
+  since: MomentRe.Moment.t,
+}
+
 type council_t = {
   id: int,
   name: CouncilSub.council_name_t,
+  account: account_t,
+  councilMembers: array<council_member_t>,
 }
 
 module Status = {
@@ -156,6 +167,17 @@ module SingleConfig = %graphql(`
       council @ppxAs(type: "council_t") {
         id
         name @ppxCustom(module: "CouncilSub.CouncilName")
+        account @ppxAs(type: "account_t") {
+          address @ppxCustom(module:"GraphQLParserModule.Address")
+        }
+        councilMembers :council_members @ppxAs(type: "council_member_t") {
+          account @ppxAs(type: "account_t") {
+            address @ppxCustom(module:"GraphQLParserModule.Address")
+          }
+          weight @ppxCustom(module:"GraphQLParserModule.IntString")
+          metadata
+          since @ppxCustom(module: "GraphQLParserModule.Date")
+        }
       }
       id @ppxCustom(module: "GraphQLParserModule.ProposalID")
       councilId: council_id
@@ -186,6 +208,17 @@ module MultiConfig = %graphql(`
       council @ppxAs(type: "council_t") {
         id
         name @ppxCustom(module: "CouncilSub.CouncilName")
+        account @ppxAs(type: "account_t") {
+          address @ppxCustom(module:"GraphQLParserModule.Address")
+        }
+        councilMembers :council_members @ppxAs(type: "council_member_t") {
+          account @ppxAs(type: "account_t") {
+            address @ppxCustom(module:"GraphQLParserModule.Address")
+          }
+          weight @ppxCustom(module:"GraphQLParserModule.IntString")
+          metadata
+          since @ppxCustom(module: "GraphQLParserModule.Date")
+        }
       }
       id @ppxCustom(module: "GraphQLParserModule.ProposalID")
       councilId: council_id

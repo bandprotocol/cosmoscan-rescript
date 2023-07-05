@@ -5,6 +5,7 @@ type modal_t =
   | QRCode(Address.t)
   | IBCPacketError(string)
   | Syncing
+  | CouncilMembers(CouncilProposalSub.council_t)
 
 type t = {
   canExit: bool,

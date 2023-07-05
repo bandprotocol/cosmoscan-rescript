@@ -70,7 +70,7 @@ module ConnectionListDesktop = {
               <Row alignItems=Row.Center>
                 <Col col=Col.Four>
                   {
-                    let port = Ellipsis.format(~text=channel.port, ~limit=25, ())
+                    let port = Ellipsis.end(~text=channel.port, ~limit=25, ())
                     <Text
                       value={port} nowrap=true ellipsis=true block=true color={theme.neutral_900}
                     />
@@ -90,7 +90,7 @@ module ConnectionListDesktop = {
                 </Col>
                 <Col col=Col.Four>
                   {
-                    let port = Ellipsis.format(~text=channel.counterpartyPort, ~limit=25, ())
+                    let port = Ellipsis.end(~text=channel.counterpartyPort, ~limit=25, ())
                     <Text
                       value={port} nowrap=true ellipsis=true block=true color={theme.neutral_900}
                     />
@@ -250,7 +250,7 @@ module ChannelItemMobile = {
       <Row alignItems=Row.Center>
         <Col colSm=Col.Five>
           {
-            let port = Ellipsis.format(~text=channel.port, ~limit=25, ())
+            let port = Ellipsis.end(~text=channel.port, ~limit=25, ())
             <Text
               value={port}
               nowrap=true
@@ -276,7 +276,7 @@ module ChannelItemMobile = {
         </Col>
         <Col colSm=Col.Five>
           {
-            let port = Ellipsis.format(~text=channel.counterpartyPort, ~limit=25, ())
+            let port = Ellipsis.end(~text=channel.counterpartyPort, ~limit=25, ())
             <Text
               value={port}
               nowrap=true
