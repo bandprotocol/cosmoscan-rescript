@@ -35,7 +35,8 @@ module Styles = {
   let proposalCardContainer = style(. [maxWidth(#px(932))])
 
   let chipContainer = style(. [marginTop(#px(16))])
-  let chipStyle = style(. [borderRadius(#px(20)), marginRight(#px(8))])
+  let chip = style(. [borderRadius(#px(20)), marginRight(#px(8)), marginTop(#px(8))])
+  let badge = style(. [marginTop(#px(8))])
   let timestamp = style(. [selector("> p", [fontWeight(#num(300))])])
 }
 
@@ -70,13 +71,18 @@ module CouncilProposalCard = {
                 weight=Text.Semibold
               />
               <HSpacing size=Spacing.sm />
-              <CouncilProposalBadge status=proposal.status />
+              {isMobile ? React.null : <CouncilProposalBadge status=proposal.status />}
             </div>
+            {isMobile
+              ? <div className={Css.merge(list{CssHelper.flexBox(), Styles.badge})}>
+                  <CouncilProposalBadge status=proposal.status />
+                </div>
+              : React.null}
           </Col>
         </Row>
         <SeperatedLine />
         <Row>
-          <Col col=Col.Four>
+          <Col col=Col.Four colSm=Col.Six>
             <Heading
               value="Vote by"
               size=Heading.H5
@@ -95,23 +101,25 @@ module CouncilProposalCard = {
               />
             </div>
           </Col>
-          <Col col=Col.Four>
-            <Heading
-              value="Voting End"
-              size=Heading.H5
-              marginBottom=8
-              weight=Heading.Thin
-              color={theme.neutral_600}
-            />
-            <Timestamp
-              size=Text.Body1
-              timeOpt={Some(proposal.votingEndTime)}
-              color={theme.neutral_900}
-              suffix=" +UTC"
-              style={Styles.timestamp}
-            />
-          </Col>
-          <Col col=Col.Three>
+          {isMobile
+            ? React.null
+            : <Col col=Col.Four>
+                <Heading
+                  value="Voting End"
+                  size=Heading.H5
+                  marginBottom=8
+                  weight=Heading.Thin
+                  color={theme.neutral_600}
+                />
+                <Timestamp
+                  size=Text.Body1
+                  timeOpt={Some(proposal.votingEndTime)}
+                  color={theme.neutral_900}
+                  suffix=" +UTC"
+                  style={Styles.timestamp}
+                />
+              </Col>}
+          <Col col=Col.Three colSm=Col.Six>
             <Heading
               value="Yes Vote"
               size=Heading.H5
@@ -141,28 +149,32 @@ module CouncilProposalCard = {
               />
             </div>
           </Col>
-          {switch proposal.vetoProposal {
-          | Some(vetoProposal) =>
-            <Col col=Col.One>
-              <Heading
-                value="Veto"
-                size=Heading.H5
-                marginBottom=8
-                weight=Heading.Thin
-                color={theme.neutral_600}
-              />
-              <Text
-                value={vetoProposal.status->CouncilProposalSub.VetoProposal.getStatusText}
-                size=Text.Body1
-                weight=Text.Thin
-                color={vetoProposal.status->CouncilProposalSub.VetoProposal.getStatusColor(theme)}
-                spacing=Text.Em(0.05)
-                block=true
-              />
-            </Col>
+          {isMobile
+            ? React.null
+            : switch proposal.vetoProposal {
+              | Some(vetoProposal) =>
+                <Col col=Col.One>
+                  <Heading
+                    value="Veto"
+                    size=Heading.H5
+                    marginBottom=8
+                    weight=Heading.Thin
+                    color={theme.neutral_600}
+                  />
+                  <Text
+                    value={vetoProposal.status->CouncilProposalSub.VetoProposal.getStatusText}
+                    size=Text.Body1
+                    weight=Text.Thin
+                    color={vetoProposal.status->CouncilProposalSub.VetoProposal.getStatusColor(
+                      theme,
+                    )}
+                    spacing=Text.Em(0.05)
+                    block=true
+                  />
+                </Col>
 
-          | None => React.null
-          }}
+              | None => React.null
+              }}
         </Row>
       </InfoContainer>
     </Col>
@@ -190,19 +202,21 @@ module ProposalCard = {
               />
               <HSpacing size=Spacing.sm />
               <Text
-                size=Text.Xl
-                value="Activate the community pool"
-                color={theme.neutral_900}
-                weight=Text.Semibold
+                size=Text.Xl value=proposal.name color={theme.neutral_900} weight=Text.Semibold
               />
               <HSpacing size=Spacing.sm />
-              <ProposalBadge status=proposal.status />
+              {isMobile ? React.null : <ProposalBadge status=proposal.status />}
             </div>
+            {isMobile
+              ? <div className={Css.merge(list{CssHelper.flexBox(), Styles.badge})}>
+                  <ProposalBadge status=proposal.status />
+                </div>
+              : React.null}
           </Col>
         </Row>
         <SeperatedLine />
         <Row>
-          <Col col=Col.Four>
+          <Col col=Col.Four colSm=Col.Six>
             <Heading
               value="Proposer"
               size=Heading.H5
@@ -212,34 +226,38 @@ module ProposalCard = {
             />
             {switch proposal.proposerAddressOpt {
             | Some(proposerAddress) =>
-              <AddressRender address=proposerAddress position=AddressRender.Subtitle />
+              <AddressRender
+                address=proposerAddress position=AddressRender.Subtitle ellipsis=true
+              />
             | None => <Text value="Proposed on Wenchang" />
             }}
           </Col>
-          <Col col=Col.Four>
-            <Heading
-              value="Voting End"
-              size=Heading.H5
-              marginBottom=8
-              weight=Heading.Thin
-              color={theme.neutral_600}
-            />
-            <Timestamp
-              size=Text.Body1
-              timeOpt={switch proposal.status {
-              | Deposit => Some(proposal.depositEndTime)
-              | Voting
-              | Passed
-              | Rejected
-              | Inactive
-              | Failed =>
-                proposal.votingEndTime
-              }}
-              color={theme.neutral_900}
-              suffix=" +UTC"
-            />
-          </Col>
-          <Col col=Col.Three>
+          {isMobile
+            ? React.null
+            : <Col col=Col.Four>
+                <Heading
+                  value="Voting End"
+                  size=Heading.H5
+                  marginBottom=8
+                  weight=Heading.Thin
+                  color={theme.neutral_600}
+                />
+                <Timestamp
+                  size=Text.Body1
+                  timeOpt={switch proposal.status {
+                  | Deposit => Some(proposal.depositEndTime)
+                  | Voting
+                  | Passed
+                  | Rejected
+                  | Inactive
+                  | Failed =>
+                    proposal.votingEndTime
+                  }}
+                  color={theme.neutral_900}
+                  suffix=" +UTC"
+                />
+              </Col>}
+          <Col col=Col.Three colSm=Col.Six>
             <Heading
               value="Turnout"
               size=Heading.H5
@@ -263,10 +281,10 @@ module ProposalCard = {
                 slots={ProgressBar.Slot.getFullSlot(
                   theme,
                   ~yes={proposal.endTotalYes},
-                  ~no={proposal.endTotalYes},
+                  ~no={proposal.endTotalNo},
                   ~noWithVeto={proposal.endTotalNoWithVeto},
                   ~abstain={proposal.endTotalAbstain},
-                  ~bondedTokenCount={proposal.totalBondedTokens->Belt.Option.getWithDefault(0.)},
+                  ~totalBondedTokens={proposal.totalBondedTokens->Belt.Option.getWithDefault(0.)},
                 )}
               />
             </div>
@@ -285,13 +303,14 @@ let make = () => {
   let proposalsSub = ProposalSub.getList(~pageSize, ~page=1, ())
   let councilProposalSub = CouncilProposalSub.getList(~filter=filterStr, ~pageSize, ~page=1, ())
   let councilProposalCount = CouncilProposalSub.count()
+  let proposalCount = ProposalSub.count()
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <Section>
     <div className=CssHelper.container id="proposalsSection">
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
-        <Col col=Col.Twelve style={CssHelper.flexBox()}>
+        <Col col=Col.Twelve mb=8 mbSm=16 style={CssHelper.flexBox()}>
           <Heading value="Council Proposals" size=Heading.H1 />
           <HSpacing size=Spacing.lg />
           {switch councilProposalCount {
@@ -329,7 +348,7 @@ let make = () => {
               variant={ChipButton.Outline}
               onClick={_ => setFilterStr(_ => pt)}
               isActive={pt === filterStr}
-              style={Styles.chipStyle}>
+              style={Styles.chip}>
               {pt->React.string}
             </ChipButton>
           )
@@ -363,6 +382,52 @@ let make = () => {
           Belt.Array.make(pageSize, Sub.NoData)
           ->Belt.Array.mapWithIndex((i, noData) => React.null)
           // <CouncilProposalCard key={i->Belt.Int.toString} reserveIndex=i id={1->ID.Proposal.fromInt} />
+          ->React.array
+        }}
+      </Row>
+      <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24 marginTop=40 marginTopSm=24>
+        <Col col=Col.Twelve style={CssHelper.flexBox()}>
+          <Heading value="Proposals" size=Heading.H1 />
+          <HSpacing size=Spacing.lg />
+          {switch proposalCount {
+          | Data(count) =>
+            <Text
+              value={count->Belt.Int.toString ++ " In Total"}
+              size=Text.Xl
+              weight=Text.Regular
+              color=theme.neutral_600
+              block=true
+            />
+          | _ => React.null
+          }}
+        </Col>
+      </Row>
+      <Row style={CssHelper.flexBox(~justify=#center, ())}>
+        {switch proposalsSub {
+        | Data(proposals) =>
+          proposals->Belt.Array.size > 0
+            ? proposals
+              ->Belt.Array.mapWithIndex((i, proposal) => {
+                <ProposalCard key={i->Belt.Int.toString} reserveIndex=i proposal />
+              })
+              ->React.array
+            : <EmptyContainer>
+                <img
+                  alt="No Proposal"
+                  src={isDarkMode ? Images.noTxDark : Images.noTxLight}
+                  className=Styles.noDataImage
+                />
+                <Heading
+                  size=Heading.H4
+                  value="No Proposal"
+                  align=Heading.Center
+                  weight=Heading.Regular
+                  color={theme.neutral_600}
+                />
+              </EmptyContainer>
+        | _ =>
+          Belt.Array.make(pageSize, Sub.NoData)
+          ->Belt.Array.mapWithIndex((i, noData) => React.null)
           ->React.array
         }}
       </Row>

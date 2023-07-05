@@ -68,7 +68,7 @@ let make = (~info) => {
   switch info {
   | Address(address, width, accountType) =>
     <div className={Styles.addressContainer(width)}>
-      <AddressRender address position=AddressRender.Text clickable=true accountType />
+      <AddressRender address position=AddressRender.Text clickable=true accountType ellipsis=true />
     </div>
   | Height(height) =>
     <div className=Styles.vFlex>
