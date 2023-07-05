@@ -186,6 +186,9 @@ module ProposalCard = {
   let make = (~reserveIndex, ~proposal: ProposalSub.t) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let voteStatByProposalIDSub = VoteSub.getVoteStatByProposalID(proposal.id)
+    let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
+    let allSub = Sub.all2(voteStatByProposalIDSub, bondedTokenCountSub)
 
     <Col key={reserveIndex->Belt.Int.toString} style=Styles.proposalCardContainer mb=24 mbSm=16>
       <InfoContainer py=24>
@@ -265,29 +268,58 @@ module ProposalCard = {
               weight=Heading.Thin
               color={theme.neutral_600}
             />
-            <div className={CssHelper.flexBox()}>
-              <Text
-                value={(proposal.endTotalYesPercent < 10. ? "0" : "") ++
-                proposal.endTotalYesPercent->Format.fPretty(~digits=2) ++ "%"}
-                size=Text.Body1
-                weight=Text.Thin
-                color=theme.neutral_900
-                spacing=Text.Em(0.05)
-                block=true
-                code=true
-              />
-              <HSpacing size=Spacing.sm />
-              <ProgressBar.Voting2
-                slots={ProgressBar.Slot.getFullSlot(
-                  theme,
-                  ~yes={proposal.endTotalYes},
-                  ~no={proposal.endTotalNo},
-                  ~noWithVeto={proposal.endTotalNoWithVeto},
-                  ~abstain={proposal.endTotalAbstain},
-                  ~totalBondedTokens={proposal.totalBondedTokens->Belt.Option.getWithDefault(0.)},
-                )}
-              />
-            </div>
+            {switch allSub {
+            | Data({total, totalYes, totalNo, totalNoWithVeto, totalAbstain}, bondedToken) =>
+              <div className={CssHelper.flexBox()}>
+                <Text
+                  value={
+                    let turnoutPercent = switch proposal.totalBondedTokens {
+                    | Some(totalBondedTokensExn) =>
+                      proposal.endTotalVote /. totalBondedTokensExn *. 100.
+                    | None => total /. bondedToken->Coin.getBandAmountFromCoin *. 100.
+                    }
+                    (turnoutPercent < 10. ? "0" : "") ++
+                    turnoutPercent->Format.fPretty(~digits=2) ++ "%"
+                  }
+                  size=Text.Body1
+                  weight=Text.Thin
+                  color=theme.neutral_900
+                  spacing=Text.Em(0.05)
+                  block=true
+                  code=true
+                />
+                <HSpacing size=Spacing.sm />
+                {switch proposal.totalBondedTokens {
+                | Some(_) =>
+                  <ProgressBar.Voting2
+                    slots={ProgressBar.Slot.getFullSlot(
+                      theme,
+                      ~yes={proposal.endTotalYes},
+                      ~no={proposal.endTotalNo},
+                      ~noWithVeto={proposal.endTotalNoWithVeto},
+                      ~abstain={proposal.endTotalAbstain},
+                      ~totalBondedTokens={
+                        proposal.totalBondedTokens->Belt.Option.getWithDefault(0.)
+                      },
+                    )}
+                  />
+                | None =>
+                  <ProgressBar.Voting2
+                    slots={ProgressBar.Slot.getFullSlot(
+                      theme,
+                      ~yes={totalYes},
+                      ~no={totalNo},
+                      ~noWithVeto={totalNoWithVeto},
+                      ~abstain={totalAbstain},
+                      ~totalBondedTokens={
+                        bondedToken->Coin.getBandAmountFromCoin
+                      },
+                    )}
+                  />
+                }}
+              </div>
+            | _ => <LoadingCensorBar width={isMobile ? 120 : 270} height=15 />
+            }}
           </Col>
         </Row>
       </InfoContainer>

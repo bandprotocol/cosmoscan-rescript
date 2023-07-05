@@ -263,7 +263,11 @@ module Voting2 = {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    <div className={CssJs.merge(. [CssHelper.flexBox(), Styles.progressSlotContainer])}>
+    <div
+      className={CssJs.merge(. [
+        CssHelper.flexBox(~wrap=#nowrap, ()),
+        Styles.progressSlotContainer,
+      ])}>
       {slots
       ->Belt.Array.mapWithIndex((index, slot) =>
         <div
