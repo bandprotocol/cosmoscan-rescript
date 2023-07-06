@@ -126,8 +126,9 @@ module VetoProposal = {
 type proposal_type_t = Tech | Grant | BandDAO | Unknown
 
 type internal_t = {
-  council: council_t,
   id: ID.Proposal.t,
+  title: string,
+  council: council_t,
   councilId: int,
   status: Status.t,
   totalWeight: int,
@@ -143,8 +144,9 @@ type internal_t = {
 }
 
 type t = {
-  council: council_t,
   id: ID.Proposal.t,
+  title: string,
+  council: council_t,
   councilId: int,
   status: Status.t,
   totalWeight: int,
@@ -164,6 +166,8 @@ type t = {
 module SingleConfig = %graphql(`
   subscription CouncilProposal($id: Int!) {
     council_proposals_by_pk(id: $id) @ppxAs(type: "internal_t") {
+      id @ppxCustom(module: "GraphQLParserModule.ProposalID")
+      title
       council @ppxAs(type: "council_t") {
         id
         name @ppxCustom(module: "CouncilSub.CouncilName")
@@ -179,7 +183,6 @@ module SingleConfig = %graphql(`
           since @ppxCustom(module: "GraphQLParserModule.Date")
         }
       }
-      id @ppxCustom(module: "GraphQLParserModule.ProposalID")
       councilId: council_id
       vetoId: veto_id
       status @ppxCustom(module: "Status")
@@ -205,6 +208,8 @@ module SingleConfig = %graphql(`
 module MultiConfig = %graphql(`
   subscription CouncilProposals($filter: String!, $limit: Int!, $offset: Int!) {
     council_proposals(where: {council: { name: { _ilike: $filter}}}, limit: $limit, offset: $offset, order_by: [{id: desc}]) @ppxAs(type: "internal_t") {
+      id @ppxCustom(module: "GraphQLParserModule.ProposalID")
+      title
       council @ppxAs(type: "council_t") {
         id
         name @ppxCustom(module: "CouncilSub.CouncilName")
@@ -220,7 +225,6 @@ module MultiConfig = %graphql(`
           since @ppxCustom(module: "GraphQLParserModule.Date")
         }
       }
-      id @ppxCustom(module: "GraphQLParserModule.ProposalID")
       councilId: council_id
       vetoId: veto_id
       status @ppxCustom(module: "Status")
@@ -273,8 +277,9 @@ let parseProposalType = councilName =>
 
 let toExternal = (
   {
-    council,
     id,
+    title,
+    council,
     councilId,
     status,
     vetoId,
@@ -291,6 +296,7 @@ let toExternal = (
 ) => {
   {
     id,
+    title,
     councilId,
     status,
     vetoId,

@@ -64,11 +64,7 @@ module CouncilProposalCard = {
               />
               <HSpacing size=Spacing.sm />
               <Text
-                size=Text.Xl
-                // TODO: change dis wen title ready
-                value="Activate the community pool"
-                color={theme.neutral_900}
-                weight=Text.Semibold
+                size=Text.Xl value=proposal.title color={theme.neutral_900} weight=Text.Semibold
               />
               <HSpacing size=Spacing.sm />
               {isMobile ? React.null : <CouncilProposalBadge status=proposal.status />}
