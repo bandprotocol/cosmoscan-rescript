@@ -30,9 +30,9 @@ type internal_t = {
 module CouncilName = {
   let parse = str =>
     switch str {
-    | "BAND_DAO_COUNCIL" => BandDaoCouncil
-    | "GRANT_COUNCIL" => GrantCouncil
-    | "TECH_COUNCIL" => TechCouncil
+    | "COUNCIL_TYPE_BAND_DAO" => BandDaoCouncil
+    | "COUNCIL_TYPE_GRANT" => GrantCouncil
+    | "COUNCIL_TYPE_TECH" => TechCouncil
     | _ => Unknown
     }
 
