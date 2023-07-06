@@ -15,18 +15,6 @@ Cosmosan is block explorer for BandChain network
 
 ## How to Run on local machine
 
-### generate graphql_schema.json
-
-```sh
-npx get-graphql-schema https://graphql-lt6.bandchain.org/v1/graphql -j > graphql_schema.json
-```
-
-### installed the dependencies
-
-```sh
-npx get-graphql-schema https://graphql-lm.bandchain.org/v1/graphql -j > graphql_schema.json
-```
-
 # installed the dependencies
 
 ```sh
@@ -57,4 +45,15 @@ RPC_URL=https://laozi1.bandchain.org/api GRAPHQL_URL=graphql-lm.bandchain.org/v1
 # run test
 GRPC=https://laozi-testnet6.bandchain.org/grpc-web yarn test
 
+```
+
+### generate graphql_schema.json (only when graphql_schema is updated )
+
+```sh
+# Testnet
+npx get-graphql-schema https://graphql-lt6.bandchain.org/v1/graphql -j > graphql_schema.json
+# Devnet
+npx get-graphql-schema https://devnet.d3n.xyz/hasura/v1/graphql -j > graphql_schema.json
+# Mainnet
+npx get-graphql-schema https://graphql-lm.bandchain.org/v1/graphql -j > graphql_schema.json
 ```
