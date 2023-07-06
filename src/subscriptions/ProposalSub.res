@@ -272,7 +272,7 @@ module SingleConfig = %graphql(`
 
 module MultiConfig = %graphql(`
   subscription Proposals($limit: Int!, $offset: Int!) {
-    proposals(limit: $limit, offset: $offset, order_by: [{id: desc}], where: {status: {_neq: "Inactive"}}) @ppxAs(type: "internal_t") {
+    proposals(limit: $limit, offset: $offset, order_by: [{id: desc}], where: {status: {_neq: "Inactive"}, type: {_neq: "CouncilVeto"}}) @ppxAs(type: "internal_t") {
       id @ppxCustom(module: "GraphQLParserModule.ProposalID")
       title
       status @ppxCustom(module: "ProposalStatus")
@@ -298,7 +298,7 @@ module MultiConfig = %graphql(`
 
 module ProposalsCountConfig = %graphql(`
   subscription ProposalsCount {
-    proposals_aggregate{
+    proposals_aggregate( where: {status: {_neq: "Inactive"}, type: {_neq: "CouncilVeto"}}){
       aggregate{
         count 
       }
