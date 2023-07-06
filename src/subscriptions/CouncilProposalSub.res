@@ -311,7 +311,7 @@ let toExternal = (
 }
 
 let get = id => {
-  let result = SingleConfig.use({id: id})
+  let result = SingleConfig.use({id: id->ID.Proposal.toInt})
 
   result
   ->Sub.fromData
