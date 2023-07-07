@@ -44,7 +44,6 @@ module Styles = {
   let badge = style(. [marginTop(#px(8))])
   let header = style(. [marginBottom(#px(24))])
   let yesnoImg = style(. [width(#px(16)), height(#px(16)), marginRight(#px(4))])
-  let mr8 = style(. [marginRight(#px(8))])
 }
 
 module VoteButton = {
@@ -172,7 +171,7 @@ module RenderData = {
                           size=Heading.H5
                           weight=Heading.Regular
                           color={theme.neutral_900}
-                          style=Styles.mr8
+                          marginRight=8
                         />
                         <Text
                           value="min 50%"
@@ -191,7 +190,7 @@ module RenderData = {
                       </div>
                     </Col>
                   </Row>
-                  <Row marginTop=18>
+                  <Row marginTop=18 alignItems=Row.Center>
                     <Col col=Col.Six>
                       <div className={CssHelper.flexBox()}>
                         <Heading
@@ -206,7 +205,7 @@ module RenderData = {
                       <div className={CssHelper.flexBox()}>
                         <Text
                           value="Pass"
-                          size=Text.Body2
+                          size=Text.Body1
                           weight=Text.Semibold
                           color={theme.success_600}
                         />
@@ -214,8 +213,25 @@ module RenderData = {
                     </Col>
                   </Row>
                 </Col>
-                <Col col=Col.Eight>
-                  <Text value="ggwp" />
+                <Col col=Col.Five>
+                  <Row>
+                    <Col col=Col.Twelve>
+                      <Text
+                        value="Pass" size=Text.Body1 weight=Text.Semibold color={theme.success_600}
+                      />
+                    </Col>
+                    <Col col=Col.Twelve>
+                      <ProgressBar.Voting2
+                        slots={ProgressBar.Slot.getYesNoSlot(
+                          theme,
+                          ~yes={proposal.yesVote},
+                          ~no={proposal.noVote},
+                          ~totalWeight={proposal.totalWeight},
+                        )}
+                        fullWidth=true
+                      />
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </InfoContainer>

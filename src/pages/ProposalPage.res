@@ -53,7 +53,9 @@ module CouncilProposalCard = {
       <InfoContainer py=24>
         <Row>
           <Col col=Col.Twelve>
-            <div className={CssHelper.flexBox()}>
+            <Link
+              route=ProposalDetailsPage(proposal.id->ID.Proposal.toInt)
+              className={CssHelper.flexBox()}>
               <TypeID.Proposal
                 id={proposal.id}
                 position=TypeID.Title
@@ -68,7 +70,7 @@ module CouncilProposalCard = {
               />
               <HSpacing size=Spacing.sm />
               {isMobile ? React.null : <CouncilProposalBadge status=proposal.status />}
-            </div>
+            </Link>
             {isMobile
               ? <div className={Css.merge(list{CssHelper.flexBox(), Styles.badge})}>
                   <CouncilProposalBadge status=proposal.status />

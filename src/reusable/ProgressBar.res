@@ -25,12 +25,14 @@ module Styles = {
       background(success ? theme.primary_600 : theme.error_600),
     ])
 
-  let progressSlotContainer = style(. [
-    width(#px(100)),
-    height(#px(8)),
-    borderRadius(#px(2)),
-    overflow(#hidden),
-  ])
+  let progressSlotContainer = (fullWidth: bool) =>
+    style(. [
+      width(fullWidth ? #percent(100.) : #px(100)),
+      height(#px(8)),
+      borderRadius(#px(2)),
+      overflow(#hidden),
+      Media.mobile([width(fullWidth ? #percent(100.) : #px(60))]),
+    ])
 
   let progressSlot = (widthPercent, color, isLast) =>
     style(. [
@@ -259,14 +261,14 @@ module Slot = {
 
 module Voting2 = {
   @react.component
-  let make = (~slots: array<Slot.t>) => {
+  let make = (~slots: array<Slot.t>, ~fullWidth=false) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div
       className={CssJs.merge(. [
         CssHelper.flexBox(~wrap=#nowrap, ()),
-        Styles.progressSlotContainer,
+        Styles.progressSlotContainer(fullWidth),
       ])}>
       {slots
       ->Belt.Array.mapWithIndex((index, slot) =>
