@@ -160,14 +160,18 @@ let make = (
   ~underline=false,
   ~breakAll=false,
   ~transform=Normal,
-  ~value,
   ~tooltipItem=React.null,
   ~tooltipPlacement=AlignBottom,
   ~tooltipLeaveDelay=100,
   ~special=false,
+  ~value="",
+  ~children=?,
 ) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-
+  let children_ = switch children {
+  | Some(child) => child
+  | None => React.string(value)
+  }
   tooltipItem == React.null
     ? <p
         className={Css.merge(list{
@@ -186,7 +190,7 @@ let make = (
           underline ? Styles.underline : "",
           breakAll ? Styles.breakAll : "",
         })}>
-        {React.string(value)}
+        children_
       </p>
     : <Tooltip
         title=tooltipItem
@@ -211,7 +215,7 @@ let make = (
             underline ? Styles.underline : "",
             breakAll ? Styles.breakAll : "",
           ])}>
-          {React.string(value)}
+          children_
         </span>
       </Tooltip>
 }
