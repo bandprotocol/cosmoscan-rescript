@@ -40,39 +40,29 @@ module Styles = {
     padding2(~v=#zero, ~h=#zero),
     margin4(~top=#zero, ~right=#zero, ~bottom=#px(40), ~left=#zero),
   ])
+
   let badge = style(. [marginTop(#px(8))])
   let header = style(. [marginBottom(#px(24))])
+  let yesnoImg = style(. [width(#px(16)), height(#px(16)), marginRight(#px(4))])
+  let mr8 = style(. [marginRight(#px(8))])
 }
 
 module VoteButton = {
   @react.component
-  let make = (~proposalID) => {
-    let trackingSub = TrackingSub.use()
-
-    let (accountOpt, _) = React.useContext(AccountContext.context)
-    let (_, dispatchModal) = React.useContext(ModalContext.context)
-
-    let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
-
+  let make = (~proposalID, ~address) => {
     let vote = () => Webapi.Dom.window->Webapi.Dom.Window.alert("vote")
+    let accountQuery = AccountQuery.get(address)
 
-    switch accountOpt {
-    | Some(_) =>
-      <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
-        {"Vote"->React.string}
-      </Button>
-    | None =>
-      switch trackingSub {
-      | Data({chainID}) =>
-        <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => connect(chainID)}>
+    switch accountQuery {
+    | Data({councilOpt}) =>
+      switch councilOpt {
+      | Some(council) =>
+        <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
           {"Vote"->React.string}
         </Button>
-      | Error(err) =>
-        // log for err details
-        Js.Console.log(err)
-        <Text value="chain id not found" />
-      | _ => <LoadingCensorBar width=90 height=26 />
+      | None => React.null
       }
+    | _ => React.null
     }
   }
 }
@@ -82,12 +72,13 @@ module RenderData = {
   let make = (~proposal: CouncilProposalSub.t) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let (accountOpt, _) = React.useContext(AccountContext.context)
 
     <Section>
       <div className=CssHelper.container>
         <button
           className={Css.merge(list{CssHelper.flexBox(), Styles.buttonStyled})}
-          onClick={_ => Route.redirect(OracleScriptPage)}>
+          onClick={_ => Route.redirect(ProposalPage)}>
           <Icon name="fa fa-angle-left" mr=8 size=16 />
           <Text value="Back to all proposals" size=Text.Xl color=theme.neutral_600 />
         </button>
@@ -105,8 +96,7 @@ module RenderData = {
               <HSpacing size=Spacing.sm />
               <Heading
                 size=Heading.H1
-                // TODO: change dis wen title ready
-                value="Activate the community pool"
+                value=proposal.title
                 color={theme.neutral_900}
                 weight=Heading.Semibold
               />
@@ -149,8 +139,86 @@ module RenderData = {
               </Col>
             </Row>
           </Col>
-          <Col col=Col.Two>
-            <VoteButton proposalID=proposal.id />
+          {switch accountOpt {
+          | Some({address}) =>
+            <Col col=Col.Two>
+              <VoteButton proposalID=proposal.id address />
+            </Col>
+          | None => React.null
+          }}
+        </Row>
+        <SeperatedLine mt=32 mb=24 color=theme.neutral_200 />
+        <Row>
+          <Col>
+            <Heading
+              value="Vote Details"
+              size=Heading.H4
+              weight=Heading.Semibold
+              color={theme.neutral_600}
+              marginBottom=8
+            />
+          </Col>
+        </Row>
+        <Row marginBottom=24>
+          <Col>
+            <InfoContainer>
+              <Row>
+                <Col col=Col.Four>
+                  <Row>
+                    <Col col=Col.Six>
+                      <div className={CssHelper.flexBox()}>
+                        <Heading
+                          value="Yes Vote"
+                          size=Heading.H5
+                          weight=Heading.Regular
+                          color={theme.neutral_900}
+                          style=Styles.mr8
+                        />
+                        <Text
+                          value="min 50%"
+                          size=Text.Body2
+                          weight=Text.Regular
+                          color={theme.neutral_600}
+                        />
+                      </div>
+                    </Col>
+                    <Col col=Col.Six>
+                      <div className={CssHelper.flexBox()}>
+                        <img src={Images.yesGreen} alt={"Yes"} className=Styles.yesnoImg />
+                        <Text
+                          value="50%" size=Text.Body1 weight=Text.Bold color={theme.neutral_900}
+                        />
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row marginTop=18>
+                    <Col col=Col.Six>
+                      <div className={CssHelper.flexBox()}>
+                        <Heading
+                          value="Current Status"
+                          size=Heading.H5
+                          weight=Heading.Regular
+                          color={theme.neutral_900}
+                        />
+                      </div>
+                    </Col>
+                    <Col col=Col.Six>
+                      <div className={CssHelper.flexBox()}>
+                        <Text
+                          value="Pass"
+                          size=Text.Body2
+                          weight=Text.Semibold
+                          color={theme.success_600}
+                        />
+                      </div>
+                    </Col>
+                  </Row>
+                </Col>
+                <Col col=Col.Eight>
+                  <Text value="ggwp" />
+                </Col>
+              </Row>
+            </InfoContainer>
           </Col>
         </Row>
       </div>
