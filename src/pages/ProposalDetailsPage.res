@@ -44,7 +44,19 @@ module Styles = {
   let badge = style(. [marginTop(#px(8))])
   let header = style(. [marginBottom(#px(24))])
   let yesnoImg = style(. [width(#px(16)), height(#px(16)), marginRight(#px(4))])
+  let councilMember = (theme: Theme.t) => style(. [color(theme.primary_600)])
+
+  let smallDot = color =>
+    style(. [
+      width(#px(8)),
+      height(#px(8)),
+      borderRadius(#percent(50.)),
+      backgroundColor(color),
+      marginRight(#px(8)),
+    ])
 }
+
+let formatVotePercent = value => (value < 10. ? "0" : "") ++ value->Format.fPretty(~digits=2) ++ "%"
 
 module VoteButton = {
   @react.component
@@ -72,6 +84,9 @@ module RenderData = {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+
+    let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
     <Section>
       <div className=CssHelper.container>
@@ -121,7 +136,7 @@ module RenderData = {
                   color={theme.neutral_600}
                 />
                 <Timestamp
-                  size=Text.Body1 timeOpt={Some(proposal.votingEndTime)} color={theme.neutral_900}
+                  size=Text.Body1 timeOpt={Some(proposal.submitTime)} color={theme.neutral_900}
                 />
               </Col>
               <Col col=Col.Six>
@@ -174,7 +189,8 @@ module RenderData = {
                           marginRight=8
                         />
                         <Text
-                          value="min 50%"
+                          // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
+                          value={`min ${CouncilProposalSub.passedTheshold->Belt.Float.toString}%`}
                           size=Text.Body2
                           weight=Text.Regular
                           color={theme.neutral_600}
@@ -183,9 +199,19 @@ module RenderData = {
                     </Col>
                     <Col col=Col.Six>
                       <div className={CssHelper.flexBox()}>
-                        <img src={Images.yesGreen} alt={"Yes"} className=Styles.yesnoImg />
+                        <img
+                          src={switch proposal.councilVoteStatus {
+                          | Pass => Images.yesGreen
+                          | Reject => Images.noRed
+                          }}
+                          alt={proposal.councilVoteStatus->CouncilProposalSub.CurrentStatus.getStatusText}
+                          className=Styles.yesnoImg
+                        />
                         <Text
-                          value="50%" size=Text.Body1 weight=Text.Bold color={theme.neutral_900}
+                          value={proposal.yesVotePercent->Format.fPercent(~digits=2)}
+                          size=Text.Body1
+                          weight=Text.Bold
+                          color={theme.neutral_900}
                         />
                       </div>
                     </Col>
@@ -204,10 +230,13 @@ module RenderData = {
                     <Col col=Col.Six>
                       <div className={CssHelper.flexBox()}>
                         <Text
-                          value="Pass"
+                          value={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
                           size=Text.Body1
                           weight=Text.Semibold
-                          color={theme.success_600}
+                          color={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusColor(
+                            theme,
+                          )}
+                          block=true
                         />
                       </div>
                     </Col>
@@ -217,9 +246,27 @@ module RenderData = {
                   <Row>
                     <Col col=Col.Twelve>
                       <Text
-                        value="Pass" size=Text.Body1 weight=Text.Semibold color={theme.success_600}
-                      />
+                        size=Text.Body2
+                        weight=Text.Semibold
+                        color={theme.neutral_600}
+                        marginBottom=8>
+                        <span>
+                          {`${(proposal.noVote +. proposal.yesVote)
+                              ->Belt.Float.toString}/${proposal.totalWeight->Belt.Int.toString} `->React.string}
+                        </span>
+                        <span
+                          className={Css.merge(list{
+                            Styles.councilMember(theme),
+                            CssHelper.clickable,
+                          })}
+                          onClick={_ => openMembers()}>
+                          {proposal.council.name->CouncilSub.getCouncilNameString->React.string}
+                        </span>
+                        <span> {" member votes"->React.string} </span>
+                      </Text>
                     </Col>
+                  </Row>
+                  <Row>
                     <Col col=Col.Twelve>
                       <ProgressBar.Voting2
                         slots={ProgressBar.Slot.getYesNoSlot(
@@ -229,6 +276,60 @@ module RenderData = {
                           ~totalWeight={proposal.totalWeight},
                         )}
                         fullWidth=true
+                      />
+                    </Col>
+                  </Row>
+                  <Row marginTop=4>
+                    <Col col=Col.Three>
+                      <div className={CssHelper.flexBox()}>
+                        <div className={Styles.smallDot(theme.success_600)} />
+                        <Text
+                          value="Yes"
+                          size=Text.Body2
+                          weight=Text.Semibold
+                          color={theme.neutral_900}
+                          marginRight=8
+                        />
+                        <Text
+                          value={proposal.yesVotePercent->formatVotePercent}
+                          size=Text.Body2
+                          weight=Text.Regular
+                          color={theme.neutral_900}
+                        />
+                      </div>
+                      <Text
+                        value={`${proposal.yesVote->Belt.Float.toString} ${proposal.yesVote > 1.
+                            ? "votes"
+                            : "vote"}`}
+                        size=Text.Body2
+                        weight=Text.Regular
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Three>
+                      <div className={CssHelper.flexBox()}>
+                        <div className={Styles.smallDot(theme.error_600)} />
+                        <Text
+                          value="No"
+                          size=Text.Body2
+                          weight=Text.Semibold
+                          color={theme.neutral_900}
+                          marginRight=8
+                        />
+                        <Text
+                          value={proposal.noVotePercent->formatVotePercent}
+                          size=Text.Body2
+                          weight=Text.Regular
+                          color={theme.neutral_900}
+                        />
+                      </div>
+                      <Text
+                        value={`${proposal.noVote->Belt.Float.toString} ${proposal.noVote > 1.
+                            ? "votes"
+                            : "vote"}`}
+                        size=Text.Body2
+                        weight=Text.Regular
+                        color={theme.neutral_600}
                       />
                     </Col>
                   </Row>

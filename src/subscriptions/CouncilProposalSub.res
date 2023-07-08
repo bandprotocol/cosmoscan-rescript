@@ -54,6 +54,7 @@ module Status = {
     str->Js.Json.string
   }
 }
+
 type proposal_t = {
   yesVote: option<float>,
   noVote: option<float>,
@@ -62,10 +63,25 @@ type proposal_t = {
   totalBondedTokens: option<float>,
 }
 
+module CurrentStatus = {
+  type t = Pass | Reject
+
+  let getStatusText = status =>
+    switch status {
+    | Pass => "Pass"
+    | Reject => "Reject"
+    }
+
+  let getStatusColor = (status, theme: Theme.t) =>
+    switch status {
+    | Pass => theme.success_600
+    | Reject => theme.error_600
+    }
+}
+
 module VetoProposal = {
-  type status_t = Pass | Reject
   type t = {
-    status: status_t,
+    status: CurrentStatus.t,
     turnOut: float,
     yesVote: float,
     noVote: float,
@@ -77,10 +93,12 @@ module VetoProposal = {
     noWithVetoVotePercent: float,
     abstainVotePercent: float,
     totalBondedTokens: float,
+    turnout: float,
   }
 
   // percent of yes vote to win
-  let passedTheshold = 50.
+  let yesTheshold = 50.
+  let turnoutTheshold = 40.
 
   let fromProposal = (proposal: proposal_t) => {
     let yesVote = proposal.yesVote->Belt.Option.getWithDefault(0.)
@@ -90,9 +108,9 @@ module VetoProposal = {
     let totalVote = yesVote +. noVote +. noWithVetoVote +. abstainVote
     let yesVotePercent = yesVote /. totalVote *. 100.
     let totalBondedTokens = proposal.totalBondedTokens->Belt.Option.getWithDefault(0.)
-
+    let turnout = totalVote /. totalBondedTokens *. 100.
     {
-      status: switch yesVotePercent > passedTheshold {
+      status: switch yesVotePercent >= yesTheshold && turnout >= turnoutTheshold {
       | true => Pass
       | false => Reject
       },
@@ -107,20 +125,9 @@ module VetoProposal = {
       noWithVetoVotePercent: noWithVetoVote /. totalVote *. 100.,
       abstainVotePercent: abstainVote /. totalVote *. 100.,
       totalBondedTokens,
+      turnout,
     }
   }
-
-  let getStatusText = status =>
-    switch status {
-    | Pass => "Pass"
-    | Reject => "Reject"
-    }
-
-  let getStatusColor = (status, theme: Theme.t) =>
-    switch status {
-    | Pass => theme.success_600
-    | Reject => theme.error_600
-    }
 }
 
 type proposal_type_t = Tech | Grant | BandDAO | Unknown
@@ -154,13 +161,16 @@ type t = {
   yesVote: float,
   yesVotePercent: float,
   noVote: float,
+  noVotePercent: float,
   submitTime: MomentRe.Moment.t,
   vetoEndTime: option<MomentRe.Moment.t>,
   votingEndTime: MomentRe.Moment.t,
-  vetoProposal: option<VetoProposal.t>,
+  vetoProposalOpt: option<VetoProposal.t>,
   metadata: string,
   messages: Js.Json.t,
   proposalType: proposal_type_t,
+  councilVoteStatus: CurrentStatus.t, // indicate is council yes vote passed
+  currentStatus: CurrentStatus.t, // same as councilVoteStatus but check if veto pass or not
 }
 
 module SingleConfig = %graphql(`
@@ -275,6 +285,9 @@ let parseProposalType = councilName =>
   | Unknown => Unknown
   }
 
+// percent of yes vote required for proposal to win
+let passedTheshold = 50.
+
 let toExternal = (
   {
     id,
@@ -294,6 +307,11 @@ let toExternal = (
     totalWeight,
   }: internal_t,
 ) => {
+  let yesVotePercent =
+    yesVote->Belt.Option.getWithDefault(0.) /. totalWeight->Belt.Int.toFloat *. 100.
+  let noVotePercent =
+    noVote->Belt.Option.getWithDefault(0.) /. totalWeight->Belt.Int.toFloat *. 100.
+  let vetoProposalOpt = proposal->Belt.Option.map(VetoProposal.fromProposal)
   {
     id,
     title,
@@ -303,16 +321,32 @@ let toExternal = (
     vetoEndTime,
     council,
     yesVote: yesVote->Belt.Option.getWithDefault(0.),
-    yesVotePercent: yesVote->Belt.Option.getWithDefault(0.) /.
-    totalWeight->Belt.Int.toFloat *. 100.,
+    yesVotePercent,
     noVote: noVote->Belt.Option.getWithDefault(0.),
+    noVotePercent,
     votingEndTime,
-    vetoProposal: proposal->Belt.Option.map(VetoProposal.fromProposal),
+    vetoProposalOpt,
     metadata,
     messages,
     submitTime,
     totalWeight,
     proposalType: council.name->parseProposalType,
+    councilVoteStatus: switch yesVotePercent >= passedTheshold {
+    | true => Pass
+    | false => Reject
+    },
+    currentStatus: switch yesVotePercent >= passedTheshold {
+    | true =>
+      switch vetoProposalOpt {
+      | Some(vetoProposal) =>
+        switch vetoProposal.status {
+        | Pass => Reject
+        | Reject => Pass
+        }
+      | None => Pass
+      }
+    | false => Reject
+    },
   }
 }
 

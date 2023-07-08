@@ -149,7 +149,7 @@ module CouncilProposalCard = {
           </Col>
           {isMobile
             ? React.null
-            : switch proposal.vetoProposal {
+            : switch proposal.vetoProposalOpt {
               | Some(vetoProposal) =>
                 <Col col=Col.One>
                   <Heading
@@ -160,10 +160,10 @@ module CouncilProposalCard = {
                     color={theme.neutral_600}
                   />
                   <Text
-                    value={vetoProposal.status->CouncilProposalSub.VetoProposal.getStatusText}
+                    value={vetoProposal.status->CouncilProposalSub.CurrentStatus.getStatusText}
                     size=Text.Body1
                     weight=Text.Thin
-                    color={vetoProposal.status->CouncilProposalSub.VetoProposal.getStatusColor(
+                    color={vetoProposal.status->CouncilProposalSub.CurrentStatus.getStatusColor(
                       theme,
                     )}
                     spacing=Text.Em(0.05)
