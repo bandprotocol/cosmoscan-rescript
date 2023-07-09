@@ -137,6 +137,7 @@ type internal_t = {
   title: string,
   council: council_t,
   councilId: int,
+  account: account_t,
   status: Status.t,
   totalWeight: int,
   vetoId: option<int>,
@@ -155,6 +156,7 @@ type t = {
   title: string,
   council: council_t,
   councilId: int,
+  account: account_t,
   status: Status.t,
   totalWeight: int,
   vetoId: option<int>,
@@ -167,7 +169,7 @@ type t = {
   votingEndTime: MomentRe.Moment.t,
   vetoProposalOpt: option<VetoProposal.t>,
   metadata: string,
-  messages: Js.Json.t,
+  messages: list<Msg.result_t>,
   proposalType: proposal_type_t,
   councilVoteStatus: CurrentStatus.t, // indicate is council yes vote passed
   currentStatus: CurrentStatus.t, // same as councilVoteStatus but check if veto pass or not
@@ -192,6 +194,9 @@ module SingleConfig = %graphql(`
           metadata
           since @ppxCustom(module: "GraphQLParserModule.Date")
         }
+      }
+      account @ppxAs(type: "account_t") {
+        address @ppxCustom(module:"GraphQLParserModule.Address")
       }
       councilId: council_id
       vetoId: veto_id
@@ -234,6 +239,9 @@ module MultiConfig = %graphql(`
           metadata
           since @ppxCustom(module: "GraphQLParserModule.Date")
         }
+      }
+      account @ppxAs(type: "account_t") {
+        address @ppxCustom(module:"GraphQLParserModule.Address")
       }
       councilId: council_id
       vetoId: veto_id
@@ -294,6 +302,7 @@ let toExternal = (
     title,
     council,
     councilId,
+    account,
     status,
     vetoId,
     vetoEndTime,
@@ -312,10 +321,12 @@ let toExternal = (
   let noVotePercent =
     noVote->Belt.Option.getWithDefault(0.) /. totalWeight->Belt.Int.toFloat *. 100.
   let vetoProposalOpt = proposal->Belt.Option.map(VetoProposal.fromProposal)
+
   {
     id,
     title,
     councilId,
+    account,
     status,
     vetoId,
     vetoEndTime,
@@ -327,7 +338,13 @@ let toExternal = (
     votingEndTime,
     vetoProposalOpt,
     metadata,
-    messages,
+    messages: {
+      let msg = messages->Js.Json.decodeArray
+      switch msg {
+      | Some(msg) => msg->Belt.List.fromArray
+      | None => []->Belt.List.fromArray
+      }->Belt.List.map(each => Msg.decodeMsg(each, false))
+    },
     submitTime,
     totalWeight,
     proposalType: council.name->parseProposalType,

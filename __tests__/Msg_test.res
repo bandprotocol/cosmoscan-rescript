@@ -85,7 +85,7 @@ describe("Expect MsgVote decodeMsg to work correctly", () => {
   },
   "type": "/cosmos.gov.v1beta1.MsgVote"
 }`->Js.Json.parseExn,
-      decoded: VoteMsg(
+      decoded: LegacyVoteMsg(
         Success({
           voterAddress: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32,
           proposalID: 5->ID.Proposal.fromInt,
@@ -121,7 +121,7 @@ describe("Expect MsgVote decodeMsg to work correctly", () => {
   },
   "type": "/cosmos.gov.v1beta1.MsgVote"
 }`->Js.Json.parseExn,
-      decoded: VoteMsg(
+      decoded: LegacyVoteMsg(
         Success({
           voterAddress: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32,
           proposalID: 5->ID.Proposal.fromInt,
@@ -157,7 +157,7 @@ describe("Expect MsgVote decodeMsg to work correctly", () => {
   },
   "type": "/cosmos.gov.v1beta1.MsgVote"
 }`->Js.Json.parseExn,
-      decoded: VoteMsg(
+      decoded: LegacyVoteMsg(
         Failure({
           voterAddress: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32,
           proposalID: 5->ID.Proposal.fromInt,

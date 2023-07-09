@@ -273,6 +273,7 @@ module Voting2 = {
       {slots
       ->Belt.Array.mapWithIndex((index, slot) =>
         <div
+          key={index->Belt.Int.toString}
           className={Styles.progressSlot(
             slot.percent,
             slot.color,

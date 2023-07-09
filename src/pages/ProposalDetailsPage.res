@@ -54,6 +54,8 @@ module Styles = {
       backgroundColor(color),
       marginRight(#px(8)),
     ])
+
+  let msgContainer = style(. [selector("> div + div", [marginTop(#px(24))])])
 }
 
 let formatVotePercent = value => (value < 10. ? "0" : "") ++ value->Format.fPretty(~digits=2) ++ "%"
@@ -336,6 +338,95 @@ module RenderData = {
                 </Col>
               </Row>
             </InfoContainer>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Heading
+              value="Proposal Details"
+              size=Heading.H4
+              weight=Heading.Semibold
+              color={theme.neutral_600}
+              marginBottom=8
+            />
+          </Col>
+        </Row>
+        <Row marginBottom=24>
+          <Col>
+            <InfoContainer>
+              <Row marginBottom=16 alignItems=Row.Center>
+                <Col col=Col.Two colSm=Col.Four>
+                  <Heading
+                    value="Proposer" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Ten colSm=Col.Eight>
+                  <AddressRender
+                    address={proposal.account.address}
+                    position=AddressRender.Subtitle
+                    copy=true
+                    ellipsis=isMobile
+                  />
+                </Col>
+              </Row>
+              <Row marginBottom=16 alignItems=Row.Center>
+                <Col col=Col.Two colSm=Col.Four>
+                  <Heading
+                    value="Vote by" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Ten colSm=Col.Eight>
+                  <div className={CssHelper.clickable} onClick={_ => openMembers()}>
+                    <Text
+                      value={proposal.council.name->CouncilSub.getCouncilNameString}
+                      size=Text.Body1
+                      weight=Text.Thin
+                      color=theme.primary_600
+                      spacing=Text.Em(0.05)
+                      block=true
+                    />
+                  </div>
+                </Col>
+              </Row>
+              <Row marginBottom=16 alignItems=Row.Center>
+                <Col col=Col.Two colSm=Col.Four>
+                  <Heading
+                    value="Description"
+                    size=Heading.H4
+                    weight=Heading.Thin
+                    color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Ten colSm=Col.Eight>
+                  // TODO: where is description in database?
+                  <MarkDown value=proposal.metadata />
+                </Col>
+              </Row>
+            </InfoContainer>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Heading
+              value={`Messages (${proposal.messages->Belt.List.length->Belt.Int.toString})`}
+              size=Heading.H4
+              weight=Heading.Semibold
+              color={theme.neutral_600}
+              marginBottom=16
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <div className=Styles.msgContainer>
+              {proposal.messages
+              ->Belt.List.mapWithIndex((index, msg) => {
+                let badge = msg.decoded->Msg.getBadge
+                <MsgDetailCard key={index->Belt.Int.toString ++ badge.name} msg />
+              })
+              ->Array.of_list
+              ->React.array}
+            </div>
           </Col>
         </Row>
       </div>
