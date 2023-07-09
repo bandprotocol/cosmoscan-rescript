@@ -8,8 +8,11 @@
 @module("./loading-circle-dark.png") external loadingCircleDark: string = "default"
 @module("./yes-green.png") external yesGreen: string = "default"
 @module("./yes-red.png") external yesRed: string = "default"
+@module("./yes-gray.png") external yesGray: string = "default"
 @module("./no-green.png") external noGreen: string = "default"
 @module("./no-red.png") external noRed: string = "default"
+@module("./no-gray.png") external noGray: string = "default"
+@module("./question.png") external question: string = "default"
 
 // Theme Toggle
 @module("./sun-icon.png") external sunIcon: string = "default"

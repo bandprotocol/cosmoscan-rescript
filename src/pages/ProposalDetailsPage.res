@@ -56,6 +56,7 @@ module Styles = {
     ])
 
   let msgContainer = style(. [selector("> div + div", [marginTop(#px(24))])])
+  let chip = style(. [borderRadius(#px(20))])
 }
 
 let formatVotePercent = value => (value < 10. ? "0" : "") ++ value->Format.fPretty(~digits=2) ++ "%"
@@ -87,6 +88,8 @@ module RenderData = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
+
+    let (filterStr, setFilterStr) = React.useState(_ => "All")
 
     let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
@@ -405,18 +408,17 @@ module RenderData = {
             </InfoContainer>
           </Col>
         </Row>
-        <Row>
+        <Row marginBottom=16>
           <Col>
             <Heading
               value={`Messages (${proposal.messages->Belt.List.length->Belt.Int.toString})`}
               size=Heading.H4
               weight=Heading.Semibold
               color={theme.neutral_600}
-              marginBottom=16
             />
           </Col>
         </Row>
-        <Row>
+        <Row marginBottom=24>
           <Col>
             <div className=Styles.msgContainer>
               {proposal.messages
@@ -426,6 +428,31 @@ module RenderData = {
               })
               ->Array.of_list
               ->React.array}
+            </div>
+          </Col>
+        </Row>
+        <Row marginBottom=16>
+          <Col>
+            <div className={CssHelper.flexBox(~align=#center, ())}>
+              <Heading
+                value={`Votes`}
+                size=Heading.H4
+                weight=Heading.Semibold
+                color={theme.neutral_600}
+                marginRight=24
+              />
+              <div>
+                <ChipButton
+                  // key={i->Belt.Int.toString}
+                  variant={ChipButton.Primary}
+                  onClick={_ => setFilterStr(_ => "All")}
+                  isActive={true}
+                  color=theme.neutral_100
+                  activeColor=theme.neutral_700
+                  style={Styles.chip}>
+                  {"All"->React.string}
+                </ChipButton>
+              </div>
             </div>
           </Col>
         </Row>
