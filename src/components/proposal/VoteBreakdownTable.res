@@ -122,9 +122,6 @@ let make = (
       !(voteAddressList->Belt.List.has(member.account.address, (a, b) => Address.isEqual(a, b)))
     )
 
-  Js.log(voteAddressList)
-  Js.log(notVoteMember)
-
   <>
     <Row marginBottom=16>
       <Col>
@@ -139,20 +136,21 @@ let make = (
           <div className={CssHelper.flexBox()}>
             {[All, Yes, No, DidNotVote]
             ->Belt.Array.map(choice =>
-              <ChipButton
-                key={choice->choiceString}
-                variant={ChipButton.Primary}
-                onClick={_ => setFilter(_ => choice)}
-                isActive={filter == choice}
-                color=theme.neutral_700
-                activeColor=theme.white
-                bgColor=theme.neutral_100
-                activeBgColor=theme.neutral_700
-                style={Styles.chip}>
-                {`${choice->choiceString} (${choice
-                  ->choiceVoteCount
-                  ->Belt.Int.toString})`->React.string}
-              </ChipButton>
+              <React.Fragment key={choice->choiceString}>
+                <ChipButton
+                  variant={ChipButton.Primary}
+                  onClick={_ => setFilter(_ => choice)}
+                  isActive={filter == choice}
+                  color=theme.neutral_700
+                  activeColor=theme.white
+                  bgColor=theme.neutral_100
+                  activeBgColor=theme.neutral_700
+                  style={Styles.chip}>
+                  {`${choice->choiceString} (${choice
+                    ->choiceVoteCount
+                    ->Belt.Int.toString})`->React.string}
+                </ChipButton>
+              </React.Fragment>
             )
             ->React.array}
           </div>
