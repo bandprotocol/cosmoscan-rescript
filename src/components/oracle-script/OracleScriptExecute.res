@@ -396,7 +396,7 @@ module ExecutionPart = {
               }}
               <div className={CssHelper.flexBox()}>
                 <SwitchV2 checked=showAdvance onClick={_ => setShowAdvance(_ => !showAdvance)} />
-                <Text value="Advance settings" size=Text.Body1 color=theme.neutral_900 />
+                <Text value="Advanced settings" size=Text.Body1 color=theme.neutral_900 />
               </div>
               {showAdvance
                 ? <div>

@@ -4,7 +4,6 @@ module Styles = {
   let idCointainer = style(. [marginBottom(#px(16))])
   let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
   let noPadding = style(. [padding(#zero)])
-  let info = style(. [borderRadius(#px(16))])
   let oracleId = style(. [
     fontFamilies([#custom("Roboto Mono"), #monospace]),
     Media.mobile([display(#block), marginBottom(#px(8))]),
@@ -38,8 +37,13 @@ module Content = {
         <button
           className={Css.merge(list{CssHelper.flexBox(), Styles.buttonStyled})}
           onClick={_ => Route.redirect(OracleScriptPage)}>
-          <Icon name="fa fa-angle-left" mr=8 size=14 />
-          <Text value="Back to all oracle scripts" size=Text.Xl color=theme.neutral_600 />
+          <Icon name="fa fa-angle-left" mr=8 size=16 />
+          <Text
+            value="Back to all Oracle Scripts"
+            size=Text.Xl
+            weight=Text.Semibold
+            color=theme.neutral_600
+          />
         </button>
         <Row marginBottom=24 marginBottomSm=24 alignItems=Row.Center>
           <Col col=Col.Six>
@@ -57,38 +61,30 @@ module Content = {
             </div>
           </Col>
           <Col col=Col.Three colSm=Col.Six>
-            <InfoContainer py=16 style=Styles.info>
-              <Heading
-                value="24 hr Requests"
-                size=Heading.H4
-                weight=Heading.Thin
-                color={theme.neutral_600}
-                marginBottom=4
-              />
+            <InfoContainer py=16>
+              <Text value="24 hr Requests" size={Xl} />
               {switch oracleScriptSub {
               | Data({requestCount}) =>
-                <Text
-                  // TODO: change to 24 hours when graphql database is ready
-                  value={requestCount->Format.iPretty}
-                  size=Text.Xxxxl
-                  block=true
-                  weight=Text.Bold
-                  color={theme.neutral_900}
-                  code=true
-                />
+                <>
+                  <VSpacing size=Spacing.xs />
+                  <Text
+                    // TODO: change to 24 hours when graphql database is ready
+                    value={requestCount->Format.iPretty}
+                    size=Text.Xxxxl
+                    block=true
+                    weight=Text.Bold
+                    color={theme.neutral_900}
+                    code=true
+                  />
+                </>
               | _ => <LoadingCensorBar width=100 height=15 />
               }}
             </InfoContainer>
           </Col>
           <Col col=Col.Three colSm=Col.Six>
-            <InfoContainer py=16 style=Styles.info>
+            <InfoContainer py=16>
               <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
-                <Heading
-                  value="Response Time"
-                  size=Heading.H4
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
-                />
+                <Text value="Response Time" size={Xl} />
                 <HSpacing size=Spacing.xs />
                 <CTooltip
                   tooltipPlacementSm=CTooltip.BottomRight
@@ -98,18 +94,21 @@ module Content = {
               </div>
               {switch statSub {
               | Data(statOpt) =>
-                <Text
-                  value={switch statOpt {
-                  | Some({responseTime}) =>
-                    responseTime->Belt.Option.getExn->Format.fPretty(~digits=2)
-                  | None => "TBD"
-                  }}
-                  size=Text.Xxxxl
-                  weight=Text.Bold
-                  block=true
-                  code=true
-                  color={theme.neutral_900}
-                />
+                <>
+                  <VSpacing size=Spacing.xs />
+                  <Text
+                    value={switch statOpt {
+                    | Some({responseTime}) =>
+                      responseTime->Belt.Option.getExn->Format.fPretty(~digits=2)
+                    | None => "TBD"
+                    }}
+                    size=Text.Xxxxl
+                    weight=Text.Bold
+                    block=true
+                    code=true
+                    color={theme.neutral_900}
+                  />
+                </>
               | Error(_) | Loading | NoData => <LoadingCensorBar width=100 height=15 />
               }}
             </InfoContainer>
