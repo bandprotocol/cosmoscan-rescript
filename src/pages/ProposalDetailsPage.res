@@ -57,6 +57,17 @@ module Styles = {
 
   let msgContainer = style(. [selector("> div + div", [marginTop(#px(24))])])
   let chip = style(. [borderRadius(#px(20))])
+
+  let voteRowContainer = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
+      padding2(~v=#px(16), ~h=#px(32)),
+      borderRadius(#px(16)),
+      marginBottom(#px(8)),
+      boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
+      border(#px(1), #solid, theme.neutral_100),
+      Media.mobile([padding2(~v=#px(16), ~h=#px(16))]),
+    ])
 }
 
 let formatVotePercent = value => (value < 10. ? "0" : "") ++ value->Format.fPretty(~digits=2) ++ "%"
@@ -81,6 +92,46 @@ module VoteButton = {
   }
 }
 
+module VoteRow = {
+  @react.component
+  let make = (~vote: CouncilVoteSub.t) => {
+    let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = React.useContext(ThemeContext.context)
+
+    <div
+      key={vote.account.address->Address.toBech32}
+      className={Styles.voteRowContainer(theme, isDarkMode)}>
+      <Row>
+        <Col col=Col.Three>
+          <AddressRender address={vote.account.address} position={Subtitle} ellipsis=true />
+        </Col>
+        <Col col=Col.Four>
+          {switch vote.transactionOpt {
+          | Some(tx) =>
+            <TxLink txHash=tx.hash width=110 size=Text.Body1 weight=Text.Regular fullHash=false />
+          | None => React.null
+          }}
+        </Col>
+        <Col col=Col.Two>
+          <Text
+            value={vote.option->CouncilVoteSub.getVoteString}
+            weight=Text.Medium
+            color={switch vote.option {
+            | Yes => theme.success_600
+            | _ => theme.error_600
+            }}
+            size={Body1}
+          />
+        </Col>
+        <Col col=Col.Three style={CssHelper.flexBox(~justify=#end_, ())}>
+          <Timestamp
+            timeOpt=vote.timestampOpt size=Text.Body1 weight=Text.Regular textAlign=Text.Right
+          />
+        </Col>
+      </Row>
+    </div>
+  }
+}
+
 module RenderData = {
   @react.component
   let make = (~proposal: CouncilProposalSub.t) => {
@@ -88,6 +139,8 @@ module RenderData = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
+
+    let councilVoteSub = CouncilVoteSub.get(proposal.id->ID.Proposal.toInt)
 
     let (filterStr, setFilterStr) = React.useState(_ => "All")
 
@@ -456,6 +509,24 @@ module RenderData = {
             </div>
           </Col>
         </Row>
+        <Row marginBottom=8 style={CssHelper.px(~size=32, ())}>
+          <Col col=Col.Three>
+            <Text block=true value="VOTERS" size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col col=Col.Four>
+            <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col col=Col.Two>
+            <Text block=true value="ANSWER" size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col col=Col.Three>
+            <Text block=true value="TIME" size=Text.Caption weight=Text.Semibold align=Text.Right />
+          </Col>
+        </Row>
+        {switch councilVoteSub {
+        | Data(votes) => votes->Belt.Array.map(vote => <VoteRow vote />)->React.array
+        | _ => React.null
+        }}
       </div>
     </Section>
   }

@@ -14,7 +14,7 @@ type vote_t =
 
 let getVoteString = vote =>
   switch vote {
-  | Yes => "Vote"
+  | Yes => "Yes"
   | No => "No"
   | Unknown => "Unknown"
   }
@@ -39,42 +39,66 @@ module VoteOption = {
 type internal_t = {
   account: account_t,
   option: VoteOption.t,
-  transaction: transaction_t,
-  txId: int,
+  transactionOpt: option<transaction_t>,
   voterId: int,
+}
+
+type vote_stat_t = {
+  yes: float,
+  no: float,
+}
+
+// type alias for good semantic
+type t = {
+  account: account_t,
+  option: VoteOption.t,
+  transactionOpt: option<transaction_t>,
+  voterId: int,
+  timestampOpt: option<MomentRe.Moment.t>,
 }
 
 module SingleConfig = %graphql(`
   subscription CouncilProposal($council_proposal_id: Int!) {
-    council_votes(where: {council_proposal_id: {_eq: $council_proposal_id } }) {
+    council_votes(where: {council_proposal_id: {_eq: $council_proposal_id } }) @ppxAs(type: "internal_t") {
       account @ppxAs(type: "account_t") {
         address @ppxCustom(module:"GraphQLParserModule.Address")
       }
       option @ppxCustom(module:"VoteOption")
-      transaction {
+      transactionOpt: transaction @ppxAs(type: "transaction_t")  {
         hash @ppxCustom(module: "GraphQLParserModule.Hash")
         block @ppxAs(type: "block_t")  {
           timestamp @ppxCustom(module: "GraphQLParserModule.Date")
         }
       }
-      txId: tx_id
       voterId: voter_id
     }
   }
 `)
 
-let toExternal = ({account, option, transaction, txId, voterId}) => {
+let toExternal = ({account, option, transactionOpt, voterId}: internal_t) => {
   {
     account,
     option,
-    transaction,
-    txId,
+    transactionOpt,
     voterId,
+    timestampOpt: transactionOpt->Belt.Option.map(tx => tx.block.timestamp),
   }
+}
+
+// TODO: calculate yes no with weight
+let getVoteStat = vote => {
+  None
 }
 
 let get = councilProposalId => {
   let result = SingleConfig.use({council_proposal_id: councilProposalId})
 
-  result->Sub.fromData->Sub.map(internal => internal.council_votes)
+  result
+  ->Sub.fromData
+  ->Sub.map(({council_votes}) =>
+    switch council_votes->Belt.Array.length > 0 {
+    | true => council_votes->Belt.Array.map(toExternal)
+    | false => []
+    }
+  )
 }
