@@ -482,7 +482,7 @@ let make = (~proposalID) => {
             </Row>
             <Row marginBottom=24>
               <Col>
-                <VoteBreakdownTable proposalID />
+                <VoteBreakdownTableOld proposalID />
               </Col>
             </Row>
           </>

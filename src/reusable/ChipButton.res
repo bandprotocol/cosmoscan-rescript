@@ -17,6 +17,8 @@ module Styles = {
     ~isActive=false,
     ~color_: Theme.color_t,
     ~activeColor_: Theme.color_t,
+    ~bgColor_: Theme.color_t,
+    ~activeBgColor_: Theme.color_t,
     (),
   ) => {
     let base = style(. [
@@ -37,11 +39,11 @@ module Styles = {
     let custom = switch variant {
     | Primary =>
       style(. [
-        backgroundColor(isActive ? activeColor_ : color_),
-        color(theme.white),
-        border(#px(1), #solid, isActive ? activeColor_ : color_),
-        hover([backgroundColor(isActive ? activeColor_ : color_)]),
-        active([backgroundColor(isActive ? activeColor_ : color_)]),
+        backgroundColor(isActive ? activeBgColor_ : bgColor_),
+        color(isActive ? activeColor_ : color_),
+        border(#px(1), #solid, isActive ? activeBgColor_ : bgColor_),
+        hover([backgroundColor(isActive ? activeBgColor_ : bgColor_)]),
+        active([backgroundColor(isActive ? activeBgColor_ : bgColor_)]),
         disabled([
           backgroundColor(isDarkMode ? theme.primary_600 : theme.neutral_200),
           color(Theme.white),
@@ -51,16 +53,16 @@ module Styles = {
       ])
     | Outline =>
       style(. [
-        backgroundColor(isActive ? activeColor_ : #transparent),
-        color(isActive ? Theme.white : theme.neutral_900),
-        border(#px(1), #solid, color_),
+        backgroundColor(isActive ? activeBgColor_ : #transparent),
+        color(isActive ? activeColor_ : color_),
+        border(#px(1), #solid, bgColor_),
         selector("i", [color(theme.neutral_900)]),
         hover([
-          backgroundColor(activeColor_),
+          backgroundColor(activeBgColor_),
           color(isDarkMode ? Theme.black : Theme.white),
           selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
         ]),
-        active([backgroundColor(activeColor_)]),
+        active([backgroundColor(activeBgColor_)]),
         disabled([
           borderColor(theme.neutral_600),
           color(theme.neutral_600),
@@ -70,7 +72,7 @@ module Styles = {
         selector(
           "&.selected",
           [
-            backgroundColor(activeColor_),
+            backgroundColor(activeBgColor_),
             color(isDarkMode ? Theme.black : Theme.white),
             selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
           ],
@@ -97,6 +99,8 @@ let make = (
   ~isActive=false,
   ~color=?,
   ~activeColor=?,
+  ~bgColor=?,
+  ~activeBgColor=?,
 ) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -112,8 +116,10 @@ let make = (
         theme,
         isDarkMode,
         ~isActive,
-        ~color_=color->Belt.Option.getWithDefault(theme.primary_600),
-        ~activeColor_=activeColor->Belt.Option.getWithDefault(theme.primary_600),
+        ~color_=color->Belt.Option.getWithDefault(theme.white),
+        ~activeColor_=activeColor->Belt.Option.getWithDefault(theme.neutral_900),
+        ~bgColor_=bgColor->Belt.Option.getWithDefault(theme.primary_600),
+        ~activeBgColor_=activeBgColor->Belt.Option.getWithDefault(theme.primary_600),
         (),
       ),
       CssHelper.flexBox(~align=#center, ~justify=#center, ()),

@@ -56,18 +56,6 @@ module Styles = {
     ])
 
   let msgContainer = style(. [selector("> div + div", [marginTop(#px(24))])])
-  let chip = style(. [borderRadius(#px(20))])
-
-  let voteRowContainer = (theme: Theme.t, isDarkMode) =>
-    style(. [
-      backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
-      padding2(~v=#px(16), ~h=#px(32)),
-      borderRadius(#px(16)),
-      marginBottom(#px(8)),
-      boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
-      border(#px(1), #solid, theme.neutral_100),
-      Media.mobile([padding2(~v=#px(16), ~h=#px(16))]),
-    ])
 }
 
 let formatVotePercent = value => (value < 10. ? "0" : "") ++ value->Format.fPretty(~digits=2) ++ "%"
@@ -92,57 +80,13 @@ module VoteButton = {
   }
 }
 
-module VoteRow = {
-  @react.component
-  let make = (~vote: CouncilVoteSub.t) => {
-    let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = React.useContext(ThemeContext.context)
-
-    <div
-      key={vote.account.address->Address.toBech32}
-      className={Styles.voteRowContainer(theme, isDarkMode)}>
-      <Row>
-        <Col col=Col.Three>
-          <AddressRender address={vote.account.address} position={Subtitle} ellipsis=true />
-        </Col>
-        <Col col=Col.Four>
-          {switch vote.transactionOpt {
-          | Some(tx) =>
-            <TxLink txHash=tx.hash width=110 size=Text.Body1 weight=Text.Regular fullHash=false />
-          | None => React.null
-          }}
-        </Col>
-        <Col col=Col.Two>
-          <Text
-            value={vote.option->CouncilVoteSub.getVoteString}
-            weight=Text.Medium
-            color={switch vote.option {
-            | Yes => theme.success_600
-            | _ => theme.error_600
-            }}
-            size={Body1}
-          />
-        </Col>
-        <Col col=Col.Three style={CssHelper.flexBox(~justify=#end_, ())}>
-          <Timestamp
-            timeOpt=vote.timestampOpt size=Text.Body1 weight=Text.Regular textAlign=Text.Right
-          />
-        </Col>
-      </Row>
-    </div>
-  }
-}
-
 module RenderData = {
   @react.component
-  let make = (~proposal: CouncilProposalSub.t) => {
+  let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
-
-    let councilVoteSub = CouncilVoteSub.get(proposal.id->ID.Proposal.toInt)
-
-    let (filterStr, setFilterStr) = React.useState(_ => "All")
 
     let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
@@ -309,8 +253,11 @@ module RenderData = {
                         color={theme.neutral_600}
                         marginBottom=8>
                         <span>
-                          {`${(proposal.noVote +. proposal.yesVote)
-                              ->Belt.Float.toString}/${proposal.totalWeight->Belt.Int.toString} `->React.string}
+                          {`${votes
+                            ->Belt.Array.length
+                            ->Belt.Int.toString}/${proposal.council.councilMembers
+                            ->Belt.Array.length
+                            ->Belt.Int.toString} `->React.string}
                         </span>
                         <span
                           className={Css.merge(list{
@@ -356,9 +303,10 @@ module RenderData = {
                         />
                       </div>
                       <Text
-                        value={`${proposal.yesVote->Belt.Float.toString} ${proposal.yesVote > 1.
-                            ? "votes"
-                            : "vote"}`}
+                        value={
+                          let yesVote = votes->CouncilVoteSub.getVoteCount(Yes)
+                          `${yesVote->Belt.Int.toString} ${yesVote > 1 ? "votes" : "vote"}`
+                        }
                         size=Text.Body2
                         weight=Text.Regular
                         color={theme.neutral_600}
@@ -382,9 +330,10 @@ module RenderData = {
                         />
                       </div>
                       <Text
-                        value={`${proposal.noVote->Belt.Float.toString} ${proposal.noVote > 1.
-                            ? "votes"
-                            : "vote"}`}
+                        value={
+                          let noVote = votes->CouncilVoteSub.getVoteCount(No)
+                          `${noVote->Belt.Int.toString} ${noVote > 1 ? "votes" : "vote"}`
+                        }
                         size=Text.Body2
                         weight=Text.Regular
                         color={theme.neutral_600}
@@ -461,6 +410,7 @@ module RenderData = {
             </InfoContainer>
           </Col>
         </Row>
+        <SeperatedLine mt=40 mb=40 color=theme.neutral_200 />
         <Row marginBottom=16>
           <Col>
             <Heading
@@ -484,49 +434,7 @@ module RenderData = {
             </div>
           </Col>
         </Row>
-        <Row marginBottom=16>
-          <Col>
-            <div className={CssHelper.flexBox(~align=#center, ())}>
-              <Heading
-                value={`Votes`}
-                size=Heading.H4
-                weight=Heading.Semibold
-                color={theme.neutral_600}
-                marginRight=24
-              />
-              <div>
-                <ChipButton
-                  // key={i->Belt.Int.toString}
-                  variant={ChipButton.Primary}
-                  onClick={_ => setFilterStr(_ => "All")}
-                  isActive={true}
-                  color=theme.neutral_100
-                  activeColor=theme.neutral_700
-                  style={Styles.chip}>
-                  {"All"->React.string}
-                </ChipButton>
-              </div>
-            </div>
-          </Col>
-        </Row>
-        <Row marginBottom=8 style={CssHelper.px(~size=32, ())}>
-          <Col col=Col.Three>
-            <Text block=true value="VOTERS" size=Text.Caption weight=Text.Semibold />
-          </Col>
-          <Col col=Col.Four>
-            <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
-          </Col>
-          <Col col=Col.Two>
-            <Text block=true value="ANSWER" size=Text.Caption weight=Text.Semibold />
-          </Col>
-          <Col col=Col.Three>
-            <Text block=true value="TIME" size=Text.Caption weight=Text.Semibold align=Text.Right />
-          </Col>
-        </Row>
-        {switch councilVoteSub {
-        | Data(votes) => votes->Belt.Array.map(vote => <VoteRow vote />)->React.array
-        | _ => React.null
-        }}
+        <VoteBreakdownTable members=proposal.council.councilMembers votes />
       </div>
     </Section>
   }
@@ -535,12 +443,14 @@ module RenderData = {
 @react.component
 let make = (~proposalID) => {
   let proposalSub = CouncilProposalSub.get(proposalID)
+  let councilVoteSub = CouncilVoteSub.get(proposalID)
+  let allSub = Sub.all2(proposalSub, councilVoteSub)
   // let voteStatByProposalIDSub = VoteSub.getVoteStatByProposalID(proposalID)
   // let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
 
   // let allSub = Sub.all3(proposalSub, voteStatByProposalIDSub, bondedTokenCountSub)
-  switch proposalSub {
-  | Data(proposal) => <RenderData proposal />
+  switch allSub {
+  | Data(proposal, votes) => <RenderData proposal votes />
   | Error(err) => <Heading value={err.message} />
   | Loading => <Heading value="Loading" />
   | NoData => <Heading value="NoData" />

@@ -44,8 +44,8 @@ type internal_t = {
 }
 
 type vote_stat_t = {
-  yes: float,
-  no: float,
+  yes: int,
+  no: int,
 }
 
 // type alias for good semantic
@@ -85,13 +85,12 @@ let toExternal = ({account, option, transactionOpt, voterId}: internal_t) => {
   }
 }
 
-// TODO: calculate yes no with weight
-let getVoteStat = vote => {
-  None
-}
+// calculate yes no vote count
+let getVoteCount = (votes, option: vote_t) =>
+  votes->Belt.Array.keep(vote => vote.option == option)->Belt.Array.length
 
 let get = councilProposalId => {
-  let result = SingleConfig.use({council_proposal_id: councilProposalId})
+  let result = SingleConfig.use({council_proposal_id: councilProposalId->ID.Proposal.toInt})
 
   result
   ->Sub.fromData
