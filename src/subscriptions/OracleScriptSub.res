@@ -16,6 +16,25 @@ type response_last_1_day_external = {
   responseTime: float,
 }
 
+module Version = {
+  type t =
+    | Ok
+    | Redeploy
+    | Nothing
+
+  let parse = version => {
+    switch version {
+    | Some(v) =>
+      switch v {
+      | 1 => Redeploy
+      | 2 => Ok
+      | _ => Nothing
+      }
+    | None => Nothing
+    }
+  }
+}
+
 type internal_t = {
   id: ID.OracleScript.t,
   owner: Address.t,
@@ -26,6 +45,7 @@ type internal_t = {
   transaction: option<transaction_t>,
   relatedDataSources: array<related_data_sources>,
   requestStat: option<request_stat_t>,
+  version: option<int>,
 }
 
 type t = {
@@ -35,9 +55,10 @@ type t = {
   description: string,
   schema: string,
   sourceCodeURL: string,
-  timestamp: option<MomentRe.Moment.t>,
+  timestampOpt: option<MomentRe.Moment.t>,
   relatedDataSources: list<data_source_t>,
   requestCount: int,
+  version: Version.t,
 }
 
 let toExternal = ({
@@ -50,6 +71,7 @@ let toExternal = ({
   transaction: txOpt,
   relatedDataSources,
   requestStat: requestStatOpt,
+  version,
 }) => {
   id,
   owner,
@@ -57,17 +79,13 @@ let toExternal = ({
   description,
   schema,
   sourceCodeURL,
-  timestamp: {
-    switch txOpt {
-    | Some({block: {timestamp}}) => Some(timestamp)
-    | None => None
-    }
-  },
+  timestampOpt: txOpt->Belt.Option.map(({block: {timestamp}}) => timestamp),
   relatedDataSources: relatedDataSources
   ->Belt.Array.map(({dataSource}) => dataSource)
   ->Belt.List.fromArray,
   // Note: requestCount can't be nullable value.
   requestCount: requestStatOpt->Belt.Option.map(({count}) => count)->Belt.Option.getWithDefault(0),
+  version: version->Version.parse,
 }
 
 module SingleConfig = %graphql(`
@@ -93,6 +111,7 @@ module SingleConfig = %graphql(`
       requestStat: request_stat @ppxAs(type: "request_stat_t") {
         count
       }
+      version
     }
   },
 `)
@@ -120,6 +139,7 @@ module MultiConfig = %graphql(`
       requestStat: request_stat @ppxAs(type: "request_stat_t") {
         count
       }
+      version
     }
   }
 `)

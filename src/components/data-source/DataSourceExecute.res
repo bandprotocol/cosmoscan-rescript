@@ -109,7 +109,7 @@ module ResultRender = {
     | Nothing => React.null
     | Loading =>
       <>
-        <VSpacing size=Spacing.xl />
+        <VSpacing size=Spacing.xxl />
         {loadingRender(#percent(100.), 30, #px(30))}
         <VSpacing size=Spacing.lg />
       </>

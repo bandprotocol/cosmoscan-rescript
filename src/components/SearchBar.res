@@ -20,7 +20,6 @@ module Styles = {
       outlineStyle(#none),
       background(theme.neutral_000),
       paddingRight(#px(40)),
-      fontFamilies([#custom("Roboto Mono"), #monospace]),
       fontWeight(#num(300)),
       boxShadows([Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(16, 18, 20, #num(0.15)))]),
     ])
