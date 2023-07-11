@@ -14,15 +14,9 @@ module Styles = {
 @react.component
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-  //   let (page, setPage) = React.useState(_ => 1)
+
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
 
-  //   React.useEffect1(() => {
-  //     // if searchTerm !== "" {
-  //     //   setPage(_ => 1)
-  //     // }
-  //     None
-  //   }, [searchTerm])
 
   <Section>
     <div className={CssHelper.container}>
@@ -32,7 +26,7 @@ let make = () => {
           <p className={Styles.bodyText(theme)}>
             {"A data source is an executable that describes a procedure to retrieve some type of data. Developers can create and customize data sources in "->React.string}
             <AbsoluteLink href="https://builder.bandprotocol.com" className={Styles.linkInline}>
-              <Text value="BandBuilder" weight={Medium} color={theme.primary_600} />
+              <Text size=Text.Body1 value="BandBuilder" weight={Medium} color={theme.primary_600} />
             </AbsoluteLink>
           </p>
         </div>

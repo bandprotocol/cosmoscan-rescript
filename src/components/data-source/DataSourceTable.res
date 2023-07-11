@@ -263,7 +263,7 @@ module RenderBody = {
               route={DataSourceDetailsPage(id->ID.DataSource.toInt, DataSourceRequests)}>
               <Text value=name ellipsis=true color={theme.primary_600} size={Body1} />
             </Link>
-          | _ => <LoadingCensorBar width=150 height=15 />
+          | _ => <LoadingCensorBar width=150 height=22 />
           }}
         </div>
         <div>
@@ -281,7 +281,7 @@ module RenderBody = {
           | Data({requestCount}) =>
             <Text
               value={requestCount->Format.iPretty}
-              weight=Text.Medium
+              weight=Text.Regular
               block=true
               ellipsis=true
               align={Center}
@@ -558,7 +558,7 @@ let make = (~searchTerm) => {
             />
           </EmptyContainer>
     | _ =>
-      <div>
+      <div className={CssHelper.mt(~size=8, ())}>
         {Belt.Array.makeBy(10, i =>
           isMobile
             ? <RenderBodyMobile
@@ -568,6 +568,14 @@ let make = (~searchTerm) => {
                 key={i->Belt.Int.toString} reserveIndex=i datasourceSub=Sub.NoData searchTerm
               />
         )->React.array}
+        <div
+          className={Css.merge(list{
+            CssHelper.flexBox(~justify=#center, ()),
+            CssHelper.mt(~size=32, ()),
+            CssHelper.mb(~size=32, ()),
+          })}>
+          <LoadingCensorBar width=200 height=32 />
+        </div>
       </div>
     }}
   </div>
