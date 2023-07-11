@@ -125,7 +125,7 @@ let make = (~chainID, ~port, ~channel) => {
                     </Col>
                     <Col col=Col.Four colSm=Col.Five>
                       {
-                        let port = Ellipsis.format(~text=counterpartyPort, ~limit=15, ())
+                        let port = Ellipsis.end(~text=counterpartyPort, ~limit=15, ())
                         <Text
                           value={port} size=Text.Body1 align={Right} color={theme.neutral_900}
                         />

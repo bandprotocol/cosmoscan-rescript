@@ -8,10 +8,10 @@ type field_t =
 
 module Styles = {
   open CssJs
-  let tabletContainer = (theme: Theme.t) =>
+  let tabletContainer = (theme: Theme.t, isDarkMode) =>
     style(. [
       padding2(~v=#px(8), ~h=#px(24)),
-      backgroundColor(theme.neutral_100),
+      backgroundColor(isDarkMode ? theme.neutral_200 : theme.neutral_100),
       borderRadius(px(8)),
       Media.mobile([padding2(~v=#px(8), ~h=#px(12))]),
       width(#percent(100.)),
@@ -32,11 +32,11 @@ module Styles = {
     ])
 }
 
-let renderField = (field, maxWidth) => {
+let renderField = (field, maxWidth, theme: Theme.t) => {
   switch field {
   | Value(v) =>
     <div className={Styles.valueContainer(maxWidth)}>
-      <Text value=v nowrap=true ellipsis=true block=true />
+      <Text value=v nowrap=true ellipsis=true block=true size=Text.Body1 color=theme.neutral_900 />
     </div>
   | Values(vals) =>
     <div className={CssHelper.flexBox(~direction=#column, ())}>
@@ -86,9 +86,9 @@ let make = (~headers=["Key", "Value"], ~rows) => {
   let columnSize = headers->Belt.Array.length > 2 ? Col.Four : Col.Six
   let valueWidth = Media.isMobile() ? 70 : 480
 
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  <div className={Styles.tabletContainer(theme)}>
+  <div className={Styles.tabletContainer(theme, isDarkMode)}>
     <div className=Styles.tableSpacing>
       <Row>
         {headers
@@ -109,7 +109,7 @@ let make = (~headers=["Key", "Value"], ~rows) => {
           {row
           ->Belt.Array.mapWithIndex((j, value) => {
             <Col key={"innerRow" ++ j->Belt.Int.toString} col=columnSize colSm=columnSize>
-              {renderField(value, valueWidth)}
+              {renderField(value, valueWidth, theme)}
             </Col>
           })
           ->React.array}

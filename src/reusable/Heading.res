@@ -60,7 +60,7 @@ module Styles = {
 
 @react.component
 let make = (
-  ~value,
+  ~value="",
   ~align=Left,
   ~weight=Semibold,
   ~size=H1,
@@ -71,8 +71,12 @@ let make = (
   ~style="",
   ~color=?,
   ~mono=false,
+  ~children=?,
 ) => {
-  let children_ = React.string(value)
+  let children_ = switch children {
+  | Some(child) => child
+  | None => React.string(value)
+  }
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 

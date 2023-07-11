@@ -147,7 +147,7 @@ module MobileRender = {
           </div>
         </Col>
       </Row>
-      <Row marginTopSm=24 marginBottomSm=24 style={Styles.chainIDContainerMobile}>
+      <Row marginTopSm=24 marginBottomSm=24 marginLeftSm=0 style={Styles.chainIDContainerMobile}>
         <ChainIDBadge />
       </Row>
       <Row marginTop=20>

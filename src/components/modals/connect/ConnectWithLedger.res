@@ -111,7 +111,7 @@ let make = (~chainID, ~ledgerApp) => {
   }
 
   <div className=Styles.container>
-    <VSpacing size=Spacing.xl />
+    <VSpacing size=Spacing.xxl />
     <Text value="1. Select HD Derivation Path" weight=Text.Semibold color={theme.neutral_900} />
     <VSpacing size=Spacing.md />
     <div className={Styles.selectWrapper(theme, isDarkMode)}>
@@ -145,9 +145,9 @@ let make = (~chainID, ~ledgerApp) => {
         </select>
       </div>
     </div>
-    <VSpacing size=Spacing.xl />
+    <VSpacing size=Spacing.xxl />
     <Text value="2. On Your Ledger" weight=Text.Semibold color={theme.neutral_900} />
-    <VSpacing size=Spacing.xl />
+    <VSpacing size=Spacing.xxl />
     <InstructionCard title="1. Enter Pin Code" url=Images.ledgerStep1 />
     <VSpacing size=Spacing.lg />
     {switch ledgerApp {

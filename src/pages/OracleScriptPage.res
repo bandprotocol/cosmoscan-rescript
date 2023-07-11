@@ -41,7 +41,7 @@ let getName = x =>
   }
 
 let defaultCompare = (a: OracleScriptSub.t, b: OracleScriptSub.t) =>
-  if a.timestamp !== b.timestamp {
+  if a.timestampOpt !== b.timestampOpt {
     compare(b.id->ID.OracleScript.toInt, a.id->ID.OracleScript.toInt)
   } else {
     compare(b.requestCount, a.requestCount)
@@ -54,7 +54,7 @@ let sorting = (oracleSctipts: array<OracleScriptSub.t>, sortedBy) => {
     let result = {
       switch sortedBy {
       | MostRequested => compare(b.requestCount, a.requestCount)
-      | LatestUpdate => compare(b.timestamp, a.timestamp)
+      | LatestUpdate => compare(b.timestampOpt, a.timestampOpt)
       }
     }
     if result !== 0 {
@@ -125,7 +125,7 @@ module RenderMostRequestedCard = {
         <div className=Styles.descriptionBox>
           {switch oracleScriptSub {
           | Data({description}) =>
-            let text = Ellipsis.format(~text=description, ~limit=70, ())
+            let text = Ellipsis.end(~text=description, ~limit=70, ())
             <Text value=text block=true />
           | _ => <LoadingCensorBar width=250 height=15 />
           }}
@@ -206,7 +206,7 @@ module RenderBody = {
         <Col col=Col.Four>
           {switch oracleScriptSub {
           | Data({description}) =>
-            let text = Ellipsis.format(~text=description, ~limit=70, ())
+            let text = Ellipsis.end(~text=description, ~limit=70, ())
             <Text value=text block=true />
           | _ => <LoadingCensorBar width=270 height=15 />
           }}
@@ -242,7 +242,7 @@ module RenderBody = {
         <Col col=Col.Two>
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch oracleScriptSub {
-            | Data({timestamp: timestampOpt}) =>
+            | Data({timestampOpt}) =>
               switch timestampOpt {
               | Some(timestamp') =>
                 <Timestamp
@@ -267,7 +267,7 @@ module RenderBodyMobile = {
     ~statsSub: Sub.variant<array<OracleScriptSub.response_last_1_day_external>>,
   ) => {
     switch oracleScriptSub {
-    | Data({id, timestamp: timestampOpt, description, name, requestCount}) =>
+    | Data({id, timestampOpt, description, name, requestCount}) =>
       <MobileCard
         values={
           open InfoMobileCard

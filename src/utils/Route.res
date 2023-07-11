@@ -40,6 +40,7 @@ type t =
   | ProposalDetailsPage(int)
   | RelayersHomepage
   | ChannelDetailsPage(string, string, string)
+  | Test
 
 let fromUrl = (url: RescriptReactRouter.url) =>
   switch (url.path, url.hash) {
@@ -119,6 +120,7 @@ let fromUrl = (url: RescriptReactRouter.url) =>
   | (list{"relayers"}, _) => RelayersHomepage
   | (list{"relayers", counterparty, port, channelID}, _) =>
     ChannelDetailsPage(counterparty, port, channelID)
+  | (list{"test"}, _) => Test
   | (list{}, _) => HomePage
   | (_, _) => NotFound
   }
@@ -189,6 +191,7 @@ let toString = route =>
   | ChannelDetailsPage(chainID, port, channel) => `/relayers/${chainID}/${port}/${channel}`
   | HomePage => "/"
   | NotFound => "/notfound"
+  | Test => "/test"
   }
 
 let redirect = (route: t) => RescriptReactRouter.push(route->toString)

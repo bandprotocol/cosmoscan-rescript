@@ -7,6 +7,7 @@ type base_account = {
 type tx_response = {
   txhash: string,
   code: int,
+  rawLog: string,
 }
 
 module Client = {
