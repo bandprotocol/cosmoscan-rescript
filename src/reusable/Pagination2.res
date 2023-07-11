@@ -104,6 +104,7 @@ let make = (
           className={Styles.inputPage(theme)}
           type_="number"
           defaultValue={currentPage->Belt.Int.toString}
+          value={inputPage}
           onChange={event => {
             let newVal = ReactEvent.Form.target(event)["value"]
             setInputPage(_ => newVal)
