@@ -87,7 +87,7 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
             }}
             <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
               {switch proposalSub {
-              | Data({status}) => <ProposalBadge status />
+              | Data({status}) => <LegacyProposalBadge status />
               | _ =>
                 <>
                   {isMobile ? React.null : <HSpacing size={#px(10)} />}

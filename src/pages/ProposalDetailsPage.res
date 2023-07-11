@@ -80,6 +80,26 @@ module VoteButton = {
   }
 }
 
+module OpenVetoButton = {
+  @react.component
+  let make = (~proposalID, ~address) => {
+    let vote = () => Webapi.Dom.window->Webapi.Dom.Window.alert("vote")
+    let accountQuery = AccountQuery.get(address)
+
+    switch accountQuery {
+    | Data({councilOpt}) =>
+      switch councilOpt {
+      | Some(council) =>
+        <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
+          {"Vote"->React.string}
+        </Button>
+      | None => React.null
+      }
+    | _ => React.null
+    }
+  }
+}
+
 module RenderData = {
   @react.component
   let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) => {
@@ -89,6 +109,7 @@ module RenderData = {
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
     let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
+    let openVeto = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
     <Section>
       <div className=CssHelper.container>
@@ -117,48 +138,77 @@ module RenderData = {
                 weight=Heading.Semibold
               />
               <HSpacing size=Spacing.sm />
-              {isMobile ? React.null : <CouncilProposalBadge status=proposal.status />}
+              {isMobile ? React.null : <ProposalBadge status=proposal.status />}
             </div>
             {isMobile
               ? <div className={Css.merge(list{CssHelper.flexBox(), Styles.badge})}>
-                  <CouncilProposalBadge status=proposal.status />
+                  <ProposalBadge status=proposal.status />
                 </div>
               : React.null}
           </Col>
         </Row>
         <Row justify=Row.Between>
-          <Col col=Col.Four>
+          <Col col=Col.Six>
             <Row>
-              <Col col=Col.Six>
+              <Col col=Col.Four>
                 <Heading
                   value="Submit & Voting Starts"
-                  size=Heading.H5
+                  size=Heading.H4
                   marginBottom=8
-                  weight=Heading.Thin
+                  weight=Heading.Semibold
                   color={theme.neutral_600}
                 />
                 <Timestamp
                   size=Text.Body1 timeOpt={Some(proposal.submitTime)} color={theme.neutral_900}
                 />
               </Col>
-              <Col col=Col.Six>
+              <Col col=Col.Four>
                 <Heading
                   value="Voting Ends"
-                  size=Heading.H5
+                  size=Heading.H4
                   marginBottom=8
-                  weight=Heading.Thin
+                  weight=Heading.Semibold
                   color={theme.neutral_600}
                 />
                 <Timestamp
                   size=Text.Body1 timeOpt={Some(proposal.votingEndTime)} color={theme.neutral_900}
                 />
               </Col>
+              {switch proposal.status {
+              | VotingPeriod => React.null
+              | _ =>
+                <Col col=Col.Four>
+                  <Heading
+                    value="Waiting for Veto Ends"
+                    size=Heading.H4
+                    marginBottom=8
+                    weight=Heading.Semibold
+                    color={theme.neutral_600}
+                  />
+                  <Timestamp
+                    size=Text.Body1 timeOpt={proposal.vetoEndTime} color={theme.neutral_900}
+                  />
+                </Col>
+              }}
             </Row>
           </Col>
           {switch accountOpt {
           | Some({address}) =>
             <Col col=Col.Two>
-              <VoteButton proposalID=proposal.id address />
+              {switch proposal.status {
+              | VotingPeriod => <VoteButton proposalID=proposal.id address />
+              | _ =>
+                <Button
+                  variant={Outline}
+                  px=40
+                  py=10
+                  fsize=14
+                  style={CssHelper.flexBox()}
+                  onClick={_ => openVeto()}>
+                  {"Open Veto"->React.string}
+                </Button>
+              // | _ => React.null
+              }}
             </Col>
           | None => React.null
           }}
@@ -410,7 +460,6 @@ module RenderData = {
             </InfoContainer>
           </Col>
         </Row>
-        <SeperatedLine mt=40 mb=40 color=theme.neutral_200 />
         <Row marginBottom=16>
           <Col>
             <Heading
@@ -434,6 +483,7 @@ module RenderData = {
             </div>
           </Col>
         </Row>
+        <SeperatedLine mt=40 mb=40 color=theme.neutral_200 />
         <VoteBreakdownTable members=proposal.council.councilMembers votes />
       </div>
     </Section>

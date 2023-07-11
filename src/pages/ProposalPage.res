@@ -69,11 +69,11 @@ module CouncilProposalCard = {
                 size=Text.Xl value=proposal.title color={theme.neutral_900} weight=Text.Semibold
               />
               <HSpacing size=Spacing.sm />
-              {isMobile ? React.null : <CouncilProposalBadge status=proposal.status />}
+              {isMobile ? React.null : <ProposalBadge status=proposal.status />}
             </Link>
             {isMobile
               ? <div className={Css.merge(list{CssHelper.flexBox(), Styles.badge})}>
-                  <CouncilProposalBadge status=proposal.status />
+                  <ProposalBadge status=proposal.status />
                 </div>
               : React.null}
           </Col>
@@ -206,11 +206,11 @@ module ProposalCard = {
                 size=Text.Xl value=proposal.name color={theme.neutral_900} weight=Text.Semibold
               />
               <HSpacing size=Spacing.sm />
-              {isMobile ? React.null : <ProposalBadge status=proposal.status />}
+              {isMobile ? React.null : <LegacyProposalBadge status=proposal.status />}
             </div>
             {isMobile
               ? <div className={Css.merge(list{CssHelper.flexBox(), Styles.badge})}>
-                  <ProposalBadge status=proposal.status />
+                  <LegacyProposalBadge status=proposal.status />
                 </div>
               : React.null}
           </Col>

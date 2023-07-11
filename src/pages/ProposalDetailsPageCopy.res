@@ -116,7 +116,7 @@ let make = (~proposalID) => {
                   <HSpacing size={#px(16)} />
                 </div>
                 <div className={CssHelper.mtSm(~size=16, ())}>
-                  <ProposalBadge status />
+                  <LegacyProposalBadge status />
                 </div>
               </div>
             </Col>
