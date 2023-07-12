@@ -1,14 +1,14 @@
 module Styles = {
   open CssJs
 
-  let infoContainer = (theme: Theme.t, isDarkMode, px, py, pxSm, pySm) =>
+  let infoContainer = (theme: Theme.t, isDarkMode, px, py) =>
     style(. [
-      backgroundColor(theme.neutral_100),
+      backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
       borderRadius(#px(16)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.2)))),
       padding2(~v=#px(py), ~h=#px(px)),
       position(#relative),
-      Media.mobile([padding2(~v=#px(pySm), ~h=#px(pxSm))]),
+      Media.mobile([padding(#px(16))]),
     ])
 }
 
