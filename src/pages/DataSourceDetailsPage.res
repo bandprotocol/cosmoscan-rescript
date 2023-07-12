@@ -50,7 +50,7 @@ module Content = {
               color=theme.neutral_600
             />
           </button>
-          <Row marginBottom=40 marginBottomSm=16 justify=Row.Between>
+          <Row marginBottom=24 marginBottomSm=24 justify=Row.Between>
             <Col col=Col.Eight>
               {switch dataSourceSub {
               | Data({id, name}) =>
@@ -89,7 +89,7 @@ module Content = {
           </Row>
           <Row marginBottom=24>
             <Col>
-              <InfoContainer>
+              <InfoContainer py=24>
                 <Row marginBottom=24 alignItems=Row.Center>
                   <Col col=Col.Three mbSm=8>
                     <div className={CssHelper.flexBox()}>
