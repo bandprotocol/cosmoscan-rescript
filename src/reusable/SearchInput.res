@@ -1,8 +1,15 @@
 module Styles = {
   open CssJs
 
-  let searchbarWrapper = (theme: Theme.t) =>
-    style(. [width(#percent(100.)), boxSizing(#borderBox), zIndex(1), position(#relative)])
+  let searchbarWrapper = (theme: Theme.t, maxWidth_) =>
+    style(. [
+      width(#percent(100.)),
+      boxSizing(#borderBox),
+      zIndex(1),
+      position(#relative),
+      maxWidth(#px(maxWidth_)),
+      Media.mobile([maxWidth(#percent(100.))]),
+    ])
 
   let searchContainer = (theme: Theme.t) =>
     style(. [
@@ -63,9 +70,9 @@ let make = (~placeholder, ~onChange, ~debounce=500, ~maxWidth=240) => {
     Some(() => Js.Global.clearTimeout(timeoutId))
   }, [changeValue])
 
-  <div className={Styles.searchbarWrapper(theme)} ref={ReactDOM.Ref.domRef(clickOutside)}>
+  <div className={Styles.searchbarWrapper(theme, maxWidth)} ref={ReactDOM.Ref.domRef(clickOutside)}>
     <div className=Styles.iconContainer>
-      <Icon name="far fa-search" color=theme.neutral_900 size=14 />
+      <Icon name="far fa-search" color=theme.neutral_600 size=14 />
     </div>
     <input
       type_="text"
