@@ -652,7 +652,7 @@ let make = (~searchTerm) => {
             />
           </EmptyContainer>
     | _ =>
-      <div>
+      <div className={CssHelper.mt(~size=8, ())}>
         {Belt.Array.makeBy(10, i =>
           isMobile
             ? <RenderBodyMobile
