@@ -117,7 +117,7 @@ type t = {
   description: string,
   schema: string,
   sourceCodeURL: string,
-  timestampOpt: option<MomentRe.Moment.t>,
+  timestamp: option<MomentRe.Moment.t>,
   relatedDataSources: list<data_source_t>,
   requestCount: int,
   version: version_t,
@@ -159,7 +159,12 @@ let toExternal = (
   description,
   schema,
   sourceCodeURL,
-  timestampOpt: txOpt->Belt.Option.map(({block: {timestamp}}) => timestamp),
+  timestamp: {
+    switch txOpt {
+    | Some({block: {timestamp}}) => Some(timestamp)
+    | None => None
+    }
+  },
   relatedDataSources: relatedDataSources
   ->Belt.Array.map(({dataSource}) => dataSource)
   ->Belt.List.fromArray,
