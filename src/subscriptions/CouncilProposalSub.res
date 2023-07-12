@@ -68,6 +68,12 @@ type proposal_t = {
 module CurrentStatus = {
   type t = Pass | Reject
 
+  let fromBool = bool =>
+    switch bool {
+    | true => Pass
+    | false => Reject
+    }
+
   let getStatusText = status =>
     switch status {
     | Pass => "Pass"
@@ -78,6 +84,12 @@ module CurrentStatus = {
     switch status {
     | Pass => theme.success_600
     | Reject => theme.error_600
+    }
+
+  let getStatusColorInverse = (status, theme: Theme.t) =>
+    switch status {
+    | Reject => theme.success_600
+    | Pass => theme.error_600
     }
 }
 
@@ -98,6 +110,8 @@ module VetoProposal = {
     totalBondedTokens: float,
     turnout: float,
     totalDeposit: list<Coin.t>,
+    isYesPassed: CurrentStatus.t,
+    isTurnoutPassed: CurrentStatus.t,
   }
 
   // percent of yes vote to win
@@ -110,13 +124,15 @@ module VetoProposal = {
     let noWithVetoVote = proposal.noWithVetoVote->Belt.Option.getWithDefault(0.)
     let abstainVote = proposal.abstainVote->Belt.Option.getWithDefault(0.)
     let totalVote = yesVote +. noVote +. noWithVetoVote +. abstainVote
-    let yesVotePercent = yesVote /. totalVote *. 100.
+    let yesVotePercent = totalVote == 0. ? 0. : yesVote /. totalVote *. 100.
     let totalBondedTokens = proposal.totalBondedTokens->Belt.Option.getWithDefault(0.)
     let turnout = totalVote /. totalBondedTokens *. 100.
+    let isYesPassed = yesVotePercent >= yesTheshold
+    let isTurnoutPassed = turnout >= turnoutTheshold
 
     {
       id: proposal.id,
-      status: switch yesVotePercent >= yesTheshold && turnout >= turnoutTheshold {
+      status: switch isYesPassed && isTurnoutPassed {
       | true => CurrentStatus.Pass
       | false => Reject
       },
@@ -127,12 +143,14 @@ module VetoProposal = {
       abstainVote,
       totalVote,
       yesVotePercent,
-      noVotePercent: noVote /. totalVote *. 100.,
-      noWithVetoVotePercent: noWithVetoVote /. totalVote *. 100.,
-      abstainVotePercent: abstainVote /. totalVote *. 100.,
+      noVotePercent: totalVote == 0. ? 0. : noVote /. totalVote *. 100.,
+      noWithVetoVotePercent: totalVote == 0. ? 0. : noWithVetoVote /. totalVote *. 100.,
+      abstainVotePercent: totalVote == 0. ? 0. : abstainVote /. totalVote *. 100.,
       totalBondedTokens,
       turnout,
       totalDeposit: proposal.totalDeposit,
+      isYesPassed: isYesPassed->CurrentStatus.fromBool,
+      isTurnoutPassed: isTurnoutPassed->CurrentStatus.fromBool,
     }
   }
 }
@@ -180,6 +198,7 @@ type t = {
   proposalType: proposal_type_t,
   councilVoteStatus: CurrentStatus.t, // indicate is council yes vote passed
   currentStatus: CurrentStatus.t, // same as councilVoteStatus but check if veto pass or not
+  isCurrentRejectByVeto: bool,
 }
 
 module SingleConfig = %graphql(`
@@ -374,6 +393,18 @@ let toExternal = (
       | None => Pass
       }
     | false => Reject
+    },
+    isCurrentRejectByVeto: switch yesVotePercent >= passedTheshold {
+    | true =>
+      switch vetoProposalOpt {
+      | Some(vetoProposal) =>
+        switch vetoProposal.status {
+        | Pass => true
+        | Reject => false
+        }
+      | None => false
+      }
+    | false => false
     },
   }
 }

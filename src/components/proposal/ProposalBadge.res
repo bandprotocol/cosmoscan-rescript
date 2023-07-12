@@ -68,7 +68,7 @@ let make = (~status) => {
       tooltipPlacement=CTooltip.Top
       tooltipPlacementSm=CTooltip.Top
       tooltipText={status->getTooltipText}>
-      <Icon name="fal fa-info-circle" size=12 color={theme.neutral_600} />
+      <Icon name="fal fa-info-circle" size=16 color={theme.neutral_400} />
     </CTooltip>
   </>
 }

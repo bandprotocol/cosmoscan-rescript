@@ -160,9 +160,8 @@ module RenderData = {
                   size=Text.Body1 timeOpt={Some(proposal.votingEndTime)} color={theme.neutral_900}
                 />
               </Col>
-              {switch proposal.status {
-              | VotingPeriod => React.null
-              | _ =>
+              {switch proposal.vetoEndTime {
+              | Some(vetoEndTime) =>
                 <Col col=Col.Four>
                   <Heading
                     value="Waiting for Veto Ends"
@@ -175,6 +174,7 @@ module RenderData = {
                     size=Text.Body1 timeOpt={proposal.vetoEndTime} color={theme.neutral_900}
                   />
                 </Col>
+              | None => React.null
               }}
             </Row>
           </Col>
@@ -203,23 +203,39 @@ module RenderData = {
         <Row marginBottom=24>
           <Col
             col={switch proposal.vetoProposalOpt {
-            | Some(_) => Col.Seven
+            | Some(_) =>
+              switch proposal.status {
+              | WaitingVeto => Col.Seven
+              | _ => Col.Six
+              }
             | None => Col.Twelve
             }}>
             <VoteDetailsCard
               proposal
               votes
               variant={switch proposal.vetoProposalOpt {
-              | Some(_) => Short
+              | Some(_) =>
+                switch proposal.status {
+                | WaitingVeto => Short
+                | _ => Half
+                }
               | None => Full
               }}
             />
           </Col>
           {switch proposal.vetoProposalOpt {
           | Some(vetoProposal) =>
-            <Col col=Col.Five>
-              <RejectDetailsCard vetoProposal />
-            </Col>
+            switch proposal.status {
+            | WaitingVeto =>
+              <Col col=Col.Five>
+                <RejectDetailsCard.Wait vetoProposal />
+              </Col>
+            | _ =>
+              <Col col=Col.Six>
+                <RejectDetailsCard.Vote vetoProposal />
+              </Col>
+            }
+
           | None => React.null
           }}
         </Row>

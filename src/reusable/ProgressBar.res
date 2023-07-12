@@ -228,28 +228,30 @@ module Slot = {
 
   let getFullSlot = (
     theme: Theme.t,
+    ~invertColor=false,
     ~yes: float,
     ~no: float,
     ~noWithVeto: float,
     ~abstain: float,
     ~totalBondedTokens: float,
+    (),
   ) =>
     [
       {
         percent: yes /. totalBondedTokens *. 100.,
-        color: theme.success_600,
+        color: invertColor ? theme.error_600 : theme.success_600,
       },
       {
         percent: no /. totalBondedTokens *. 100.,
-        color: theme.error_600,
+        color: invertColor ? theme.success_600 : theme.error_600,
       },
       {
         percent: noWithVeto /. totalBondedTokens *. 100.,
-        color: theme.error_700,
+        color: invertColor ? theme.success_800 : theme.error_700,
       },
       {
         percent: abstain /. totalBondedTokens *. 100.,
-        color: theme.warning_600,
+        color: invertColor ? theme.neutral_500 : theme.warning_600,
       },
       {
         percent: (totalBondedTokens -. (yes +. no +. noWithVeto +. abstain)) /.

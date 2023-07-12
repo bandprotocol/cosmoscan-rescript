@@ -16,7 +16,7 @@ module Styles = {
   let msgContainer = style(. [selector("> div + div", [marginTop(#px(24))])])
 }
 
-type variant = Short | Full
+type variant = Short | Half | Full
 
 @react.component
 let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~variant=Full) => {
@@ -24,11 +24,8 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
   let (_, dispatchModal) = React.useContext(ModalContext.context)
   let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
-  let formatVotePercent = value =>
-    (value < 10. ? "0" : "") ++ value->Format.fPretty(~digits=2) ++ "%"
-
   <Row>
-    <Col col=Col.Seven>
+    <Col col=Col.Twelve>
       <Heading
         value="Vote Details"
         size=Heading.H4
@@ -41,17 +38,18 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
       <InfoContainer py=24 px=32>
         <Row>
           <Col
-            style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}
             col={switch variant {
             | Full => Col.Four
-            | Short => Col.Six
-            }}>
+            | _ => Col.Six
+            }}
+            mb=22
+            style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}>
             <div>
               <Row>
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | Short => Col.Seven
+                  | _ => Col.Seven
                   }}>
                   <div className={CssHelper.flexBox()}>
                     <Heading
@@ -73,7 +71,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | Short => Col.Five
+                  | _ => Col.Five
                   }}>
                   <div className={CssHelper.flexBox()}>
                     <img
@@ -93,11 +91,11 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                   </div>
                 </Col>
               </Row>
-              <Row marginTop=18 alignItems=Row.Center>
+              <Row marginTop=16 alignItems=Row.Center>
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | Short => Col.Seven
+                  | _ => Col.Seven
                   }}>
                   <div className={CssHelper.flexBox()}>
                     <Heading
@@ -106,12 +104,22 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                       weight=Heading.Regular
                       color={theme.neutral_900}
                     />
+                    {proposal.isCurrentRejectByVeto
+                      ? <>
+                          <HSpacing size=Spacing.xs />
+                          <CTooltip
+                            tooltipPlacement=CTooltip.Bottom
+                            tooltipText="The proposal was rejected because a veto was passed.">
+                            <Icon name="fal fa-info-circle" size=16 color={theme.neutral_400} />
+                          </CTooltip>
+                        </>
+                      : React.null}
                   </div>
                 </Col>
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | Short => Col.Five
+                  | _ => Col.Five
                   }}>
                   <div className={CssHelper.flexBox()}>
                     <Text
@@ -128,101 +136,17 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
               </Row>
             </div>
           </Col>
+          {switch variant {
+          | Half => <SeperatedLine mt=24 mb=24 color=theme.neutral_300 />
+          | _ => React.null
+          }}
           <Col
             col={switch variant {
             | Full => Col.Five
             | Short => Col.Six
+            | Half => Col.Twelve
             }}>
-            <Row>
-              <Col col=Col.Twelve>
-                <Text size=Text.Body2 weight=Text.Semibold color={theme.neutral_600} marginBottom=8>
-                  <span>
-                    {`${votes
-                      ->Belt.Array.length
-                      ->Belt.Int.toString}/${proposal.council.councilMembers
-                      ->Belt.Array.length
-                      ->Belt.Int.toString} `->React.string}
-                  </span>
-                  <span
-                    className={Css.merge(list{Styles.councilMember(theme), CssHelper.clickable})}
-                    onClick={_ => openMembers()}>
-                    {proposal.council.name->CouncilSub.getCouncilNameString->React.string}
-                  </span>
-                  <span> {" member votes"->React.string} </span>
-                </Text>
-              </Col>
-            </Row>
-            <Row>
-              <Col col=Col.Twelve>
-                <ProgressBar.Voting2
-                  slots={ProgressBar.Slot.getYesNoSlot(
-                    theme,
-                    ~yes={proposal.yesVote},
-                    ~no={proposal.noVote},
-                    ~totalWeight={proposal.totalWeight},
-                  )}
-                  fullWidth=true
-                />
-              </Col>
-            </Row>
-            <Row marginTop=4 marginBottom=14>
-              <Col col=Col.Twelve style={CssHelper.flexBox()}>
-                <div className={CssHelper.mr(~size=40, ())}>
-                  <div className={CssHelper.flexBox()}>
-                    <div className={Styles.smallDot(theme.success_600)} />
-                    <Text
-                      value="Yes"
-                      size=Text.Body1
-                      weight=Text.Semibold
-                      color={theme.neutral_900}
-                      marginRight=8
-                    />
-                    <Text
-                      value={proposal.yesVotePercent->formatVotePercent}
-                      size=Text.Body2
-                      weight=Text.Regular
-                      color={theme.neutral_900}
-                    />
-                  </div>
-                  <Text
-                    value={
-                      let yesVote = votes->CouncilVoteSub.getVoteCount(Yes)
-                      `${yesVote->Belt.Int.toString} ${yesVote > 1 ? "votes" : "vote"}`
-                    }
-                    size=Text.Body2
-                    weight=Text.Regular
-                    color={theme.neutral_600}
-                  />
-                </div>
-                <div>
-                  <div className={CssHelper.flexBox()}>
-                    <div className={Styles.smallDot(theme.error_600)} />
-                    <Text
-                      value="No"
-                      size=Text.Body1
-                      weight=Text.Semibold
-                      color={theme.neutral_900}
-                      marginRight=8
-                    />
-                    <Text
-                      value={proposal.noVotePercent->formatVotePercent}
-                      size=Text.Body2
-                      weight=Text.Regular
-                      color={theme.neutral_900}
-                    />
-                  </div>
-                  <Text
-                    value={
-                      let noVote = votes->CouncilVoteSub.getVoteCount(No)
-                      `${noVote->Belt.Int.toString} ${noVote > 1 ? "votes" : "vote"}`
-                    }
-                    size=Text.Body2
-                    weight=Text.Regular
-                    color={theme.neutral_600}
-                  />
-                </div>
-              </Col>
-            </Row>
+            <VoteProgress proposal votes />
           </Col>
         </Row>
       </InfoContainer>

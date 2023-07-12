@@ -162,8 +162,8 @@ module CouncilProposalCard = {
                   <Text
                     value={vetoProposal.status->CouncilProposalSub.CurrentStatus.getStatusText}
                     size=Text.Body1
-                    weight=Text.Thin
-                    color={vetoProposal.status->CouncilProposalSub.CurrentStatus.getStatusColor(
+                    weight=Text.Regular
+                    color={vetoProposal.status->CouncilProposalSub.CurrentStatus.getStatusColorInverse(
                       theme,
                     )}
                     spacing=Text.Em(0.05)
@@ -299,6 +299,7 @@ module ProposalCard = {
                       ~totalBondedTokens={
                         proposal.totalBondedTokens->Belt.Option.getWithDefault(0.)
                       },
+                      (),
                     )}
                   />
                 | None =>
@@ -312,6 +313,7 @@ module ProposalCard = {
                       ~totalBondedTokens={
                         bondedToken->Coin.getBandAmountFromCoin
                       },
+                      (),
                     )}
                   />
                 }}
