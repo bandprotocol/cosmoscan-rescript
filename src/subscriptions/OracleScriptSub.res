@@ -298,10 +298,17 @@ let get = id => {
 
 let getList = (~page, ~pageSize, ~searchTerm, ~sortedBy, ()) => {
   let offset = (page - 1) * pageSize
-  let keyword = {j`%$searchTerm%`}
+
   let lists = MultiConfig.use({
-    searchTerm: keyword,
-    searchID: Some(searchTerm->Belt.Int.fromString->Belt.Option.getWithDefault(-1)),
+    searchTerm: {j`%$searchTerm%`},
+    searchID: searchTerm->Js.String2.toLowerCase->Js.String2.startsWith("o")
+      ? Some(
+          searchTerm
+          ->Js.String2.slice(~from=1, ~to_=searchTerm->Js.String2.length)
+          ->Belt.Int.fromString
+          ->Belt.Option.getWithDefault(-1),
+        )
+      : Some(searchTerm->Belt.Int.fromString->Belt.Option.getWithDefault(-1)),
   })
   let stats = MultiOracleScriptStatLast1DayConfig.use()
 
