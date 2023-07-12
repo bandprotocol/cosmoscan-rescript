@@ -56,11 +56,13 @@ module Status = {
 }
 
 type proposal_t = {
+  id: ID.Proposal.t,
   yesVote: option<float>,
   noVote: option<float>,
   noWithVetoVote: option<float>,
   abstainVote: option<float>,
   totalBondedTokens: option<float>,
+  totalDeposit: list<Coin.t>,
 }
 
 module CurrentStatus = {
@@ -81,6 +83,7 @@ module CurrentStatus = {
 
 module VetoProposal = {
   type t = {
+    id: ID.Proposal.t,
     status: CurrentStatus.t,
     turnOut: float,
     yesVote: float,
@@ -94,6 +97,7 @@ module VetoProposal = {
     abstainVotePercent: float,
     totalBondedTokens: float,
     turnout: float,
+    totalDeposit: list<Coin.t>,
   }
 
   // percent of yes vote to win
@@ -109,9 +113,11 @@ module VetoProposal = {
     let yesVotePercent = yesVote /. totalVote *. 100.
     let totalBondedTokens = proposal.totalBondedTokens->Belt.Option.getWithDefault(0.)
     let turnout = totalVote /. totalBondedTokens *. 100.
+
     {
+      id: proposal.id,
       status: switch yesVotePercent >= yesTheshold && turnout >= turnoutTheshold {
-      | true => Pass
+      | true => CurrentStatus.Pass
       | false => Reject
       },
       turnOut: totalVote,
@@ -126,6 +132,7 @@ module VetoProposal = {
       abstainVotePercent: abstainVote /. totalVote *. 100.,
       totalBondedTokens,
       turnout,
+      totalDeposit: proposal.totalDeposit,
     }
   }
 }
@@ -208,11 +215,13 @@ module SingleConfig = %graphql(`
       vetoEndTime: veto_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       votingEndTime: voting_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       proposal @ppxAs(type: "proposal_t") {
+        id @ppxCustom(module: "GraphQLParserModule.ProposalID")
         yesVote: yes_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         noVote: no_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         noWithVetoVote: no_with_veto_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         abstainVote: abstain_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         totalBondedTokens: total_bonded_tokens @ppxCustom(module: "GraphQLParserModule.FloatString")
+        totalDeposit: total_deposit @ppxCustom(module: "GraphQLParserModule.Coins")
       }
       metadata
       messages
@@ -253,11 +262,13 @@ module MultiConfig = %graphql(`
       vetoEndTime: veto_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       votingEndTime: voting_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       proposal @ppxAs(type: "proposal_t") {
+        id @ppxCustom(module: "GraphQLParserModule.ProposalID")
         yesVote: yes_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         noVote: no_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         noWithVetoVote: no_with_veto_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         abstainVote: abstain_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         totalBondedTokens: total_bonded_tokens @ppxCustom(module: "GraphQLParserModule.FloatString")
+        totalDeposit: total_deposit @ppxCustom(module: "GraphQLParserModule.Coins")
       }
       metadata
       messages
