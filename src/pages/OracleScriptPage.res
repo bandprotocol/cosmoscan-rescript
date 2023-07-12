@@ -184,7 +184,13 @@ module RenderBody = {
   ) => {
     let allSub = Sub.all2(oracleScriptSub, statsSub)
 
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let tableWrapper = style(. [
+      marginTop(#px(24)),
+      marginBottom(#px(8)),
+      Media.mobile([marginTop(#px(8)), marginBottom(#px(8))]),
+    ])
+    let bodyText = (theme: Theme.t, isDarkMode) =>
+      style(. [color(isDarkMode ? theme.neutral_000 : theme.neutral_600), fontSize(#px(14))])
 
     <TBody
       key={switch oracleScriptSub {
@@ -319,10 +325,9 @@ module RenderBodyMobile = {
 
 @react.component
 let make = () => {
-  let isMobile = Media.isMobile()
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let (page, setPage) = React.useState(_ => 1)
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
-  let (sortedBy, setSortedBy) = React.useState(_ => LatestUpdate)
 
   React.useEffect1(() => {
     if searchTerm !== "" {
@@ -331,198 +336,31 @@ let make = () => {
     None
   }, [searchTerm])
 
-  let pageSize = 10
-  let mostRequestedPageSize = isMobile ? 3 : 6
-  let oracleScriptsCountSub = OracleScriptSub.count(~searchTerm, ())
-  let oracleScriptsSub = OracleScriptSub.getList(~pageSize, ~page, ~searchTerm, ~sortedBy, ())
-
-  let mostRequestedOracleScriptSub = OracleScriptSub.getList(
-    ~pageSize=mostRequestedPageSize,
-    ~page=1,
-    ~searchTerm="",
-    (),
-  )
-  let statsSub = OracleScriptSub.getResponseTimeList()
-
-  let allSub = Sub.all2(oracleScriptsSub, oracleScriptsCountSub)
-
-  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-
-  <> </>
-
-  // <Section>
-  //   <div className=CssHelper.container id="oraclescriptsSection">
-  //     <div className=CssHelper.mobileSpacing>
-  //       <Heading value="All Oracle Scripts" size=Heading.H2 marginBottom=40 marginBottomSm=24 />
-  //       {switch mostRequestedOracleScriptSub {
-  //       | Sub.Data(oracleScripts) =>
-  //         oracleScripts->Belt.Array.length > 0
-  //           ? <>
-  //               <Heading
-  //                 value="Most Requested" size=Heading.H3 marginBottom=16 color={theme.neutral_600}
-  //               />
-  //               <Row>
-  //                 {oracleScripts
-  //                 ->Belt.Array.mapWithIndex((i, e) =>
-  //                   <RenderMostRequestedCard
-  //                     key={e.id->ID.OracleScript.toString}
-  //                     reserveIndex=i
-  //                     oracleScriptSub={Sub.resolve(e)}
-  //                     statsSub
-  //                   />
-  //                 )
-  //                 ->React.array}
-  //               </Row>
-  //             </>
-  //           : React.null
-  //       | _ =>
-  //         <>
-  //           <Heading value="Most Requested" size=Heading.H4 marginBottom=16 />
-  //           <Row>
-  //             {Belt.Array.makeBy(mostRequestedPageSize, i =>
-  //               <RenderMostRequestedCard
-  //                 key={i->Belt.Int.toString} reserveIndex=i oracleScriptSub=NoData statsSub=NoData
-  //               />
-  //             )->React.array}
-  //           </Row>
-  //         </>
-  //       }}
-  //       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
-  //         <Col>
-  //           {switch allSub {
-  //           | Data((_, oracleScriptsCount)) =>
-  //             <Heading value={oracleScriptsCount->Format.iPretty ++ " In total"} size=Heading.H3 />
-  //           | _ => <LoadingCensorBar width=65 height=21 />
-  //           }}
-  //         </Col>
-  //       </Row>
-  //       <Table>
-  //         <Row alignItems=Row.Center marginTop=32 marginBottom=16>
-  //           <Col col=Col.Six colSm=Col.Eight>
-  //             <SearchInput placeholder="Search Oracle Script" onChange=setSearchTerm />
-  //           </Col>
-  //           <Col col=Col.Six colSm=Col.Four>
-  //             <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-  //               <SortableDropdown
-  //                 sortedBy
-  //                 setSortedBy
-  //                 sortList=list{
-  //                   (MostRequested, getName(MostRequested)),
-  //                   (LatestUpdate, getName(LatestUpdate)),
-  //                 }
-  //               />
-  //             </div>
-  //           </Col>
-  //         </Row>
-  //         {isMobile
-  //           ? React.null
-  //           : <THead>
-  //               <Row alignItems=Row.Center>
-  //                 <Col col=Col.Four>
-  //                   <Text
-  //                     block=true
-  //                     value="Oracle Script"
-  //                     weight=Text.Semibold
-  //                     transform=Text.Uppercase
-  //                     size=Text.Caption
-  //                   />
-  //                 </Col>
-  //                 <Col col=Col.Four>
-  //                   <Text
-  //                     block=true
-  //                     value="Description"
-  //                     weight=Text.Semibold
-  //                     transform=Text.Uppercase
-  //                     size=Text.Caption
-  //                   />
-  //                 </Col>
-  //                 <Col col=Col.Two>
-  //                   <Text
-  //                     block=true
-  //                     value="Request & Response time"
-  //                     weight=Text.Semibold
-  //                     transform=Text.Uppercase
-  //                     size=Text.Caption
-  //                   />
-  //                 </Col>
-  //                 <Col col=Col.Two>
-  //                   <Text
-  //                     block=true
-  //                     value="Timestamp"
-  //                     weight=Text.Semibold
-  //                     transform=Text.Uppercase
-  //                     size=Text.Caption
-  //                     align=Text.Right
-  //                   />
-  //                 </Col>
-  //               </Row>
-  //             </THead>}
-  //         {switch allSub {
-  //         | Data((oracleScripts, oracleScriptsCount)) =>
-  //           oracleScripts->Belt.Array.length > 0
-  //             ? {
-  //                 let pageCount = Page.getPageCount(oracleScriptsCount, pageSize)
-  //                 <>
-  //                   {oracleScripts
-  //                   ->sorting(sortedBy)
-  //                   ->Belt.Array.mapWithIndex((i, e) =>
-  //                     isMobile
-  //                       ? <RenderBodyMobile
-  //                           key={e.id->ID.OracleScript.toString}
-  //                           reserveIndex=i
-  //                           oracleScriptSub={Sub.resolve(e)}
-  //                           statsSub
-  //                         />
-  //                       : <RenderBody
-  //                           key={e.id->ID.OracleScript.toString}
-  //                           reserveIndex=i
-  //                           oracleScriptSub={Sub.resolve(e)}
-  //                           statsSub
-  //                         />
-  //                   )
-  //                   ->React.array}
-  //                   {isMobile
-  //                     ? React.null
-  //                     : <Pagination
-  //                         currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
-  //                       />}
-  //                 </>
-  //               }
-  //             : <EmptyContainer>
-  //                 <img
-  //                   src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
-  //                   className=Styles.noDataImage
-  //                   alt="No OracleScript"
-  //                 />
-  //                 <Heading
-  //                   size=Heading.H4
-  //                   value="No OracleScript"
-  //                   align=Heading.Center
-  //                   weight=Heading.Regular
-  //                   color={theme.neutral_600}
-  //                 />
-  //               </EmptyContainer>
-  //         | _ =>
-  //           <div className=Styles.tbodyContainer>
-  //             {Belt.Array.makeBy(10, i =>
-  //               isMobile
-  //                 ? <RenderBodyMobile
-  //                     key={i->Belt.Int.toString}
-  //                     reserveIndex=i
-  //                     oracleScriptSub=NoData
-  //                     statsSub=NoData
-  //                   />
-  //                 : <RenderBody
-  //                     key={i->Belt.Int.toString}
-  //                     reserveIndex=i
-  //                     oracleScriptSub=NoData
-  //                     statsSub=NoData
-  //                   />
-  //             )->React.array}
-  //           </div>
-  //         }}
-  //       </Table>
-  //     </div>
-  //   </div>
-  // </Section>
+  <Section>
+    <div className={CssHelper.container}>
+      <div className={CssHelper.mb(~size=24, ())}>
+        <Heading value="All Oracle Scripts" size=Heading.H2 marginBottom=8 />
+        <div className={CssHelper.flexBox(~align=#center, ())}>
+          <p className={Styles.bodyText(theme, isDarkMode)}>
+            {"Oracle scripts bring real-world data onto the blockchain for smart contracts to use. Developers can create and customize these scripts in "->React.string}
+            <AbsoluteLink href="https://builder.bandprotocol.com" className={Styles.linkInline}>
+              <Text value="BandBuilder" weight={Medium} color={theme.primary_600} />
+            </AbsoluteLink>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div className={CssHelper.container}>
+      <div id="oraclescriptsSection">
+        <SearchInput
+          placeholder="Search Oracle Script / ID or Data Source Name"
+          onChange=setSearchTerm
+          maxWidth=460
+        />
+      </div>
+      <div className={Styles.tableWrapper}>
+        <OracleScriptsTable searchTerm />
+      </div>
+    </div>
+  </Section>
 }

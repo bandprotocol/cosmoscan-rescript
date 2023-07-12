@@ -29,7 +29,7 @@ let make = () => {
       | DataSourcePage => <DataSourcePage />
       | DataSourceDetailsPage(dataSourceID, hashtag) =>
         <DataSourceDetailsPage dataSourceID=ID.DataSource.ID(dataSourceID) hashtag />
-      | OracleScriptPage => <OracleScriptPageV2 />
+      | OracleScriptPage => <OracleScriptPage />
       | OracleScriptDetailsPage(oracleScriptID, hashtag) =>
         <OracleScriptDetailsPage oracleScriptID=ID.OracleScript.ID(oracleScriptID) hashtag />
       | TxHomePage => <TxHomePage />
