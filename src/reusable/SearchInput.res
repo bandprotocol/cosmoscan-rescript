@@ -65,7 +65,7 @@ let make = (~placeholder, ~onChange, ~debounce=500, ~maxWidth=240) => {
 
   <div className={Styles.searchbarWrapper(theme)} ref={ReactDOM.Ref.domRef(clickOutside)}>
     <div className=Styles.iconContainer>
-      <Icon name="far fa-search" color=theme.neutral_900 size=14 />
+      <Icon name="far fa-search" color=theme.neutral_600 size=14 />
     </div>
     <input
       type_="text"
