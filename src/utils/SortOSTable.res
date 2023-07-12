@@ -2,6 +2,13 @@ type sort_direction_t =
   | ASC
   | DESC
 
+type sort_t =
+  | ID
+  | Name
+  | Version
+  | Request
+  | Response
+
 type sort_by_t =
   | IDAsc
   | IDDesc
@@ -56,22 +63,22 @@ let defaultCompare = (a: OracleScriptSub.t_with_stats, b: OracleScriptSub.t_with
     compareString(b.name, a.name)
   }
 
-let sorting = (oraclescripts: array<OracleScriptSub.t_with_stats>, sortedBy) => {
+let sorting = (oraclescripts: array<OracleScriptSub.t_with_stats>, ~sortedBy, ~direction) => {
   oraclescripts
   ->Belt.List.fromArray
   ->Belt.List.sort((a, b) => {
     let result = {
-      switch sortedBy {
-      | IDAsc => compare(a.id, b.id)
-      | IDDesc => compare(b.id, a.id)
-      | NameAsc => compareString(b.name, a.name)
-      | NameDesc => compareString(a.name, b.name)
-      | VersionAsc => compareVersion(a.version, b.version)
-      | VersionDesc => compareVersion(b.version, a.version)
-      | RequestAsc => compare(a.stat.count, b.stat.count)
-      | RequestDesc => compare(b.stat.count, a.stat.count)
-      | ResponseAsc => compare(a.stat.responseTime, b.stat.responseTime)
-      | ResponseDesc => compare(b.stat.responseTime, a.stat.responseTime)
+      switch (sortedBy, direction) {
+      | (ID, ASC) => compare(a.id, b.id)
+      | (ID, DESC) => compare(b.id, a.id)
+      | (Name, ASC) => compareString(b.name, a.name)
+      | (Name, DESC) => compareString(a.name, b.name)
+      | (Version, ASC) => compareVersion(a.version, b.version)
+      | (Version, DESC) => compareVersion(b.version, a.version)
+      | (Request, ASC) => compare(a.stat.count, b.stat.count)
+      | (Request, DESC) => compare(b.stat.count, a.stat.count)
+      | (Response, ASC) => compare(a.stat.responseTime, b.stat.responseTime)
+      | (Response, DESC) => compare(b.stat.responseTime, a.stat.responseTime)
       }
     }
     if result != 0 {
@@ -81,4 +88,41 @@ let sorting = (oraclescripts: array<OracleScriptSub.t_with_stats>, sortedBy) => 
     }
   })
   ->Belt.List.toArray
+}
+
+let parseSortString = sortOption => {
+  switch sortOption {
+  | ID => "Oracle Script ID"
+  | Name => "Oracle Script Name"
+  | Version => "Latest Version"
+  | Request => "Most 24 hr Requested"
+  | Response => "Response Time"
+  }
+}
+
+let parseDirection = dir => {
+  switch dir {
+  | ASC => "ASC"
+  | DESC => "DESC"
+  }
+}
+
+let parseSortby = s => {
+  switch s {
+  | IDAsc
+  | IDDesc =>
+    ID
+  | NameAsc
+  | NameDesc =>
+    Name
+  | VersionAsc
+  | VersionDesc =>
+    Version
+  | RequestAsc
+  | RequestDesc =>
+    Request
+  | ResponseAsc
+  | ResponseDesc =>
+    Response
+  }
 }

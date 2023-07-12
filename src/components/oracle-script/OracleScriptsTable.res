@@ -42,13 +42,160 @@ module Styles = {
     ])
 }
 
+module SortDropdown = {
+  module StylesDropdown = {
+    open CssJs
+    let dropdownContainer = style(. [
+      position(#relative),
+      display(#flex),
+      alignItems(#center),
+      justifyContent(#center),
+      cursor(#pointer),
+    ])
+
+    let dropdownSelected = style(. [
+      display(#flex),
+      alignItems(#center),
+      padding2(~v=#px(8), ~h=#zero),
+    ])
+
+    let dropdownMenu = (theme: Theme.t, isDarkMode, isShow) =>
+      style(. [
+        position(#absolute),
+        top(#px(40)),
+        left(#px(0)),
+        width(#px(270)),
+        backgroundColor(theme.neutral_000),
+        borderRadius(#px(8)),
+        padding2(~v=#px(8), ~h=#px(0)),
+        zIndex(1),
+        boxShadow(
+          Shadow.box(
+            ~x=#zero,
+            ~y=#px(2),
+            ~blur=#px(4),
+            ~spread=#px(1),
+            rgba(16, 18, 20, #num(0.15)),
+          ),
+        ),
+        selector(" > ul + ul", [borderTop(#px(1), #solid, theme.neutral_300)]),
+        display(isShow ? #block : #none),
+      ])
+
+    let menuItem = (theme: Theme.t, isDarkMode) =>
+      style(. [
+        position(#relative),
+        display(#flex),
+        alignItems(#center),
+        justifyContent(#flexStart),
+        padding4(~top=#px(10), ~right=#px(16), ~bottom=#px(10), ~left=#px(38)),
+        cursor(#pointer),
+        marginTop(#zero),
+        selector("&:hover", [backgroundColor(isDarkMode ? theme.neutral_200 : theme.neutral_100)]),
+        selector(
+          "i",
+          [
+            position(#absolute),
+            left(#px(18)),
+            top(#percent(50.)),
+            transform(#translateY(#percent(-50.))),
+          ],
+        ),
+      ])
+  }
+  @react.component
+  let make = (~sortedBy, ~setSortedBy, ~direction, ~setDirection) => {
+    let (show, setShow) = React.useState(_ => false)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    <div className=StylesDropdown.dropdownContainer>
+      <div
+        className={StylesDropdown.dropdownSelected}
+        onClick={event => {
+          setShow(oldVal => !oldVal)
+          ReactEvent.Mouse.stopPropagation(event)
+        }}>
+        <Text
+          value={sortedBy->SortOSTable.parseSortString ++
+          "( " ++
+          direction->SortOSTable.parseDirection ++ " )"}
+          size={Body1}
+          color=theme.neutral_900
+          weight={Semibold}
+        />
+        <HSpacing size=Spacing.sm />
+        {show
+          ? <Icon name="far fa-angle-up" color={theme.neutral_900} />
+          : <Icon name="far fa-angle-down" color={theme.neutral_900} />}
+      </div>
+      <div className={StylesDropdown.dropdownMenu(theme, isDarkMode, show)}>
+        <ul>
+          {[
+            SortOSTable.ID,
+            SortOSTable.Name,
+            SortOSTable.Version,
+            SortOSTable.Request,
+            SortOSTable.Response,
+          ]
+          ->Belt.Array.mapWithIndex((i, each) => {
+            <li
+              key={i->Belt.Int.toString}
+              className={StylesDropdown.menuItem(theme, isDarkMode)}
+              onClick={_ => {
+                setSortedBy(_ => each)
+                setShow(_ => false)
+              }}>
+              {sortedBy == each
+                ? <Icon name="fal fa-check" size=12 color=theme.neutral_900 />
+                : React.null}
+              <Text
+                value={each->SortOSTable.parseSortString}
+                size={Body1}
+                weight={Semibold}
+                color={theme.neutral_900}
+              />
+            </li>
+          })
+          ->React.array}
+        </ul>
+        <ul>
+          {[SortOSTable.ASC, SortOSTable.DESC]
+          ->Belt.Array.mapWithIndex((i, each) => {
+            <li
+              className={StylesDropdown.menuItem(theme, isDarkMode)}
+              key={i->Belt.Int.toString}
+              onClick={_ => {
+                setDirection(_ => each)
+                setShow(_ => false)
+              }}>
+              {direction == each
+                ? <Icon name="fal fa-check" size=12 color=theme.neutral_900 />
+                : React.null}
+              <Text
+                value={switch each {
+                | SortOSTable.ASC => "Ascending (smallest value first)"
+                | DESC => "Descending (largest value first)"
+                }}
+                size={Body1}
+                weight={Semibold}
+                color={theme.neutral_900}
+              />
+            </li>
+          })
+          ->React.array}
+        </ul>
+      </div>
+    </div>
+  }
+}
+
 module SortableTHead = {
   @react.component
   let make = (
     ~title,
-    ~asc,
-    ~desc,
+    ~direction,
     ~toggle,
+    ~value,
     ~sortedBy,
     ~isCenter=false,
     ~tooltipItem=?,
@@ -56,7 +203,7 @@ module SortableTHead = {
   ) => {
     let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = React.useContext(ThemeContext.context)
 
-    <div className={Styles.sortableTHead(isCenter)} onClick={_ => toggle(asc, desc)}>
+    <div className={Styles.sortableTHead(isCenter)} onClick={_ => toggle(direction, value)}>
       <Text
         block=true
         value=title
@@ -65,14 +212,21 @@ module SortableTHead = {
         transform=Text.Uppercase
         tooltipItem={tooltipItem->Belt.Option.mapWithDefault(React.null, React.string)}
         tooltipPlacement
+        color={sortedBy == value ? theme.neutral_900 : theme.neutral_600}
       />
       <HSpacing size=Spacing.xs />
-      {if sortedBy == asc {
-        <Icon name="fas fa-caret-down" color={theme.neutral_600} />
-      } else if sortedBy == desc {
-        <Icon name="fas fa-caret-up" color={theme.neutral_600} />
+      {if direction == SortOSTable.ASC {
+        <Icon
+          name="fas fa-caret-down" color={sortedBy == value ? theme.neutral_900 : theme.neutral_600}
+        />
+      } else if direction == SortOSTable.DESC {
+        <Icon
+          name="fas fa-caret-up" color={sortedBy == value ? theme.neutral_900 : theme.neutral_600}
+        />
       } else {
-        <Icon name="fas fa-sort" color={theme.neutral_600} />
+        <Icon
+          name="fas fa-sort" color={sortedBy == value ? theme.neutral_900 : theme.neutral_600}
+        />
       }}
     </div>
   }
@@ -363,7 +517,7 @@ module RenderBody = {
                         : React.null}
                     </div>
                   : React.null
-              | _ => <LoadingCensorBar width=100 height=15 />
+              | _ => React.null
               }
             }}
       </div>
@@ -376,16 +530,18 @@ let make = (~searchTerm) => {
   let isMobile = Media.isMobile()
   let (page, setPage) = React.useState(_ => 1)
   let pageSize = 10
-  let (sortedBy, setSortedBy) = React.useState(_ => SortOSTable.IDDesc)
+  let (sortedBy, setSortedBy) = React.useState(_ => SortOSTable.Request)
+  let (direction, setDirection) = React.useState(_ => SortOSTable.DESC)
 
-  let toggle = (sortedByAsc, sortedByDesc) =>
-    if sortedBy == sortedByDesc {
-      setSortedBy(_ => sortedByAsc)
-      setPage(_ => 1)
-    } else {
-      setSortedBy(_ => sortedByDesc)
-      setPage(_ => 1)
-    }
+  let toggle = (direction, sortValue) => {
+    setSortedBy(_ => sortValue)
+    setDirection(_ => {
+      switch direction {
+      | SortOSTable.ASC => SortOSTable.DESC
+      | SortOSTable.DESC => SortOSTable.ASC
+      }
+    })
+  }
 
   let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = React.useContext(ThemeContext.context)
 
@@ -396,44 +552,43 @@ let make = (~searchTerm) => {
 
   <div>
     {isMobile
-      ? React.null
+      ? <div className={CssHelper.flexBox(~align=#center, ())}>
+          <Text value="Sort By" size={Body1} />
+          <HSpacing size=Spacing.sm />
+          <SortDropdown sortedBy setSortedBy direction setDirection />
+        </div>
       : <div className={Css.merge(list{Styles.tablehead, Styles.outer})}>
           <div>
-            <SortableTHead title="ID" asc=SortOSTable.IDAsc desc=IDDesc toggle sortedBy />
+            <SortableTHead title="ID" direction toggle value=SortOSTable.ID sortedBy />
           </div>
           <div>
             <SortableTHead
-              title="Oracle Script Name" asc=SortOSTable.NameAsc desc=NameDesc toggle sortedBy
+              title="Oracle Script Name" direction toggle sortedBy value=SortOSTable.Name
             />
           </div>
           <div>
             <SortableTHead
-              title="Version"
-              asc=SortOSTable.VersionAsc
-              desc=SortOSTable.VersionDesc
-              toggle
-              sortedBy
-              isCenter=true
+              title="Version" toggle sortedBy direction isCenter=true value=SortOSTable.Version
             />
           </div>
           <div>
             <SortableTHead
               title="24hr Requests"
-              asc=SortOSTable.RequestAsc
-              desc=SortOSTable.RequestDesc
               toggle
               sortedBy
+              direction
               isCenter=true
+              value=SortOSTable.Request
             />
           </div>
           <div>
             <SortableTHead
               title="Response Time"
-              asc=SortOSTable.ResponseAsc
-              desc=SortOSTable.ResponseDesc
               toggle
               sortedBy
+              direction
               isCenter=true
+              value=SortOSTable.Response
             />
           </div>
           <div>
@@ -454,7 +609,7 @@ let make = (~searchTerm) => {
             let pageCount = Page.getPageCount(oracleScriptsCount, pageSize)
             <div className={CssHelper.mt(~size=8, ())}>
               {oracleScripts
-              ->SortOSTable.sorting(sortedBy)
+              ->SortOSTable.sorting(~sortedBy, ~direction)
               ->Belt.Array.slice(
                 ~offset={
                   (page - 1) * pageSize
@@ -499,14 +654,13 @@ let make = (~searchTerm) => {
     | _ =>
       <div>
         {Belt.Array.makeBy(10, i =>
-          //   isMobile
-          //     ? <RenderBodyMobile
-          //         key={i->Belt.Int.toString} reserveIndex=i oracleScriptSub=NoData statsSub=NoData
-          //       />
-          //     : <RenderBody
-          //         key={i->Belt.Int.toString} reserveIndex=i oracleScriptSub=NoData statsSub=NoData
-          //       />
-          <> </>
+          isMobile
+            ? <RenderBodyMobile
+                key={i->Belt.Int.toString} reserveIndex=i oracleScriptSub=Sub.NoData searchTerm
+              />
+            : <RenderBody
+                key={i->Belt.Int.toString} reserveIndex=i oracleScriptSub=Sub.NoData searchTerm
+              />
         )->React.array}
       </div>
     }}

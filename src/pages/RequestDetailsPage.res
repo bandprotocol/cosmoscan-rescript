@@ -330,7 +330,7 @@ let make = (~reqID) => {
                       block=true
                       value={transactionOpt.gasFee
                       ->Coin.getBandAmountFromCoins
-                      ->Format.fPretty(~digits=6) ++ " BAND"}
+                      ->Format.fPretty(~digits=2) ++ " BAND"}
                       size=Text.Body1
                       color={theme.neutral_600}
                     />
