@@ -7,6 +7,7 @@ type t =
   | Reinvest(Address.t, float)
   | Vote(ID.Proposal.t, string)
   | VetoVote(ID.Proposal.t, string)
+  | OpenVeto(ID.Proposal.t, string, list<Coin.t>)
 
 let toString = x =>
   switch x {
@@ -17,7 +18,8 @@ let toString = x =>
   | WithdrawReward(_) => "Withdraw Reward"
   | Reinvest(_) => "Reinvest"
   | Vote(_) => "Vote"
-  | VetoVote(_) => "VetoVote"
+  | VetoVote(_) => "Veto Vote"
+  | OpenVeto(_) => "Open Veto Proposal"
   }
 
 let defaultGasLimit = x =>
@@ -27,6 +29,7 @@ let defaultGasLimit = x =>
   | Undelegate(_)
   | Vote(_)
   | VetoVote(_)
+  | OpenVeto(_)
   | WithdrawReward(_)
   | Reinvest(_)
   | Redelegate(_) => 300000

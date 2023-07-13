@@ -85,7 +85,14 @@ let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
 
   <>
     <div className=Styles.container>
-      <Text value="Proposal Name" size=Text.Body2 weight=Text.Medium nowrap=true block=true />
+      <Text
+        value="Proposal Name"
+        size=Text.Body2
+        weight=Text.Regular
+        color={theme.neutral_900}
+        nowrap=true
+        block=true
+      />
       <VSpacing size=Spacing.xs />
       <Text
         value={`${proposalID->ID.Proposal.toString} ${proposalName}`}
@@ -96,7 +103,7 @@ let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
         block=true
       />
       <VSpacing size=Spacing.md />
-      <Text value="Anwser" size=Text.Body2 weight=Text.Medium nowrap=true block=true />
+      <Text value="Answer" size=Text.Body2 weight=Text.Medium nowrap=true block=true />
     </div>
     <VoteInput answerOpt setAnswerOpt />
   </>

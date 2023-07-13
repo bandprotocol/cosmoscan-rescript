@@ -40,7 +40,9 @@ let make = (
   ~inputData,
   ~setInputData,
   ~msg,
+  ~subMsg=?,
   ~parse,
+  ~helperText: option<React.element>=?,
   ~maxValue=?,
   ~width,
   ~code=false,
@@ -64,14 +66,24 @@ let make = (
   }
 
   <div className=Styles.container>
-    <Heading
-      value=msg
-      size=Heading.H5
-      marginBottom=8
-      align=Heading.Left
-      color={theme.neutral_600}
-      weight=Heading.Regular
-    />
+    <div
+      className={Css.merge(list{CssHelper.flexBox(~wrap=#nowrap, ()), CssHelper.mb(~size=8, ())})}>
+      <Heading
+        value=msg
+        size=Heading.H5
+        align=Heading.Left
+        color={theme.neutral_900}
+        weight=Heading.Regular
+      />
+      {switch subMsg {
+      | Some(val) =>
+        <>
+          <HSpacing size=Spacing.xs />
+          <Text value=val size=Text.Caption weight=Text.Regular color={theme.neutral_600} />
+        </>
+      | None => React.null
+      }}
+    </div>
     <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
       <input
         id
@@ -115,6 +127,14 @@ let make = (
         <Text value=errMsg size=Text.Caption color={theme.error_600} />
       </div>
     | _ => React.null
+    }}
+    {switch helperText {
+    | Some(helperText_) =>
+      <>
+        <VSpacing size=Spacing.xs />
+        helperText_
+      </>
+    | None => React.null
     }}
   </div>
 }

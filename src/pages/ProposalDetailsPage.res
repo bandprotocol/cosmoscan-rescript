@@ -74,21 +74,16 @@ module VoteButton = {
 
 module OpenVetoButton = {
   @react.component
-  let make = (~proposalID, ~address) => {
-    let vote = () => Webapi.Dom.window->Webapi.Dom.Window.alert("vote")
+  let make = (~proposalID, ~address, ~proposalName, ~totalDeposit) => {
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+    let openVeto = () =>
+      OpenVeto(proposalID, proposalName, totalDeposit)->SubmitTx->OpenModal->dispatchModal
     let accountQuery = AccountQuery.get(address)
 
-    switch accountQuery {
-    | Data({councilOpt}) =>
-      switch councilOpt {
-      | Some(council) =>
-        <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
-          {"Vote"->React.string}
-        </Button>
-      | None => React.null
-      }
-    | _ => React.null
-    }
+    <Button
+      variant={Outline} px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => openVeto()}>
+      {"Open Veto"->React.string}
+    </Button>
   }
 }
 
@@ -101,7 +96,6 @@ module RenderData = {
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
     let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
-    let openVeto = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
     <Section>
       <div className=CssHelper.container>
@@ -187,20 +181,19 @@ module RenderData = {
           {switch accountOpt {
           | Some({address}) =>
             <Col col=Col.Two>
-              <VoteButton proposalID=proposal.id proposalName=proposal.title address />
+              {switch proposal.vetoProposalOpt {
+              | Some({totalDeposit}) =>
+                <OpenVetoButton
+                  proposalID=proposal.id proposalName=proposal.title address totalDeposit
+                />
+              | None => React.null
+              }}
               // TODO: uncomment before launch
               // {switch proposal.status {
               // | VotingPeriod => <VoteButton proposalID=proposal.id proposalName=proposal.title address />
-              // | _ =>
-              //   <Button
-              //     variant={Outline}
-              //     px=40
-              //     py=10
-              //     fsize=14
-              //     style={CssHelper.flexBox()}
-              //     onClick={_ => openVeto()}>
-              //     {"Open Veto"->React.string}
-              //   </Button>
+              // | _ => <OpenVetoButton
+              //   proposalID=proposal.id proposalName=proposal.title address totalDeposit
+              // />
               // | _ => React.null
               // }}
             </Col>
