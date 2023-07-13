@@ -48,21 +48,27 @@ module Styles = {
 
 module VoteButton = {
   @react.component
-  let make = (~proposalID, ~address) => {
-    let vote = () => Webapi.Dom.window->Webapi.Dom.Window.alert("vote")
+  let make = (~proposalID, ~proposalName, ~address) => {
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+    let vote = () => Vote(proposalID, proposalName)->SubmitTx->OpenModal->dispatchModal
     let accountQuery = AccountQuery.get(address)
 
-    switch accountQuery {
-    | Data({councilOpt}) =>
-      switch councilOpt {
-      | Some(council) =>
-        <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
-          {"Vote"->React.string}
-        </Button>
-      | None => React.null
-      }
-    | _ => React.null
-    }
+    // TODO: (proposal) uncomment before launch
+    // switch accountQuery {
+    // | Data({councilOpt}) =>
+    //   switch councilOpt {
+    //   | Some(council) =>
+    //     <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
+    //       {"Vote"->React.string}
+    //     </Button>
+    //   | None => React.null
+    //   }
+    // | _ => React.null
+    // }
+
+    <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
+      {"Vote"->React.string}
+    </Button>
   }
 }
 
@@ -181,20 +187,22 @@ module RenderData = {
           {switch accountOpt {
           | Some({address}) =>
             <Col col=Col.Two>
-              {switch proposal.status {
-              | VotingPeriod => <VoteButton proposalID=proposal.id address />
-              | _ =>
-                <Button
-                  variant={Outline}
-                  px=40
-                  py=10
-                  fsize=14
-                  style={CssHelper.flexBox()}
-                  onClick={_ => openVeto()}>
-                  {"Open Veto"->React.string}
-                </Button>
+              <VoteButton proposalID=proposal.id proposalName=proposal.title address />
+              // TODO: uncomment before launch
+              // {switch proposal.status {
+              // | VotingPeriod => <VoteButton proposalID=proposal.id proposalName=proposal.title address />
+              // | _ =>
+              //   <Button
+              //     variant={Outline}
+              //     px=40
+              //     py=10
+              //     fsize=14
+              //     style={CssHelper.flexBox()}
+              //     onClick={_ => openVeto()}>
+              //     {"Open Veto"->React.string}
+              //   </Button>
               // | _ => React.null
-              }}
+              // }}
             </Col>
           | None => React.null
           }}

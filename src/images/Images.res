@@ -12,7 +12,10 @@
 @module("./no-green.png") external noGreen: string = "default"
 @module("./no-red.png") external noRed: string = "default"
 @module("./no-gray.png") external noGray: string = "default"
+@module("./no-dark-green.png") external noDarkGreen: string = "default"
 @module("./question.png") external question: string = "default"
+@module("./abstain.png") external abstain: string = "default"
+@module("./abstain-gray.png") external abstainGray: string = "default"
 
 // Theme Toggle
 @module("./sun-icon.png") external sunIcon: string = "default"

@@ -49,10 +49,10 @@ module VoteInput = {
   let make = (~setAnswerOpt, ~answerOpt) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     <div className={Styles.buttonGroup(theme)}>
-      {[Vote.YesNo.Yes, No]
+      {[Vote.Full.Yes, No, NoWithVeto, Abstain]
       ->Belt.Array.map(option =>
-        <React.Fragment key={option->Vote.YesNo.toString}>
-          <VoteButton
+        <React.Fragment key={option->Vote.Full.toString}>
+          <VetoVoteButton
             isActive={answerOpt == option} variant=option onClick={_ => setAnswerOpt(_ => option)}
           />
           <VSpacing size=Spacing.sm />
@@ -65,7 +65,7 @@ module VoteInput = {
 
 @react.component
 let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
-  let (answerOpt, setAnswerOpt) = React.useState(_ => Vote.YesNo.Unknown)
+  let (answerOpt, setAnswerOpt) = React.useState(_ => Vote.Full.Unknown)
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   // React.useEffect1(_ => {

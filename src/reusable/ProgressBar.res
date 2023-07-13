@@ -213,11 +213,11 @@ module Slot = {
     [
       {
         percent: yes /. totalWeightF *. 100.,
-        color: theme.success_600,
+        color: Vote.YesNo.Yes->Vote.YesNo.getColor(theme),
       },
       {
         percent: no /. totalWeightF *. 100.,
-        color: theme.error_600,
+        color: Vote.YesNo.No->Vote.YesNo.getColor(theme),
       },
       {
         percent: (totalWeightF -. yes -. no) /. totalWeightF *. 100.,
@@ -239,19 +239,27 @@ module Slot = {
     [
       {
         percent: yes /. totalBondedTokens *. 100.,
-        color: invertColor ? theme.error_600 : theme.success_600,
+        color: invertColor
+          ? Vote.Full.Yes->Vote.Full.getColorInvert(theme)
+          : Vote.Full.Yes->Vote.Full.getColor(theme),
       },
       {
         percent: no /. totalBondedTokens *. 100.,
-        color: invertColor ? theme.success_600 : theme.error_600,
+        color: invertColor
+          ? Vote.Full.No->Vote.Full.getColorInvert(theme)
+          : Vote.Full.No->Vote.Full.getColor(theme),
       },
       {
         percent: noWithVeto /. totalBondedTokens *. 100.,
-        color: invertColor ? theme.success_800 : theme.error_700,
+        color: invertColor
+          ? Vote.Full.NoWithVeto->Vote.Full.getColorInvert(theme)
+          : Vote.Full.NoWithVeto->Vote.Full.getColor(theme),
       },
       {
         percent: abstain /. totalBondedTokens *. 100.,
-        color: invertColor ? theme.neutral_500 : theme.warning_600,
+        color: invertColor
+          ? Vote.Full.Abstain->Vote.Full.getColorInvert(theme)
+          : Vote.Full.Abstain->Vote.Full.getColor(theme),
       },
       {
         percent: (totalBondedTokens -. (yes +. no +. noWithVeto +. abstain)) /.

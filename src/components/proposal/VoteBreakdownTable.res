@@ -18,7 +18,7 @@ module VoteRow = {
   type t = {
     address: Address.t,
     transactionOpt: option<CouncilVoteSub.transaction_t>,
-    optionOpt: option<CouncilVoteSub.VoteOption.t>,
+    optionOpt: option<Vote.YesNo.t>,
     timestampOpt: option<MomentRe.Moment.t>,
   }
 
@@ -61,7 +61,7 @@ module VoteRow = {
           {switch vote.optionOpt {
           | Some(option_) =>
             <Text
-              value={option_->CouncilVoteSub.getVoteString}
+              value={option_->Vote.YesNo.toString}
               weight=Text.Medium
               color={switch option_ {
               | Yes => theme.success_600

@@ -7,38 +7,9 @@ type transaction_t = {
   block: block_t,
 }
 
-type vote_t =
-  | Yes
-  | No
-  | Unknown
-
-let getVoteString = vote =>
-  switch vote {
-  | Yes => "Yes"
-  | No => "No"
-  | Unknown => "Unknown"
-  }
-
-module VoteOption = {
-  type t = vote_t
-
-  let parse = json =>
-    switch json->Js.Json.decodeString {
-    | Some(str) =>
-      switch str {
-      | "Yes" => Yes
-      | "No" => No
-      | _ => Unknown
-      }
-    | None => Unknown
-    }
-
-  let serialize = vote => vote->getVoteString->Js.Json.string
-}
-
 type internal_t = {
   account: account_t,
-  option: VoteOption.t,
+  option: Vote.YesNo.t,
   transactionOpt: option<transaction_t>,
   voterId: int,
 }
@@ -51,7 +22,7 @@ type vote_stat_t = {
 // type alias for good semantic
 type t = {
   account: account_t,
-  option: VoteOption.t,
+  option: Vote.YesNo.t,
   transactionOpt: option<transaction_t>,
   voterId: int,
   timestampOpt: option<MomentRe.Moment.t>,
@@ -63,7 +34,7 @@ module SingleConfig = %graphql(`
       account @ppxAs(type: "account_t") {
         address @ppxCustom(module:"GraphQLParserModule.Address")
       }
-      option @ppxCustom(module:"VoteOption")
+      option @ppxCustom(module:"Vote.YesNo.Parser")
       transactionOpt: transaction @ppxAs(type: "transaction_t")  {
         hash @ppxCustom(module: "GraphQLParserModule.Hash")
         block @ppxAs(type: "block_t")  {
@@ -86,7 +57,7 @@ let toExternal = ({account, option, transactionOpt, voterId}: internal_t) => {
 }
 
 // calculate yes no vote count
-let getVoteCount = (votes, option: vote_t) =>
+let getVoteCount = (votes, option: Vote.YesNo.t) =>
   votes->Belt.Array.keep(vote => vote.option == option)->Belt.Array.length
 
 let get = councilProposalId => {
