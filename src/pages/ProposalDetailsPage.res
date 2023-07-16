@@ -229,7 +229,17 @@ module RenderData = {
             switch proposal.status {
             | WaitingVeto =>
               <Col col=Col.Five>
-                <RejectDetailsCard.Wait vetoProposal />
+                {switch proposal.vetoId {
+                | Some(vetoId) => {
+                    let totalDepositSub = ProposalSub.totalDeposit(vetoId)
+                    switch totalDepositSub {
+                    | Data(totalDepositOpt) => <RejectDetailsCard.Wait vetoId totalDepositOpt />
+                    | _ => <LoadingCensorBar width=153 height=30 />
+                    }
+                  }
+
+                | None => React.null
+                }}
               </Col>
             | _ =>
               <Col col=Col.Six>
@@ -337,13 +347,8 @@ module RenderData = {
 let make = (~proposalID) => {
   let proposalSub = CouncilProposalSub.get(proposalID)
   let councilVoteSub = CouncilVoteSub.get(proposalID)
-  // let depositsSub = DepositSub.getList(proposalID, ~pageSize, ~page, ())
 
   let allSub = Sub.all2(proposalSub, councilVoteSub)
-  // let voteStatByProposalIDSub = VoteSub.getVoteStatByProposalID(proposalID)
-  // let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
-
-  // let allSub = Sub.all3(proposalSub, voteStatByProposalIDSub, bondedTokenCountSub)
   switch allSub {
   | Data(proposal, votes) => <RenderData proposal votes />
   | Error(err) => <Heading value={err.message} />

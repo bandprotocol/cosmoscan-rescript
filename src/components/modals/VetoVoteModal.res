@@ -96,27 +96,31 @@ let make = (~council: CouncilProposalSub.council_t) => {
         address=council.account.address position=AddressRender.Subtitle copy=true ellipsis=true
       />
     </div>
-    {isMobile
-      ? <>
-          <RenderBodyMobile
-            name={council.name->CouncilSub.getCouncilNameString} members=council.councilMembers
-          />
-        </>
-      : <>
-          <THead height=30>
-            <Row alignItems=Row.Center>
-              <Col col=Col.One>
-                <Text value="#" size=Text.Caption weight=Text.Semibold />
-              </Col>
-              <Col col=Col.Six>
-                <Text value="TECH COUNCIL MEMBERS" size=Text.Caption weight=Text.Semibold />
-              </Col>
-              <Col col=Col.Five>
-                <Text value="SINCE" size=Text.Caption weight=Text.Semibold align=Text.Right />
-              </Col>
-            </Row>
-          </THead>
-          <RenderBody members=council.councilMembers />
-        </>}
+    {switch isMobile {
+    | true =>
+      <RenderBodyMobile
+        name={council.name->CouncilSub.getCouncilNameString} members=council.councilMembers
+      />
+    | false =>
+      <>
+        <THead height=30>
+          <Row alignItems=Row.Center>
+            <Col col=Col.Three>
+              <Text value="VOTERS" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col col=Col.Four>
+              <Text value="TX HASH" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col col=Col.Two>
+              <Text value="AMOUNT (BAND)" size=Text.Caption weight=Text.Semibold align=Text.Right />
+            </Col>
+            <Col col=Col.Three>
+              <Text value="TIMESTAMP" size=Text.Caption weight=Text.Semibold align=Text.Right />
+            </Col>
+          </Row>
+        </THead>
+        <RenderBody members=council.councilMembers />
+      </>
+    }}
   </div>
 }

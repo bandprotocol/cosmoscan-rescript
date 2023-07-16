@@ -17,6 +17,7 @@ let make = (
   ~size=Text.Body2,
   ~weight=Text.Medium,
   ~fullHash=true,
+  ~ellipsisLimit=6,
 ) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -28,19 +29,7 @@ let make = (
           block=true
           code=true
           spacing={Text.Em(0.02)}
-          value={
-            let startHash = txHash->Hash.toHex(~upper=true)->Js.String.slice(~from=0, ~to_=6)
-
-            let endHash =
-              txHash
-              ->Hash.toHex(~upper=true)
-              ->Js.String.slice(
-                ~from=txHash->Hash.toHex->Js.String2.length - 6,
-                ~to_=txHash->Hash.toHex->Js.String2.length,
-              )
-
-            startHash ++ "..." ++ endHash
-          }
+          value={Ellipsis.center(~text=txHash->Hash.toHex(~upper=true), ~limit=ellipsisLimit, ())}
           weight
           ellipsis=false
           size

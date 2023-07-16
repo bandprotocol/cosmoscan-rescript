@@ -16,11 +16,11 @@ module Styles = {
 
 module Wait = {
   @react.component
-  let make = (~vetoProposal: CouncilProposalSub.VetoProposal.t) => {
+  let make = (~vetoId: int, ~totalDepositOpt: option<float>) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-    let openDepositors = () => Syncing->OpenModal->dispatchModal
+    let openDepositors = () => vetoId->ID.Proposal.fromInt->Depositors->OpenModal->dispatchModal
 
     <Row marginTopSm=24>
       <Col col=Col.Twelve mb=8 style={CssHelper.flexBox()}>
@@ -83,8 +83,9 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
             <Col col=Col.Seven>
               <div className={CssHelper.flexBox()}>
                 <Text
-                  value={`${vetoProposal.totalDeposit
-                    ->Coin.getBandAmountFromCoins
+                  // if none totalDepositOpt exist getWithDefault with 0
+                  value={`${totalDepositOpt
+                    ->Belt.Option.getWithDefault(0.)
                     ->Format.fPretty(~digits=0)}/1,000 BAND`}
                   size=Text.Body1
                   code=true
@@ -121,8 +122,7 @@ module Vote = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-    // let depositCountSub = DepositSub.count(vetoProposal.id)
-    let openDepositors = () => Syncing->OpenModal->dispatchModal
+    let openDepositors = () => vetoProposal.id->Depositors->OpenModal->dispatchModal
     let vote = () => Syncing->OpenModal->dispatchModal
 
     <Row marginTopSm=24>

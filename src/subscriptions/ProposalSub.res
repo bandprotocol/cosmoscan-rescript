@@ -122,6 +122,8 @@ type account_t = {address: Address.t}
 
 type deposit_t = {amount: list<Coin.t>}
 
+type total_deposit_t = {deposits: array<deposit_t>}
+
 type internal_t = {
   id: ID.Proposal.t,
   title: string,
@@ -306,6 +308,16 @@ module ProposalsCountConfig = %graphql(`
   }
 `)
 
+module DepositAmountConfig = %graphql(`
+  subscription DepositAmount($id: Int!) {
+    proposals( where: {id: {_eq: $id}}) @ppxAs(type: "total_deposit_t"){
+      deposits @ppxAs(type: "deposit_t") {
+        amount @ppxCustom(module: "GraphQLParserModule.Coins")
+      }
+    }
+  }
+`)
+
 let getList = (~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({limit: pageSize, offset})
@@ -332,4 +344,21 @@ let count = () => {
   result
   ->Sub.fromData
   ->Sub.map(x => x.proposals_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+}
+
+let totalDeposit = id => {
+  let result = DepositAmountConfig.use({id: id})
+
+  result
+  ->Sub.fromData
+  ->Sub.map(x => {
+    x.proposals
+    ->Belt.Array.get(0)
+    ->Belt.Option.map(proposal =>
+      proposal.deposits->Belt.Array.reduce(
+        0.,
+        (acc, deposit) => acc +. deposit.amount->Coin.getBandAmountFromCoins,
+      )
+    )
+  })
 }
