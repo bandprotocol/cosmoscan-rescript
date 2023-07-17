@@ -44,6 +44,9 @@ let make = () => {
       | ProposalPage => <ProposalPage />
       | ProposalDetailsPage(proposalID) =>
         <ProposalDetailsPage proposalID=ID.Proposal.ID(proposalID) />
+      | LegacyProposalPage => <LegacyProposalPage />
+      | LegacyProposalDetailsPage(proposalID) =>
+        <LegacyProposalDetailsPage proposalID=ID.Proposal.ID(proposalID) />
       | RelayersHomepage => <RelayersHomepage />
       | ChannelDetailsPage(chainID, port, channel) => <ChannelPage chainID channel port />
       | NotFound => <NotFound />

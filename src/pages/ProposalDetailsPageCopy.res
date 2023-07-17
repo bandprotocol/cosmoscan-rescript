@@ -101,7 +101,7 @@ let make = (~proposalID) => {
       </Row>
       <Row alignItems=Row.Center marginBottom=40 marginBottomSm=16>
         {switch allSub {
-        | Data(({id, name, status}, _, _)) =>
+        | Data(({id, title, status}, _, _)) =>
           <>
             <Col col=Col.Eight mbSm=16>
               <div
@@ -112,7 +112,7 @@ let make = (~proposalID) => {
                 <div className={CssHelper.flexBox()}>
                   <TypeID.Proposal id position=TypeID.Title />
                   <HSpacing size=Spacing.sm />
-                  <Heading size=Heading.H3 value=name />
+                  <Heading size=Heading.H3 value=title />
                   <HSpacing size={#px(16)} />
                 </div>
                 <div className={CssHelper.mtSm(~size=16, ())}>
@@ -128,7 +128,7 @@ let make = (~proposalID) => {
                       CssHelper.flexBox(~direction=#column, ~align=#flexEnd, ()),
                     })}>
                     <div className={Styles.voteButton(status)}>
-                      <VoteButton proposalID proposalName=name />
+                      <VoteButton proposalID proposalName=title />
                     </div>
                   </div>}
             </Col>

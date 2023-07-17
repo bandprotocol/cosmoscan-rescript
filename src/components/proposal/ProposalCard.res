@@ -72,10 +72,12 @@ let make = (~reserveIndex, ~proposalSub: Sub.variant<ProposalSub.t>) => {
               Styles.idContainer,
             })}>
             {switch proposalSub {
-            | Data({id, name}) =>
+            | Data({id, title}) =>
               <>
                 <TypeID.Proposal id position=TypeID.Title />
-                <Heading size=Heading.H3 value=name color={theme.neutral_600} weight=Heading.Thin />
+                <Heading
+                  size=Heading.H3 value=title color={theme.neutral_600} weight=Heading.Thin
+                />
               </>
             | _ =>
               isMobile

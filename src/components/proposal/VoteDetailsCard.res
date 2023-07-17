@@ -153,3 +153,106 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
     </Col>
   </Row>
 }
+
+module Legacy = {
+  @react.component
+  let make = (~proposal: ProposalSub.t, ~voteStat: VoteSub.vote_stat_t, ~bondedToken: Coin.t) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+
+    <Row>
+      <Col col=Col.Twelve>
+        <Heading
+          value="Vote Details"
+          size=Heading.H4
+          weight=Heading.Semibold
+          color={theme.neutral_600}
+          marginBottom=8
+        />
+      </Col>
+      <Col col=Col.Twelve>
+        <InfoContainer py=24 px=32>
+          <Row>
+            <Col
+              col=Col.Four
+              mb=22
+              style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}>
+              <div>
+                <Row>
+                  <Col col=Col.Six>
+                    <div className={CssHelper.flexBox()}>
+                      <Heading
+                        value="Yes Vote"
+                        size=Heading.H5
+                        weight=Heading.Regular
+                        color={theme.neutral_900}
+                        marginRight=8
+                      />
+                      <Text
+                        // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
+                        value="min 50%"
+                        size=Text.Body2
+                        weight=Text.Regular
+                        color={theme.neutral_600}
+                      />
+                    </div>
+                  </Col>
+                  <Col col=Col.Six>
+                    <div className={CssHelper.flexBox()}>
+                      <img
+                        src={switch proposal.status {
+                        | Passed => Images.yesGreen
+                        | _ => Images.noRed
+                        }}
+                        alt={proposal.status
+                        ->ProposalSub.ProposalStatus.serialize
+                        ->Js.Json.decodeString
+                        ->Belt.Option.getExn}
+                        className=Styles.yesnoImg
+                      />
+                      <Text
+                        value={proposal.endTotalYesPercent->Format.fPercent(~digits=2)}
+                        size=Text.Body1
+                        weight=Text.Bold
+                        color={theme.neutral_900}
+                      />
+                    </div>
+                  </Col>
+                </Row>
+                <Row marginTop=16 alignItems=Row.Center>
+                  <Col col=Col.Six>
+                    <div className={CssHelper.flexBox()}>
+                      <Heading
+                        value="Status"
+                        size=Heading.H5
+                        weight=Heading.Regular
+                        color={theme.neutral_900}
+                      />
+                    </div>
+                  </Col>
+                  <Col col=Col.Six>
+                    <div className={CssHelper.flexBox()}>
+                      <Text
+                        value={proposal.status
+                        ->ProposalSub.ProposalStatus.serialize
+                        ->Js.Json.decodeString
+                        ->Belt.Option.getExn}
+                        size=Text.Body1
+                        weight=Text.Semibold
+                        color={proposal.status->ProposalSub.getStatusColor(theme)}
+                        block=true
+                      />
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            </Col>
+            <Col col=Col.Twelve>
+              <VoteProgress.Legacy proposal voteStat bondedToken />
+            </Col>
+          </Row>
+        </InfoContainer>
+      </Col>
+    </Row>
+  }
+}

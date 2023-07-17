@@ -90,6 +90,12 @@ type proposal_status_t =
   | Failed
   | Inactive
 
+let getStatusColor = (status, theme: Theme.t) =>
+  switch status {
+  | Passed => theme.success_600
+  | _ => theme.error_600
+  }
+
 module ProposalStatus = {
   type t = proposal_status_t
   let parse = json => {
@@ -146,7 +152,7 @@ type internal_t = {
 
 type t = {
   id: ID.Proposal.t,
-  name: string,
+  title: string,
   status: proposal_status_t,
   description: string,
   content: content_t,
@@ -221,7 +227,7 @@ let toExternal = ({
 
   {
     id,
-    name: title,
+    title,
     status,
     description,
     // TODO: This field expect to exist on every proposals, will fix schema to be required field
