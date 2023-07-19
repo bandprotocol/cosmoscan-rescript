@@ -273,8 +273,8 @@ module Legacy = {
     let openVetos = () => Syncing->OpenModal->dispatchModal
 
     let yesVote = switch proposal.totalBondedTokens {
-    | Some(_) => proposal.endTotalNo
-    | None => voteStat.totalNo
+    | Some(_) => proposal.endTotalYes
+    | None => voteStat.totalYes
     }
 
     let noVote = switch proposal.totalBondedTokens {
@@ -283,13 +283,13 @@ module Legacy = {
     }
 
     let noWithVetoVote = switch proposal.totalBondedTokens {
-    | Some(_) => proposal.endTotalNo
-    | None => voteStat.totalNo
+    | Some(_) => proposal.endTotalNoWithVeto
+    | None => voteStat.totalNoWithVeto
     }
 
     let abstainVote = switch proposal.totalBondedTokens {
-    | Some(_) => proposal.endTotalNo
-    | None => voteStat.totalNo
+    | Some(_) => proposal.endTotalAbstain
+    | None => voteStat.totalAbstain
     }
 
     let yesVotePercent = switch proposal.totalBondedTokens {
@@ -322,11 +322,23 @@ module Legacy = {
     | None => bondedToken->Coin.getBandAmountFromCoin
     }
 
+    Js.logMany([
+      yesVote,
+      noVote,
+      noWithVetoVote,
+      abstainVote,
+      yesVotePercent,
+      noVotePercent,
+      noWithVetoVotePercent,
+      abstainVotePercent,
+    ])
     <>
       <Row>
         <Col col=Col.Twelve mb=8 style={CssHelper.flexBox()}>
           <Text
-            value={`${yesVotePercent->Format.fCurrency} of ${totalBondedToken->Format.fCurrency} BAND voted (${turnOut->Belt.Float.toString}%)`}
+            value={`${yesVote->Format.fCurrency} of ${totalBondedToken->Format.fCurrency} BAND voted (${turnOut->Format.fPretty(
+                ~digits=2,
+              )}%)`}
             size=Text.Body2
             weight=Text.Semibold
             color={theme.neutral_600}
@@ -339,49 +351,19 @@ module Legacy = {
           <ProgressBar.Voting2
             slots={ProgressBar.Slot.getFullSlot(
               theme,
-              ~yes={yesVotePercent},
-              ~no={noVotePercent},
-              ~noWithVeto={noWithVetoVotePercent},
-              ~abstain={abstainVotePercent},
+              ~yes={yesVote},
+              ~no={noVote},
+              ~noWithVeto={noWithVetoVote},
+              ~abstain={abstainVote},
               ~totalBondedTokens={totalBondedToken},
               ~invertColor=true,
               (),
             )}
             fullWidth=true
           />
-          // {switch proposal.totalBondedTokens {
-          // | Some(totalBondedTokensExn) =>
-          //   <ProgressBar.Voting2
-          //     slots={ProgressBar.Slot.getFullSlot(
-          //       theme,
-          //       ~yes={proposal.endTotalYes},
-          //       ~no={proposal.endTotalNo},
-          //       ~noWithVeto={proposal.endTotalNoWithVeto},
-          //       ~abstain={proposal.endTotalAbstain},
-          //       ~totalBondedTokens={totalBondedTokensExn},
-          //       ~invertColor=true,
-          //       (),
-          //     )}
-          //     fullWidth=true
-          //   />
-          // | None =>
-          //   <ProgressBar.Voting2
-          //     slots={ProgressBar.Slot.getFullSlot(
-          //       theme,
-          //       ~yes={voteStat.totalYes},
-          //       ~no={voteStat.totalNo},
-          //       ~noWithVeto={voteStat.totalNoWithVeto},
-          //       ~abstain={voteStat.totalAbstain},
-          //       ~totalBondedTokens={bondedToken->Coin.getBandAmountFromCoin},
-          //       ~invertColor=true,
-          //       (),
-          //     )}
-          //     fullWidth=true
-          //   />
-          // }}
         </Col>
       </Row>
-      <Row marginTop=4 marginBottom=14>
+      <Row marginTop=4>
         <Col col=Col.Twelve style={CssHelper.flexBox()}>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
