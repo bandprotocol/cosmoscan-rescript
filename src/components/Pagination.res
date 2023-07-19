@@ -37,10 +37,7 @@ module Styles = {
       ]),
     ])
 
-  let paginationBox = style(. [
-    margin2(~v=zero, ~h=#px(32)),
-    selector("> * + *", [marginLeft(#px(20))]),
-  ])
+  let paginationBox = style(. [margin2(~v=zero, ~h=#px(32))])
 }
 module ClickableSymbol = {
   @react.component
@@ -83,12 +80,13 @@ let make = (~currentPage, ~pageCount, ~onPageChange: int => unit) => {
             weight=Text.Semibold
             color=theme.neutral_900
           />
-          <Text value="of" size=Text.Body1 />
+          <Text value="of" size=Text.Body1 marginLeft=20 />
           <Text
             value={pageCount->Format.iPretty}
             weight=Text.Semibold
             size=Text.Body1
             color=theme.neutral_900
+            marginLeft=20
           />
         </div>
         <ClickableSymbol

@@ -124,6 +124,16 @@ module ProposalStatus = {
   }
 }
 
+let getStatusText = status =>
+  switch status {
+  | Deposit => "DepositPeriod"
+  | Voting => "VotingPeriod"
+  | Passed => "Pass"
+  | Rejected => "Reject"
+  | Failed => "Fail"
+  | Inactive => "Inactive"
+  }
+
 type account_t = {address: Address.t}
 
 type deposit_t = {amount: list<Coin.t>}

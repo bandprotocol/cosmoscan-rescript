@@ -22,6 +22,12 @@ module Styles = {
       display(#inlineBlock),
       selector(" > p", [color(theme.primary_600)]),
     ])
+
+  let parameterChanges = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      padding2(~v=#px(16), ~h=#px(24)),
+      backgroundColor(isDarkMode ? theme.neutral_200 : theme.neutral_100),
+    ])
 }
 
 module ProposalTypeBadge = {
@@ -160,19 +166,6 @@ module RenderData = {
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Submit Time"
-                    size=Heading.H4
-                    weight=Heading.Thin
-                    color={theme.neutral_600}
-                  />
-                </Col>
-                <Col col=Col.Eight>
-                  <Timestamp size=Text.Body1 timeOpt=Some(proposal.submitTime) />
-                </Col>
-              </Row>
-              <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
-                  <Heading
                     value="Proposal Type"
                     size=Heading.H4
                     weight=Heading.Thin
@@ -199,31 +192,102 @@ module RenderData = {
             </InfoContainer>
           </Col>
         </Row>
-        // <Row marginBottom=16>
-        //   <Col>
-        //     <Heading
-        //       value={`Messages (${proposal.messages->Belt.List.length->Belt.Int.toString})`}
-        //       size=Heading.H4
-        //       weight=Heading.Semibold
-        //       color={theme.neutral_600}
-        //     />
-        //   </Col>
-        // </Row>
-        // <Row marginBottom=24>
-        //   <Col>
-        //     <div className=Styles.msgContainer>
-        //       {proposal.messages
-        //       ->Belt.List.mapWithIndex((index, msg) => {
-        //         let badge = msg.decoded->Msg.getBadge
-        //         <MsgDetailCard key={index->Belt.Int.toString ++ badge.name} msg />
-        //       })
-        //       ->Array.of_list
-        //       ->React.array}
-        //     </div>
-        //   </Col>
-        // </Row>
-        <SeperatedLine mt=40 mb=40 color=theme.neutral_200 />
-        // <VoteBreakdownTable members=proposal.council.councilMembers votes />
+        <Row marginBottom=16>
+          <Col>
+            <Heading
+              value="Messages" size=Heading.H4 weight=Heading.Semibold color={theme.neutral_600}
+            />
+          </Col>
+        </Row>
+        <Row marginBottom=24>
+          <Col>
+            <InfoContainer>
+              {switch proposal.content {
+              | CommunityPoolSpend({recipient, amount}) =>
+                <>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="Recipient Address"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <AddressRender address=recipient position=AddressRender.Subtitle />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="Amount" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <AmountRender coins=amount pos=AmountRender.TxIndex />
+                    </Col>
+                  </Row>
+                </>
+              | SoftwareUpgrade({name, height}) =>
+                <>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="Upgrade Name"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text value={name} size=Text.Body1 block=true />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="Upgrade Height"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text value={height->Belt.Int.toString} size=Text.Body1 block=true />
+                    </Col>
+                  </Row>
+                </>
+              | ParameterChange(parameters) =>
+                <>
+                  <Row marginBottom=24>
+                    <Col col=Col.Twelve>
+                      <div className={Styles.parameterChanges(theme, isDarkMode)}>
+                        {parameters
+                        ->Belt.Array.mapWithIndex((i, value) =>
+                          <div key={i->Belt.Int.toString}>
+                            <Text
+                              value={value.subspace ++ "." ++ value.key ++ ": " ++ value.value}
+                              size=Text.Body1
+                              block=true
+                              code=true
+                            />
+                            {i < parameters->Belt.Array.length - 1
+                              ? <VSpacing size=Spacing.md />
+                              : React.null}
+                          </div>
+                        )
+                        ->React.array}
+                      </div>
+                    </Col>
+                  </Row>
+                </>
+              | _ => <Text value="Unable to show the proposal messages" />
+              }}
+            </InfoContainer>
+          </Col>
+        </Row>
+        <LegacyVoteBreakdownTable members=[] proposalID=proposal.id />
       </div>
     </Section>
   }

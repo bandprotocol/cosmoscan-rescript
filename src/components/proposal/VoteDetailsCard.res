@@ -205,10 +205,7 @@ module Legacy = {
                       | Passed => Images.yesGreen
                       | _ => Images.noRed
                       }}
-                      alt={proposal.status
-                      ->ProposalSub.ProposalStatus.serialize
-                      ->Js.Json.decodeString
-                      ->Belt.Option.getExn}
+                      alt={proposal.status->ProposalSub.getStatusText}
                       className=Styles.yesnoImg
                     />
                     <Text
@@ -247,10 +244,7 @@ module Legacy = {
                       | Passed => Images.yesGreen
                       | _ => Images.noRed
                       }}
-                      alt={proposal.status
-                      ->ProposalSub.ProposalStatus.serialize
-                      ->Js.Json.decodeString
-                      ->Belt.Option.getExn}
+                      alt={proposal.status->ProposalSub.getStatusText}
                       className=Styles.yesnoImg
                     />
                     <Text
@@ -277,10 +271,7 @@ module Legacy = {
                 <Col col=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Text
-                      value={proposal.status
-                      ->ProposalSub.ProposalStatus.serialize
-                      ->Js.Json.decodeString
-                      ->Belt.Option.getExn}
+                      value={proposal.status->ProposalSub.getStatusText}
                       size=Text.Body1
                       weight=Text.Semibold
                       color={proposal.status->ProposalSub.getStatusColor(theme)}

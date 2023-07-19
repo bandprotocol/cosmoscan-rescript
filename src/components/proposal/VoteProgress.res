@@ -333,8 +333,8 @@ module Legacy = {
       abstainVotePercent,
     ])
     <>
-      <Row>
-        <Col col=Col.Twelve mb=8 style={CssHelper.flexBox()}>
+      <Row marginBottom=16>
+        <Col col=Col.Twelve style={CssHelper.flexBox()}>
           <Text
             value={`${yesVote->Format.fCurrency} of ${totalBondedToken->Format.fCurrency} BAND voted (${turnOut->Format.fPretty(
                 ~digits=2,
@@ -356,14 +356,13 @@ module Legacy = {
               ~noWithVeto={noWithVetoVote},
               ~abstain={abstainVote},
               ~totalBondedTokens={totalBondedToken},
-              ~invertColor=true,
               (),
             )}
             fullWidth=true
           />
         </Col>
       </Row>
-      <Row marginTop=4>
+      <Row marginTop=8>
         <Col col=Col.Twelve style={CssHelper.flexBox()}>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
