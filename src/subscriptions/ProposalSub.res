@@ -131,7 +131,7 @@ type deposit_t = {amount: list<Coin.t>}
 type total_deposit_t = {deposits: array<deposit_t>}
 
 type internal_t = {
-  id: ID.Proposal.t,
+  id: ID.LegacyProposal.t,
   title: string,
   status: proposal_status_t,
   description: string,
@@ -151,7 +151,7 @@ type internal_t = {
 }
 
 type t = {
-  id: ID.Proposal.t,
+  id: ID.LegacyProposal.t,
   title: string,
   status: proposal_status_t,
   description: string,
@@ -255,7 +255,7 @@ let toExternal = ({
 module SingleConfig = %graphql(`
   subscription Proposal($id: Int!) {
     proposals_by_pk(id: $id) @ppxAs(type: "internal_t") {
-      id @ppxCustom(module: "GraphQLParserModule.ProposalID")
+      id @ppxCustom(module: "GraphQLParserModule.LegacyProposalID")
       title
       status @ppxCustom(module: "ProposalStatus")
       description
@@ -281,7 +281,7 @@ module SingleConfig = %graphql(`
 module MultiConfig = %graphql(`
   subscription Proposals($limit: Int!, $offset: Int!) {
     proposals(limit: $limit, offset: $offset, order_by: [{id: desc}], where: {status: {_neq: "Inactive"}, type: {_neq: "CouncilVeto"}}) @ppxAs(type: "internal_t") {
-      id @ppxCustom(module: "GraphQLParserModule.ProposalID")
+      id @ppxCustom(module: "GraphQLParserModule.LegacyProposalID")
       title
       status @ppxCustom(module: "ProposalStatus")
       description
@@ -332,7 +332,7 @@ let getList = (~page, ~pageSize, ()) => {
 }
 
 let get = id => {
-  let result = SingleConfig.use({id: id->ID.Proposal.toInt})
+  let result = SingleConfig.use({id: id->ID.LegacyProposal.toInt})
 
   result
   ->Sub.fromData

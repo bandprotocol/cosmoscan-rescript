@@ -51,7 +51,7 @@ type answer_vote_t = {
   valPower: float,
   valVote: option<vote_t>,
   delVotes: vote_t => float,
-  proposalID: ID.Proposal.t,
+  proposalID: ID.LegacyProposal.t,
 }
 
 type internal_vote_t = {
@@ -65,11 +65,11 @@ type result_val_t = {
   validatorID: int,
   validatorPower: float,
   validatorAns: option<vote_t>,
-  proposalID: ID.Proposal.t,
+  proposalID: ID.LegacyProposal.t,
 }
 
 type vote_stat_t = {
-  proposalID: ID.Proposal.t,
+  proposalID: ID.LegacyProposal.t,
   totalYes: float,
   totalYesPercent: float,
   totalNo: float,
@@ -274,7 +274,7 @@ let getList = (proposalID, answer, ~page, ~pageSize, ()) => {
   switch answer {
   | Yes =>
     YesVoteConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
       limit: pageSize,
       offset,
     })
@@ -283,7 +283,7 @@ let getList = (proposalID, answer, ~page, ~pageSize, ()) => {
 
   | No =>
     NoVoteConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
       limit: pageSize,
       offset,
     })
@@ -292,7 +292,7 @@ let getList = (proposalID, answer, ~page, ~pageSize, ()) => {
 
   | NoWithVeto =>
     NoWithVetoVoteConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
       limit: pageSize,
       offset,
     })
@@ -301,7 +301,7 @@ let getList = (proposalID, answer, ~page, ~pageSize, ()) => {
 
   | Abstain =>
     AbstainVoteConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
       limit: pageSize,
       offset,
     })
@@ -314,28 +314,28 @@ let count = (proposalID, answer) => {
   switch answer {
   | Yes =>
     YesVoteCountConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
     })
     ->Sub.fromData
     ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
 
   | No =>
     NoVoteCountConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
     })
     ->Sub.fromData
     ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
 
   | NoWithVeto =>
     NoWithVetoVoteCountConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
     })
     ->Sub.fromData
     ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
 
   | Abstain =>
     AbstainVoteCountConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
     })
     ->Sub.fromData
     ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
@@ -345,10 +345,10 @@ let count = (proposalID, answer) => {
 // TODO: mess a lot with option need to clean
 let getVoteStatByProposalID = proposalID => {
   let validatorVotes = ValidatorVoteByProposalIDConfig.use({
-    proposalID: proposalID->ID.Proposal.toInt,
+    proposalID: proposalID->ID.LegacyProposal.toInt,
   })
   let delegatorVotes = DelegatorVoteByProposalIDConfig.use({
-    proposalID: proposalID->ID.Proposal.toInt,
+    proposalID: proposalID->ID.LegacyProposal.toInt,
   })
 
   let val_votes =

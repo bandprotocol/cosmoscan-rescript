@@ -124,11 +124,11 @@ module RenderData = {
                 weight=Heading.Semibold
               />
               <HSpacing size=Spacing.sm />
-              {isMobile ? React.null : <ProposalBadge status=proposal.status />}
+              {isMobile ? React.null : <ProposalBadge status=proposal.status tooltip=true />}
             </div>
             {isMobile
               ? <div className={Css.merge(list{CssHelper.flexBox(), Styles.badge})}>
-                  <ProposalBadge status=proposal.status />
+                  <ProposalBadge status=proposal.status tooltip=true />
                 </div>
               : React.null}
           </Col>

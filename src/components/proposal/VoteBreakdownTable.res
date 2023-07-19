@@ -172,7 +172,12 @@ let make = (
       </Col>
     </Row>
     {switch filter {
-    | All => votes->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.voteToVoteRow} />)
+    | All =>
+      votes
+      ->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.voteToVoteRow} />)
+      ->Belt.Array.concat(
+        notVoteMember->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.memberToVoteRow} />),
+      )
     | Yes => yesVotes->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.voteToVoteRow} />)
     | No => noVotes->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.voteToVoteRow} />)
     | DidNotVote =>

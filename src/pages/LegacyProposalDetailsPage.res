@@ -58,7 +58,7 @@ module RenderData = {
         <Row style=Styles.header>
           <Col col=Col.Twelve>
             <div className={CssHelper.flexBox()}>
-              <TypeID.Proposal
+              <TypeID.LegacyProposal
                 id={proposal.id}
                 position=TypeID.Title
                 size=Text.Xxxxl

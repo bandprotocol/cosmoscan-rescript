@@ -47,7 +47,7 @@ let getTooltipText = status =>
   }
 
 @react.component
-let make = (~status) => {
+let make = (~status, ~tooltip=false) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   <>
     <div
@@ -63,12 +63,18 @@ let make = (~status) => {
         color=theme.white
       />
     </div>
-    <HSpacing size=Spacing.xs />
-    <CTooltip
-      tooltipPlacement=CTooltip.Top
-      tooltipPlacementSm=CTooltip.Top
-      tooltipText={status->getTooltipText}>
-      <Icon name="fal fa-info-circle" size=16 color={theme.neutral_400} />
-    </CTooltip>
+    {switch tooltip {
+    | true =>
+      <>
+        <HSpacing size=Spacing.xs />
+        <CTooltip
+          tooltipPlacement=CTooltip.Top
+          tooltipPlacementSm=CTooltip.Top
+          tooltipText={status->getTooltipText}>
+          <Icon name="fal fa-info-circle" size=16 color={theme.neutral_400} />
+        </CTooltip>
+      </>
+    | false => React.null
+    }}
   </>
 }
