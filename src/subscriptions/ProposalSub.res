@@ -234,6 +234,7 @@ let toExternal = ({
   let noWithVetoVote = no_with_veto_vote->Belt.Option.getWithDefault(0.)
   let abstainVote = abstain_vote->Belt.Option.getWithDefault(0.)
   let totalVote = yesVote +. noVote +. noWithVetoVote +. abstainVote
+  let totalVoteWithoutAbstain = yesVote +. noVote +. noWithVetoVote
 
   {
     id,
@@ -249,13 +250,21 @@ let toExternal = ({
     votingEndTime,
     proposerAddressOpt: accountOpt->Belt.Option.map(({address}) => address),
     endTotalYes: yesVote /. 1e6,
-    endTotalYesPercent: totalVote != 0. ? yesVote /. totalVote *. 100. : 0.,
+    endTotalYesPercent: totalVoteWithoutAbstain != 0.
+      ? yesVote /. totalVoteWithoutAbstain *. 100.
+      : 0.,
     endTotalNo: noVote /. 1e6,
-    endTotalNoPercent: totalVote != 0. ? noVote /. totalVote *. 100. : 0.,
+    endTotalNoPercent: totalVoteWithoutAbstain != 0.
+      ? noVote /. totalVoteWithoutAbstain *. 100.
+      : 0.,
     endTotalNoWithVeto: noWithVetoVote /. 1e6,
-    endTotalNoWithVetoPercent: totalVote != 0. ? noWithVetoVote /. totalVote *. 100. : 0.,
+    endTotalNoWithVetoPercent: totalVoteWithoutAbstain != 0.
+      ? noWithVetoVote /. totalVoteWithoutAbstain *. 100.
+      : 0.,
     endTotalAbstain: abstainVote /. 1e6,
-    endTotalAbstainPercent: totalVote != 0. ? abstainVote /. totalVote *. 100. : 0.,
+    endTotalAbstainPercent: totalVoteWithoutAbstain != 0.
+      ? abstainVote /. totalVoteWithoutAbstain *. 100.
+      : 0.,
     endTotalVote: totalVote /. 1e6,
     totalBondedTokens: total_bonded_tokens->Belt.Option.map(d => d /. 1e6),
     totalDeposit,
