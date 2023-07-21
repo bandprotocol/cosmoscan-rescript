@@ -48,7 +48,7 @@ module CouncilName = {
 
 let getCouncilNameString = (councilName: council_name_t) =>
   switch councilName {
-  | BandDaoCouncil => "Band Dao Council"
+  | BandDaoCouncil => "Band DAO Council"
   | GrantCouncil => "Grant Council"
   | TechCouncil => "Tech Council"
   | Unknown => "Unknown"

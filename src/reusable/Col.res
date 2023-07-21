@@ -79,16 +79,30 @@ module Styles = {
 
   let marginBottom = (~mb, ~mbSm, ()) =>
     style(. [marginBottom(#px(mb)), Media.mobile([marginBottom(#px(mbSm))])])
+
+  let marginTop = (~mt, ~mtSm, ()) =>
+    style(. [marginTop(#px(mt)), Media.mobile([marginTop(#px(mtSm))])])
 }
 @react.component
-let make = (~col=Twelve, ~colSm=Twelve, ~offset=Twelve, ~mb=0, ~mbSm=0, ~style="", ~children) =>
+let make = (
+  ~col=Twelve,
+  ~colSm=Twelve,
+  ~offset=Twelve,
+  ~mb=0,
+  ~mbSm=?,
+  ~mt=0,
+  ~mtSm=?,
+  ~style="",
+  ~children,
+) =>
   <div
     className={CssJs.merge(. [
       Styles.colGridBase,
       Styles.colGrid(col),
       Styles.colOffset(offset),
       Styles.colSmGrid(colSm),
-      Styles.marginBottom(~mb, ~mbSm, ()),
+      Styles.marginBottom(~mb, ~mbSm=mbSm->Belt.Option.getWithDefault(mb), ()),
+      Styles.marginTop(~mt, ~mtSm=mtSm->Belt.Option.getWithDefault(mt), ()),
       style,
     ])}>
     children

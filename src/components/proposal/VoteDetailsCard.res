@@ -42,7 +42,9 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
             | Full => Col.Four
             | _ => Col.Six
             }}
+            colSm=Col.Twelve
             mb=22
+            mbSm=0
             style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}>
             <div>
               <Row>
@@ -50,7 +52,8 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                   col={switch variant {
                   | Full => Col.Six
                   | _ => Col.Seven
-                  }}>
+                  }}
+                  colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Yes Vote"
@@ -72,7 +75,8 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                   col={switch variant {
                   | Full => Col.Six
                   | _ => Col.Five
-                  }}>
+                  }}
+                  colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <img
                       src={switch proposal.councilVoteStatus {
@@ -96,7 +100,8 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                   col={switch variant {
                   | Full => Col.Six
                   | _ => Col.Seven
-                  }}>
+                  }}
+                  colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Current Status"
@@ -120,7 +125,8 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                   col={switch variant {
                   | Full => Col.Six
                   | _ => Col.Five
-                  }}>
+                  }}
+                  colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Text
                       value={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
@@ -136,6 +142,14 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
               </Row>
             </div>
           </Col>
+          <Hidden variant={Desktop}>
+            <SeperatedLine
+              mtSm=0
+              mbSm=16
+              color=theme.neutral_300
+              style={Css.merge(list{CssHelper.mlSm(~size=12, ()), CssHelper.mrSm(~size=12, ())})}
+            />
+          </Hidden>
           {switch variant {
           | Half => <SeperatedLine mt=24 mb=24 color=theme.neutral_300 />
           | _ => React.null

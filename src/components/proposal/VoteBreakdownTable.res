@@ -12,6 +12,9 @@ module Styles = {
       border(#px(1), #solid, theme.neutral_100),
       Media.mobile([padding2(~v=#px(16), ~h=#px(16))]),
     ])
+
+  let filterButtonGroup = style(. [display(#flex), width(#vw(75.)), overflow(#scroll)])
+  let innerContainer = style(. [display(#flex), width(#vw(100.)), whiteSpace(#nowrap)])
 }
 
 module VoteRow = {
@@ -43,45 +46,107 @@ module VoteRow = {
   @react.component
   let make = (~vote: t) => {
     let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = React.useContext(ThemeContext.context)
-
+    let isMobile = Media.isMobile()
     <div
       key={vote.address->Address.toBech32} className={Styles.voteRowContainer(theme, isDarkMode)}>
-      <Row>
-        <Col col=Col.Three>
-          <AddressRender address={vote.address} position={Subtitle} ellipsis=true />
-        </Col>
-        <Col col=Col.Four>
-          {switch vote.transactionOpt {
-          | Some(tx) =>
-            <TxLink txHash=tx.hash width=110 size=Text.Body1 weight=Text.Regular fullHash=false />
-          | None => React.null
-          }}
-        </Col>
-        <Col col=Col.Two>
-          {switch vote.optionOpt {
-          | Some(option_) =>
-            <Text
-              value={option_->Vote.YesNo.toString}
-              weight=Text.Medium
-              color={switch option_ {
-              | Yes => theme.success_600
-              | _ => theme.error_600
+      {switch isMobile {
+      | true =>
+        <>
+          <Row>
+            <Col colSm=Col.Three>
+              <Text block=true value="VOTERS" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col colSm=Col.Nine>
+              <AddressRender address={vote.address} position={Subtitle} ellipsis=true />
+            </Col>
+          </Row>
+          <Row marginTopSm=16>
+            <Col colSm=Col.Three>
+              <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col colSm=Col.Nine>
+              {switch vote.transactionOpt {
+              | Some(tx) =>
+                <TxLink
+                  txHash=tx.hash width=110 size=Text.Body1 weight=Text.Regular fullHash=false
+                />
+              | None => <Text value="n/a" color=theme.neutral_600 size={Body2} />
               }}
-              size={Body1}
+            </Col>
+          </Row>
+          <Row marginTopSm=16>
+            <Col colSm=Col.Three>
+              <Text block=true value="ANSWER" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col colSm=Col.Nine>
+              {switch vote.optionOpt {
+              | Some(option_) =>
+                <Text
+                  value={option_->Vote.YesNo.toString}
+                  weight=Text.Medium
+                  color={switch option_ {
+                  | Yes => theme.success_600
+                  | _ => theme.error_600
+                  }}
+                  size={Body1}
+                />
+              | None => <Text value="n/a" color=theme.neutral_600 size={Body2} />
+              }}
+            </Col>
+          </Row>
+          <Row marginTopSm=16>
+            <Col colSm=Col.Three>
+              <Text block=true value="TIME" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col colSm=Col.Nine>
+              <Timestamp
+                timeOpt=vote.timestampOpt
+                size=Text.Body1
+                weight=Text.Regular
+                textAlign=Text.Right
+                defaultText="-"
+              />
+            </Col>
+          </Row>
+        </>
+      | false =>
+        <Row>
+          <Col col=Col.Three>
+            <AddressRender address={vote.address} position={Subtitle} ellipsis=true />
+          </Col>
+          <Col col=Col.Four>
+            {switch vote.transactionOpt {
+            | Some(tx) =>
+              <TxLink txHash=tx.hash width=110 size=Text.Body1 weight=Text.Regular fullHash=false />
+            | None => <Text value="n/a" color=theme.neutral_600 size={Body2} />
+            }}
+          </Col>
+          <Col col=Col.Two>
+            {switch vote.optionOpt {
+            | Some(option_) =>
+              <Text
+                value={option_->Vote.YesNo.toString}
+                weight=Text.Medium
+                color={switch option_ {
+                | Yes => theme.success_600
+                | _ => theme.error_600
+                }}
+                size={Body1}
+              />
+            | None => <Text value="n/a" color=theme.neutral_600 size={Body2} />
+            }}
+          </Col>
+          <Col col=Col.Three style={CssHelper.flexBox(~justify=#end_, ())}>
+            <Timestamp
+              timeOpt=vote.timestampOpt
+              size=Text.Body1
+              weight=Text.Regular
+              textAlign=Text.Right
+              defaultText="-"
             />
-          | None => React.null
-          }}
-        </Col>
-        <Col col=Col.Three style={CssHelper.flexBox(~justify=#end_, ())}>
-          <Timestamp
-            timeOpt=vote.timestampOpt
-            size=Text.Body1
-            weight=Text.Regular
-            textAlign=Text.Right
-            defaultText=""
-          />
-        </Col>
-      </Row>
+          </Col>
+        </Row>
+      }}
     </div>
   }
 }
@@ -133,44 +198,49 @@ let make = (
             color={theme.neutral_600}
             marginRight=24
           />
-          <div className={CssHelper.flexBox()}>
-            {[All, Yes, No, DidNotVote]
-            ->Belt.Array.map(choice =>
-              <React.Fragment key={choice->choiceString}>
-                <ChipButton
-                  variant={ChipButton.Primary}
-                  onClick={_ => setFilter(_ => choice)}
-                  isActive={filter == choice}
-                  color=theme.neutral_700
-                  activeColor=theme.white
-                  bgColor=theme.neutral_100
-                  activeBgColor=theme.neutral_700
-                  style={Styles.chip}>
-                  {`${choice->choiceString} (${choice
-                    ->choiceVoteCount
-                    ->Belt.Int.toString})`->React.string}
-                </ChipButton>
-              </React.Fragment>
-            )
-            ->React.array}
+          // TODO: remove visibility of scollbar on Mobile
+          <div className={Styles.filterButtonGroup}>
+            <div className={Styles.innerContainer}>
+              {[All, Yes, No, DidNotVote]
+              ->Belt.Array.map(choice =>
+                <React.Fragment key={choice->choiceString}>
+                  <ChipButton
+                    variant={ChipButton.Primary}
+                    onClick={_ => setFilter(_ => choice)}
+                    isActive={filter == choice}
+                    color=theme.neutral_700
+                    activeColor=theme.white
+                    bgColor=theme.neutral_100
+                    activeBgColor=theme.neutral_700
+                    style={Styles.chip}>
+                    {`${choice->choiceString} (${choice
+                      ->choiceVoteCount
+                      ->Belt.Int.toString})`->React.string}
+                  </ChipButton>
+                </React.Fragment>
+              )
+              ->React.array}
+            </div>
           </div>
         </div>
       </Col>
     </Row>
-    <Row marginBottom=8 style={CssHelper.px(~size=32, ())}>
-      <Col col=Col.Three>
-        <Text block=true value="VOTERS" size=Text.Caption weight=Text.Semibold />
-      </Col>
-      <Col col=Col.Four>
-        <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
-      </Col>
-      <Col col=Col.Two>
-        <Text block=true value="ANSWER" size=Text.Caption weight=Text.Semibold />
-      </Col>
-      <Col col=Col.Three>
-        <Text block=true value="TIME" size=Text.Caption weight=Text.Semibold align=Text.Right />
-      </Col>
-    </Row>
+    <Hidden variant={Mobile}>
+      <Row marginBottom=8 style={CssHelper.px(~size=32, ())}>
+        <Col col=Col.Three>
+          <Text block=true value="VOTERS" size=Text.Caption weight=Text.Semibold />
+        </Col>
+        <Col col=Col.Four>
+          <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
+        </Col>
+        <Col col=Col.Two>
+          <Text block=true value="ANSWER" size=Text.Caption weight=Text.Semibold />
+        </Col>
+        <Col col=Col.Three>
+          <Text block=true value="TIME" size=Text.Caption weight=Text.Semibold align=Text.Right />
+        </Col>
+      </Row>
+    </Hidden>
     {switch filter {
     | All =>
       votes

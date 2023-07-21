@@ -14,7 +14,9 @@ module Styles = {
 
 // TODO: I add mtSm, mbSm propoties to this component. recheck marginTop for every existence of it
 @react.component
-let make = (~mt=15, ~mb=15, ~mtSm=15, ~mbSm=15, ~color=?) => {
+let make = (~mt=15, ~mb=15, ~mtSm=15, ~mbSm=15, ~style="", ~color=?) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-  <div className={Styles.container(theme, isDarkMode, mt, mb, mtSm, mbSm, color)} />
+  <div
+    className={Css.merge(list{Styles.container(theme, isDarkMode, mt, mb, mtSm, mbSm, color)})}
+  />
 }

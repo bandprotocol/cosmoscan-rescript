@@ -15,6 +15,11 @@ module Styles = {
       style(. [visibility(#hidden)])
     }
 
+  let proposalId = style(. [
+    fontFamilies([#custom("Roboto Mono"), #monospace]),
+    Media.mobile([display(#block), marginBottom(#px(8))]),
+  ])
+
   let chartContainer = style(. [paddingRight(#px(20)), Media.mobile([paddingRight(#zero)])])
 
   let parameterChanges = (theme: Theme.t, isDarkMode) =>
@@ -39,6 +44,7 @@ module Styles = {
     cursor(#pointer),
     padding2(~v=#zero, ~h=#zero),
     margin4(~top=#zero, ~right=#zero, ~bottom=#px(40), ~left=#zero),
+    Media.mobile([margin4(~top=#zero, ~right=#zero, ~bottom=#px(16), ~left=#zero)]),
   ])
 
   let badge = style(. [marginTop(#px(8))])
@@ -97,7 +103,7 @@ module RenderData = {
 
     let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
-    <Section>
+    <Section ptSm=16>
       <div className=CssHelper.container>
         <button
           className={Css.merge(list{CssHelper.flexBox(), Styles.buttonStyled})}
@@ -108,21 +114,13 @@ module RenderData = {
         <Row style=Styles.header>
           <Col col=Col.Twelve>
             <div className={CssHelper.flexBox()}>
-              <TypeID.Proposal
-                id={proposal.id}
-                position=TypeID.Title
-                size=Text.Xxxxl
-                weight=Text.Bold
-                color={theme.neutral_900}
-                isNotLink=true
-              />
-              <HSpacing size=Spacing.sm />
-              <Heading
-                size=Heading.H1
-                value=proposal.title
-                color={theme.neutral_900}
-                weight=Heading.Semibold
-              />
+              // TODO: seem like this Header reused in every detail page should created component for it
+              <Heading size=Heading.H1 weight=Heading.Bold>
+                <span className=Styles.proposalId>
+                  {`#P${proposal.id->ID.Proposal.toInt->Belt.Int.toString} `->React.string}
+                </span>
+                <span> {proposal.title->React.string} </span>
+              </Heading>
               <HSpacing size=Spacing.sm />
               {isMobile ? React.null : <ProposalBadge status=proposal.status tooltip=true />}
             </div>
@@ -136,7 +134,7 @@ module RenderData = {
         <Row justify=Row.Between>
           <Col col=Col.Six>
             <Row>
-              <Col col=Col.Four>
+              <Col col=Col.Four colSm=Col.Twelve mtSm=24>
                 <Heading
                   value="Submit & Voting Starts"
                   size=Heading.H4
@@ -148,7 +146,7 @@ module RenderData = {
                   size=Text.Body1 timeOpt={Some(proposal.submitTime)} color={theme.neutral_900}
                 />
               </Col>
-              <Col col=Col.Four>
+              <Col col=Col.Four colSm=Col.Twelve mtSm=24>
                 <Heading
                   value="Voting Ends"
                   size=Heading.H4
@@ -162,7 +160,7 @@ module RenderData = {
               </Col>
               {switch proposal.vetoEndTime {
               | Some(vetoEndTime) =>
-                <Col col=Col.Four>
+                <Col col=Col.Four colSm=Col.Twelve mtSm=24>
                   <Heading
                     value="Waiting for Veto Ends"
                     size=Heading.H4
@@ -178,29 +176,31 @@ module RenderData = {
               }}
             </Row>
           </Col>
-          {switch accountOpt {
-          | Some({address}) =>
-            <Col col=Col.Two>
-              {switch proposal.vetoProposalOpt {
-              | Some({totalDeposit}) =>
-                <OpenVetoButton
-                  proposalID=proposal.id proposalName=proposal.title address totalDeposit
-                />
-              | None => React.null
-              }}
-              // TODO: uncomment before launch
-              // {switch proposal.status {
-              // | VotingPeriod => <VoteButton proposalID=proposal.id proposalName=proposal.title address />
-              // | _ => <OpenVetoButton
-              //   proposalID=proposal.id proposalName=proposal.title address totalDeposit
-              // />
-              // | _ => React.null
-              // }}
-            </Col>
-          | None => React.null
-          }}
+          <Hidden variant={Mobile}>
+            {switch accountOpt {
+            | Some({address}) =>
+              <Col col=Col.Two>
+                {switch proposal.vetoProposalOpt {
+                | Some({totalDeposit}) =>
+                  <OpenVetoButton
+                    proposalID=proposal.id proposalName=proposal.title address totalDeposit
+                  />
+                | None => React.null
+                }}
+                // TODO: uncomment before launch
+                // {switch proposal.status {
+                // | VotingPeriod => <VoteButton proposalID=proposal.id proposalName=proposal.title address />
+                // | _ => <OpenVetoButton
+                //   proposalID=proposal.id proposalName=proposal.title address totalDeposit
+                // />
+                // | _ => React.null
+                // }}
+              </Col>
+            | None => React.null
+            }}
+          </Hidden>
         </Row>
-        <SeperatedLine mt=32 mb=24 color=theme.neutral_200 />
+        <SeperatedLine mt=32 mb=24 mtSm=24 mbSm=24 color=theme.neutral_200 />
         <Row marginBottom=24>
           <Col
             col={switch proposal.vetoProposalOpt {
@@ -250,6 +250,9 @@ module RenderData = {
           | None => React.null
           }}
         </Row>
+        <Hidden variant={Desktop}>
+          <SeperatedLine mtSm=24 mbSm=24 color=theme.neutral_300 />
+        </Hidden>
         <Row marginBottom=24>
           <Col col=Col.Twelve>
             <Heading
@@ -336,7 +339,9 @@ module RenderData = {
             </div>
           </Col>
         </Row>
-        <SeperatedLine mt=40 mb=40 color=theme.neutral_200 />
+        <Hidden variant={Mobile}>
+          <SeperatedLine mt=40 mb=40 color=theme.neutral_200 />
+        </Hidden>
         <VoteBreakdownTable members=proposal.council.councilMembers votes />
       </div>
     </Section>

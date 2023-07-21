@@ -343,7 +343,7 @@ module RenderData = {
           </Col>
         </Row>
         <LegacyVoteBreakdownTable members=[] proposalID=proposal.id />
-        <Row marginBottom=24>
+        <Row marginTop=40 marginBottom=24>
           <Col col=Col.Twelve>
             <Heading
               value="Propose Details"
