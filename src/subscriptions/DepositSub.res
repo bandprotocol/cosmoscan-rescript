@@ -56,7 +56,7 @@ module DepositCountConfig = %graphql(`
 let getList = (proposalID, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({
-    proposal_id: proposalID->ID.Proposal.toInt,
+    proposal_id: proposalID->ID.LegacyProposal.toInt,
     limit: pageSize,
     offset,
   })
@@ -65,7 +65,7 @@ let getList = (proposalID, ~page, ~pageSize, ()) => {
 }
 
 let count = proposalID => {
-  let result = DepositCountConfig.use({proposal_id: proposalID->ID.Proposal.toInt})
+  let result = DepositCountConfig.use({proposal_id: proposalID->ID.LegacyProposal.toInt})
 
   result
   ->Sub.fromData

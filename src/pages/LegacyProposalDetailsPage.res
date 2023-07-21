@@ -46,6 +46,61 @@ module ProposalTypeBadge = {
   }
 }
 
+module RenderDepositor = {
+  @react.component
+  let make = (~proposalID) => {
+    let depositsSub = DepositSub.getList(proposalID, ~pageSize=10, ~page=1, ())
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
+    {
+      switch depositsSub {
+      | Data(deposits) =>
+        deposits
+        ->Belt.Array.mapWithIndex((index, deposit) => <>
+          <Row marginBottom=8>
+            <Col col=Col.One>
+              <Text value={(index + 1)->Belt.Int.toString} size=Text.Body1 weight=Text.Thin />
+            </Col>
+            <Col col=Col.Three>
+              <AddressRender
+                address=deposit.depositor position=AddressRender.Subtitle ellipsis=true
+              />
+            </Col>
+            <Col col=Col.Three>
+              {switch deposit.txHashOpt {
+              | Some(txHash) => <TxLink txHash width=280 fullHash=false ellipsisLimit=10 />
+              // TODO: Handle Null Txhash for deposit
+              | None => <Text value="No Tx" size=Text.Body1 weight=Text.Thin />
+              }}
+            </Col>
+            <Col col=Col.Two>
+              <Text
+                value={deposit.amount->Coin.getBandAmountFromCoins->Format.fPretty(~digits=0)}
+                size=Text.Body1
+                weight=Text.Thin
+                align={Right}
+                code=true
+              />
+            </Col>
+            <Col col=Col.Three style={CssHelper.flexBox(~justify=#end_, ())}>
+              <Timestamp
+                timeOpt=deposit.timestampOpt
+                size=Text.Body2
+                weight=Text.Regular
+                textAlign=Text.Right
+              />
+            </Col>
+          </Row>
+          <SeperatedLine mt=12 mb=12 color=theme.neutral_100 />
+        </>)
+        ->React.array
+      // TODO: add LoadingCensorBar
+      | _ => React.null
+      }
+    }
+  }
+}
+
 module RenderData = {
   @react.component
   let make = (~proposal: ProposalSub.t, ~voteStat: VoteSub.vote_stat_t, ~bondedToken: Coin.t) => {
@@ -317,29 +372,97 @@ module RenderData = {
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Proposal Type"
+                    value="Submit Time"
                     size=Heading.H4
                     weight=Heading.Thin
                     color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  <ProposalTypeBadge proposalType=proposal.proposalType />
+                  <Timestamp
+                    size=Text.Body1 timeOpt={Some(proposal.submitTime)} color={theme.neutral_900}
+                  />
                 </Col>
               </Row>
               <Row marginBottom=24>
                 <Col col=Col.Four mbSm=8>
                   <Heading
-                    value="Description"
+                    value="Deposit End Time"
                     size=Heading.H4
                     weight=Heading.Thin
                     color={theme.neutral_600}
                   />
                 </Col>
                 <Col col=Col.Eight>
-                  <MarkDown value=proposal.description />
+                  <Timestamp
+                    size=Text.Body1 timeOpt=proposal.votingEndTime color={theme.neutral_900}
+                  />
                 </Col>
               </Row>
+              <Row marginBottom=24>
+                <Col col=Col.Four mbSm=8>
+                  <Heading
+                    value="Total Deposit"
+                    size=Heading.H4
+                    weight=Heading.Thin
+                    color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Eight>
+                  <Text
+                    size={Body1}
+                    value={`${proposal.totalDeposit
+                      ->Coin.getBandAmountFromCoins
+                      ->Format.fPretty(~digits=0)} / 1,000 BAND`}
+                    code=true
+                  />
+                </Col>
+              </Row>
+              <Row marginBottom=24>
+                <Col col=Col.Four mbSm=8>
+                  <Heading
+                    value="Status" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Eight>
+                  <div className={CssHelper.flexBox()}>
+                    <img alt="Success Icon" src=Images.success />
+                    <Text value="Complete" size={Body1} marginLeft=8 />
+                  </div>
+                </Col>
+              </Row>
+              <SeperatedLine mt=24 mb=12 color=theme.neutral_200 />
+              <Row marginBottom=8>
+                <Col col=Col.One>
+                  <Text block=true value="No." size=Text.Caption weight=Text.Semibold />
+                </Col>
+                <Col col=Col.Three>
+                  <Text block=true value="DEPOSITOR" size=Text.Caption weight=Text.Semibold />
+                </Col>
+                <Col col=Col.Three>
+                  <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
+                </Col>
+                <Col col=Col.Two>
+                  <Text
+                    block=true
+                    value="DEPOSIT AMOUNT (BAND)"
+                    size=Text.Caption
+                    weight=Text.Semibold
+                    align=Text.Right
+                  />
+                </Col>
+                <Col col=Col.Three>
+                  <Text
+                    block=true
+                    value="TIMESTAMP"
+                    size=Text.Caption
+                    weight=Text.Semibold
+                    align=Text.Right
+                  />
+                </Col>
+              </Row>
+              <SeperatedLine mt=24 mb=12 color=theme.neutral_200 />
+              <RenderDepositor proposalID=proposal.id />
             </InfoContainer>
           </Col>
         </Row>

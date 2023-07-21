@@ -91,7 +91,8 @@ module RenderBodyMobile = {
 let make = (~vetoId: int) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let isMobile = Media.isMobile()
-  let depositsSub = DepositSub.getList(vetoId->ID.Proposal.fromInt, ~pageSize=10, ~page=1, ())
+  // TODO: add pagination
+  let depositsSub = DepositSub.getList(vetoId->ID.LegacyProposal.fromInt, ~pageSize=10, ~page=1, ())
 
   <div className={Styles.container(theme)}>
     <Heading size=Heading.H2 value="Depositors" marginBottom=16 marginBottomSm=8 />
