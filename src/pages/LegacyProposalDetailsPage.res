@@ -288,6 +288,61 @@ module RenderData = {
           </Col>
         </Row>
         <LegacyVoteBreakdownTable members=[] proposalID=proposal.id />
+        <Row marginBottom=24>
+          <Col col=Col.Twelve>
+            <Heading
+              value="Propose Details"
+              size=Heading.H4
+              weight=Heading.Semibold
+              color={theme.neutral_600}
+              marginBottom=8
+            />
+          </Col>
+          <Col col=Col.Twelve>
+            <InfoContainer>
+              <Row marginBottom=24 alignItems=Row.Center>
+                <Col col=Col.Four mbSm=8>
+                  <Heading
+                    value="Proposer" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Eight>
+                  {switch proposal.proposerAddressOpt {
+                  | Some(proposerAddress) =>
+                    <AddressRender address=proposerAddress position=AddressRender.Subtitle />
+                  | None => <Text value="Proposed on Wenchang" />
+                  }}
+                </Col>
+              </Row>
+              <Row marginBottom=24 alignItems=Row.Center>
+                <Col col=Col.Four mbSm=8>
+                  <Heading
+                    value="Proposal Type"
+                    size=Heading.H4
+                    weight=Heading.Thin
+                    color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Eight>
+                  <ProposalTypeBadge proposalType=proposal.proposalType />
+                </Col>
+              </Row>
+              <Row marginBottom=24>
+                <Col col=Col.Four mbSm=8>
+                  <Heading
+                    value="Description"
+                    size=Heading.H4
+                    weight=Heading.Thin
+                    color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Eight>
+                  <MarkDown value=proposal.description />
+                </Col>
+              </Row>
+            </InfoContainer>
+          </Col>
+        </Row>
       </div>
     </Section>
   }

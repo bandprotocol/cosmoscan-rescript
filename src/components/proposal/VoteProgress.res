@@ -164,7 +164,7 @@ module Veto = {
         <Col col=Col.Twelve style={CssHelper.flexBox()}>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(theme.error_600)} />
+              <div className={Styles.smallDot(Vote.Full.Yes->Vote.Full.getColorInvert(theme))} />
               <Text
                 value="Yes"
                 size=Text.Body1
@@ -188,7 +188,7 @@ module Veto = {
           </div>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(theme.success_600)} />
+              <div className={Styles.smallDot(Vote.Full.No->Vote.Full.getColorInvert(theme))} />
               <Text
                 value="No"
                 size=Text.Body1
@@ -212,7 +212,9 @@ module Veto = {
           </div>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(theme.success_800)} />
+              <div
+                className={Styles.smallDot(Vote.Full.NoWithVeto->Vote.Full.getColorInvert(theme))}
+              />
               <Text
                 value="NWV"
                 size=Text.Body1
@@ -236,7 +238,9 @@ module Veto = {
           </div>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(theme.neutral_500)} />
+              <div
+                className={Styles.smallDot(Vote.Full.Abstain->Vote.Full.getColorInvert(theme))}
+              />
               <Text
                 value="Abstain"
                 size=Text.Body1
@@ -366,7 +370,7 @@ module Legacy = {
         <Col col=Col.Twelve style={CssHelper.flexBox()}>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(theme.error_600)} />
+              <div className={Styles.smallDot(Vote.Full.Yes->Vote.Full.getColor(theme))} />
               <Text
                 value="Yes"
                 size=Text.Body1
@@ -390,7 +394,7 @@ module Legacy = {
           </div>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(theme.success_600)} />
+              <div className={Styles.smallDot(Vote.Full.No->Vote.Full.getColor(theme))} />
               <Text
                 value="No"
                 size=Text.Body1
@@ -414,7 +418,7 @@ module Legacy = {
           </div>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(theme.success_800)} />
+              <div className={Styles.smallDot(Vote.Full.NoWithVeto->Vote.Full.getColor(theme))} />
               <Text
                 value="NWV"
                 size=Text.Body1
@@ -438,7 +442,7 @@ module Legacy = {
           </div>
           <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(theme.neutral_500)} />
+              <div className={Styles.smallDot(Vote.Full.Abstain->Vote.Full.getColor(theme))} />
               <Text
                 value="Abstain"
                 size=Text.Body1
