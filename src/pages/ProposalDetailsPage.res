@@ -243,7 +243,7 @@ module RenderData = {
               </Col>
             | _ =>
               <Col col=Col.Six>
-                <RejectDetailsCard.Vote vetoProposal />
+                <RejectDetailsCard.Vote vetoProposal status=proposal.status />
               </Col>
             }
 

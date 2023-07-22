@@ -118,7 +118,10 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
 
 module Vote = {
   @react.component
-  let make = (~vetoProposal: CouncilProposalSub.VetoProposal.t) => {
+  let make = (
+    ~vetoProposal: CouncilProposalSub.VetoProposal.t,
+    ~status: CouncilProposalSub.Status.t,
+  ) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
@@ -152,9 +155,9 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
       <Col col=Col.Twelve>
         <InfoContainer py=24 px=24>
           <Row>
-            <Col col=Col.Six>
+            <Col col=Col.Six colSm=Col.Twelve>
               <Row marginBottom=16>
-                <Col col=Col.Seven>
+                <Col col=Col.Seven colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Turnout"
@@ -172,7 +175,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                     />
                   </div>
                 </Col>
-                <Col col=Col.Five>
+                <Col col=Col.Five colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <img
                       src={switch vetoProposal.isTurnoutPassed {
@@ -192,7 +195,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                 </Col>
               </Row>
               <Row marginBottom=16>
-                <Col col=Col.Seven>
+                <Col col=Col.Seven colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Yes Vote"
@@ -210,7 +213,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                     />
                   </div>
                 </Col>
-                <Col col=Col.Five>
+                <Col col=Col.Five colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <img
                       src={switch vetoProposal.isYesPassed {
@@ -230,7 +233,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                 </Col>
               </Row>
               <Row>
-                <Col col=Col.Seven>
+                <Col col=Col.Seven colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Current Status"
@@ -240,7 +243,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                     />
                   </div>
                 </Col>
-                <Col col=Col.Five>
+                <Col col=Col.Five colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Text
                       value={vetoProposal.status->CouncilProposalSub.CurrentStatus.getStatusText}
@@ -255,17 +258,23 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                 </Col>
               </Row>
             </Col>
-            <Col col=Col.Six style={CssHelper.flexBox(~justify=#end_, ~align=#flexStart, ())}>
-              <Button
-                variant={Outline}
-                px=70
-                py=10
-                fsize=14
-                style={CssHelper.flexBox()}
-                onClick={_ => vote()}>
-                {"Vote"->React.string}
-              </Button>
-            </Col>
+            {switch status {
+            | VetoPeriod =>
+              <Hidden variant={Mobile}>
+                <Col col=Col.Six style={CssHelper.flexBox(~justify=#end_, ~align=#flexStart, ())}>
+                  <Button
+                    variant={Outline}
+                    px=70
+                    py=10
+                    fsize=14
+                    style={CssHelper.flexBox()}
+                    onClick={_ => vote()}>
+                    {"Vote"->React.string}
+                  </Button>
+                </Col>
+              </Hidden>
+            | _ => React.null
+            }}
           </Row>
           <SeperatedLine mt=24 mb=24 color=theme.neutral_300 />
           <Row marginTop=16>

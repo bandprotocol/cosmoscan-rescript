@@ -23,6 +23,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let (_, dispatchModal) = React.useContext(ModalContext.context)
   let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
+  let isMobile = Media.isMobile()
 
   <Row>
     <Col col=Col.Twelve>
@@ -143,15 +144,27 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
             </div>
           </Col>
           <Hidden variant={Desktop}>
-            <SeperatedLine
-              mtSm=0
-              mbSm=16
-              color=theme.neutral_300
-              style={Css.merge(list{CssHelper.mlSm(~size=12, ()), CssHelper.mrSm(~size=12, ())})}
-            />
+            {switch variant {
+            | Half => React.null
+            | _ =>
+              <SeperatedLine
+                mtSm=0
+                mbSm=16
+                color=theme.neutral_300
+                style={Css.merge(list{CssHelper.mlSm(~size=12, ()), CssHelper.mrSm(~size=12, ())})}
+              />
+            }}
           </Hidden>
           {switch variant {
-          | Half => <SeperatedLine mt=24 mb=24 color=theme.neutral_300 />
+          | Half =>
+            <SeperatedLine
+              mt=24
+              mb=24
+              mtSm=0
+              mbSm=16
+              style={Css.merge(list{CssHelper.mlSm(~size=12, ()), CssHelper.mrSm(~size=12, ())})}
+              color=theme.neutral_300
+            />
           | _ => React.null
           }}
           <Col

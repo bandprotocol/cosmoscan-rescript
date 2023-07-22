@@ -17,6 +17,9 @@ module Styles = {
 let make = (~mt=15, ~mb=15, ~mtSm=15, ~mbSm=15, ~style="", ~color=?) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   <div
-    className={Css.merge(list{Styles.container(theme, isDarkMode, mt, mb, mtSm, mbSm, color)})}
+    className={Css.merge(list{
+      Styles.container(theme, isDarkMode, mt, mb, mtSm, mbSm, color),
+      style,
+    })}
   />
 }

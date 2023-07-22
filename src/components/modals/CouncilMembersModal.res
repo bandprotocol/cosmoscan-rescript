@@ -6,8 +6,19 @@ module Styles = {
       width(#percent(100.)),
       minWidth(#px(568)),
       minHeight(#px(360)),
-      padding(#px(32)),
+      padding2(~v=#px(40), ~h=#px(16)),
       Media.mobile([minWidth(#px(300))]),
+    ])
+
+  let memberCard = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
+      padding2(~v=#px(4), ~h=#px(8)),
+      borderRadius(#px(4)),
+      marginTop(#px(8)),
+      boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
+      border(#px(1), #solid, theme.neutral_100),
+      Media.mobile([padding2(~v=#px(16), ~h=#px(16))]),
     ])
 
   let description = style(. [marginBottom(#px(24)), Media.mobile([marginBottom(#px(0))])])
@@ -50,29 +61,70 @@ module RenderBody = {
 module RenderBodyMobile = {
   @react.component
   let make = (~name: string, ~members: array<CouncilProposalSub.council_member_t>) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
     members
     ->Belt.Array.mapWithIndex((index, member) =>
-      <MobileCard
-        values={
-          open InfoMobileCard
-          [
-            ("#", Text(index->Belt.Int.toString)),
-            ("ADDRESS", Address(member.account.address, 200, #account)),
-            (
-              "SINCE",
-              Text(
-                `${member.since->MomentRe.Moment.format(
-                    "YYYY-MM-DD",
-                    _,
-                  )} (${member.since->MomentRe.Moment.fromNow(~withoutSuffix=Some(true))})`,
-              ),
-            ),
-          ]
-        }
-        key={member.account.address->Address.toBech32}
-        idx={member.account.address->Address.toBech32}
-      />
+      <div className={Styles.memberCard(theme, isDarkMode)}>
+        <Row>
+          <Col colSm=Col.Three>
+            <Text block=true value="No." size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col colSm=Col.Nine>
+            <Text
+              block=true
+              value={(index + 1)->Belt.Int.toString}
+              size=Text.Caption
+              weight=Text.Semibold
+            />
+          </Col>
+        </Row>
+        <Row marginTopSm=16>
+          <Col colSm=Col.Three>
+            <Text block=true value="ADDRESS" size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col colSm=Col.Nine>
+            <AddressRender address=member.account.address position={Subtitle} ellipsis=true />
+          </Col>
+        </Row>
+        <Row marginTopSm=16>
+          <Col colSm=Col.Three>
+            <Text block=true value="SINCE" size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col colSm=Col.Nine>
+            <Text
+              block=true
+              value={`${member.since->MomentRe.Moment.format(
+                  "YYYY-MM-DD",
+                  _,
+                )} (${member.since->MomentRe.Moment.fromNow(~withoutSuffix=Some(true))})`}
+              size=Text.Caption
+              weight=Text.Semibold
+            />
+          </Col>
+        </Row>
+      </div>
     )
+    // <MobileCard
+    //   values={
+    //     open InfoMobileCard
+    //     [
+    //       ("No.", Text((index + 1)->Belt.Int.toString)),
+    //       ("ADDRESS", Address(member.account.address, 200, #account)),
+    //       (
+    //         "SINCE",
+    //         Text(
+    //           `${member.since->MomentRe.Moment.format(
+    //               "YYYY-MM-DD",
+    //               _,
+    //             )} (${member.since->MomentRe.Moment.fromNow(~withoutSuffix=Some(true))})`,
+    //         ),
+    //       ),
+    //     ]
+    //   }
+    //   key={member.account.address->Address.toBech32}
+    //   idx={member.account.address->Address.toBech32}
+    // />
     ->React.array
   }
 }
