@@ -8,6 +8,7 @@ module Styles = {
     cursor(#pointer),
     padding2(~v=#zero, ~h=#zero),
     margin4(~top=#zero, ~right=#zero, ~bottom=#px(40), ~left=#zero),
+    Media.mobile([margin4(~top=#zero, ~right=#zero, ~bottom=#px(16), ~left=#zero)]),
   ])
 
   let badge = style(. [marginTop(#px(8))])
@@ -101,14 +102,121 @@ module RenderDepositor = {
   }
 }
 
+module RenderMessages = {
+  @react.component
+  let make = (~proposal: ProposalSub.t) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    <>
+      <Row marginBottom=16>
+        <Col>
+          <Heading
+            value="Messages" size=Heading.H4 weight=Heading.Semibold color={theme.neutral_600}
+          />
+        </Col>
+      </Row>
+      <Row marginBottom=24>
+        <Col>
+          <InfoContainer>
+            {switch proposal.content {
+            | CommunityPoolSpend({recipient, amount}) =>
+              <>
+                <Row marginBottom=24>
+                  <Col col=Col.Four mbSm=8>
+                    <Heading
+                      value="Recipient Address"
+                      size=Heading.H4
+                      weight=Heading.Thin
+                      color={theme.neutral_600}
+                    />
+                  </Col>
+                  <Col col=Col.Eight>
+                    <AddressRender address=recipient position=AddressRender.Subtitle />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col col=Col.Four mbSm=8>
+                    <Heading
+                      value="Amount" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                    />
+                  </Col>
+                  <Col col=Col.Eight>
+                    <AmountRender coins=amount pos=AmountRender.TxIndex />
+                  </Col>
+                </Row>
+              </>
+            | SoftwareUpgrade({name, height}) =>
+              <>
+                <Row marginBottom=24>
+                  <Col col=Col.Four mbSm=8>
+                    <Heading
+                      value="Upgrade Name"
+                      size=Heading.H4
+                      weight=Heading.Thin
+                      color={theme.neutral_600}
+                    />
+                  </Col>
+                  <Col col=Col.Eight>
+                    <Text value={name} size=Text.Body1 block=true />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col col=Col.Four mbSm=8>
+                    <Heading
+                      value="Upgrade Height"
+                      size=Heading.H4
+                      weight=Heading.Thin
+                      color={theme.neutral_600}
+                    />
+                  </Col>
+                  <Col col=Col.Eight>
+                    <Text value={height->Belt.Int.toString} size=Text.Body1 block=true />
+                  </Col>
+                </Row>
+              </>
+            | ParameterChange(parameters) =>
+              <>
+                <Row marginBottom=24>
+                  <Col col=Col.Twelve>
+                    <div className={Styles.parameterChanges(theme, isDarkMode)}>
+                      {parameters
+                      ->Belt.Array.mapWithIndex((i, value) =>
+                        <div key={i->Belt.Int.toString}>
+                          <Text
+                            value={value.subspace ++ "." ++ value.key ++ ": " ++ value.value}
+                            size=Text.Body1
+                            block=true
+                            code=true
+                          />
+                          {i < parameters->Belt.Array.length - 1
+                            ? <VSpacing size=Spacing.md />
+                            : React.null}
+                        </div>
+                      )
+                      ->React.array}
+                    </div>
+                  </Col>
+                </Row>
+              </>
+            | _ => <Text value="Unable to show the proposal messages" />
+            }}
+          </InfoContainer>
+        </Col>
+      </Row>
+    </>
+  }
+}
+
 module RenderData = {
   @react.component
   let make = (~proposal: ProposalSub.t, ~voteStat: VoteSub.vote_stat_t, ~bondedToken: Coin.t) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-    <Section>
+    let openDepositors = () => Syncing->OpenModal->dispatchModal
+
+    <Section ptSm=16>
       <div className=CssHelper.container>
         <button
           className={Css.merge(list{CssHelper.flexBox(), Styles.buttonStyled})}
@@ -145,53 +253,53 @@ module RenderData = {
           </Col>
         </Row>
         <Row justify=Row.Between>
-          <Col col=Col.Six>
-            <Row>
-              <Col col=Col.Four>
-                <Heading
-                  value="Submit Time"
-                  size=Heading.H4
-                  marginBottom=8
-                  weight=Heading.Semibold
-                  color={theme.neutral_600}
-                />
-                <Timestamp
-                  size=Text.Body1 timeOpt={Some(proposal.submitTime)} color={theme.neutral_900}
-                />
-              </Col>
-              <Col col=Col.Four>
-                <Heading
-                  value="Voting Starts"
-                  size=Heading.H4
-                  marginBottom=8
-                  weight=Heading.Semibold
-                  color={theme.neutral_600}
-                />
-                <Timestamp
-                  size=Text.Body1 timeOpt={proposal.votingStartTime} color={theme.neutral_900}
-                />
-              </Col>
-              <Col col=Col.Four>
-                <Heading
-                  value="Voting Ends"
-                  size=Heading.H4
-                  marginBottom=8
-                  weight=Heading.Semibold
-                  color={theme.neutral_600}
-                />
-                <Timestamp
-                  size=Text.Body1 timeOpt={proposal.votingEndTime} color={theme.neutral_900}
-                />
-              </Col>
-            </Row>
+          <Col col=Col.Four mtSm=24>
+            <Heading
+              value="Submit Time"
+              size=Heading.H4
+              marginBottom=8
+              weight=Heading.Semibold
+              color={theme.neutral_600}
+            />
+            <Timestamp
+              size=Text.Body1 timeOpt={Some(proposal.submitTime)} color={theme.neutral_900}
+            />
+          </Col>
+          <Col col=Col.Four mtSm=24>
+            <Heading
+              value="Voting Starts"
+              size=Heading.H4
+              marginBottom=8
+              weight=Heading.Semibold
+              color={theme.neutral_600}
+            />
+            <Timestamp
+              size=Text.Body1 timeOpt={proposal.votingStartTime} color={theme.neutral_900}
+            />
+          </Col>
+          <Col col=Col.Four mtSm=24>
+            <Heading
+              value="Voting Ends"
+              size=Heading.H4
+              marginBottom=8
+              weight=Heading.Semibold
+              color={theme.neutral_600}
+            />
+            <Timestamp size=Text.Body1 timeOpt={proposal.votingEndTime} color={theme.neutral_900} />
           </Col>
         </Row>
-        <SeperatedLine mt=32 mb=24 color=theme.neutral_200 />
-        <Row marginBottom=24>
+        <Hidden variant={Mobile}>
+          <SeperatedLine mt=32 mb=24 color=theme.neutral_200 />
+        </Hidden>
+        <Row marginBottom=24 marginTopSm=24>
           <Col col=Col.Twelve>
             <VoteDetailsCard.Legacy proposal voteStat bondedToken />
           </Col>
         </Row>
+        <Hidden variant={Desktop}>
+          <LegacyVoteBreakdownTable members=[] proposalID=proposal.id />
+          <SeperatedLine mt=32 mb=24 color=theme.neutral_200 />
+        </Hidden>
         <Row marginBottom=24>
           <Col col=Col.Twelve>
             <Heading
@@ -247,103 +355,13 @@ module RenderData = {
             </InfoContainer>
           </Col>
         </Row>
-        <Row marginBottom=16>
-          <Col>
-            <Heading
-              value="Messages" size=Heading.H4 weight=Heading.Semibold color={theme.neutral_600}
-            />
-          </Col>
-        </Row>
-        <Row marginBottom=24>
-          <Col>
-            <InfoContainer>
-              {switch proposal.content {
-              | CommunityPoolSpend({recipient, amount}) =>
-                <>
-                  <Row marginBottom=24>
-                    <Col col=Col.Four mbSm=8>
-                      <Heading
-                        value="Recipient Address"
-                        size=Heading.H4
-                        weight=Heading.Thin
-                        color={theme.neutral_600}
-                      />
-                    </Col>
-                    <Col col=Col.Eight>
-                      <AddressRender address=recipient position=AddressRender.Subtitle />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col col=Col.Four mbSm=8>
-                      <Heading
-                        value="Amount" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
-                      />
-                    </Col>
-                    <Col col=Col.Eight>
-                      <AmountRender coins=amount pos=AmountRender.TxIndex />
-                    </Col>
-                  </Row>
-                </>
-              | SoftwareUpgrade({name, height}) =>
-                <>
-                  <Row marginBottom=24>
-                    <Col col=Col.Four mbSm=8>
-                      <Heading
-                        value="Upgrade Name"
-                        size=Heading.H4
-                        weight=Heading.Thin
-                        color={theme.neutral_600}
-                      />
-                    </Col>
-                    <Col col=Col.Eight>
-                      <Text value={name} size=Text.Body1 block=true />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col col=Col.Four mbSm=8>
-                      <Heading
-                        value="Upgrade Height"
-                        size=Heading.H4
-                        weight=Heading.Thin
-                        color={theme.neutral_600}
-                      />
-                    </Col>
-                    <Col col=Col.Eight>
-                      <Text value={height->Belt.Int.toString} size=Text.Body1 block=true />
-                    </Col>
-                  </Row>
-                </>
-              | ParameterChange(parameters) =>
-                <>
-                  <Row marginBottom=24>
-                    <Col col=Col.Twelve>
-                      <div className={Styles.parameterChanges(theme, isDarkMode)}>
-                        {parameters
-                        ->Belt.Array.mapWithIndex((i, value) =>
-                          <div key={i->Belt.Int.toString}>
-                            <Text
-                              value={value.subspace ++ "." ++ value.key ++ ": " ++ value.value}
-                              size=Text.Body1
-                              block=true
-                              code=true
-                            />
-                            {i < parameters->Belt.Array.length - 1
-                              ? <VSpacing size=Spacing.md />
-                              : React.null}
-                          </div>
-                        )
-                        ->React.array}
-                      </div>
-                    </Col>
-                  </Row>
-                </>
-              | _ => <Text value="Unable to show the proposal messages" />
-              }}
-            </InfoContainer>
-          </Col>
-        </Row>
-        <LegacyVoteBreakdownTable members=[] proposalID=proposal.id />
-        <Row marginTop=40 marginBottom=24>
+        <RenderMessages proposal />
+        // Note: this have to rearrange card between the desktop and mobile version
+        // may affect the performance
+        <Hidden variant={Mobile}>
+          <LegacyVoteBreakdownTable members=[] proposalID=proposal.id />
+        </Hidden>
+        <Row marginTop=40 marginTopSm=24 marginBottom=8>
           <Col col=Col.Twelve>
             <Heading
               value="Propose Details"
@@ -353,24 +371,28 @@ module RenderData = {
               marginBottom=8
             />
           </Col>
+        </Row>
+        <Row marginBottom=24>
           <Col col=Col.Twelve>
             <InfoContainer>
-              <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+              <Row marginBottom=24 marginBottomSm=16 alignItems=Row.Center>
+                <Col col=Col.Four colSm=Col.Five mbSm=8>
                   <Heading
                     value="Proposer" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Eight colSm=Col.Seven>
                   {switch proposal.proposerAddressOpt {
                   | Some(proposerAddress) =>
-                    <AddressRender address=proposerAddress position=AddressRender.Subtitle />
+                    <AddressRender
+                      address=proposerAddress position=AddressRender.Subtitle ellipsis=true
+                    />
                   | None => <Text value="Proposed on Wenchang" />
                   }}
                 </Col>
               </Row>
-              <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+              <Row marginBottom=24 marginBottomSm=16 alignItems=Row.Center>
+                <Col col=Col.Four colSm=Col.Five mbSm=8>
                   <Heading
                     value="Submit Time"
                     size=Heading.H4
@@ -378,14 +400,14 @@ module RenderData = {
                     color={theme.neutral_600}
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Eight colSm=Col.Seven>
                   <Timestamp
                     size=Text.Body1 timeOpt={Some(proposal.submitTime)} color={theme.neutral_900}
                   />
                 </Col>
               </Row>
-              <Row marginBottom=24>
-                <Col col=Col.Four mbSm=8>
+              <Row marginBottom=24 marginBottomSm=16>
+                <Col col=Col.Four colSm=Col.Five mbSm=8>
                   <Heading
                     value="Deposit End Time"
                     size=Heading.H4
@@ -393,14 +415,14 @@ module RenderData = {
                     color={theme.neutral_600}
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Eight colSm=Col.Seven>
                   <Timestamp
                     size=Text.Body1 timeOpt=proposal.votingEndTime color={theme.neutral_900}
                   />
                 </Col>
               </Row>
-              <Row marginBottom=24>
-                <Col col=Col.Four mbSm=8>
+              <Row marginBottom=24 marginBottomSm=16>
+                <Col col=Col.Four colSm=Col.Five mbSm=8>
                   <Heading
                     value="Total Deposit"
                     size=Heading.H4
@@ -408,7 +430,7 @@ module RenderData = {
                     color={theme.neutral_600}
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Eight colSm=Col.Seven>
                   <Text
                     size={Body1}
                     value={`${proposal.totalDeposit
@@ -418,51 +440,62 @@ module RenderData = {
                   />
                 </Col>
               </Row>
-              <Row marginBottom=24>
-                <Col col=Col.Four mbSm=8>
+              <Row marginBottom=24 marginBottomSm=16>
+                <Col col=Col.Four colSm=Col.Five mbSm=8>
                   <Heading
                     value="Status" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Eight colSm=Col.Seven>
                   <div className={CssHelper.flexBox()}>
                     <img alt="Success Icon" src=Images.success />
                     <Text value="Complete" size={Body1} marginLeft=8 />
                   </div>
                 </Col>
               </Row>
-              <SeperatedLine mt=24 mb=12 color=theme.neutral_200 />
-              <Row marginBottom=8>
-                <Col col=Col.One>
-                  <Text block=true value="No." size=Text.Caption weight=Text.Semibold />
-                </Col>
-                <Col col=Col.Three>
-                  <Text block=true value="DEPOSITOR" size=Text.Caption weight=Text.Semibold />
-                </Col>
-                <Col col=Col.Three>
-                  <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
-                </Col>
-                <Col col=Col.Two>
+              {switch isMobile {
+              | true =>
+                <div className={CssHelper.clickable} onClick={_ => openDepositors()}>
                   <Text
-                    block=true
-                    value="DEPOSIT AMOUNT (BAND)"
-                    size=Text.Caption
-                    weight=Text.Semibold
-                    align=Text.Right
+                    value="View deposit details" size=Text.Body2 color=theme.primary_600 block=true
                   />
-                </Col>
-                <Col col=Col.Three>
-                  <Text
-                    block=true
-                    value="TIMESTAMP"
-                    size=Text.Caption
-                    weight=Text.Semibold
-                    align=Text.Right
-                  />
-                </Col>
-              </Row>
-              <SeperatedLine mt=24 mb=12 color=theme.neutral_200 />
-              <RenderDepositor proposalID=proposal.id />
+                </div>
+              | false =>
+                <>
+                  <SeperatedLine mt=24 mb=12 color=theme.neutral_200 />
+                  <Row marginBottom=8>
+                    <Col col=Col.One>
+                      <Text block=true value="No." size=Text.Caption weight=Text.Semibold />
+                    </Col>
+                    <Col col=Col.Three>
+                      <Text block=true value="DEPOSITOR" size=Text.Caption weight=Text.Semibold />
+                    </Col>
+                    <Col col=Col.Three>
+                      <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
+                    </Col>
+                    <Col col=Col.Two>
+                      <Text
+                        block=true
+                        value="DEPOSIT AMOUNT (BAND)"
+                        size=Text.Caption
+                        weight=Text.Semibold
+                        align=Text.Right
+                      />
+                    </Col>
+                    <Col col=Col.Three>
+                      <Text
+                        block=true
+                        value="TIMESTAMP"
+                        size=Text.Caption
+                        weight=Text.Semibold
+                        align=Text.Right
+                      />
+                    </Col>
+                  </Row>
+                  <SeperatedLine mt=24 mb=12 color=theme.neutral_200 />
+                  <RenderDepositor proposalID=proposal.id />
+                </>
+              }}
             </InfoContainer>
           </Col>
         </Row>

@@ -346,16 +346,6 @@ module Legacy = {
     | None => bondedToken->Coin.getBandAmountFromCoin
     }
 
-    Js.logMany([
-      yesVote,
-      noVote,
-      noWithVetoVote,
-      abstainVote,
-      yesVotePercent,
-      noVotePercent,
-      noWithVetoVotePercent,
-      abstainVotePercent,
-    ])
     <>
       <Row marginBottom=16>
         <Col col=Col.Twelve style={CssHelper.flexBox()}>
@@ -388,101 +378,109 @@ module Legacy = {
       </Row>
       <Row marginTop=8>
         <Col col=Col.Twelve style={CssHelper.flexBox()}>
-          <div className={CssHelper.mr(~size=16, ())}>
+          <div className={Styles.voteCountGroup}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(Vote.Full.Yes->Vote.Full.getColor(theme))} />
-              <Text
-                value="Yes"
-                size=Text.Body1
-                weight=Text.Semibold
-                color={theme.neutral_900}
-                marginRight=8
-              />
-              <Text
-                value={yesVotePercent->Format.fVotePercent}
-                size=Text.Body2
-                weight=Text.Regular
-                color={theme.neutral_900}
-              />
+              <div className={Styles.voteCountBox}>
+                <div className={CssHelper.flexBox()}>
+                  <div className={Styles.smallDot(Vote.Full.Yes->Vote.Full.getColor(theme))} />
+                  <Text
+                    value="Yes"
+                    size=Text.Body1
+                    weight=Text.Semibold
+                    color={theme.neutral_900}
+                    marginRight=8
+                  />
+                  <Text
+                    value={yesVotePercent->Format.fVotePercent}
+                    size=Text.Body2
+                    weight=Text.Regular
+                    color={theme.neutral_900}
+                  />
+                </div>
+                <Text
+                  value={`${yesVote->Format.fPretty(~digits=0)} BAND`}
+                  size=Text.Body2
+                  weight=Text.Regular
+                  color={theme.neutral_600}
+                />
+              </div>
+              <div className={Styles.voteCountBox}>
+                <div className={CssHelper.flexBox()}>
+                  <div className={Styles.smallDot(Vote.Full.No->Vote.Full.getColor(theme))} />
+                  <Text
+                    value="No"
+                    size=Text.Body1
+                    weight=Text.Semibold
+                    color={theme.neutral_900}
+                    marginRight=8
+                  />
+                  <Text
+                    value={noVotePercent->Format.fVotePercent}
+                    size=Text.Body2
+                    weight=Text.Regular
+                    color={theme.neutral_900}
+                  />
+                </div>
+                <Text
+                  value={`${noVote->Format.fPretty(~digits=0)} BAND`}
+                  size=Text.Body2
+                  weight=Text.Regular
+                  color={theme.neutral_600}
+                />
+              </div>
             </div>
-            <Text
-              value={`${yesVote->Format.fPretty(~digits=0)} BAND`}
-              size=Text.Body2
-              weight=Text.Regular
-              color={theme.neutral_600}
-            />
-          </div>
-          <div className={CssHelper.mr(~size=16, ())}>
             <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(Vote.Full.No->Vote.Full.getColor(theme))} />
-              <Text
-                value="No"
-                size=Text.Body1
-                weight=Text.Semibold
-                color={theme.neutral_900}
-                marginRight=8
-              />
-              <Text
-                value={noVotePercent->Format.fVotePercent}
-                size=Text.Body2
-                weight=Text.Regular
-                color={theme.neutral_900}
-              />
+              <div className={Styles.voteCountBox}>
+                <div className={CssHelper.flexBox()}>
+                  <div
+                    className={Styles.smallDot(Vote.Full.NoWithVeto->Vote.Full.getColor(theme))}
+                  />
+                  <Text
+                    value="NWV"
+                    size=Text.Body1
+                    weight=Text.Semibold
+                    color={theme.neutral_900}
+                    marginRight=8
+                  />
+                  <Text
+                    value={noWithVetoVotePercent->Format.fVotePercent}
+                    size=Text.Body2
+                    weight=Text.Regular
+                    color={theme.neutral_900}
+                  />
+                </div>
+                <Text
+                  value={`${noWithVetoVote->Format.fPretty(~digits=0)} BAND`}
+                  size=Text.Body2
+                  weight=Text.Regular
+                  color={theme.neutral_600}
+                />
+              </div>
+              <div className={Styles.voteCountBox}>
+                <div className={CssHelper.flexBox()}>
+                  <div className={Styles.smallDot(Vote.Full.Abstain->Vote.Full.getColor(theme))} />
+                  <Text
+                    value="Abstain"
+                    size=Text.Body1
+                    weight=Text.Semibold
+                    color={theme.neutral_900}
+                    marginRight=8
+                  />
+                  <Text
+                    value={abstainVotePercent->Format.fVotePercent}
+                    size=Text.Body2
+                    weight=Text.Regular
+                    color={theme.neutral_900}
+                  />
+                </div>
+                <Text
+                  value={`${abstainVote->Format.fPretty(~digits=0)} BAND`}
+                  size=Text.Body2
+                  weight=Text.Regular
+                  color={theme.neutral_600}
+                />
+              </div>
             </div>
-            <Text
-              value={`${noVote->Format.fPretty(~digits=0)} BAND`}
-              size=Text.Body2
-              weight=Text.Regular
-              color={theme.neutral_600}
-            />
-          </div>
-          <div className={CssHelper.mr(~size=16, ())}>
-            <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(Vote.Full.NoWithVeto->Vote.Full.getColor(theme))} />
-              <Text
-                value="NWV"
-                size=Text.Body1
-                weight=Text.Semibold
-                color={theme.neutral_900}
-                marginRight=8
-              />
-              <Text
-                value={noWithVetoVotePercent->Format.fVotePercent}
-                size=Text.Body2
-                weight=Text.Regular
-                color={theme.neutral_900}
-              />
-            </div>
-            <Text
-              value={`${noWithVetoVote->Format.fPretty(~digits=0)} BAND`}
-              size=Text.Body2
-              weight=Text.Regular
-              color={theme.neutral_600}
-            />
-          </div>
-          <div className={CssHelper.mr(~size=16, ())}>
-            <div className={CssHelper.flexBox()}>
-              <div className={Styles.smallDot(Vote.Full.Abstain->Vote.Full.getColor(theme))} />
-              <Text
-                value="Abstain"
-                size=Text.Body1
-                weight=Text.Semibold
-                color={theme.neutral_900}
-                marginRight=8
-              />
-              <Text
-                value={abstainVotePercent->Format.fVotePercent}
-                size=Text.Body2
-                weight=Text.Regular
-                color={theme.neutral_900}
-              />
-            </div>
-            <Text
-              value={`${abstainVote->Format.fPretty(~digits=0)} BAND`}
-              size=Text.Body2
-              weight=Text.Regular
-              color={theme.neutral_600}
-            />
           </div>
         </Col>
       </Row>

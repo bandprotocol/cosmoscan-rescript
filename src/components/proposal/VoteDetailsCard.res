@@ -205,9 +205,9 @@ module Legacy = {
       <Col col=Col.Twelve>
         <InfoContainer py=24 px=32>
           <Row>
-            <Col col=Col.Three>
+            <Col col=Col.Three colSm=Col.Twelve>
               <Row>
-                <Col col=Col.Six>
+                <Col col=Col.Six colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Turnout"
@@ -225,7 +225,7 @@ module Legacy = {
                     />
                   </div>
                 </Col>
-                <Col col=Col.Six>
+                <Col col=Col.Six colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <img
                       src={switch proposal.status {
@@ -246,7 +246,7 @@ module Legacy = {
                 </Col>
               </Row>
               <Row marginTop=16>
-                <Col col=Col.Six>
+                <Col col=Col.Six colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Yes Vote"
@@ -264,7 +264,7 @@ module Legacy = {
                     />
                   </div>
                 </Col>
-                <Col col=Col.Six>
+                <Col col=Col.Six colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <img
                       src={switch proposal.status {
@@ -285,7 +285,7 @@ module Legacy = {
                 </Col>
               </Row>
               <Row marginTop=16 alignItems=Row.Center>
-                <Col col=Col.Six>
+                <Col col=Col.Six colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Status"
@@ -295,7 +295,7 @@ module Legacy = {
                     />
                   </div>
                 </Col>
-                <Col col=Col.Six>
+                <Col col=Col.Six colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Text
                       value={proposal.status->ProposalSub.getStatusText}
@@ -308,7 +308,15 @@ module Legacy = {
                 </Col>
               </Row>
             </Col>
-            <Col col=Col.Nine>
+            <Hidden variant={Desktop}>
+              <SeperatedLine
+                mtSm=16
+                mbSm=16
+                color=theme.neutral_300
+                style={Css.merge(list{CssHelper.mlSm(~size=12, ()), CssHelper.mrSm(~size=12, ())})}
+              />
+            </Hidden>
+            <Col col=Col.Nine colSm=Col.Twelve>
               <VoteProgress.Legacy proposal voteStat bondedToken />
             </Col>
           </Row>

@@ -10,7 +10,7 @@ module Styles = {
       marginBottom(#px(8)),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
       border(#px(1), #solid, theme.neutral_100),
-      Media.mobile([padding2(~v=#px(16), ~h=#px(16))]),
+      Media.mobile([padding2(~v=#px(16), ~h=#px(24))]),
     ])
 
   let filterButtonGroup = style(. [display(#flex), width(#vw(75.)), overflow(#scroll)])
