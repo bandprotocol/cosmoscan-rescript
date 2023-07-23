@@ -56,7 +56,7 @@ module Status = {
 }
 
 type proposal_t = {
-  id: ID.Proposal.t,
+  id: ID.LegacyProposal.t,
   yesVote: option<float>,
   noVote: option<float>,
   noWithVetoVote: option<float>,
@@ -95,7 +95,7 @@ module CurrentStatus = {
 
 module VetoProposal = {
   type t = {
-    id: ID.Proposal.t,
+    id: ID.LegacyProposal.t,
     status: CurrentStatus.t,
     turnOut: float,
     yesVote: float,
@@ -234,7 +234,7 @@ module SingleConfig = %graphql(`
       vetoEndTime: veto_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       votingEndTime: voting_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       proposal @ppxAs(type: "proposal_t") {
-        id @ppxCustom(module: "GraphQLParserModule.ProposalID")
+        id @ppxCustom(module: "GraphQLParserModule.LegacyProposalID")
         yesVote: yes_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         noVote: no_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         noWithVetoVote: no_with_veto_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
@@ -281,7 +281,7 @@ module MultiConfig = %graphql(`
       vetoEndTime: veto_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       votingEndTime: voting_end_time @ppxCustom(module: "GraphQLParserModule.Date")
       proposal @ppxAs(type: "proposal_t") {
-        id @ppxCustom(module: "GraphQLParserModule.ProposalID")
+        id @ppxCustom(module: "GraphQLParserModule.LegacyProposalID")
         yesVote: yes_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         noVote: no_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
         noWithVetoVote: no_with_veto_vote @ppxCustom(module: "GraphQLParserModule.FloatString")

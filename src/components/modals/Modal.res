@@ -116,7 +116,8 @@ let make = () => {
         | IBCPacketError(reason) => <IBCPacketFail reason />
         | Syncing => <SyncingModal />
         | CouncilMembers(council) => <CouncilMembersModal council />
-        | Depositors(id) => <DepositorsModal vetoId={id->ID.Proposal.toInt} />
+        | Depositors(vetoId) => <DepositorsModal vetoId />
+        | VetoVote(vetoId) => <VetoVotesModal vetoId />
         }}
       </div>
     </div>

@@ -105,26 +105,6 @@ module RenderBodyMobile = {
         </Row>
       </div>
     )
-    // <MobileCard
-    //   values={
-    //     open InfoMobileCard
-    //     [
-    //       ("No.", Text((index + 1)->Belt.Int.toString)),
-    //       ("ADDRESS", Address(member.account.address, 200, #account)),
-    //       (
-    //         "SINCE",
-    //         Text(
-    //           `${member.since->MomentRe.Moment.format(
-    //               "YYYY-MM-DD",
-    //               _,
-    //             )} (${member.since->MomentRe.Moment.fromNow(~withoutSuffix=Some(true))})`,
-    //         ),
-    //       ),
-    //     ]
-    //   }
-    //   key={member.account.address->Address.toBech32}
-    //   idx={member.account.address->Address.toBech32}
-    // />
     ->React.array
   }
 }

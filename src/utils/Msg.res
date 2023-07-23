@@ -1675,6 +1675,7 @@ let rec decodeMsg = (json, isSuccess) => {
             (DepositMsg(Failure(msg)), msg.depositor, false)
           }
 
+    | "/cosmos.gov.v1.MsgVote"
     | "/cosmos.gov.v1beta1.MsgVote" =>
       isSuccess
         ? {

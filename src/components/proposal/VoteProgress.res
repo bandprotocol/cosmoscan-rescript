@@ -129,7 +129,7 @@ module Veto = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-    let openVetos = () => Syncing->OpenModal->dispatchModal
+    let openVetos = () => vetoProposal.id->VetoVote->OpenModal->dispatchModal
 
     <>
       <Row>

@@ -6,7 +6,8 @@ type modal_t =
   | IBCPacketError(string)
   | Syncing
   | CouncilMembers(CouncilProposalSub.council_t)
-  | Depositors(ID.Proposal.t)
+  | Depositors(int)
+  | VetoVote(ID.LegacyProposal.t)
 
 type t = {
   canExit: bool,

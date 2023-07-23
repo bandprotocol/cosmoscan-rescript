@@ -20,7 +20,7 @@ module Wait = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-    let openDepositors = () => vetoId->ID.Proposal.fromInt->Depositors->OpenModal->dispatchModal
+    let openDepositors = () => vetoId->Depositors->OpenModal->dispatchModal
 
     <Row marginTopSm=24>
       <Col col=Col.Twelve mb=8 style={CssHelper.flexBox()}>
@@ -125,7 +125,8 @@ module Vote = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-    let openDepositors = () => vetoProposal.id->Depositors->OpenModal->dispatchModal
+    let openDepositors = () =>
+      vetoProposal.id->ID.LegacyProposal.toInt->Depositors->OpenModal->dispatchModal
     let vote = () => Syncing->OpenModal->dispatchModal
 
     <Row marginTopSm=24>
