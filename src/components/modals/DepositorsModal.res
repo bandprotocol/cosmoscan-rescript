@@ -4,10 +4,21 @@ module Styles = {
     style(. [
       backgroundColor(theme.neutral_000),
       width(#percent(100.)),
-      minWidth(#px(956)),
+      minWidth(#px(568)),
       minHeight(#px(360)),
-      padding(#px(32)),
+      padding2(~v=#px(40), ~h=#px(16)),
       Media.mobile([minWidth(#px(300))]),
+    ])
+
+  let memberCard = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
+      padding2(~v=#px(4), ~h=#px(8)),
+      borderRadius(#px(4)),
+      marginTop(#px(8)),
+      boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
+      border(#px(1), #solid, theme.neutral_100),
+      Media.mobile([padding2(~v=#px(16), ~h=#px(16))]),
     ])
 
   let description = style(. [marginBottom(#px(24)), Media.mobile([marginBottom(#px(0))])])
@@ -59,29 +70,56 @@ module RenderBody = {
 }
 module RenderBodyMobile = {
   @react.component
-  let make = (~name: string, ~members: array<CouncilProposalSub.council_member_t>) => {
-    members
-    ->Belt.Array.mapWithIndex((index, member) =>
-      <MobileCard
-        values={
-          open InfoMobileCard
-          [
-            ("#", Text(index->Belt.Int.toString)),
-            ("ADDRESS", Address(member.account.address, 200, #account)),
-            (
-              "SINCE",
-              Text(
-                `${member.since->MomentRe.Moment.format(
-                    "YYYY-MM-DD",
-                    _,
-                  )} (${member.since->MomentRe.Moment.fromNow(~withoutSuffix=Some(true))})`,
-              ),
-            ),
-          ]
-        }
-        key={member.account.address->Address.toBech32}
-        idx={member.account.address->Address.toBech32}
-      />
+  let make = (~deposits: array<DepositSub.t>) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    deposits
+    ->Belt.Array.mapWithIndex((index, deposit) =>
+      <div className={Styles.memberCard(theme, isDarkMode)}>
+        <Row>
+          <Col colSm=Col.Three>
+            <Text block=true value="No." size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col colSm=Col.Nine>
+            <Text
+              block=true
+              value={(index + 1)->Belt.Int.toString}
+              size=Text.Caption
+              weight=Text.Semibold
+            />
+          </Col>
+        </Row>
+        <Row marginTopSm=16>
+          <Col colSm=Col.Three>
+            <Text block=true value="ADDRESS" size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col colSm=Col.Nine>
+            <AddressRender address=deposit.depositor position={Subtitle} ellipsis=true />
+          </Col>
+        </Row>
+        <Row marginTopSm=16>
+          <Col colSm=Col.Three>
+            <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col colSm=Col.Nine>
+            {switch deposit.txHashOpt {
+            | Some(txHash) => <TxLink txHash width=280 fullHash=false />
+            // TODO: Handle Null Txhash for deposit
+            | None => <Text value="No Tx" size=Text.Body1 weight=Text.Thin />
+            }}
+          </Col>
+        </Row>
+        <Row marginTopSm=16>
+          <Col colSm=Col.Three>
+            <Text block=true value="Timestamp" size=Text.Caption weight=Text.Semibold />
+          </Col>
+          <Col colSm=Col.Nine>
+            <Timestamp
+              timeOpt=deposit.timestampOpt size=Text.Body2 weight=Text.Regular textAlign=Text.Right
+            />
+          </Col>
+        </Row>
+      </div>
     )
     ->React.array
   }
@@ -97,41 +135,42 @@ let make = (~vetoId: int) => {
   <div className={Styles.container(theme)}>
     <Heading size=Heading.H2 value="Depositors" marginBottom=16 marginBottomSm=8 />
     <SeperatedLine mt=0 mb=0 color=theme.neutral_100 />
-    {switch isMobile {
-    | true => React.null
-    // <RenderBodyMobile
-    //   name={council.name->CouncilSub.getCouncilNameString} members=council.councilMembers
-    // />
-    | false =>
-      <>
-        <Row alignItems=Row.Center marginTop=12 marginBottom=12>
-          <Col col=Col.One>
-            <Text value="No." size=Text.Caption weight=Text.Semibold />
-          </Col>
-          <Col col=Col.Three>
-            <Text value="DEPOSITORS" size=Text.Caption weight=Text.Semibold />
-          </Col>
-          <Col col=Col.Two>
-            <Text value="TX HASH" size=Text.Caption weight=Text.Semibold />
-          </Col>
-          <Col col=Col.Three>
-            <Text
-              value="DEPOSIT AMOUNT (BAND)" size=Text.Caption weight=Text.Semibold align=Text.Right
-            />
-          </Col>
-          <Col col=Col.Three>
-            <Text value="TIMESTAMP" size=Text.Caption weight=Text.Semibold align=Text.Right />
-          </Col>
-        </Row>
-        {switch depositsSub {
-        | Data(deposits) => <RenderBody deposits />
-        // TODO: insert Loader
-        | Error(err) =>
-          <Text value={err.message} color={theme.error_600} align=Text.Center breakAll=true />
-        | Loading | NoData =>
-          <Text value="Loading" color={theme.error_600} align=Text.Center breakAll=true />
-        }}
-      </>
+    {switch depositsSub {
+    | Data(deposits) =>
+      switch isMobile {
+      | true => <RenderBodyMobile deposits />
+      | false =>
+        <>
+          <Row alignItems=Row.Center marginTop=12 marginBottom=12>
+            <Col col=Col.One>
+              <Text value="No." size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col col=Col.Three>
+              <Text value="DEPOSITORS" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col col=Col.Two>
+              <Text value="TX HASH" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col col=Col.Three>
+              <Text
+                value="DEPOSIT AMOUNT (BAND)"
+                size=Text.Caption
+                weight=Text.Semibold
+                align=Text.Right
+              />
+            </Col>
+            <Col col=Col.Three>
+              <Text value="TIMESTAMP" size=Text.Caption weight=Text.Semibold align=Text.Right />
+            </Col>
+          </Row>
+          <RenderBody deposits />
+        </>
+      }
+    // TODO: insert Loader
+    | Error(err) =>
+      <Text value={err.message} color={theme.error_600} align=Text.Center breakAll=true />
+    | Loading | NoData =>
+      <Text value="Loading" color={theme.error_600} align=Text.Center breakAll=true />
     }}
   </div>
 }
