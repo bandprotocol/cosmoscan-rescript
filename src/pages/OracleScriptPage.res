@@ -6,8 +6,8 @@ module Styles = {
     marginBottom(#px(8)),
     Media.mobile([marginTop(#px(8)), marginBottom(#px(8))]),
   ])
-  let bodyText = (theme: Theme.t, isDarkMode) =>
-    style(. [color(isDarkMode ? theme.neutral_000 : theme.neutral_600), fontSize(#px(14))])
+  let bodyText = (theme: Theme.t) =>
+    style(. [color(theme.neutral_600), fontSize(#px(14))])
 
   let linkInline = style(. [display(#inlineFlex)])
 }
@@ -30,10 +30,10 @@ let make = () => {
       <div className={CssHelper.mb(~size=24, ())}>
         <Heading value="All Oracle Scripts" size=Heading.H2 marginBottom=8 />
         <div className={CssHelper.flexBox(~align=#center, ())}>
-          <p className={Styles.bodyText(theme, isDarkMode)}>
+          <p className={Styles.bodyText(theme)}>
             {"Oracle scripts bring real-world data onto the blockchain for smart contracts to use. Developers can create and customize these scripts in "->React.string}
-            <AbsoluteLink href="https://builder.bandprotocol.com" className={Styles.linkInline}>
-              <Text value="BandBuilder" weight={Medium} color={theme.primary_600} />
+            <AbsoluteLink href="https://builder.bandprotocol.com" className={Styles.linkInline} >
+              <Text value="BandBuilder" weight={Medium} color={theme.primary_600} size=Body1 />
             </AbsoluteLink>
           </p>
         </div>
