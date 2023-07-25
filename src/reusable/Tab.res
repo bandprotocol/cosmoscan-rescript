@@ -19,7 +19,7 @@ module Styles = {
       justifyContent(center),
       alignItems(center),
       cursor(pointer),
-      padding4(~top=#px(24), ~right=#zero, ~bottom=#px(16), ~left=#zero),
+      padding4(~top=#zero, ~right=#zero, ~bottom=#px(16), ~left=#zero),
       borderBottom(#px(4), solid, active ? theme.primary_600 : transparent),
       Media.mobile([whiteSpace(nowrap), padding2(~v=#px(24), ~h=zero)]),
     ])
@@ -39,9 +39,9 @@ module Route = {
     <Link key=name isTab=true className={Styles.buttonContainer(theme, active)} route>
       <Text
         value=name
-        weight=Text.Semibold
-        color={active ? theme.neutral_900 : theme.neutral_600}
+        weight={active ? Text.Semibold : Text.Regular}
         size=Text.Body1
+        color={active ? theme.neutral_900 : theme.neutral_600}
       />
     </Link>
   }
