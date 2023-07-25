@@ -37,9 +37,14 @@ let make = (~coins, ~pos=Msg, ~size=Text.Body1, ~color=?) => {
     }}
     <HSpacing size=Spacing.sm />
     {switch pos {
-    | Msg => <Text size value="BAND" weight=Text.Regular color=textColor nowrap=true block=true />
+    | Msg =>
+      <Text
+        size value="BAND" weight=Text.Regular color=textColor nowrap=true block=true code=true
+      />
     | TxIndex =>
-      <Text size value="BAND" weight=Text.Regular color=textColor nowrap=true block=true />
+      <Text
+        size value="BAND" weight=Text.Regular color=textColor nowrap=true block=true code=true
+      />
     | Fee => React.null
     }}
   </div>

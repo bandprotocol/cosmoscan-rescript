@@ -203,9 +203,9 @@ module Content = {
                 </Col>
                 <Col col=Col.Ten colSm=Col.Eight>
                   {switch oracleScriptSub {
-                  | Data({timestampOpt}) =>
+                  | Data({timestamp}) =>
                     <Text
-                      value={switch timestampOpt {
+                      value={switch timestamp {
                       | Some(timestamp) =>
                         timestamp->MomentRe.Moment.format("YYYY-MM-DD HH:mm:ss", _)
                       | None => "N/A"
