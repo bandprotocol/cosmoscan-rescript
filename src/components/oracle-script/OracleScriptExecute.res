@@ -342,7 +342,7 @@ module ExecutionPart = {
     // set parameter default value here
     let (callDataArr, setCallDataArr) = React.useState(_ => Belt.Array.make(numParams, ""))
     let (clientID, setClientID) = React.useState(_ => "from_scan")
-    let (feeLimit, setFeeLimit) = React.useState(_ => "0.00025")
+    let (feeLimit, setFeeLimit) = React.useState(_ => "0.002")
     let (prepareGas, setPrepareGas) = React.useState(_ => 20000)
     let (executeGas, setExecuteGas) = React.useState(_ => 100000)
     let (gaslimit, setGaslimit) = React.useState(_ => 2000000)
@@ -388,7 +388,7 @@ module ExecutionPart = {
                 value=feeLimit
                 setValue=setFeeLimit
                 title="Fee Limit (BAND)"
-                tooltip="Maximum amount of BAND tokens that you are willing to pay for the oracle data request. 0.0002 is recommended"
+                tooltip="The maximum number of BAND tokens that you are willing to pay for an oracle data request depends on each Oracle Script."
                 required=true
               />
               {switch validatorCount {
