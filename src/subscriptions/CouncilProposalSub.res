@@ -311,7 +311,7 @@ let getFilter = str =>
   | "All" => "%%"
   | "Tech Proposal" => "%Tech%"
   | "Grant Proposal" => "%Grant%"
-  | "BandDAO Proposal" => "%BandDAO%"
+  | "BandDAO Proposal" => "%DAO%"
   | _ => ""
   }
 
