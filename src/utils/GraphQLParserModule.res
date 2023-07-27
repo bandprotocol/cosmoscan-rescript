@@ -126,6 +126,12 @@ module ProposalID = {
   let serialize = proposalID => proposalID->ID.Proposal.toInt
 }
 
+module LegacyProposalID = {
+  type t = ID.Proposal.t
+  let parse = proposalID => proposalID->ID.LegacyProposal.fromInt
+  let serialize = proposalID => proposalID->ID.LegacyProposal.toInt
+}
+
 module OracleScriptID = {
   type t = ID.OracleScript.t
   let parse = oracleScriptID => oracleScriptID->ID.OracleScript.fromInt

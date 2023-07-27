@@ -90,6 +90,12 @@ type proposal_status_t =
   | Failed
   | Inactive
 
+let getStatusColor = (status, theme: Theme.t) =>
+  switch status {
+  | Passed => theme.success_600
+  | _ => theme.error_600
+  }
+
 module ProposalStatus = {
   type t = proposal_status_t
   let parse = json => {
@@ -118,12 +124,24 @@ module ProposalStatus = {
   }
 }
 
+let getStatusText = status =>
+  switch status {
+  | Deposit => "DepositPeriod"
+  | Voting => "VotingPeriod"
+  | Passed => "Pass"
+  | Rejected => "Reject"
+  | Failed => "Fail"
+  | Inactive => "Inactive"
+  }
+
 type account_t = {address: Address.t}
 
 type deposit_t = {amount: list<Coin.t>}
 
+type total_deposit_t = {deposits: array<deposit_t>}
+
 type internal_t = {
-  id: ID.Proposal.t,
+  id: ID.LegacyProposal.t,
   title: string,
   status: proposal_status_t,
   description: string,
@@ -143,8 +161,8 @@ type internal_t = {
 }
 
 type t = {
-  id: ID.Proposal.t,
-  name: string,
+  id: ID.LegacyProposal.t,
+  title: string,
   status: proposal_status_t,
   description: string,
   content: content_t,
@@ -216,10 +234,11 @@ let toExternal = ({
   let noWithVetoVote = no_with_veto_vote->Belt.Option.getWithDefault(0.)
   let abstainVote = abstain_vote->Belt.Option.getWithDefault(0.)
   let totalVote = yesVote +. noVote +. noWithVetoVote +. abstainVote
+  let totalVoteWithoutAbstain = yesVote +. noVote +. noWithVetoVote
 
   {
     id,
-    name: title,
+    title,
     status,
     description,
     // TODO: This field expect to exist on every proposals, will fix schema to be required field
@@ -231,13 +250,21 @@ let toExternal = ({
     votingEndTime,
     proposerAddressOpt: accountOpt->Belt.Option.map(({address}) => address),
     endTotalYes: yesVote /. 1e6,
-    endTotalYesPercent: totalVote != 0. ? yesVote /. totalVote *. 100. : 0.,
+    endTotalYesPercent: totalVoteWithoutAbstain != 0.
+      ? yesVote /. totalVoteWithoutAbstain *. 100.
+      : 0.,
     endTotalNo: noVote /. 1e6,
-    endTotalNoPercent: totalVote != 0. ? noVote /. totalVote *. 100. : 0.,
+    endTotalNoPercent: totalVoteWithoutAbstain != 0.
+      ? noVote /. totalVoteWithoutAbstain *. 100.
+      : 0.,
     endTotalNoWithVeto: noWithVetoVote /. 1e6,
-    endTotalNoWithVetoPercent: totalVote != 0. ? noWithVetoVote /. totalVote *. 100. : 0.,
+    endTotalNoWithVetoPercent: totalVoteWithoutAbstain != 0.
+      ? noWithVetoVote /. totalVoteWithoutAbstain *. 100.
+      : 0.,
     endTotalAbstain: abstainVote /. 1e6,
-    endTotalAbstainPercent: totalVote != 0. ? abstainVote /. totalVote *. 100. : 0.,
+    endTotalAbstainPercent: totalVoteWithoutAbstain != 0.
+      ? abstainVote /. totalVoteWithoutAbstain *. 100.
+      : 0.,
     endTotalVote: totalVote /. 1e6,
     totalBondedTokens: total_bonded_tokens->Belt.Option.map(d => d /. 1e6),
     totalDeposit,
@@ -247,7 +274,7 @@ let toExternal = ({
 module SingleConfig = %graphql(`
   subscription Proposal($id: Int!) {
     proposals_by_pk(id: $id) @ppxAs(type: "internal_t") {
-      id @ppxCustom(module: "GraphQLParserModule.ProposalID")
+      id @ppxCustom(module: "GraphQLParserModule.LegacyProposalID")
       title
       status @ppxCustom(module: "ProposalStatus")
       description
@@ -272,8 +299,8 @@ module SingleConfig = %graphql(`
 
 module MultiConfig = %graphql(`
   subscription Proposals($limit: Int!, $offset: Int!) {
-    proposals(limit: $limit, offset: $offset, order_by: [{id: desc}], where: {status: {_neq: "Inactive"}, type: {_neq: "CouncilVeto"}}) @ppxAs(type: "internal_t") {
-      id @ppxCustom(module: "GraphQLParserModule.ProposalID")
+    proposals(limit: $limit, offset: $offset, order_by: [{id: desc}], where: {status: {_neq: "Inactive"}, type: {_neq: "CouncilVetoProposal"}}) @ppxAs(type: "internal_t") {
+      id @ppxCustom(module: "GraphQLParserModule.LegacyProposalID")
       title
       status @ppxCustom(module: "ProposalStatus")
       description
@@ -298,9 +325,19 @@ module MultiConfig = %graphql(`
 
 module ProposalsCountConfig = %graphql(`
   subscription ProposalsCount {
-    proposals_aggregate( where: {status: {_neq: "Inactive"}, type: {_neq: "CouncilVeto"}}){
+    proposals_aggregate( where: {status: {_neq: "Inactive"}, type: {_neq: "CouncilVetoProposal"}}){
       aggregate{
         count 
+      }
+    }
+  }
+`)
+
+module DepositAmountConfig = %graphql(`
+  subscription DepositAmount($id: Int!) {
+    proposals( where: {id: {_eq: $id}}) @ppxAs(type: "total_deposit_t"){
+      deposits @ppxAs(type: "deposit_t") {
+        amount @ppxCustom(module: "GraphQLParserModule.Coins")
       }
     }
   }
@@ -314,7 +351,7 @@ let getList = (~page, ~pageSize, ()) => {
 }
 
 let get = id => {
-  let result = SingleConfig.use({id: id->ID.Proposal.toInt})
+  let result = SingleConfig.use({id: id->ID.LegacyProposal.toInt})
 
   result
   ->Sub.fromData
@@ -332,4 +369,21 @@ let count = () => {
   result
   ->Sub.fromData
   ->Sub.map(x => x.proposals_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+}
+
+let totalDeposit = id => {
+  let result = DepositAmountConfig.use({id: id})
+
+  result
+  ->Sub.fromData
+  ->Sub.map(x => {
+    x.proposals
+    ->Belt.Array.get(0)
+    ->Belt.Option.map(proposal =>
+      proposal.deposits->Belt.Array.reduce(
+        0.,
+        (acc, deposit) => acc +. deposit.amount->Coin.getBandAmountFromCoins,
+      )
+    )
+  })
 }
