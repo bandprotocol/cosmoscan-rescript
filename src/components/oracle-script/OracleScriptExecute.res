@@ -10,17 +10,17 @@ module Styles = {
 
   let listContainer = style(. [width(#percent(100.)), marginBottom(#px(25))])
 
-  let input = (theme: Theme.t, isDarkMode) =>
+  let input = (theme: Theme.t) =>
     style(. [
       width(#percent(100.)),
       height(#px(37)),
       paddingLeft(#px(9)),
       paddingRight(#px(9)),
-      borderRadius(#px(4)),
+      borderRadius(#px(8)),
       fontSize(#px(14)),
       fontWeight(#light),
-      border(#px(1), #solid, isDarkMode ? theme.neutral_200 : theme.neutral_100),
-      backgroundColor(isDarkMode ? theme.neutral_300 : theme.neutral_100),
+      border(#px(1), #solid, theme.neutral_300),
+      backgroundColor(theme.neutral_000),
       outlineStyle(#none),
       color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
@@ -32,11 +32,18 @@ module Styles = {
       fontWeight(#num(600)),
       opacity(isLoading ? 0.8 : 1.),
       cursor(isLoading ? #auto : #pointer),
-      marginTop(#px(16)),
+      padding2(~v=#px(8), ~h=#px(56)),
     ])
 
   let withWH = (w, h) =>
     style(. [width(w), height(h), display(#flex), justifyContent(#center), alignItems(#center)])
+
+  let gasContainer = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      backgroundColor(isDarkMode ? theme.neutral_200 : theme.neutral_100),
+      padding2(~v=px(16), ~h=px(24)),
+      borderRadius(#px(8)),
+    ])
 
   let resultWrapper = (w, h, paddingV, overflowChioce) =>
     style(. [
@@ -97,16 +104,18 @@ module ParameterInput = {
   let make = (~params: Obi.field_key_type_t, ~index, ~setCallDataArr) => {
     let fieldType = params.fieldType
     let fieldName = params.fieldName->Js.String2.replaceByRe(%re(`/[_]/g`), " ")
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
     <div className=Styles.listContainer key=fieldName>
       <div className={CssHelper.flexBox()}>
-        <Text value=fieldName weight=Text.Semibold transform=Text.Capitalize />
+        <Text value=fieldName size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
         <HSpacing size=Spacing.xs />
         <Text value={j`($fieldType)`} weight=Text.Semibold />
+        <Text value="*" size=Text.Body1 weight=Text.Semibold color=theme.error_600 />
       </div>
       <VSpacing size=Spacing.sm />
       <input
-        className={Styles.input(theme, isDarkMode)}
+        className={Styles.input(theme)}
         type_="text"
         onChange={event => {
           let inputVal: string = ReactEvent.Form.target(event)["value"]
@@ -130,13 +139,21 @@ module ParameterInput = {
 
 module CountInputs = {
   @react.component
-  let make = (~askCount, ~setAskCount, ~setMinCount, ~validatorCount) => {
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let make = (~askCount, ~setAskCount, ~minCount, ~setMinCount, ~validatorCount) => {
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-    <Row marginBottom=24>
+    React.useEffect1(_ => {
+      if minCount->Belt.Int.fromString > askCount->Belt.Int.fromString {
+        setMinCount(_ => askCount)
+      }
+      None
+    }, [askCount])
+
+    <Row marginBottom=32>
       <Col col=Col.Two colSm=Col.Six>
         <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
-          <Text value="Ask Count" weight=Text.Semibold transform=Text.Capitalize />
+          <Text value="Ask Count" size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
+          <Text value="*" size=Text.Body1 weight=Text.Semibold color=theme.error_600 />
           <HSpacing size=Spacing.xs />
           <CTooltip
             tooltipPlacementSm=CTooltip.BottomLeft
@@ -144,26 +161,26 @@ module CountInputs = {
             <Icon name="fal fa-info-circle" size=10 />
           </CTooltip>
         </div>
-        <div className={CssHelper.selectWrapper(~fontColor=theme.neutral_900, ())}>
-          <select
-            className={Styles.input(theme, isDarkMode)}
-            onChange={event => {
-              let newVal = ReactEvent.Form.target(event)["value"]
-              setAskCount(_ => newVal)
-            }}>
-            {Belt.Array.makeBy(validatorCount, i => i + 1)
-            ->Belt.Array.map(index =>
-              <option key={index->Belt.Int.toString ++ "askCount"} value={index->Belt.Int.toString}>
-                {index->Belt.Int.toString->React.string}
-              </option>
+        <input
+          className={Styles.input(theme)}
+          type_="number"
+          min="1"
+          max={validatorCount}
+          onChange={event => {
+            let newVal = ReactEvent.Form.target(event)["value"]
+            setAskCount(_ =>
+              newVal->Belt.Int.fromString > validatorCount->Belt.Int.fromString
+                ? validatorCount
+                : newVal
             )
-            ->React.array}
-          </select>
-        </div>
+          }}
+          value=askCount
+        />
       </Col>
       <Col col=Col.Two colSm=Col.Six>
         <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
-          <Text value="Min Count" weight=Text.Semibold transform=Text.Capitalize />
+          <Text value="Min Count" size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
+          <Text value="*" size=Text.Body1 weight=Text.Semibold color=theme.error_600 />
           <HSpacing size=Spacing.xs />
           <CTooltip
             tooltipPlacementSm=CTooltip.BottomLeft
@@ -171,22 +188,19 @@ module CountInputs = {
             <Icon name="fal fa-info-circle" size=10 />
           </CTooltip>
         </div>
-        <div className={CssHelper.selectWrapper(~fontColor=theme.neutral_900, ())}>
-          <select
-            className={Styles.input(theme, isDarkMode)}
-            onChange={event => {
-              let newVal = ReactEvent.Form.target(event)["value"]
-              setMinCount(_ => newVal)
-            }}>
-            {Belt.Array.makeBy(askCount->Parse.mustParseInt, i => i + 1)
-            ->Belt.Array.map(index =>
-              <option key={index->Belt.Int.toString ++ "minCount"} value={index->Belt.Int.toString}>
-                {index->Belt.Int.toString->React.string}
-              </option>
+        <input
+          className={Styles.input(theme)}
+          type_="number"
+          min="1"
+          max={askCount}
+          onChange={event => {
+            let newVal = ReactEvent.Form.target(event)["value"]
+            setMinCount(_ =>
+              newVal->Belt.Int.fromString > askCount->Belt.Int.fromString ? askCount : newVal
             )
-            ->React.array}
-          </select>
-        </div>
+          }}
+          value=minCount
+        />
       </Col>
     </Row>
   }
@@ -195,17 +209,26 @@ module CountInputs = {
 module ClientIDInput = {
   @react.component
   let make = (~clientID, ~setClientID) => {
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
-        <Text value="Client ID" weight=Text.Semibold transform=Text.Capitalize />
+        <Text
+          value="Client ID (Optional)"
+          size=Text.Body1
+          weight=Text.Semibold
+          transform=Text.Capitalize
+        />
         <HSpacing size=Spacing.xs />
-        <Text value="(default value is from_scan)" weight=Text.Semibold />
+        <CTooltip
+          tooltipPlacementSm=CTooltip.BottomLeft
+          tooltipText="A unique identifier for your application to help track the usage of the oracle script.">
+          <Icon name="fal fa-info-circle" size=10 />
+        </CTooltip>
       </div>
       <VSpacing size=Spacing.sm />
       <input
-        className={Styles.input(theme, isDarkMode)}
+        className={Styles.input(theme)}
         type_="text"
         onChange={event => {
           let newVal = ReactEvent.Form.target(event)["value"]
@@ -219,18 +242,29 @@ module ClientIDInput = {
 
 module ValueInput = {
   @react.component
-  let make = (~value, ~setValue, ~title, ~info=?, ~inputType="text") => {
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let make = (~value, ~setValue, ~title, ~tooltip=?, ~inputType="text", ~required=false) => {
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className=Styles.listContainer>
       <div className={CssHelper.flexBox()}>
-        <Text value=title weight=Text.Semibold transform=Text.Capitalize />
-        <HSpacing size=Spacing.xs />
-        <Text value={info->Belt.Option.getWithDefault("")} weight=Text.Semibold />
+        <Text value=title size=Text.Body1 weight=Text.Semibold transform=Text.Capitalize />
+        {required
+          ? <Text value="*" size=Text.Body1 weight=Text.Semibold color=theme.error_600 />
+          : React.null}
+        {switch tooltip {
+        | Some(text) =>
+          <>
+            <HSpacing size=Spacing.xs />
+            <CTooltip tooltipPlacementSm=CTooltip.BottomLeft tooltipText=text>
+              <Icon name="fal fa-info-circle" size=10 />
+            </CTooltip>
+          </>
+        | None => React.null
+        }}
       </div>
       <VSpacing size=Spacing.sm />
       <input
-        className={Styles.input(theme, isDarkMode)}
+        className={Styles.input(theme)}
         type_=inputType
         onChange={event => {
           let newVal = ReactEvent.Form.target(event)["value"]
@@ -257,12 +291,7 @@ let loadingRender = (wDiv, wImg, h) => {
 let resultRender = (result, schema) => {
   switch result {
   | Nothing => React.null
-  | Loading =>
-    <>
-      <VSpacing size=Spacing.xl />
-      {loadingRender(#percent(100.), 30, #px(30))}
-      <VSpacing size=Spacing.lg />
-    </>
+  | Loading => <OracleScriptExecuteResponse.Loading />
   | Error(err) =>
     <>
       <VSpacing size=Spacing.lg />
@@ -299,7 +328,7 @@ module ExecutionPart = {
     let isMobile = Media.isMobile()
 
     let client = React.useContext(ClientContext.context)
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     let (accountOpt, dispatch) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
@@ -308,15 +337,17 @@ module ExecutionPart = {
     let numParams = paramsInput->Belt.Array.length
 
     let validatorCount = ValidatorSub.countByActive(true)
+    let (showAdvance, setShowAdvance) = React.useState(_ => false)
 
+    // set parameter default value here
     let (callDataArr, setCallDataArr) = React.useState(_ => Belt.Array.make(numParams, ""))
     let (clientID, setClientID) = React.useState(_ => "from_scan")
-    let (feeLimit, setFeeLimit) = React.useState(_ => "200")
+    let (feeLimit, setFeeLimit) = React.useState(_ => "0.002")
     let (prepareGas, setPrepareGas) = React.useState(_ => 20000)
     let (executeGas, setExecuteGas) = React.useState(_ => 100000)
     let (gaslimit, setGaslimit) = React.useState(_ => 2000000)
-    let (askCount, setAskCount) = React.useState(_ => "1")
-    let (minCount, setMinCount) = React.useState(_ => "1")
+    let (askCount, setAskCount) = React.useState(_ => "16")
+    let (minCount, setMinCount) = React.useState(_ => "10")
     let (result, setResult) = React.useState(_ => Nothing)
 
     // TODO: Change when input can be empty
@@ -343,18 +374,6 @@ module ExecutionPart = {
               {isUnused
                 ? React.null
                 : <div>
-                    <div className={Css.merge(list{CssHelper.flexBox(), Styles.upperTextCotainer})}>
-                      <Text value="This oracle script requires the following" size=Text.Body1 />
-                      <HSpacing size=Spacing.sm />
-                      {numParams == 0
-                        ? React.null
-                        : <Text
-                            value={numParams > 1 ? "parameters" : "parameter"}
-                            weight=Text.Bold
-                            size=Text.Body1
-                          />}
-                    </div>
-                    <VSpacing size=Spacing.lg />
                     <div className={CssHelper.flexBox(~direction=#column, ())}>
                       {paramsInput
                       ->Belt.Array.mapWithIndex((i, params) =>
@@ -365,33 +384,65 @@ module ExecutionPart = {
                       ->React.array}
                     </div>
                   </div>}
-              <ClientIDInput clientID setClientID />
-              <ValueInput value=feeLimit setValue=setFeeLimit title="Fee Limit" info="(uband)" />
               <ValueInput
-                value={prepareGas->Belt.Int.toString}
-                setValue=setPrepareGas
-                title="Prepare Gas"
-                inputType="number"
+                value=feeLimit
+                setValue=setFeeLimit
+                title="Fee Limit (BAND)"
+                tooltip="The maximum number of BAND tokens that you are willing to pay for an oracle data request depends on each Oracle Script."
+                required=true
               />
-              <ValueInput
-                value={executeGas->Belt.Int.toString}
-                setValue=setExecuteGas
-                title="Execute Gas"
-                inputType="number"
-              />
-              <ValueInput
-                value={gaslimit->Belt.Int.toString}
-                setValue=setGaslimit
-                title="Gas Limit"
-                inputType="number"
-              />
-              <SeperatedLine />
               {switch validatorCount {
               | Data(count) =>
                 let limitCount = count > 16 ? 16 : count
-                <CountInputs askCount setAskCount setMinCount validatorCount=limitCount />
+                <CountInputs
+                  askCount
+                  setAskCount
+                  minCount
+                  setMinCount
+                  validatorCount={limitCount->Belt.Int.toString}
+                />
               | _ => React.null
               }}
+              <div className={CssHelper.flexBox()}>
+                <SwitchV2 checked=showAdvance onClick={_ => setShowAdvance(_ => !showAdvance)} />
+                <Text value="Advanced settings" size=Text.Body1 color=theme.neutral_900 />
+              </div>
+              {showAdvance
+                ? <div>
+                    <VSpacing size=Spacing.lg />
+                    <ClientIDInput clientID setClientID />
+                    <Row style={Styles.gasContainer(theme, isDarkMode)} marginLeft=0 marginRight=0>
+                      <Col col=Col.Twelve>
+                        <ValueInput
+                          value={gaslimit->Belt.Int.toString}
+                          setValue=setGaslimit
+                          title="Gas Limit (Optional)"
+                          inputType="number"
+                          tooltip="Maximum amount of computational steps that the oracle is allowed to use to fulfill the data request. The gas limit must be greater than or equal to the sum of the prepare gas and execute gas. If omitted, the gas used will be set to xxx."
+                        />
+                      </Col>
+                      <Col col=Col.Six>
+                        <ValueInput
+                          value={executeGas->Belt.Int.toString}
+                          setValue=setExecuteGas
+                          title="Execute Gas (Optional)"
+                          inputType="number"
+                          tooltip="Used to execute the transaction. This includes things like calling the contract function and updating the state of the blockchain."
+                        />
+                      </Col>
+                      <Col col=Col.Six>
+                        <ValueInput
+                          value={prepareGas->Belt.Int.toString}
+                          setValue=setPrepareGas
+                          title="Prepare Gas (Optional)"
+                          inputType="number"
+                          tooltip="Used to prepare the transaction for execution. This includes things like validating the transaction data and checking the signer's account balance."
+                        />
+                      </Col>
+                    </Row>
+                  </div>
+                : React.null}
+              <VSpacing size=Spacing.xl />
               {switch accountOpt {
               | Some(account) =>
                 <>
@@ -435,6 +486,7 @@ module ExecutionPart = {
                                   feeLimit
                                   ->Belt.Float.fromString
                                   ->Belt.Option.getExn
+                                  ->(band => band *. 1000000.)
                                   ->Coin.newUBANDFromAmount,
                                 },
                                 prepareGas,
@@ -444,7 +496,7 @@ module ExecutionPart = {
                                 schema: (),
                               }),
                             ],
-                            5000,
+                            (gaslimit->Belt.Int.toFloat *. 0.0025)->Js.Math.ceil_int,
                             gaslimit,
                             "Request via scan",
                           )->Promise.then(res => {
@@ -462,6 +514,7 @@ module ExecutionPart = {
                       }}>
                     {(result == Loading ? "Sending Request ... " : "Request")->React.string}
                   </Button>
+                  <SeperatedLine mt=40 mb=40 />
                   {resultRender(result, schema)}
                 </>
               | None =>

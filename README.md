@@ -11,7 +11,7 @@ BandChain - Decentralized Data Delivery Network<br/><br/>
 
 ## What is Cosmoscan
 
-Cosmosan is block explorer for BandChain network
+Cosmoscan is block explorer for BandChain network
 
 ## How to Run on local machine
 

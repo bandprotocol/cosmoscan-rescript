@@ -1,8 +1,8 @@
 module Styles = {
   open CssJs
-  let msgBadge = (theme: Theme.t) =>
+  let msgBadge = (theme: Theme.t, mw) =>
     style(. [
-      maxWidth(#px(80)),
+      maxWidth(#px(mw)),
       backgroundColor(theme.neutral_700),
       border(#px(1), #solid, theme.neutral_600),
       borderRadius(#px(50)),
@@ -15,12 +15,12 @@ module Styles = {
 }
 
 @react.component
-let make = (~name) => {
+let make = (~name, ~mw=80) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   <div
     className={Css.merge(list{
       CssHelper.flexBox(~wrap=#nowrap, ~justify=#center, ()),
-      Styles.msgBadge(theme),
+      Styles.msgBadge(theme, mw),
     })}>
     <Text
       value=name

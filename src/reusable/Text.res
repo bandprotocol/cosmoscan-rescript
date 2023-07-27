@@ -156,7 +156,6 @@ let make = (
   ~color=?,
   ~block=false,
   ~code=false,
-  ~mono=false,
   ~ellipsis=false,
   ~underline=false,
   ~breakAll=false,

@@ -7,6 +7,27 @@ module Styles = {
 let setMomentRelativeTimeThreshold: unit => unit = %raw(`
 function() {
   const moment = require("moment");
+  moment.updateLocale('en', {
+    relativeTime : {
+      future: "in %s",
+      past:   "%s ago",
+      s  : 'a few seconds',
+      ss : '%d seconds',
+      m:  "a min",
+      mm: "%d min",
+      h:  "an hr",
+      hh: "%d hrs",
+      d:  "a day",
+      dd: "%d days",
+      w:  "a week",
+      ww: "%d weeks",
+      M:  "a mo",
+      MM: "%d mo",
+      y:  "a y",
+      yy: "%d y"
+    }
+  });
+  
   moment.relativeTimeRounding(Math.floor);
   moment.relativeTimeThreshold('s', 60);
   moment.relativeTimeThreshold('ss', 0);

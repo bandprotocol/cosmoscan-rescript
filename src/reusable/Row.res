@@ -29,7 +29,6 @@ module Styles = {
   let wrap = style(. [flexWrap(#wrap)])
 
   let minHeight = mh => style(. [minHeight(mh)])
-  let rowBase = style(. [display(#flex), margin2(~v=#zero, ~h=#px(-12))])
   let mb = (~mb, ~mbSm, ()) =>
     style(. [
       marginBottom(#px(mb)),
@@ -39,6 +38,16 @@ module Styles = {
     style(. [
       marginTop(#px(mt)),
       Media.mobile([marginTop(#px(mtSm->Belt.Option.getWithDefault(mt)))]),
+    ])
+  let ml = (~ml, ~mlSm, ()) =>
+    style(. [
+      marginLeft(#px(ml)),
+      Media.mobile([marginLeft(#px(mlSm->Belt.Option.getWithDefault(ml)))]),
+    ])
+  let mr = (~mr, ~mrSm, ()) =>
+    style(. [
+      marginRight(#px(mr)),
+      Media.mobile([marginRight(#px(mrSm->Belt.Option.getWithDefault(mr)))]),
     ])
 }
 
@@ -54,15 +63,21 @@ let make = (
   ~marginBottomSm=?,
   ~marginTop=0,
   ~marginTopSm=?,
+  ~marginLeft=-12,
+  ~marginLeftSm=?,
+  ~marginRight=-12,
+  ~marginRightSm=?,
 ) =>
   <div
     className={CssJs.merge(. [
-      Styles.rowBase,
+      CssHelper.flexBox(),
       Styles.justify(justify),
       Styles.minHeight(minHeight),
       Styles.alignItems(alignItems),
       Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),
       Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
+      Styles.ml(~ml=marginLeft, ~mlSm=marginLeftSm, ()),
+      Styles.mr(~mr=marginRight, ~mrSm=marginRightSm, ()),
       wrap ? Styles.wrap : "",
       style,
     ])}>
