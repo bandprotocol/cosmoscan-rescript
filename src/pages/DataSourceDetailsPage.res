@@ -174,11 +174,7 @@ module Content = {
                     {switch dataSourceSub {
                     | Data({timestamp}) =>
                       <Timestamp
-                        timeOpt=timestamp
-                        code=true
-                        size={Body1}
-                        color={theme.neutral_900}
-                        weight={Thin}
+                        timeOpt=timestamp size={Body1} color={theme.neutral_900} weight={Thin}
                       />
                     | _ => <LoadingCensorBar width=284 height=15 />
                     }}
