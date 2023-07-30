@@ -46,7 +46,7 @@ let make = (
           ellipsis=true
           size
           code=true
-          color={theme.neutral_900}
+          color={theme.primary_600}
         />
       </Link>
     }

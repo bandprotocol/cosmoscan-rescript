@@ -37,7 +37,7 @@ let make = (~chainID, ~channel, ~port) => {
   let (page, setPage) = React.useState(_ => 1)
   let (packetType, setPacketType) = React.useState(_ => "All")
 
-  let packetCountSub = IBCSub.incomingCount(~port, ~channel, ~packetType, ())
+  let packetCountSub = IBCPacketQuery.incomingCount(~port, ~channel, ~packetType, ())
   let pageSize = 5
 
   let packetsSub = IBCQuery.getList(
@@ -114,7 +114,23 @@ let make = (~chainID, ~channel, ~port) => {
             />
           </EmptyContainer>
         </div>
-      | _ => React.null
+      | _ =>
+        <div className={Styles.paperStyle(theme, isDarkMode)}>
+          <EmptyContainer>
+            <img
+              alt="No Packets"
+              src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
+              className=Styles.noDataImage
+            />
+            <Heading
+              size=Heading.H4
+              value="No Packets"
+              align=Heading.Center
+              weight=Heading.Regular
+              color={theme.neutral_600}
+            />
+          </EmptyContainer>
+        </div>
       }}
     </Row>
     {switch packetCountSub {

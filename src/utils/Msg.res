@@ -1038,7 +1038,13 @@ module Channel = {
 
     let decodeSuccess: JsonUtils.Decode.t<success_t> = {
       open JsonUtils.Decode
-      decodeFactory(json => json.optional(list{}, PacketDecoder.decodeAction))
+      decodeFactory(json => {
+        let packetTypeOpt = json.optional(list{"msg", "packet_type"}, string)
+        switch packetTypeOpt {
+        | None => None // Fail IBC will have no packet_type
+        | Some(_) => json.optional(list{}, PacketDecoder.decodeAction)
+        }
+      })
     }
 
     let decodeFail: JsonUtils.Decode.t<fail_t> = {

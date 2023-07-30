@@ -77,11 +77,26 @@ module Styles = {
     | Twelve => style(. [])
     }
 
-  let marginBottom = (~mb, ~mbSm, ()) =>
-    style(. [marginBottom(#px(mb)), Media.mobile([marginBottom(#px(mbSm))])])
-
-  let marginTop = (~mt, ~mtSm, ()) =>
-    style(. [marginTop(#px(mt)), Media.mobile([marginTop(#px(mtSm))])])
+  let mb = (~mb, ~mbSm, ()) =>
+    style(. [
+      marginBottom(#px(mb)),
+      Media.mobile([marginBottom(#px(mbSm->Belt.Option.getWithDefault(mb)))]),
+    ])
+  let mt = (~mt, ~mtSm, ()) =>
+    style(. [
+      marginTop(#px(mt)),
+      Media.mobile([marginTop(#px(mtSm->Belt.Option.getWithDefault(mt)))]),
+    ])
+  let ml = (~ml, ~mlSm, ()) =>
+    style(. [
+      marginLeft(#px(ml)),
+      Media.mobile([marginLeft(#px(mlSm->Belt.Option.getWithDefault(ml)))]),
+    ])
+  let mr = (~mr, ~mrSm, ()) =>
+    style(. [
+      marginRight(#px(mr)),
+      Media.mobile([marginRight(#px(mrSm->Belt.Option.getWithDefault(mr)))]),
+    ])
 }
 @react.component
 let make = (
@@ -92,6 +107,10 @@ let make = (
   ~mbSm=?,
   ~mt=0,
   ~mtSm=?,
+  ~ml=0,
+  ~mlSm=?,
+  ~mr=0,
+  ~mrSm=?,
   ~style="",
   ~children,
 ) =>
@@ -101,8 +120,10 @@ let make = (
       Styles.colGrid(col),
       Styles.colOffset(offset),
       Styles.colSmGrid(colSm),
-      Styles.marginBottom(~mb, ~mbSm=mbSm->Belt.Option.getWithDefault(mb), ()),
-      Styles.marginTop(~mt, ~mtSm=mtSm->Belt.Option.getWithDefault(mt), ()),
+      Styles.mt(~mt, ~mtSm, ()),
+      Styles.mb(~mb, ~mbSm, ()),
+      Styles.ml(~ml, ~mlSm, ()),
+      Styles.mr(~mr, ~mrSm, ()),
       style,
     ])}>
     children

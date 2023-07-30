@@ -1,3 +1,13 @@
+type sort_direction_t =
+  | ASC
+  | DESC
+
+type sort_t =
+  | ID
+  | Name
+  | Fee
+  | TotalRequest
+
 type block_t = {timestamp: MomentRe.Moment.t}
 type transaction_t = {block: block_t}
 type request_stat_t = {count: int}
@@ -78,8 +88,11 @@ module SingleConfig = %graphql(`
 `)
 
 module MultiConfig = %graphql(`
-  subscription DataSources($limit: Int!, $offset: Int!, $searchTerm: String!) {
-    data_sources(limit: $limit, offset: $offset, where: {name: {_ilike: $searchTerm}},order_by: [{transaction: {block: {timestamp: desc_nulls_last}}, id: desc}]) @ppxAs(type: "internal_t") {
+  subscription DataSources($limit: Int!, $offset: Int!, $searchTerm: String!, $searchID: Int, $orderBy: data_sources_order_by!) {
+    data_sources(limit: $limit, offset: $offset, where: {_or: [
+        {id: {_eq: $searchID }}
+				{ name: { _ilike: $searchTerm } } ]
+			}, order_by: [ $orderBy ]) @ppxAs(type: "internal_t") {
       id @ppxCustom(module: "GraphQLParserModule.DataSourceID")
       owner @ppxCustom(module: "GraphQLParserModule.Address")
       treasury @ppxCustom(module: "GraphQLParserModule.Address")
@@ -123,10 +136,79 @@ let get = id => {
   })
 }
 
-let getList = (~page, ~pageSize, ~searchTerm, ()) => {
+let getList = (~page, ~pageSize, ~searchTerm, ~sortDirection, ~sortBy, ()) => {
   let offset = (page - 1) * pageSize
   let keyword = {j`%$searchTerm%`}
-  let result = MultiConfig.use({limit: pageSize, offset, searchTerm: keyword})
+  // let defaultSortBy = {transaction: {block: {timestamp: desc_nulls_last}}, id: desc}
+  let defaultSortBy: MultiConfig.MultiConfig_inner.t_variables_data_sources_order_by = {
+    id: None,
+    accumulated_revenue: None,
+    description: None,
+    executable: None,
+    fee: None,
+    name: None,
+    owner: None,
+    raw_requests_aggregate: None,
+    related_data_source_oracle_scripts_aggregate: None,
+    request_stat: None,
+    transaction: None,
+    transaction_id: None,
+    treasury: None,
+  }
+
+  let requestStatSortBy: MultiConfig.MultiConfig_inner.t_variables_data_source_requests_order_by = {
+    count: Some(#asc),
+    data_source_id: None,
+    data_source: None,
+  }
+
+  let orderBy: MultiConfig.MultiConfig_inner.t_variables_data_sources_order_by = {
+    switch (sortBy, sortDirection) {
+    | (ID, ASC) => {
+        ...defaultSortBy,
+        id: Some(#asc),
+      }
+    | (ID, DESC) => {
+        ...defaultSortBy,
+        id: Some(#desc),
+      }
+    | (Name, ASC) => {
+        ...defaultSortBy,
+        name: Some(#asc_nulls_last),
+      }
+    | (Name, DESC) => {
+        ...defaultSortBy,
+        name: Some(#desc_nulls_last),
+      }
+
+    | (Fee, ASC) => {
+        ...defaultSortBy,
+        fee: Some(#asc),
+      }
+    | (Fee, DESC) => {
+        ...defaultSortBy,
+        fee: Some(#desc),
+      }
+    | (TotalRequest, ASC) => {
+        ...defaultSortBy,
+        request_stat: Some(requestStatSortBy),
+      }
+    | (TotalRequest, DESC) => {
+        ...defaultSortBy,
+        request_stat: Some({
+          ...requestStatSortBy,
+          count: Some(#desc),
+        }),
+      }
+    }
+  }
+  let result = MultiConfig.use({
+    limit: pageSize,
+    offset,
+    searchTerm: keyword,
+    orderBy,
+    searchID: Some(searchTerm->Belt.Int.fromString->Belt.Option.getWithDefault(-1)),
+  })
 
   result->Sub.fromData->Sub.map(internal => internal.data_sources->Belt.Array.map(toExternal))
 }
@@ -138,4 +220,20 @@ let count = (~searchTerm, ()) => {
   result
   ->Sub.fromData
   ->Sub.map(x => x.data_sources_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+}
+
+let parseSortString = sortOption => {
+  switch sortOption {
+  | ID => "Data Source ID"
+  | Name => "Data Source Name"
+  | TotalRequest => "Total Request" // TODO: will change to 24 hr requests
+  | _ => ""
+  }
+}
+
+let parseDirection = dir => {
+  switch dir {
+  | ASC => "ASC"
+  | DESC => "DESC"
+  }
 }

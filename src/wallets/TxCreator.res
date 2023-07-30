@@ -2,6 +2,7 @@ type tx_response_t = {
   txHash: Hash.t,
   success: bool,
   code: int,
+  rawLog: string,
 }
 
 let createMsg = (msg: Msg.Input.t) => {
@@ -125,6 +126,7 @@ let broadcastTx = async (client, signedTx) => {
       txHash: response.txhash->Hash.fromHex,
       code: response.code,
       success: response.code == 0,
+      rawLog: response.rawLog,
     })
   } catch {
   | Js.Exn.Error(obj) =>

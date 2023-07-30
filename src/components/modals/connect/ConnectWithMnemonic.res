@@ -53,7 +53,7 @@ let make = (~chainID) => {
     }
 
   <div className=Styles.container>
-    <VSpacing size=Spacing.xl />
+    <VSpacing size=Spacing.xxl />
     <Heading value="Enter Your Mnemonic" size=Heading.H5 />
     <VSpacing size=Spacing.md />
     <input
@@ -70,7 +70,7 @@ let make = (~chainID) => {
         | _ => ()
         }}
     />
-    <VSpacing size=Spacing.xl />
+    <VSpacing size=Spacing.xxl />
     <div id="mnemonicConnectButton" className={CssHelper.flexBox(~justify=#flexEnd, ())}>
       <Button px=20 py=8 onClick={_ => createMnemonic()} style=Styles.connectBtn>
         {"Connect"->React.string}

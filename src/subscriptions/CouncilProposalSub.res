@@ -309,9 +309,9 @@ let proposalsTypeStr = ["All", "Tech Proposal", "Grant Proposal", "BandDAO Propo
 let getFilter = str =>
   switch str {
   | "All" => "%%"
-  | "Tech Proposal" => "%Tech%"
-  | "Grant Proposal" => "%Grant%"
-  | "BandDAO Proposal" => "%DAO%"
+  | "Tech Proposal" => "%TECH%"
+  | "Grant Proposal" => "%GRANT%"
+  | "BandDAO Proposal" => "%BAND_DAO%"
   | _ => ""
   }
 

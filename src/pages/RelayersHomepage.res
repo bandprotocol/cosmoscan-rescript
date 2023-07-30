@@ -1,6 +1,8 @@
 module Styles = {
   open CssJs
 
+  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
+
   let relayerItem = (theme: Theme.t, isDarkMode) =>
     style(. [
       backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
@@ -13,7 +15,24 @@ module Styles = {
     ])
 
   let relayerTitleWrapper = (theme: Theme.t, isDarkMode) =>
-    style(. [padding(#px(24)), Media.mobile([padding(#px(16))])])
+    style(. [
+      padding(#px(24)),
+      Media.mobile([padding(#px(16))]),
+      selector(
+        "> div:nth-child(1)",
+        [width(#percent(50.)), display(#flex), justifyContent(#flexStart), alignItems(#center)],
+      ),
+      selector(
+        "> div:nth-child(2)",
+        [width(#percent(25.)), display(#flex), justifyContent(#center), alignItems(#center)],
+      ),
+      selector(
+        "> div:last-child",
+        [width(#percent(25.)), display(#flex), justifyContent(#flexEnd), alignItems(#center)],
+      ),
+    ])
+
+  let relayerTableHead = style(. [padding2(~h=#px(24), ~v=#px(8)), Media.mobile([display(#none)])])
   let chainLogo = style(. [width(#px(24)), height(#px(24)), objectFit(#cover)])
   let relayerDetailsWrapper = (theme: Theme.t, isDarkMode, isOpen) =>
     style(. [
@@ -28,7 +47,7 @@ module Styles = {
     style(. [
       display(#flex),
       width(#percent(100.)),
-      justifyContent(#center),
+      justifyContent(#flexEnd),
       alignItems(#center),
       cursor(#pointer),
       padding2(~v=#px(10), ~h=#zero),
@@ -40,10 +59,12 @@ module Styles = {
 
 module RelayerCard = {
   @react.component
-  let make = (~chainID: IBCFilterSub.filter_counterparty_t, ~channelState, ()) => {
+  let make = (~relayer: RelayerSub.t) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     let (show, setShow) = React.useState(_ => false)
+
+    let {chainID, connections} = relayer
 
     let toggle = () => setShow(prev => !prev)
 
@@ -54,11 +75,19 @@ module RelayerCard = {
           Styles.relayerTitleWrapper(theme, isDarkMode),
           "chain",
         })}>
-        <div
-          className={Css.merge(list{CssHelper.flexBox(~justify=#flexStart, ~align=#center, ())})}>
-          <Avatar moniker={chainID.chainID} identity={chainID.chainID} width=40 />
+        <div>
+          <Avatar moniker={chainID} identity={chainID} width=40 />
           <HSpacing size=Spacing.lg />
-          <Heading size={H3} value={chainID.chainID} weight={Semibold} />
+          <Heading size={H3} value={chainID} weight={Semibold} />
+        </div>
+        <div>
+          <Text
+            value={connections
+            ->Belt.Array.map(connection => connection.channels->Belt.Array.length)
+            ->Belt.Array.reduce(0, (acc, x) => acc + x)
+            ->Belt.Int.toString}
+            weight={Semibold}
+          />
         </div>
         <div>
           <div className=Styles.toggleButton onClick={_ => toggle()}>
@@ -73,7 +102,7 @@ module RelayerCard = {
         </div>
       </div>
       <div className={Styles.relayerDetailsWrapper(theme, isDarkMode, show)}>
-        <LiveConnection counterpartyChainID={chainID.chainID} state=channelState />
+        <LiveConnection connections={relayer.connections} />
       </div>
     </div>
   }
@@ -86,10 +115,8 @@ let make = () => {
   let (showActive, setShowActive) = React.useState(() => true)
 
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
-  let chainIDFilterSub = IBCFilterSub.getChainFilterList()
 
-  let (page, setPage) = React.useState(_ => 1)
-  let pageSize = 5
+  let relayersSub = RelayerSub.getList()
 
   <Section ptSm=32 pbSm=32>
     <div className=CssHelper.container id="ibcSection">
@@ -104,7 +131,11 @@ let make = () => {
       </Row>
       <Row marginTop=24 marginBottom=24 marginBottomSm={24}>
         <Col col=Col.Twelve>
-          <SearchInput placeholder="Search relayer" onChange=setSearchTerm maxWidth=370 />
+          <SearchInput
+            placeholder="Search by Relayer / connection ID / Channel ID"
+            onChange=setSearchTerm
+            maxWidth=500
+          />
         </Col>
       </Row>
       <Row marginTop=24 marginBottom=24 marginBottomSm={24}>
@@ -131,33 +162,104 @@ let make = () => {
       </Row>
       <Row>
         <Col col=Col.Twelve>
-          {switch chainIDFilterSub {
-          | Data(chainIDList) =>
-            let filteredRelayers =
-              searchTerm->Js.String2.length == 0
-                ? chainIDList
-                : chainIDList->Belt.Array.keep(relayer => {
-                    relayer.chainID->Js.String2.toLowerCase->Js.String2.includes(searchTerm)
+          {switch relayersSub {
+          | Data(relayers) => {
+              let filteredRelayers =
+                relayers
+                ->Belt.Array.keep((relayer: RelayerSub.t) => {
+                  let isChainMatch = relayer.chainID->Js.String2.includes(searchTerm)
+
+                  let isConnectionMatch =
+                    relayer.connections->Belt.Array.some(connection =>
+                      connection.connectionID->Js.String2.includes(searchTerm) &&
+                        connection.channels->Belt.Array.length > 0
+                    )
+
+                  let isChannelMatch =
+                    relayer.connections->Belt.Array.some(connection =>
+                      connection.channels->Belt.Array.some(
+                        channel => channel.channel->Js.String2.includes(searchTerm),
+                      )
+                    )
+
+                  isChainMatch || isConnectionMatch || isChannelMatch
+                })
+                ->Belt.Array.map(relayer => {
+                  ...relayer,
+                  connections: relayer.connections
+                  ->Belt.Array.map(connection => {
+                    ...connection,
+                    channels: connection.channels->Belt.Array.keep(
+                      channel =>
+                        (showActive ? channel.state == RelayerSub.Open : true) && (
+                          searchTerm->Js.String2.startsWith("channel-")
+                            ? channel.channel->Js.String2.includes(searchTerm)
+                            : true
+                        ),
+                    ),
                   })
+                  ->Belt.Array.keep(connection =>
+                    connection.channels->Belt.Array.length > 0 && (
+                        searchTerm->Js.String2.startsWith("connection-")
+                          ? connection.connectionID->Js.String2.includes(searchTerm)
+                          : true
+                      )
+                  ),
+                })
+                ->Belt.Array.keep(relayer => relayer.connections->Belt.Array.length > 0)
 
-            <div>
-              {filteredRelayers
-              ->Belt.Array.slice(~offset=(page - 1) * pageSize, ~len=pageSize)
-              ->Belt.Array.mapWithIndex((i, channel) => {
-                <RelayerCard chainID=channel channelState={showActive} key={i->Belt.Int.toString} />
-              })
-              ->React.array}
-              {
-                let pageCount = Page.getPageCount(filteredRelayers->Belt.Array.length, pageSize)
-                <Pagination
-                  currentPage=page
-                  pageCount={pageCount}
-                  onPageChange={newPage => setPage(_ => newPage)}
-                />
-              }
-            </div>
+              <>
+                {filteredRelayers->Belt.Array.length > 0
+                  ? <>
+                      <div className={Styles.relayerTableHead}>
+                        <Row alignItems=Row.Center>
+                          <Col col=Col.Six>
+                            <Text value="Chain ID" weight={Semibold} />
+                          </Col>
+                          <Col col=Col.Three>
+                            <Text value="Active Channels" weight={Semibold} align={Center} />
+                          </Col>
+                        </Row>
+                      </div>
+                      {filteredRelayers
+                      ->Belt.Array.mapWithIndex((i, relayer) => {
+                        <RelayerCard relayer key={i->Belt.Int.toString} />
+                      })
+                      ->React.array}
+                    </>
+                  : <EmptyContainer>
+                      <img
+                        alt="No Relayer Found"
+                        src={isDarkMode ? Images.noDelegatorDark : Images.noDelegatorLight}
+                        className=Styles.noDataImage
+                      />
+                      <Heading
+                        size=Heading.H4
+                        value="No Relayer Found"
+                        align=Heading.Center
+                        weight=Heading.Regular
+                        color={theme.neutral_600}
+                      />
+                    </EmptyContainer>}
+              </>
+            }
 
-          | _ => <LoadingCensorBar width=285 height=37 radius=8 />
+          | NoData =>
+            <EmptyContainer>
+              <img
+                alt="No Relayer Found"
+                src={isDarkMode ? Images.noDelegatorDark : Images.noDelegatorLight}
+                className=Styles.noDataImage
+              />
+              <Heading
+                size=Heading.H4
+                value="No Relayer Found"
+                align=Heading.Center
+                weight=Heading.Regular
+                color={theme.neutral_600}
+              />
+            </EmptyContainer>
+          | _ => React.null
           }}
         </Col>
       </Row>

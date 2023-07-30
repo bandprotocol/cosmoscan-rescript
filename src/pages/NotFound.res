@@ -29,7 +29,7 @@ let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   <Section>
     <div className=CssHelper.container>
-      <VSpacing size=Spacing.xxl />
+      <VSpacing size=Spacing.xxxl />
       <div className={Styles.pageContainer(theme)}>
         <div className={CssHelper.flexBox()}>
           <img
@@ -38,7 +38,7 @@ let make = () => {
             className=Styles.logo
           />
         </div>
-        <VSpacing size=Spacing.xxl />
+        <VSpacing size=Spacing.xxxl />
         <Text value="Oops! We cannot find the page you're looking for." size=Text.Body1 />
         <VSpacing size=Spacing.lg />
         <Link className=Styles.linkToHome route=Route.HomePage>
@@ -46,7 +46,7 @@ let make = () => {
           <HSpacing size=Spacing.md />
           <Icon name="far fa-arrow-right" color=theme.neutral_900 />
         </Link>
-        <VSpacing size=Spacing.xxl />
+        <VSpacing size=Spacing.xxxl />
       </div>
     </div>
   </Section>

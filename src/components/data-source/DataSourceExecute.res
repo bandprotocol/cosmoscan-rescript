@@ -16,11 +16,11 @@ module Styles = {
       height(#px(37)),
       paddingLeft(#px(9)),
       paddingRight(#px(9)),
-      borderRadius(#px(4)),
+      borderRadius(#px(8)),
       fontSize(#px(14)),
       fontWeight(#light),
-      border(#px(1), #solid, theme.neutral_100),
-      backgroundColor(isDarkMode ? theme.neutral_300 : theme.neutral_100),
+      border(#px(1), #solid, theme.neutral_300),
+      backgroundColor(theme.neutral_000),
       outlineStyle(#none),
       color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
@@ -28,7 +28,8 @@ module Styles = {
 
   let button = (theme: Theme.t, isLoading) =>
     style(. [
-      backgroundColor(isLoading ? theme.primary_200 : theme.primary_600),
+      backgroundColor(isLoading ? theme.primary_200 : theme.primary_default),
+      border(#px(1), #solid, theme.primary_default),
       fontWeight(#num(600)),
       opacity(isLoading ? 0.8 : 1.),
       cursor(isLoading ? #auto : #pointer),
@@ -40,8 +41,10 @@ module Styles = {
 
   let resultContainer = (theme: Theme.t) =>
     style(. [
-      margin2(~v=#px(20), ~h=#zero),
-      selector("> div + div", [borderTop(#px(1), #solid, theme.neutral_100)]),
+      margin3(~top=#px(40), ~h=#auto, ~bottom=#zero),
+      borderTop(#px(1), #solid, theme.neutral_300),
+      paddingTop(#px(20)),
+      selector("> div", [padding2(~v=#px(12), ~h=#zero)]),
     ])
   let resultBox = style(. [padding(#px(20))])
   let labelWrapper = style(. [
@@ -109,7 +112,7 @@ module ResultRender = {
     | Nothing => React.null
     | Loading =>
       <>
-        <VSpacing size=Spacing.xl />
+        <VSpacing size=Spacing.xxl />
         {loadingRender(#percent(100.), 30, #px(30))}
         <VSpacing size=Spacing.lg />
       </>
@@ -122,30 +125,34 @@ module ResultRender = {
       </>
     | Success({returncode, stdout, stderr}) =>
       <div className={Styles.resultContainer(theme)}>
-        <div className={Css.merge(list{CssHelper.flexBox(), Styles.resultBox})}>
-          <div className=Styles.labelWrapper>
-            <Text value="Exit Status" weight=Text.Semibold />
-          </div>
-          <div className=Styles.resultWrapper>
-            <Text value={returncode->Belt.Int.toString} />
-          </div>
-        </div>
-        <div className={Css.merge(list{CssHelper.flexBox(), Styles.resultBox})}>
-          <div className=Styles.labelWrapper>
-            <Text value="Output" weight=Text.Semibold />
-          </div>
-          <div className=Styles.resultWrapper>
-            <Text value=stdout />
-          </div>
-        </div>
-        <div className={Css.merge(list{CssHelper.flexBox(), Styles.resultBox})}>
-          <div className=Styles.labelWrapper>
-            <Text value="Error" weight=Text.Semibold />
-          </div>
-          <div className=Styles.resultWrapper>
-            <Text value=stderr code=true weight=Text.Semibold />
-          </div>
-        </div>
+        <Row>
+          <Col col=Col.Two>
+            <Text value="Exit Status" />
+          </Col>
+          <Col col=Col.Ten>
+            <Text value={returncode->Belt.Int.toString} color={theme.neutral_900} />
+          </Col>
+        </Row>
+        {stdout == ""
+          ? React.null
+          : <Row>
+              <Col col=Col.Two>
+                <Text value="Output" />
+              </Col>
+              <Col col=Col.Ten>
+                <Text value={stdout} color={theme.neutral_900} />
+              </Col>
+            </Row>}
+        {stderr == ""
+          ? React.null
+          : <Row>
+              <Col col=Col.Two>
+                <Text value="Error" />
+              </Col>
+              <Col col=Col.Ten>
+                <Text value={stderr} color={theme.error_600} code=true />
+              </Col>
+            </Row>}
       </div>
     }
   }
@@ -155,7 +162,7 @@ module ResultRender = {
 let make = (~executable: JsBuffer.t) => {
   let params = ExecutableParser.parseExecutableScript(executable)->Belt.Option.getWithDefault([])
   let numParams = params->Belt.Array.length
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   let (callDataList, setCalldataList) = React.useState(_ => Belt.List.make(numParams, ""))
 
@@ -188,13 +195,6 @@ let make = (~executable: JsBuffer.t) => {
             </>
           : React.null}
         <div className="buttonContainer">
-          <div className={CssHelper.flexBox()}>
-            <Text value="Click" />
-            <HSpacing size=Spacing.sm />
-            <Text value=" Test Execution " weight=Text.Bold />
-            <HSpacing size=Spacing.sm />
-            <Text value="to test the data source." />
-          </div>
           <Button
             fsize=14
             style={Styles.button(theme, result == Loading)}

@@ -50,6 +50,7 @@ let make = () => {
       | RelayersHomepage => <RelayersHomepage />
       | ChannelDetailsPage(chainID, port, channel) => <ChannelPage chainID channel port />
       | NotFound => <NotFound />
+      | Test => <Test />
       }}
     </div>
     <Footer />

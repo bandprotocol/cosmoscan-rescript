@@ -7,7 +7,7 @@ module PacketsAggregate = {
 }
 
 module IncomingPacketsCountConfig = %graphql(`
-    subscription IncomingPacketsCount ($port: String!, $channel: String!, $packetType: String!, $packetTypeIsNull: Boolean!) {
+    query IncomingPacketsCount ($port: String!, $channel: String!, $packetType: String!, $packetTypeIsNull: Boolean!) {
         incoming_packets_aggregate (where: { dst_port: { _eq: $port }, dst_channel: { _eq: $channel }, type: {_is_null: $packetTypeIsNull, _ilike: $packetType} } ) @ppxAs(type: "PacketsAggregate.internal_t") {
             aggregate @ppxAs(type: "PacketsAggregate.aggregate_t"){
                 count
@@ -17,7 +17,7 @@ module IncomingPacketsCountConfig = %graphql(`
 `)
 
 module OutgoingPacketsCountConfig = %graphql(`
-    subscription OutgoingPacketsCount ($port: String!, $channel: String!, $packetType: String!, $packetTypeIsNull: Boolean!) {
+    query OutgoingPacketsCount ($port: String!, $channel: String!, $packetType: String!, $packetTypeIsNull: Boolean!) {
         outgoing_packets_aggregate (where: { src_port: { _eq: $port }, src_channel: { _eq: $channel }, type: {_is_null: $packetTypeIsNull, _ilike: $packetType} } ) @ppxAs(type: "PacketsAggregate.internal_t") {
             aggregate @ppxAs(type: "PacketsAggregate.aggregate_t"){
                 count
@@ -65,8 +65,8 @@ let incomingCount = (~port, ~channel, ~packetType, ()) => {
     },
   })
   result
-  ->Sub.fromData
-  ->Sub.map(x =>
+  ->Query.fromData
+  ->Query.map(x =>
     x.incoming_packets_aggregate.aggregate->Belt.Option.mapWithDefault(0, a => a.count)
   )
 }
@@ -111,8 +111,8 @@ let outgoingCount = (~port, ~channel, ~packetType, ()) => {
   })
 
   result
-  ->Sub.fromData
-  ->Sub.map(x =>
+  ->Query.fromData
+  ->Query.map(x =>
     x.outgoing_packets_aggregate.aggregate->Belt.Option.mapWithDefault(0, a => a.count)
   )
 }
