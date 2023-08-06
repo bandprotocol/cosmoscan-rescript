@@ -4,44 +4,6 @@ module Styles = {
   let container = style(. [paddingBottom(#px(8))])
 
   let buttonGroup = (theme: Theme.t) => style(. [margin2(~v=#zero, ~h=#zero)])
-  // let buttonGroup = (theme: Theme.t) =>
-  //   style(. [
-  //     margin4(~top=#px(0), ~right=#px(-12), ~bottom=#px(23), ~left=#px(-12)),
-  //     selector(
-  //       "> button",
-  //       [
-  //         flexGrow(0.),
-  //         flexShrink(0.),
-  //         flexBasis(#calc((#sub, #percent(50.), #px(24)))),
-  //         margin2(~v=#zero, ~h=#px(12)),
-  //         borderColor(theme.neutral_100),
-  //         position(#relative),
-  //         disabled([
-  //           color(theme.neutral_900),
-  //           opacity(1.),
-  //           border(#px(1), #solid, theme.primary_600),
-  //           hover([backgroundColor(#transparent)]),
-  //           after([
-  //             contentRule(#text("\f00c")),
-  //             fontFamily(#custom("'Font Awesome 5 Pro'")),
-  //             fontWeight(#light),
-  //             borderRadius(#percent(50.)),
-  //             fontSize(#px(10)),
-  //             lineHeight(#em(1.8)),
-  //             display(#block),
-  //             position(#absolute),
-  //             pointerEvents(#none),
-  //             top(#px(-8)),
-  //             right(#px(-8)),
-  //             color(theme.white),
-  //             backgroundColor(theme.primary_600),
-  //             width(#px(20)),
-  //             height(#px(20)),
-  //           ]),
-  //         ]),
-  //       ],
-  //     ),
-  //   ])
 }
 
 module VoteInput = {
