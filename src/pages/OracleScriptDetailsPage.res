@@ -260,6 +260,7 @@ module Content = {
             </InfoContainer>
           </Col>
         </Row>
+        <InfoContainer>
         <Table>
           <Tab.Route
             tabs=[
@@ -319,6 +320,7 @@ module Content = {
             }}
           </Tab.Route>
         </Table>
+        </InfoContainer>
       </div>
     </Section>
   }

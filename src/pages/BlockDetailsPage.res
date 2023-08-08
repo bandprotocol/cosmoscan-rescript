@@ -204,11 +204,13 @@ let make = (~height) => {
             : React.null
         | Error(_) | Loading | NoData => React.null
         }}
-        <Table>
-          <Heading value="Transactions" size=Heading.H4 marginBottom=32 marginTop=32 />
-          <SeperatedLine mt=32 mb=0 />
-          <BlockIndexTxsTable txsSub=commonTxsSub />
-        </Table>
+        <InfoContainer>
+          <Table>
+            <Heading value="Transactions" size=Heading.H4 marginBottom=32 />
+            <SeperatedLine mt=32 mb=0 />
+            <BlockIndexTxsTable txsSub=commonTxsSub />
+          </Table>
+        </InfoContainer>
       </div>
     </Section>
   }

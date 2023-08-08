@@ -477,7 +477,9 @@ let make = (~proposalID) => {
             </Row>
             <Row marginBottom=24>
               <Col>
-                <VoteBreakdownTable proposalID />
+                <InfoContainer>
+                  <VoteBreakdownTable proposalID />
+                </InfoContainer>
               </Col>
             </Row>
           </>
@@ -536,11 +538,13 @@ let make = (~proposalID) => {
       </Row>
       <Row>
         <Col>
-          <Table>
-            <Heading value="Depositors" size=Heading.H4 marginTop=32 marginTopSm=16 />
-            <SeperatedLine mt=32 mb=0 />
-            <DepositorTable proposalID />
-          </Table>
+          <InfoContainer>
+            <Table>
+              <Heading value="Depositors" size=Heading.H4 marginTopSm=16 />
+              <SeperatedLine mt=32 mb=0 />
+              <DepositorTable proposalID />
+            </Table>
+          </InfoContainer>
         </Col>
       </Row>
     </div>

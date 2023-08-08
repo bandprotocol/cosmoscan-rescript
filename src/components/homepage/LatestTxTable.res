@@ -125,71 +125,75 @@ let make = () => {
           </div>
         </div>
       : React.null}
-    <Table>
-      {isMobile
-        ? React.null
-        : <Row marginTop=30 marginBottom=25 marginTopSm=24 marginBottomSm=0>
-            <Col col=Col.Six colSm=Col.Six>
-              <Text
-                value="Latest Transactions"
-                size=Text.Xl
-                weight=Text.Semibold
-                color=theme.neutral_900
-              />
-            </Col>
-            <Col col=Col.Six colSm=Col.Six>
-              <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                <Link className={CssHelper.flexBox(~align=#center, ())} route=Route.TxHomePage>
-                  <div className=Styles.textMRight>
-                    <Text
-                      value="All Transactions"
-                      size=Text.Body2
-                      weight=Text.Semibold
-                      underline=true
-                      color=theme.neutral_900
-                    />
-                  </div>
-                  <Icon name="far fa-arrow-right" color=theme.neutral_900 />
-                </Link>
-              </div>
-            </Col>
-          </Row>}
-      {isMobile
-        ? React.null
-        : <THead height=30>
-            <Row alignItems=Row.Center>
-              <Col col=Col.Four>
-                <Text value="Tx Hash" size=Text.Body2 weight=Text.Semibold />
+    <InfoContainer>
+      <Table>
+        {isMobile
+          ? React.null
+          : <Row marginBottom=25 marginTopSm=24 marginBottomSm=0>
+              <Col col=Col.Six colSm=Col.Six>
+                <Text
+                  value="Latest Transactions"
+                  size=Text.Xl
+                  weight=Text.Semibold
+                  color=theme.neutral_900
+                />
               </Col>
-              <Col col=Col.Three>
-                <Text value="Block" size=Text.Body2 weight=Text.Semibold />
+              <Col col=Col.Six colSm=Col.Six>
+                <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+                  <Link className={CssHelper.flexBox(~align=#center, ())} route=Route.TxHomePage>
+                    <div className=Styles.textMRight>
+                      <Text
+                        value="All Transactions"
+                        size=Text.Body2
+                        weight=Text.Semibold
+                        underline=true
+                        color=theme.neutral_900
+                      />
+                    </div>
+                    <Icon name="far fa-arrow-right" color=theme.neutral_900 />
+                  </Link>
+                </div>
               </Col>
-              <Col col=Col.Three>
-                <Text value="Message" size=Text.Body2 weight=Text.Semibold />
-              </Col>
-              <Col col=Col.Two>
-                <Text value="Status" size=Text.Body2 weight=Text.Semibold />
-              </Col>
-            </Row>
-          </THead>}
-      {switch txsSub {
-      | Data(txs) =>
-        txs
-        ->Belt.Array.mapWithIndex((i, e) =>
-          isMobile
-            ? <RenderBodyMobile key={e.txHash->Hash.toHex} reserveIndex=i txSub={Sub.resolve(e)} />
-            : <RenderBody key={e.txHash->Hash.toHex} txSub={Sub.resolve(e)} />
-        )
-        ->React.array
-      | _ =>
-        Belt.Array.make(txCount, Sub.NoData)
-        ->Belt.Array.mapWithIndex((i, noData) =>
-          isMobile
-            ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i txSub=noData />
-            : <RenderBody key={i->Belt.Int.toString} txSub=noData />
-        )
-        ->React.array
-      }}
-    </Table>
+            </Row>}
+        {isMobile
+          ? React.null
+          : <THead height=30>
+              <Row alignItems=Row.Center>
+                <Col col=Col.Four>
+                  <Text value="Tx Hash" size=Text.Body2 weight=Text.Semibold />
+                </Col>
+                <Col col=Col.Three>
+                  <Text value="Block" size=Text.Body2 weight=Text.Semibold />
+                </Col>
+                <Col col=Col.Three>
+                  <Text value="Message" size=Text.Body2 weight=Text.Semibold />
+                </Col>
+                <Col col=Col.Two>
+                  <Text value="Status" size=Text.Body2 weight=Text.Semibold />
+                </Col>
+              </Row>
+            </THead>}
+        {switch txsSub {
+        | Data(txs) =>
+          txs
+          ->Belt.Array.mapWithIndex((i, e) =>
+            isMobile
+              ? <RenderBodyMobile
+                  key={e.txHash->Hash.toHex} reserveIndex=i txSub={Sub.resolve(e)}
+                />
+              : <RenderBody key={e.txHash->Hash.toHex} txSub={Sub.resolve(e)} />
+          )
+          ->React.array
+        | _ =>
+          Belt.Array.make(txCount, Sub.NoData)
+          ->Belt.Array.mapWithIndex((i, noData) =>
+            isMobile
+              ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i txSub=noData />
+              : <RenderBody key={i->Belt.Int.toString} txSub=noData />
+          )
+          ->React.array
+        }}
+      </Table>
+    </InfoContainer>
   </>
 }

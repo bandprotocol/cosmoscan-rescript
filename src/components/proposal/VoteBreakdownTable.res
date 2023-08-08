@@ -16,7 +16,7 @@ module Styles = {
       justifyContent(#center),
       alignItems(#center),
       cursor(#pointer),
-      padding2(~v=#px(32), ~h=#zero),
+      padding3(~top=#zero, ~bottom=#px(16), ~h=#zero),
       borderBottom(#px(4), #solid, active ? theme.primary_600 : #transparent),
       Media.mobile([whiteSpace(#nowrap), padding2(~v=#px(24), ~h=#zero)]),
     ])
