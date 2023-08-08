@@ -127,82 +127,87 @@ let make = (~latestRequestsSub: Sub.variant<array<RequestSub.t>>) => {
           </div>
         </div>
       : React.null}
-    <Table>
-      {isMobile
-        ? React.null
-        : <Row marginTop=30 marginBottom=25 marginTopSm=24 marginBottomSm=0>
-            <Col col=Col.Six colSm=Col.Six>
-              <Text
-                value="Latest Request" size=Text.Xl weight=Text.Semibold color=theme.neutral_900
-              />
-            </Col>
-            <Col col=Col.Six colSm=Col.Six>
-              <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                <Link className={CssHelper.flexBox(~align=#center, ())} route=Route.RequestHomePage>
-                  <div className=Styles.textMRight>
-                    <Text
-                      value="All Requests"
-                      size=Text.Body2
-                      weight=Text.Semibold
-                      underline=true
-                      color=theme.neutral_900
-                    />
-                  </div>
-                  <Icon name="far fa-arrow-right" color=theme.neutral_900 />
-                </Link>
-              </div>
-            </Col>
-          </Row>}
-      {isMobile
-        ? React.null
-        : <THead height=30>
-            <Row alignItems=Row.Center>
-              <Col col=Col.Three>
-                <Text block=true value="Request ID" size=Text.Body2 weight=Text.Semibold />
-              </Col>
-              <Col col=Col.Six>
-                <Text block=true value="Oracle Script" size=Text.Body2 weight=Text.Semibold />
-              </Col>
-              <Col col=Col.Three>
+    <InfoContainer>
+      <Table>
+        {isMobile
+          ? React.null
+          : <Row marginBottom=25 marginTopSm=24 marginBottomSm=0>
+              <Col col=Col.Six colSm=Col.Six>
                 <Text
-                  block=true
-                  value="Report Status"
-                  size=Text.Body2
-                  weight=Text.Semibold
-                  align=Text.Right
+                  value="Latest Request" size=Text.Xl weight=Text.Semibold color=theme.neutral_900
                 />
               </Col>
-            </Row>
-          </THead>}
-      {switch latestRequestsSub {
-      | Data(requests) if requests->Belt.Array.length === 0 =>
-        <EmptyContainer height={#calc((#sub, #percent(100.), #px(86)))} boxShadow=true>
-          <img
-            src={isDarkMode ? Images.noDataDark : Images.noDataLight}
-            className=Styles.noDataImage
-            alt="No Request"
-          />
-          <Heading size=Heading.H4 value="No Request" align=Heading.Center weight=Heading.Regular />
-        </EmptyContainer>
-      | Data(requests) =>
-        requests
-        ->Belt.Array.mapWithIndex((i, e) =>
-          isMobile
-            ? <RenderBodyMobile
-                key={e.id->ID.Request.toString} reserveIndex=i requestSub={Sub.resolve(e)}
-              />
-            : <RenderBody key={e.id->ID.Request.toString} requestSub={Sub.resolve(e)} />
-        )
-        ->React.array
-      | _ =>
-        Belt.Array.make(10, Sub.NoData)
-        ->Belt.Array.mapWithIndex((i, noData) =>
-          isMobile
-            ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i requestSub=noData />
-            : <RenderBody key={i->Belt.Int.toString} requestSub=noData />
-        )
-        ->React.array
-      }}
-    </Table>
+              <Col col=Col.Six colSm=Col.Six>
+                <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+                  <Link
+                    className={CssHelper.flexBox(~align=#center, ())} route=Route.RequestHomePage>
+                    <div className=Styles.textMRight>
+                      <Text
+                        value="All Requests"
+                        size=Text.Body2
+                        weight=Text.Semibold
+                        underline=true
+                        color=theme.neutral_900
+                      />
+                    </div>
+                    <Icon name="far fa-arrow-right" color=theme.neutral_900 />
+                  </Link>
+                </div>
+              </Col>
+            </Row>}
+        {isMobile
+          ? React.null
+          : <THead height=30>
+              <Row alignItems=Row.Center>
+                <Col col=Col.Three>
+                  <Text block=true value="Request ID" size=Text.Body2 weight=Text.Semibold />
+                </Col>
+                <Col col=Col.Six>
+                  <Text block=true value="Oracle Script" size=Text.Body2 weight=Text.Semibold />
+                </Col>
+                <Col col=Col.Three>
+                  <Text
+                    block=true
+                    value="Report Status"
+                    size=Text.Body2
+                    weight=Text.Semibold
+                    align=Text.Right
+                  />
+                </Col>
+              </Row>
+            </THead>}
+        {switch latestRequestsSub {
+        | Data(requests) if requests->Belt.Array.length === 0 =>
+          <EmptyContainer height={#calc((#sub, #percent(100.), #px(86)))} boxShadow=true>
+            <img
+              src={isDarkMode ? Images.noDataDark : Images.noDataLight}
+              className=Styles.noDataImage
+              alt="No Request"
+            />
+            <Heading
+              size=Heading.H4 value="No Request" align=Heading.Center weight=Heading.Regular
+            />
+          </EmptyContainer>
+        | Data(requests) =>
+          requests
+          ->Belt.Array.mapWithIndex((i, e) =>
+            isMobile
+              ? <RenderBodyMobile
+                  key={e.id->ID.Request.toString} reserveIndex=i requestSub={Sub.resolve(e)}
+                />
+              : <RenderBody key={e.id->ID.Request.toString} requestSub={Sub.resolve(e)} />
+          )
+          ->React.array
+        | _ =>
+          Belt.Array.make(10, Sub.NoData)
+          ->Belt.Array.mapWithIndex((i, noData) =>
+            isMobile
+              ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i requestSub=noData />
+              : <RenderBody key={i->Belt.Int.toString} requestSub=noData />
+          )
+          ->React.array
+        }}
+      </Table>
+    </InfoContainer>
   </>
 }

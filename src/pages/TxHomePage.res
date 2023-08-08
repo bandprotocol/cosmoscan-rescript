@@ -30,61 +30,63 @@ let make = () => {
           }}
         </Col>
       </Row>
-      <Table>
-        {isMobile
-          ? React.null
-          : <THead>
-              <Row alignItems=Row.Center>
-                <Col col=Col.Three>
-                  <Text
-                    block=true
-                    value="TX Hash"
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                    size=Text.Caption
-                  />
-                </Col>
-                <Col col=Col.One>
-                  <Text
-                    block=true
-                    value="Block"
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                    size=Text.Caption
-                  />
-                </Col>
-                <Col col=Col.One>
-                  <Text
-                    block=true
-                    value="Status"
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                    size=Text.Caption
-                    align=Text.Center
-                  />
-                </Col>
-                <Col col=Col.Two>
-                  <Text
-                    block=true
-                    value="Gas Fee (BAND)"
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                    size=Text.Caption
-                  />
-                </Col>
-                <Col col=Col.Five>
-                  <Text
-                    block=true
-                    value="Actions"
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                    size=Text.Caption
-                  />
-                </Col>
-              </Row>
-            </THead>}
-        <TxsTable txsSub />
-      </Table>
+      <InfoContainer>
+        <Table>
+          {isMobile
+            ? React.null
+            : <THead>
+                <Row alignItems=Row.Center>
+                  <Col col=Col.Three>
+                    <Text
+                      block=true
+                      value="TX Hash"
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                      size=Text.Caption
+                    />
+                  </Col>
+                  <Col col=Col.One>
+                    <Text
+                      block=true
+                      value="Block"
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                      size=Text.Caption
+                    />
+                  </Col>
+                  <Col col=Col.One>
+                    <Text
+                      block=true
+                      value="Status"
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                      size=Text.Caption
+                      align=Text.Center
+                    />
+                  </Col>
+                  <Col col=Col.Two>
+                    <Text
+                      block=true
+                      value="Gas Fee (BAND)"
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                      size=Text.Caption
+                    />
+                  </Col>
+                  <Col col=Col.Five>
+                    <Text
+                      block=true
+                      value="Actions"
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                      size=Text.Caption
+                    />
+                  </Col>
+                </Row>
+              </THead>}
+          <TxsTable txsSub />
+        </Table>
+      </InfoContainer>
     </div>
   </Section>
 }
