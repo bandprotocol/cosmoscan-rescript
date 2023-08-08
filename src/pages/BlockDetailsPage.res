@@ -191,14 +191,14 @@ let make = (~height) => {
           ibcTxs->Belt.Array.length > 0
             ? <Row marginBottom=24>
                 <Col>
-                  <Table>
-                    <Heading
-                      value="IBC Transactions" size=Heading.H4 marginBottom=16 marginTop=32
-                    />
-                    <Text value="This section contains only IBC-related transactions." />
-                    <SeperatedLine mt=32 mb=0 />
-                    <BlockIndexTxsTable txsSub=ibcTxsSub />
-                  </Table>
+                  <InfoContainer>
+                    <Table>
+                      <Heading value="IBC Transactions" size=Heading.H4 marginBottom=16 />
+                      <Text value="This section contains only IBC-related transactions." />
+                      <SeperatedLine mt=32 mb=0 />
+                      <BlockIndexTxsTable txsSub=ibcTxsSub />
+                    </Table>
+                  </InfoContainer>
                 </Col>
               </Row>
             : React.null
