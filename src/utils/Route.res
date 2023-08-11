@@ -201,9 +201,11 @@ let search = (str: string) => {
   let capStr = str->String.capitalize_ascii
 
   if str->Js.String2.startsWith("bandvaloper") {
-    Some(ValidatorDetailsPage(str->Address.fromBech32, Reports))
+    str->Address.fromBech32Opt->Belt.Option.map(address => ValidatorDetailsPage(address, Reports))
   } else if str->Js.String2.startsWith("band") {
-    Some(AccountIndexPage(str->Address.fromBech32, AccountDelegations))
+    str
+    ->Address.fromBech32Opt
+    ->Belt.Option.map(address => AccountIndexPage(address, AccountDelegations))
   } else if len == 64 || (str->Js.String2.startsWith("0x") && len == 66) {
     Some(TxIndexPage(str->Hash.fromHex))
   } else if capStr->Js.String2.startsWith("B") {
