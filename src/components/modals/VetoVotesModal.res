@@ -131,11 +131,9 @@ let make = (~vetoId) => {
           <RenderBody votes />
         </>
       }
-    // TODO: insert Loader
     | Error(err) =>
       <Text value={err.message} color={theme.error_600} align=Text.Center breakAll=true />
-    | Loading | NoData =>
-      <Text value="Loading" color={theme.error_600} align=Text.Center breakAll=true />
+    | Loading | NoData => <LoadingCensorBar width=153 height=30 />
     }}
   </div>
 }

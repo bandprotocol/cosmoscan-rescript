@@ -37,6 +37,13 @@ module Styles = {
       selector(" > p", [color(theme.primary_600)]),
     ])
 
+  let loadingContainer = style(. [
+    display(#flex),
+    alignItems(#center),
+    width(#percent(100.)),
+    height(#vh(80.)),
+  ])
+
   let buttonStyled = style(. [
     backgroundColor(#transparent),
     border(#zero, #solid, #transparent),
@@ -109,13 +116,15 @@ module RenderData = {
           className={Css.merge(list{CssHelper.flexBox(), Styles.buttonStyled})}
           onClick={_ => Route.redirect(ProposalPage)}>
           <Icon name="fa fa-angle-left" mr=8 size=16 />
-          <Text value="Back to all proposals" size=Text.Xl color=theme.neutral_600 />
+          <Text
+            value="Back to all proposals" size=Text.Xl weight=Text.Semibold color=theme.neutral_600
+          />
         </button>
         <Row style=Styles.header>
           <Col col=Col.Twelve>
             <div className={CssHelper.flexBox()}>
               // TODO: seem like this Header reused in every detail page should created component for it
-              <Heading size=Heading.H1 weight=Heading.Bold>
+              <Heading size=Heading.H1 weight=Heading.Semibold>
                 <span className=Styles.proposalId>
                   {`#P${proposal.id->ID.Proposal.toInt->Belt.Int.toString} `->React.string}
                 </span>
@@ -357,7 +366,10 @@ let make = (~proposalID) => {
   switch allSub {
   | Data(proposal, votes) => <RenderData proposal votes />
   | Error(err) => <Heading value={err.message} />
-  | Loading => <Heading value="Loading" />
+  | Loading =>
+    <div className=Styles.loadingContainer>
+      <LoadingCensorBar.CircleSpin />
+    </div>
   | NoData => <Heading value="NoData" />
   }
 }

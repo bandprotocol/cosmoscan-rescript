@@ -234,7 +234,7 @@ module Veto = {
                     )}
                   />
                   <Text
-                    value="NWV"
+                    value="Veto"
                     size=Text.Body1
                     weight=Text.Semibold
                     color={theme.neutral_900}
@@ -436,7 +436,7 @@ module Legacy = {
                     className={Styles.smallDot(Vote.Full.NoWithVeto->Vote.Full.getColor(theme))}
                   />
                   <Text
-                    value="NWV"
+                    value="Veto"
                     size=Text.Body1
                     weight=Text.Semibold
                     color={theme.neutral_900}

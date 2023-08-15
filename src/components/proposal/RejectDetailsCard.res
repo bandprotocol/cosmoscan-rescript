@@ -53,7 +53,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
               <div className={CssHelper.flexBox()}>
                 <Heading
                   value="Open status"
-                  size=Heading.H5
+                  size=Heading.H4
                   weight=Heading.Regular
                   color={theme.neutral_900}
                   marginRight=8
@@ -73,7 +73,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
               <div className={CssHelper.flexBox()}>
                 <Heading
                   value="Total deposit"
-                  size=Heading.H5
+                  size=Heading.H4
                   weight=Heading.Regular
                   color={theme.neutral_900}
                   marginRight=8
@@ -162,7 +162,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Turnout"
-                      size=Heading.H5
+                      size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                       marginRight=8
@@ -200,7 +200,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Yes Vote"
-                      size=Heading.H5
+                      size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                       marginRight=8
@@ -238,7 +238,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Current Status"
-                      size=Heading.H5
+                      size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                     />

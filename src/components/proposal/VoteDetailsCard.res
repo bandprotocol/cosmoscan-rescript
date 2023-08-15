@@ -44,7 +44,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
             | _ => Col.Six
             }}
             colSm=Col.Twelve
-            mb=22
+            mb=7
             mbSm=0
             style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}>
             <div>
@@ -58,7 +58,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Yes Vote"
-                      size=Heading.H5
+                      size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                       marginRight=8
@@ -106,7 +106,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Current Status"
-                      size=Heading.H5
+                      size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                     />
@@ -211,7 +211,7 @@ module Legacy = {
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Turnout"
-                      size=Heading.H5
+                      size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                       marginRight=8
@@ -250,7 +250,7 @@ module Legacy = {
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Yes Vote"
-                      size=Heading.H5
+                      size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                       marginRight=8
@@ -289,7 +289,7 @@ module Legacy = {
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Status"
-                      size=Heading.H5
+                      size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                     />
