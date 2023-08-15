@@ -24,12 +24,15 @@ module RenderBody = {
           <Col col=Col.One>
             <Text value={(index + 1)->Belt.Int.toString} size=Text.Body1 weight=Text.Thin />
           </Col>
-          <Col col=Col.Six>
+          <Col col=Col.Five>
             <AddressRender
               address=member.account.address position=AddressRender.Subtitle ellipsis=true
             />
           </Col>
-          <Col col=Col.Five>
+          <Col col=Col.Two>
+            <Text value={member.weight->Belt.Int.toString} size=Text.Body1 align=Text.Center />
+          </Col>
+          <Col col=Col.Four>
             <Text
               value={`${member.since->MomentRe.Moment.format(
                   "YYYY-MM-DD",
@@ -108,10 +111,13 @@ let make = (~council: CouncilProposalSub.council_t) => {
               <Col col=Col.One>
                 <Text value="#" size=Text.Caption weight=Text.Semibold />
               </Col>
-              <Col col=Col.Six>
+              <Col col=Col.Five>
                 <Text value="TECH COUNCIL MEMBERS" size=Text.Caption weight=Text.Semibold />
               </Col>
-              <Col col=Col.Five>
+              <Col col=Col.Two>
+                <Text value="WEIGHT" size=Text.Caption weight=Text.Semibold align=Text.Center />
+              </Col>
+              <Col col=Col.Four>
                 <Text value="SINCE" size=Text.Caption weight=Text.Semibold align=Text.Right />
               </Col>
             </Row>

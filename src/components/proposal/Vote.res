@@ -63,7 +63,7 @@ module Full = {
     switch vote {
     | Yes => "Yes"
     | No => "No"
-    | NoWithVeto => "NoWithVeto"
+    | NoWithVeto => "Veto"
     | Abstain => "Abstain"
     | Unknown => "Unknown"
     }
