@@ -483,31 +483,33 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
           </InfoContainer>
         </Col>
       </Row>
-      <Table>
-        <Tab.Route
-          tabs=[
-            {name: "Oracle Reports", route: Route.ValidatorDetailsPage(address, Route.Reports)},
-            {name: "Delegators", route: Route.ValidatorDetailsPage(address, Route.Delegators)},
-            {
-              name: "Proposed Blocks",
-              route: Route.ValidatorDetailsPage(address, Route.ProposedBlocks),
-            },
-            {name: "Reporters", route: Route.ValidatorDetailsPage(address, Route.Reporters)},
-          ]
-          currentRoute={Route.ValidatorDetailsPage(address, hashtag)}>
-          {switch hashtag {
-          | Reports => <ReportsTable address />
-          | Delegators => <DelegatorsTable address />
-          | ProposedBlocks =>
-            switch validatorSub {
-            | Data(validator) =>
-              <ProposedBlocksTable consensusAddress={Some(validator.consensusAddress)} />
-            | _ => <ProposedBlocksTable consensusAddress=None />
-            }
-          | Reporters => <ReportersTable address />
-          }}
-        </Tab.Route>
-      </Table>
+      <InfoContainer>
+        <Table>
+          <Tab.Route
+            tabs=[
+              {name: "Oracle Reports", route: Route.ValidatorDetailsPage(address, Route.Reports)},
+              {name: "Delegators", route: Route.ValidatorDetailsPage(address, Route.Delegators)},
+              {
+                name: "Proposed Blocks",
+                route: Route.ValidatorDetailsPage(address, Route.ProposedBlocks),
+              },
+              {name: "Reporters", route: Route.ValidatorDetailsPage(address, Route.Reporters)},
+            ]
+            currentRoute={Route.ValidatorDetailsPage(address, hashtag)}>
+            {switch hashtag {
+            | Reports => <ReportsTable address />
+            | Delegators => <DelegatorsTable address />
+            | ProposedBlocks =>
+              switch validatorSub {
+              | Data(validator) =>
+                <ProposedBlocksTable consensusAddress={Some(validator.consensusAddress)} />
+              | _ => <ProposedBlocksTable consensusAddress=None />
+              }
+            | Reporters => <ReportersTable address />
+            }}
+          </Tab.Route>
+        </Table>
+      </InfoContainer>
     </div>
   </Section>
 }

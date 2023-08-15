@@ -15,7 +15,7 @@ module Styles = {
       border(#px(1), #solid, theme.neutral_200),
       backgroundColor(theme.neutral_000),
       outlineStyle(#none),
-      color(theme.primary_600),
+      color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
     ])
 

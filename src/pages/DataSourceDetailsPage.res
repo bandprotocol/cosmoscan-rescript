@@ -201,36 +201,38 @@ module Content = {
             </Col>
           </Row>
           <InfoContainer>
-            <Tab.Route
-              tabs=[
-                {
-                  name: "Requests",
-                  route: dataSourceID->ID.DataSource.getRouteWithTab(_, Route.DataSourceRequests),
-                },
-                {
-                  name: "Code",
-                  route: dataSourceID->ID.DataSource.getRouteWithTab(_, Route.DataSourceCode),
-                },
-                {
-                  name: "Test Execution",
-                  route: dataSourceID->ID.DataSource.getRouteWithTab(_, Route.DataSourceExecute),
-                },
-              ]
-              currentRoute={dataSourceID->ID.DataSource.getRouteWithTab(_, hashtag)}>
-              {switch hashtag {
-              | DataSourceExecute =>
-                switch dataSourceSub {
-                | Data({executable}) => <DataSourceExecute executable />
-                | _ => <LoadingCensorBar.CircleSpin height=400 />
-                }
-              | DataSourceCode =>
-                switch dataSourceSub {
-                | Data({executable}) => <DataSourceCode executable />
-                | _ => <LoadingCensorBar.CircleSpin height=300 />
-                }
-              | DataSourceRequests => <DataSourceRequestTable dataSourceID />
-              }}
-            </Tab.Route>
+            <Table>
+              <Tab.Route
+                tabs=[
+                  {
+                    name: "Requests",
+                    route: dataSourceID->ID.DataSource.getRouteWithTab(_, Route.DataSourceRequests),
+                  },
+                  {
+                    name: "Code",
+                    route: dataSourceID->ID.DataSource.getRouteWithTab(_, Route.DataSourceCode),
+                  },
+                  {
+                    name: "Test Execution",
+                    route: dataSourceID->ID.DataSource.getRouteWithTab(_, Route.DataSourceExecute),
+                  },
+                ]
+                currentRoute={dataSourceID->ID.DataSource.getRouteWithTab(_, hashtag)}>
+                {switch hashtag {
+                | DataSourceExecute =>
+                  switch dataSourceSub {
+                  | Data({executable}) => <DataSourceExecute executable />
+                  | _ => <LoadingCensorBar.CircleSpin height=400 />
+                  }
+                | DataSourceCode =>
+                  switch dataSourceSub {
+                  | Data({executable}) => <DataSourceCode executable />
+                  | _ => <LoadingCensorBar.CircleSpin height=300 />
+                  }
+                | DataSourceRequests => <DataSourceRequestTable dataSourceID />
+                }}
+              </Tab.Route>
+            </Table>
           </InfoContainer>
         </div>
       </Section>

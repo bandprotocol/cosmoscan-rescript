@@ -59,16 +59,18 @@ let make = (~blockSub: Sub.variant<BlockSub.t>) => {
                     value="Resolved requests are requests that were successfully processed, failed, or timed out by BandChain in this block."
                   />
                 </div>
-                <Tab.State tabs=[j`On Chain ($onChain)`, j`IBC ($ibc)`] tabIndex setTab>
-                  {showRequests->Belt.Array.length === 0
-                    ? <div className=Styles.emptyContainer>
-                        <Text value="There is no resolved request." />
-                      </div>
-                    : <div className=Styles.container>
-                        <Text value="Request ID" size=Text.Caption transform=Text.Uppercase />
-                        <RequestsList requests=showRequests />
-                      </div>}
-                </Tab.State>
+                <div className={CssHelper.mt(~size=16, ())}>
+                  <Tab.State tabs=[j`On Chain ($onChain)`, j`IBC ($ibc)`] tabIndex setTab>
+                    {showRequests->Belt.Array.length === 0
+                      ? <div className=Styles.emptyContainer>
+                          <Text value="There is no resolved request." />
+                        </div>
+                      : <div className=Styles.container>
+                          <Text value="Request ID" size=Text.Caption transform=Text.Uppercase />
+                          <RequestsList requests=showRequests />
+                        </div>}
+                  </Tab.State>
+                </div>
               </InfoContainer>
             </Col>
           </Row>

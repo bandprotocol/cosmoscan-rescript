@@ -135,79 +135,81 @@ let make = () => {
             }}
           </Col>
         </Row>
-        <Table>
-          {isMobile
-            ? React.null
-            : <THead>
-                <Row alignItems=Row.Center>
-                  <Col col=Col.Two>
-                    <Text
-                      block=true
-                      value="Block"
-                      size=Text.Caption
-                      weight=Text.Semibold
-                      transform=Text.Uppercase
-                    />
-                  </Col>
-                  <Col col=Col.Four>
-                    <Text
-                      block=true
-                      value="Block Hash"
-                      size=Text.Caption
-                      weight=Text.Semibold
-                      transform=Text.Uppercase
-                    />
-                  </Col>
-                  <Col col=Col.Three>
-                    <Text
-                      block=true
-                      value="Proposer"
-                      size=Text.Caption
-                      weight=Text.Semibold
-                      transform=Text.Uppercase
-                    />
-                  </Col>
-                  <Col col=Col.One>
-                    <Text
-                      block=true
-                      value="Txn"
-                      size=Text.Caption
-                      weight=Text.Semibold
-                      align=Text.Center
-                      transform=Text.Uppercase
-                    />
-                  </Col>
-                  <Col col=Col.Two>
-                    <Text
-                      block=true
-                      value="Timestamp"
-                      size=Text.Caption
-                      weight=Text.Semibold
-                      align=Text.Right
-                      transform=Text.Uppercase
-                    />
-                  </Col>
-                </Row>
-              </THead>}
-          {switch blocksSub {
-          | Data(blocks) =>
-            blocks
-            ->Belt.Array.mapWithIndex((i, e) =>
-              isMobile
-                ? <BodyMobile reserveIndex=i blockSub={Sub.resolve(e)} />
-                : <BodyDesktop reserveIndex=i blockSub={Sub.resolve(e)} />
-            )
-            ->React.array
-          | Error(_) | Loading | NoData =>
-            Belt.Array.make(10, React.null)
-            ->Belt.Array.mapWithIndex((i, _) =>
-              isMobile
-                ? <BodyMobile reserveIndex=i blockSub=Sub.NoData />
-                : <BodyDesktop reserveIndex=i blockSub=Sub.NoData />
-            )
-            ->React.array
-          }}
-        </Table>
+        <InfoContainer>
+          <Table>
+            {isMobile
+              ? React.null
+              : <THead>
+                  <Row alignItems=Row.Center>
+                    <Col col=Col.Two>
+                      <Text
+                        block=true
+                        value="Block"
+                        size=Text.Caption
+                        weight=Text.Semibold
+                        transform=Text.Uppercase
+                      />
+                    </Col>
+                    <Col col=Col.Four>
+                      <Text
+                        block=true
+                        value="Block Hash"
+                        size=Text.Caption
+                        weight=Text.Semibold
+                        transform=Text.Uppercase
+                      />
+                    </Col>
+                    <Col col=Col.Three>
+                      <Text
+                        block=true
+                        value="Proposer"
+                        size=Text.Caption
+                        weight=Text.Semibold
+                        transform=Text.Uppercase
+                      />
+                    </Col>
+                    <Col col=Col.One>
+                      <Text
+                        block=true
+                        value="Txn"
+                        size=Text.Caption
+                        weight=Text.Semibold
+                        align=Text.Center
+                        transform=Text.Uppercase
+                      />
+                    </Col>
+                    <Col col=Col.Two>
+                      <Text
+                        block=true
+                        value="Timestamp"
+                        size=Text.Caption
+                        weight=Text.Semibold
+                        align=Text.Right
+                        transform=Text.Uppercase
+                      />
+                    </Col>
+                  </Row>
+                </THead>}
+            {switch blocksSub {
+            | Data(blocks) =>
+              blocks
+              ->Belt.Array.mapWithIndex((i, e) =>
+                isMobile
+                  ? <BodyMobile reserveIndex=i blockSub={Sub.resolve(e)} />
+                  : <BodyDesktop reserveIndex=i blockSub={Sub.resolve(e)} />
+              )
+              ->React.array
+            | Error(_) | Loading | NoData =>
+              Belt.Array.make(10, React.null)
+              ->Belt.Array.mapWithIndex((i, _) =>
+                isMobile
+                  ? <BodyMobile reserveIndex=i blockSub=Sub.NoData />
+                  : <BodyDesktop reserveIndex=i blockSub=Sub.NoData />
+              )
+              ->React.array
+            }}
+          </Table>
+        </InfoContainer>
       </div>
     </div>
   </Section>
