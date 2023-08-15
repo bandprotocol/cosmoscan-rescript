@@ -22,6 +22,13 @@ module Styles = {
     ),
   ])
 
+  let link = (theme: Theme.t) =>
+    style(. [
+      cursor(pointer),
+      selector("&:hover span", [color(theme.primary_800)]),
+      selector("> span", [transition(~duration=150, "all")]),
+    ])
+
   let bandToken = style(. [
     position(#absolute),
     width(#percent(60.)),
@@ -230,32 +237,34 @@ let make = (~latestBlockSub: Sub.variant<BlockSub.t>) => {
         />
       </Col>
       <Col col=Col.Three colSm=Col.Six>
-        <HighlightCard
-          label="Active Validators"
-          valueAndExtraComponentSub={switch validatorInfoSub {
-          | Data(activeValidatorCount, _, avgBlockTime) =>
-            Some(
-              {
-                let activeValidators = activeValidatorCount->Format.iPretty
-                <Heading
-                  value=activeValidators
-                  size=Heading.H1
-                  color={theme.primary_600}
-                  weight=Heading.Semibold
-                  marginTop=8
-                  marginBottom=8
-                  mono=true
-                />
-              },
-              <Text
-                value={"block time " ++ avgBlockTime->Format.fPretty(~digits=2) ++ " secs"}
-                size={isMobile ? Text.Body2 : Text.Body1}
-                weight=Text.Regular
-              />,
-            )
-          | _ => None
-          }}
-        />
+        <Link route={ValidatorsPage} className={Styles.link(theme)}>
+          <HighlightCard
+            label="Active Validators"
+            valueAndExtraComponentSub={switch validatorInfoSub {
+            | Data(activeValidatorCount, _, avgBlockTime) =>
+              Some(
+                {
+                  let activeValidators = activeValidatorCount->Format.iPretty
+                  <Heading
+                    value=activeValidators
+                    size=Heading.H1
+                    color={theme.primary_600}
+                    weight=Heading.Semibold
+                    marginTop=8
+                    marginBottom=8
+                    mono=true
+                  />
+                },
+                <Text
+                  value={"block time " ++ avgBlockTime->Format.fPretty(~digits=2) ++ " secs"}
+                  size={isMobile ? Text.Body2 : Text.Body1}
+                  weight=Text.Regular
+                />,
+              )
+            | _ => None
+            }}
+          />
+        </Link>
       </Col>
     </Row>
     <div
