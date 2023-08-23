@@ -101,7 +101,7 @@ module ValidatorSearch = {
   }
 }
 
-module ValidatorSearchConfig = %graphql(`
+module ValidatorSearchByAddressConfig = %graphql(`
     query SearchValidator( $operator_address: String!) {
        validators_by_pk(operator_address: $operator_address) @ppxAs(type: "ValidatorSearch.t") {
             operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
@@ -109,7 +109,16 @@ module ValidatorSearchConfig = %graphql(`
             identity
         }
     }
+`)
 
+module ValidatorSearchByMonikerConfig = %graphql(`
+    query SearchValidator( $filter: String!) {
+       validators(where: { moniker: { _ilike: $filter}}) @ppxAs(type: "ValidatorSearch.t") {
+            operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
+            moniker
+            identity
+        }
+    }
 `)
 
 let searchOracleScript = (~filter, ()) => {
@@ -289,11 +298,28 @@ let searchProposal = (~filter, ()) => {
 }
 
 let getValidatorMoniker = (~address, ()) => {
-  let result = ValidatorSearchConfig.use({operator_address: address->Address.toOperatorBech32})
+  let result = ValidatorSearchByAddressConfig.use({
+    operator_address: address->Address.toOperatorBech32,
+  })
   result
   ->Query.fromData
   ->Query.map(({validators_by_pk}) => {
     validators_by_pk
+  })
+}
+
+let searchValidatorByMoniker = (~filter, ()) => {
+  let result = ValidatorSearchByMonikerConfig.use({
+    filter: `%${filter}%`,
+  })
+
+  result
+  ->Query.fromData
+  ->Query.map(({validators}) => {
+    switch validators->Belt.Array.length > 0 {
+    | true => validators
+    | false => []
+    }
   })
 }
 

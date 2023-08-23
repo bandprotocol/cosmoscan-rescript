@@ -404,7 +404,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
         searchTerm->Js.String2.length == 0
           ? validators
           : validators->Belt.Array.keep(validator => {
-              Js.String2.includes(searchTerm, validator.moniker->Js.String2.toLowerCase)
+              Js.String2.includes(validator.moniker->Js.String2.toLowerCase, searchTerm)
             })
       <>
         {filteredValidator->Belt.Array.length > 0

@@ -260,6 +260,7 @@ module RenderSearchResult = {
       array<SearchBarQuery.OracleScriptSearch.t>,
       array<SearchBarQuery.DataSourceSearch.t>,
       array<SearchBarQuery.ProposalSearch.t>,
+      array<SearchBarQuery.ValidatorSearch.t>,
     )>,
     ~resultLength: int,
   ) => {
@@ -408,7 +409,7 @@ module RenderSearchResult = {
             switch (results, resultLength) {
             | (Data(_), 0) => <RenderNotFound searchTerm=trimSearchTerm />
 
-            | (Data(blocks, requests, os, ds, proposals), _) =>
+            | (Data(blocks, requests, os, ds, proposals, validators), _) =>
               <>
                 {switch blocks->Belt.Array.length {
                 | 0 => React.null
@@ -554,6 +555,30 @@ module RenderSearchResult = {
                     ->React.array}
                   </>
                 }}
+                {switch validators->Belt.Array.length {
+                | 0 => React.null
+                | _ =>
+                  <>
+                    <li className={Styles.resultHeading(theme)}>
+                      <Heading
+                        size=Heading.H4
+                        value="Validators"
+                        align=Heading.Left
+                        weight=Heading.Semibold
+                        color={theme.neutral_600}
+                      />
+                    </li>
+                    {validators
+                    ->Belt.Array.mapWithIndex((i, validator) => {
+                      <li className={Styles.resultItem} key={i->Belt.Int.toString}>
+                        <div className={Styles.innerResultItem}>
+                          <RenderMonikerLink validatorAddress={validator.operatorAddress} />
+                        </div>
+                      </li>
+                    })
+                    ->React.array}
+                  </>
+                }}
               </>
 
             | (Loading, _) =>
@@ -646,19 +671,24 @@ let make = () => {
     array<SearchBarQuery.ProposalSearch.t>,
   > = SearchBarQuery.searchProposal(~filter=searchTerm->Js.String.trim, ())
 
-  let allQuery = Query.all5(
+  let resultValidatorQuery: Query.variant<
+    array<SearchBarQuery.ValidatorSearch.t>,
+  > = SearchBarQuery.searchValidatorByMoniker(~filter=searchTerm->Js.String.trim, ())
+
+  let allQuery = Query.all6(
     resultBlockQuery,
     resultRequestQuery,
     resultOracleScriptQuery,
     resultDataSourceQuery,
     resultProposalQuery,
+    resultValidatorQuery,
   )
 
-  let resultLen = Query.sumResults5(allQuery)
+  let resultLen = Query.sumResults6(allQuery)
 
   let mergedResult = {
     switch allQuery {
-    | Data(blocks, requests, os, ds, proposals) => {
+    | Data(blocks, requests, os, ds, proposals, validators) => {
         let blockResults = blocks->Belt.Array.map(block => {
           let route = Route.BlockDetailsPage(block.height->ID.Block.toInt)
           {route}
@@ -682,7 +712,19 @@ let make = () => {
           let route = Route.ProposalDetailsPage(proposal.id->ID.Proposal.toInt)
           {route}
         })
-        let allResults = [blockResults, requestResults, osResults, dsResults, proposalResults]
+        let validatorResults = validators->Belt.Array.map(validator => {
+          let route = Route.ValidatorDetailsPage(validator.operatorAddress, Route.Reports)
+          {route}
+        })
+
+        let allResults = [
+          blockResults,
+          requestResults,
+          osResults,
+          dsResults,
+          proposalResults,
+          validatorResults,
+        ]
 
         let mergeResults = allResults->Belt.Array.reduce([], (acc, x) => {
           acc->Belt.Array.concat(x)
