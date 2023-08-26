@@ -10,6 +10,43 @@ type tx_response = {
   rawLog: string,
 }
 
+type voteOption =
+  | VOTE_OPTION_UNSPECIFIED
+  | VOTE_OPTION_YES
+  | VOTE_OPTION_ABSTAIN
+  | VOTE_OPTION_NO
+  | VOTE_OPTION_NO_WITH_VETO
+
+type proposalStatus =
+  | PROPOSAL_STATUS_UNSPECIFIED
+  | PROPOSAL_STATUS_DEPOSIT_PERIOD
+  | PROPOSAL_STATUS_VOTING_PERIOD
+  | PROPOSAL_STATUS_PASSED
+  | PROPOSAL_STATUS_REJECTED
+  | PROPOSAL_STATUS_FAILED
+
+type councilType =
+  | COUNCIL_TYPE_UNSPECIFIED
+  | COUNCIL_TYPE_BAND_DAO
+  | COUNCIL_TYPE_GRANT
+  | COUNCIL_TYPE_TECH
+
+type councilProposalStatus =
+  | PROPOSAL_STATUS_UNSPECIFIED
+  | PROPOSAL_STATUS_SUBMITTED
+  | PROPOSAL_STATUS_WAITING_VETO
+  | PROPOSAL_STATUS_IN_VETO
+  | PROPOSAL_STATUS_REJECTED_BY_COUNCIL
+  | PROPOSAL_STATUS_REJECTED_BY_VETO
+  | PROPOSAL_STATUS_EXECUTED
+  | PROPOSAL_STATUS_EXECUTION_FAILED
+  | PROPOSAL_STATUS_TALLYING_FAILED
+
+type voteOptionCouncil =
+  | VOTE_OPTION_COUNCIL_UNSPECIFIED
+  | VOTE_OPTION_COUNCIL_YES
+  | VOTE_OPTION_COUNCIL_NO
+
 module Client = {
   type t
   type reference_data_t = {
@@ -125,11 +162,43 @@ module Message = {
     @send external toJSON: t => Js.Json.t = "toJSON"
   }
 
+  module MsgSubmitProposal = {
+    //  (initialDepositList: Coin[], proposer: string, content?: Proposal.Content);
+    @module("@bandprotocol/bandchain.js") @scope("Message") @new
+    external create: (array<Coin.t>, string, Js.Json.t) => t = "MsgSubmitProposal"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
+  }
+
+  module MsgDeposit = {
+    //  (proposalId: number, depositor: string, amountList: Coin[]);
+    @module("@bandprotocol/bandchain.js") @scope("Message") @new
+    external create: (int, string, array<Coin.t>) => t = "MsgDeposit"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
+  }
+
   module MsgVote = {
-    // TODO: make Variant for VoteOptionMap
     // (proposalId: number, voter: string, option: VoteOptionMap[keyof VoteOptionMap],)
     @module("@bandprotocol/bandchain.js") @scope("Message") @new
-    external create: (int, string, int) => t = "MsgVote"
+    external create: (int, string, voteOption) => t = "MsgVote"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
+  }
+
+  module MsgSubmitCouncilProposal = {
+    //  (title: string, council: CouncilTypeMap[keyof CouncilTypeMap], proposer: string, messagesList: Array<BaseMsg>, metadata: string);
+    // TODO: currently recieve messagesList: Array<BaseMsg> as JSON. find the way to define BaseMsg type
+    @module("@bandprotocol/bandchain.js") @scope("Message") @new
+    external create: (string, councilType, Js.Json.t, string) => t = "MsgSubmitCouncilProposal"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
+  }
+
+  module MsgVoteCouncil = {
+    //  (proposalId: number, voter: string, option: VoteOptionMapCouncil[keyof VoteOptionMapCouncil]);
+    @module("@bandprotocol/bandchain.js") @scope("Message") @new
+    external create: (int, string, voteOptionCouncil) => t = "MsgVoteCouncil"
 
     @send external toJSON: t => Js.Json.t = "toJSON"
   }

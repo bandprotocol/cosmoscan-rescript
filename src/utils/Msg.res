@@ -783,7 +783,7 @@ module Gov = {
     type input_t = {
       voterAddress: Address.t,
       proposalID: ID.Proposal.t,
-      option: int,
+      option: BandChainJS.voteOption,
     }
 
     type decoded_t =
