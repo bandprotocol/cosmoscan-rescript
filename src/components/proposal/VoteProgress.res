@@ -43,7 +43,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
           <span
             className={Css.merge(list{Styles.councilMember(theme), CssHelper.clickable})}
             onClick={_ => openMembers()}>
-            {proposal.council.name->CouncilSub.getCouncilNameString->React.string}
+            {proposal.council.name->Council.getCouncilNameString->React.string}
           </span>
           <span> {" member votes"->React.string} </span>
         </Text>

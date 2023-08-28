@@ -298,7 +298,7 @@ module RenderData = {
                 <Col col=Col.Ten colSm=Col.Eight>
                   <div className={CssHelper.clickable} onClick={_ => openMembers()}>
                     <Text
-                      value={proposal.council.name->CouncilSub.getCouncilNameString}
+                      value={proposal.council.name->Council.getCouncilNameString}
                       size=Text.Body1
                       weight=Text.Thin
                       color=theme.primary_600

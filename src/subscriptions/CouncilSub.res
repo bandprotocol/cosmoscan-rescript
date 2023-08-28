@@ -4,8 +4,6 @@ type account_t = {address: Address.t}
 
 type aggregate_t = {count: int}
 
-type council_name_t = BandDaoCouncil | GrantCouncil | TechCouncil | Unknown
-
 type council_member_aggregate_t = {aggregate: option<aggregate_t>}
 
 type council_member_t = {
@@ -17,7 +15,7 @@ type council_member_t = {
 
 type internal_t = {
   id: int,
-  name: council_name_t,
+  name: Council.council_name_t,
   account: account_t,
   councilMembers: array<council_member_t>,
   council_members_aggregate: council_member_aggregate_t,
@@ -27,38 +25,11 @@ type internal_t = {
   createdAt: MomentRe.Moment.t,
 }
 
-module CouncilName = {
-  let parse = str =>
-    switch str {
-    | "COUNCIL_TYPE_BAND_DAO" => BandDaoCouncil
-    | "COUNCIL_TYPE_GRANT" => GrantCouncil
-    | "COUNCIL_TYPE_TECH" => TechCouncil
-    | _ => Unknown
-    }
-
-  let serialize = (councilName: council_name_t) => {
-    switch councilName {
-    | BandDaoCouncil => "COUNCIL_TYPE_BAND_DAO"
-    | GrantCouncil => "COUNCIL_TYPE_GRANT"
-    | TechCouncil => "COUNCIL_TYPE_TECH"
-    | Unknown => "Unknown"
-    }
-  }
-}
-
-let getCouncilNameString = (councilName: council_name_t) =>
-  switch councilName {
-  | BandDaoCouncil => "Band DAO Council"
-  | GrantCouncil => "Grant Council"
-  | TechCouncil => "Tech Council"
-  | Unknown => "Unknown"
-  }
-
 module SingleConfig = %graphql(`
   subscription Councils($id: Int!) {
     councils_by_pk(id: $id) @ppxAs(type: "internal_t") {
       id
-      name @ppxCustom(module: "CouncilName")
+      name @ppxCustom(module: "Council.CouncilNameParser")
       account @ppxAs(type: "account_t") {
         address @ppxCustom(module:"GraphQLParserModule.Address")
       }
@@ -87,7 +58,7 @@ module MultiConfig = %graphql(`
   subscription Councils($limit: Int!, $offset: Int!)  {
     councils(limit: $limit, offset: $offset) @ppxAs(type: "internal_t") {
       id
-      name @ppxCustom(module: "CouncilName")
+      name @ppxCustom(module: "Council.CouncilNameParser")
       account @ppxAs(type: "account_t") {
         address @ppxCustom(module:"GraphQLParserModule.Address")
       }

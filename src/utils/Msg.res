@@ -871,8 +871,13 @@ module Council = {
       option: string,
     }
 
+    // type input_t = {
+    //   voterAddress: Address.t,
+    //   proposalID: ID.Proposal.t,
+    //   option: BandChainJS.voteOption,
+    // }
+
     exception ParseVoteNotMatch
-    // TODO: check option again
     let parse = vote => {
       switch vote {
       | 0 => "Unspecified"
@@ -889,6 +894,43 @@ module Council = {
         proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
         option: json.required(list{"msg", "option"}, int)->parse,
       })
+    }
+  }
+
+  module SubmitProposal = {
+    type t<'a> = {
+      council: string,
+      metadata: string,
+      // msgs: array<Js.Json.t>,
+      proposer: Address.t,
+      proposalID: 'a,
+    }
+
+    type success_t = t<ID.Proposal.t>
+    type fail_t = t<unit>
+
+    type decoded_t =
+      | Success(success_t)
+      | Failure(fail_t)
+
+    let decodeFactory = proposalIDD => {
+      open JsonUtils.Decode
+      buildObject(json => {
+        council: json.required(list{"msg", "council"}, string),
+        metadata: json.required(list{"msg", "metadata"}, string),
+        proposer: json.required(list{"msg", "proposer"}, address),
+        proposalID: json->proposalIDD,
+      })
+    }
+
+    let decodeSuccess: JsonUtils.Decode.t<success_t> = {
+      open JsonUtils.Decode
+      decodeFactory(json => json.required(list{"msg", "council_proposal_id"}, ID.Proposal.decoder))
+    }
+
+    let decodeFail: JsonUtils.Decode.t<fail_t> = {
+      open JsonUtils.Decode
+      decodeFactory(_ => ())
     }
   }
 }
@@ -1396,6 +1438,8 @@ module Input = {
     // change this when can create Counil Vote message
     | VoteMsg(Gov.Vote.input_t)
     | IBCTransfer(ibc_transfer_t)
+  // Council
+  // | VoteMsg(Council.Vote.input_t)
 }
 
 type rec msg_t =
@@ -1426,6 +1470,7 @@ type rec msg_t =
   | LegacyVoteMsg(Gov.Vote.decoded_t)
   | LegacyVoteWeightedMsg(Gov.VoteWeighted.decoded_t)
   | VoteMsg(Council.Vote.t)
+  | SubmitCouncilProposalMsg(Council.SubmitProposal.decoded_t)
   | CreateClientMsg(Client.Create.t)
   | UpdateClientMsg(Client.t)
   | UpgradeClientMsg(Client.t)
@@ -1493,11 +1538,12 @@ let getBadge = msg => {
   | WithdrawCommissionMsg(_) => {name: "Withdraw Commission", category: TokenMsg}
   | UnjailMsg(_) => {name: "Unjail", category: ValidatorMsg}
   | SetWithdrawAddressMsg(_) => {name: "Set Withdraw Address", category: ValidatorMsg}
-  | SubmitProposalMsg(_) => {name: "Submit Proposal", category: ProposalMsg}
+  | SubmitProposalMsg(_) => {name: "Submit Veto Proposal", category: ProposalMsg}
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
   | LegacyVoteMsg(_) => {name: "Legacy Vote", category: ProposalMsg}
   | LegacyVoteWeightedMsg(_) => {name: "Legacy Vote Weighted", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
+  | SubmitCouncilProposalMsg(_) => {name: "Submit Proposal", category: ProposalMsg}
   | CreateClientMsg(_) => {name: "Create Client", category: IBCMsg}
   | UpdateClientMsg(_) => {name: "Update Client", category: IBCMsg}
   | UpgradeClientMsg(_) => {name: "Upgrade Client", category: IBCMsg}
@@ -1519,7 +1565,7 @@ let getBadge = msg => {
   | ActivateMsg(_) => {name: "Activate", category: IBCMsg}
   | TransferMsg(_) => {name: "Transfer", category: IBCMsg}
   | ExecMsg(_) => {name: "Exec", category: ValidatorMsg}
-  | _ => {name: "Unknown msg", category: UnknownMsg}
+  | UnknownMsg => {name: "Unknown msg", category: UnknownMsg}
   }
 }
 
@@ -1668,6 +1714,17 @@ let rec decodeMsg = (json, isSuccess) => {
         : {
             let msg = json->mustDecode(Gov.SubmitProposal.decodeFail)
             (SubmitProposalMsg(Failure(msg)), msg.proposer, false)
+          }
+
+    | "/council.v1beta1.MsgSubmitProposal" =>
+      isSuccess
+        ? {
+            let msg = json->mustDecode(Council.SubmitProposal.decodeSuccess)
+            (SubmitCouncilProposalMsg(Success(msg)), msg.proposer, false)
+          }
+        : {
+            let msg = json->mustDecode(Council.SubmitProposal.decodeFail)
+            (SubmitCouncilProposalMsg(Failure(msg)), msg.proposer, false)
           }
 
     | "/cosmos.gov.v1beta1.MsgDeposit" =>

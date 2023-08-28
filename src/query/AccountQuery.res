@@ -1,4 +1,4 @@
-type council_t = {name: CouncilSub.council_name_t}
+type council_t = {name: Council.council_name_t}
 
 type t = {
   balance: list<Coin.t>,
@@ -31,7 +31,7 @@ module SingleConfig = %graphql(`
         commission: accumulated_commission @ppxCustom(module: "GraphQLParserModule.Coins")
       }
       councilOpt: council @ppxAs(type: "council_t") {
-        name @ppxCustom(module: "CouncilSub.CouncilName")
+        name @ppxCustom(module: "Council.CouncilNameParser")
       }
     }
   }

@@ -9,7 +9,7 @@ type council_member_t = {
 
 type council_t = {
   id: int,
-  name: CouncilSub.council_name_t,
+  name: Council.council_name_t,
   account: account_t,
   councilMembers: array<council_member_t>,
 }
@@ -208,7 +208,7 @@ module SingleConfig = %graphql(`
       title
       council @ppxAs(type: "council_t") {
         id
-        name @ppxCustom(module: "CouncilSub.CouncilName")
+        name @ppxCustom(module: "Council.CouncilNameParser")
         account @ppxAs(type: "account_t") {
           address @ppxCustom(module:"GraphQLParserModule.Address")
         }
@@ -255,7 +255,7 @@ module MultiConfig = %graphql(`
       title
       council @ppxAs(type: "council_t") {
         id
-        name @ppxCustom(module: "CouncilSub.CouncilName")
+        name @ppxCustom(module: "Council.CouncilNameParser")
         account @ppxAs(type: "account_t") {
           address @ppxCustom(module:"GraphQLParserModule.Address")
         }
@@ -317,7 +317,7 @@ let getFilter = str =>
 
 let parseProposalType = councilName =>
   switch councilName {
-  | CouncilSub.BandDaoCouncil => BandDAO
+  | Council.BandDaoCouncil => BandDAO
   | GrantCouncil => Grant
   | TechCouncil => Tech
   | Unknown => Unknown
