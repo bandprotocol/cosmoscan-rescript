@@ -196,14 +196,11 @@ module RenderData = {
                   />
                 | None => React.null
                 }}
-                // TODO: uncomment before launch
-                // {switch proposal.status {
-                // | VotingPeriod => <VoteButton proposalID=proposal.id proposalName=proposal.title address />
-                // | _ => <OpenVetoButton
-                //   proposalID=proposal.id proposalName=proposal.title address totalDeposit
-                // />
-                // | _ => React.null
-                // }}
+                {switch proposal.status {
+                | VotingPeriod =>
+                  <VoteButton proposalID=proposal.id proposalName=proposal.title address />
+                | _ => React.null
+                }}
               </Col>
             | None => React.null
             }}

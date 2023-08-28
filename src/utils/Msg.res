@@ -865,17 +865,17 @@ module Gov = {
 
 module Council = {
   module Vote = {
+    type input_t = {
+      voterAddress: Address.t,
+      proposalID: ID.Proposal.t,
+      option: BandChainJS.voteOptionCouncil,
+    }
+
     type t = {
       voterAddress: Address.t,
       proposalID: ID.Proposal.t,
       option: string,
     }
-
-    // type input_t = {
-    //   voterAddress: Address.t,
-    //   proposalID: ID.Proposal.t,
-    //   option: BandChainJS.voteOption,
-    // }
 
     exception ParseVoteNotMatch
     let parse = vote => {
@@ -1436,10 +1436,10 @@ module Input = {
     | RedelegateMsg(Staking.Redelegate.input_t)
     | WithdrawRewardMsg(Distribution.WithdrawReward.input_t)
     // change this when can create Counil Vote message
-    | VoteMsg(Gov.Vote.input_t)
+    | VetoMsg(Gov.Vote.input_t)
     | IBCTransfer(ibc_transfer_t)
-  // Council
-  // | VoteMsg(Council.Vote.input_t)
+    // Council
+    | VoteMsg(Council.Vote.input_t)
 }
 
 type rec msg_t =

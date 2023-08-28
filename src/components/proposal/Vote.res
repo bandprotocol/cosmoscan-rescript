@@ -22,6 +22,13 @@ module YesNo = {
     | Unknown => "Unknown"
     }
 
+  let toBandChainJsCouncilVote = vote =>
+    switch vote {
+    | Yes => BandChainJS.VOTE_OPTION_COUNCIL_YES
+    | No => BandChainJS.VOTE_OPTION_COUNCIL_NO
+    | Unknown => BandChainJS.VOTE_OPTION_COUNCIL_UNSPECIFIED
+    }
+
   module Parser = {
     let parse = json =>
       switch json->Js.Json.decodeString {
@@ -66,5 +73,14 @@ module Full = {
     | NoWithVeto => "Veto"
     | Abstain => "Abstain"
     | Unknown => "Unknown"
+    }
+
+  let toBandChainJsCouncilVote = vote =>
+    switch vote {
+    | Yes => BandChainJS.VOTE_OPTION_YES
+    | No => BandChainJS.VOTE_OPTION_NO
+    | NoWithVeto => BandChainJS.VOTE_OPTION_NO_WITH_VETO
+    | Abstain => BandChainJS.VOTE_OPTION_ABSTAIN
+    | Unknown => BandChainJS.VOTE_OPTION_UNSPECIFIED
     }
 }
