@@ -7,7 +7,7 @@ let make = (~hashtag: Route.group_tab_t) => {
     ]
     currentRoute={Route.GroupPage(hashtag)}>
     {switch hashtag {
-    | Group => <GroupContent />
+    | Group => <GroupTabContent />
     | Proposal => <GroupProposalContent />
     }}
   </Tab.Route>

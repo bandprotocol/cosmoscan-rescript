@@ -66,9 +66,9 @@ let make = (~sortedBy, ~setSortedBy, ~direction, ~setDirection) => {
         ReactEvent.Mouse.stopPropagation(event)
       }}>
       <Text
-        value={sortedBy->SortGroupTable.parseSortString ++
+        value={sortedBy->SortGroupProposalTable.parseSortString ++
         "( " ++
-        direction->SortGroupTable.parseDirection ++ " )"}
+        direction->SortGroupProposalTable.parseDirection ++ " )"}
         size={Body1}
         color=theme.neutral_900
         weight={Semibold}
@@ -81,10 +81,10 @@ let make = (~sortedBy, ~setSortedBy, ~direction, ~setDirection) => {
     <div className={StylesDropdown.dropdownMenu(theme, isDarkMode, show)}>
       <ul>
         {[
-          SortGroupTable.ID,
-          SortGroupTable.Name,
-          SortGroupTable.MembersCount,
-          SortGroupTable.ProposalsCount,
+          SortGroupProposalTable.ID,
+          SortGroupProposalTable.Name,
+          SortGroupProposalTable.GroupID,
+          SortGroupProposalTable.ProposalStatus,
         ]
         ->Belt.Array.mapWithIndex((i, each) => {
           <li
@@ -98,7 +98,7 @@ let make = (~sortedBy, ~setSortedBy, ~direction, ~setDirection) => {
               ? <Icon name="fal fa-check" size=12 color=theme.neutral_900 />
               : React.null}
             <Text
-              value={each->SortGroupTable.parseSortString}
+              value={each->SortGroupProposalTable.parseSortString}
               size={Body1}
               weight={Semibold}
               color={theme.neutral_900}
@@ -108,7 +108,7 @@ let make = (~sortedBy, ~setSortedBy, ~direction, ~setDirection) => {
         ->React.array}
       </ul>
       <ul>
-        {[SortGroupTable.ASC, SortGroupTable.DESC]
+        {[SortGroupProposalTable.ASC, SortGroupProposalTable.DESC]
         ->Belt.Array.mapWithIndex((i, each) => {
           <li
             className={StylesDropdown.menuItem(theme, isDarkMode)}
@@ -122,7 +122,7 @@ let make = (~sortedBy, ~setSortedBy, ~direction, ~setDirection) => {
               : React.null}
             <Text
               value={switch each {
-              | SortGroupTable.ASC => "Ascending (smallest value first)"
+              | SortGroupProposalTable.ASC => "Ascending (smallest value first)"
               | DESC => "Descending (largest value first)"
               }}
               size={Body1}
