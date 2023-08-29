@@ -14,7 +14,7 @@ module Styles = {
 }
 module RenderBody = {
   @react.component
-  let make = (~members: array<CouncilProposalSub.council_member_t>) => {
+  let make = (~members: array<Council.council_member_t>) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <TBody paddingV=#px(12)>
@@ -52,7 +52,7 @@ module RenderBody = {
 }
 module RenderBodyMobile = {
   @react.component
-  let make = (~name: string, ~members: array<CouncilProposalSub.council_member_t>) => {
+  let make = (~name: string, ~members: array<Council.council_member_t>) => {
     members
     ->Belt.Array.mapWithIndex((index, member) =>
       <MobileCard
@@ -81,7 +81,7 @@ module RenderBodyMobile = {
 }
 
 @react.component
-let make = (~council: CouncilProposalSub.council_t) => {
+let make = (~council: Council.council_t) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let isMobile = Media.isMobile()
 

@@ -183,7 +183,7 @@ let choiceString = choice =>
   }
 
 @react.component
-let make = (~proposalID, ~members: array<CouncilProposalSub.council_member_t>) => {
+let make = (~proposalID, ~members: array<Council.council_member_t>) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let (filter, setFilter) = React.useState(_ => All)
 

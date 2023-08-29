@@ -1,19 +1,4 @@
-type account_t = {address: Address.t}
-
-type council_member_t = {
-  account: account_t,
-  weight: int,
-  metadata: string,
-  since: MomentRe.Moment.t,
-}
-
-type council_t = {
-  id: int,
-  name: Council.council_name_t,
-  account: account_t,
-  councilMembers: array<council_member_t>,
-}
-
+open Council
 module Status = {
   type t =
     | VotingPeriod
@@ -208,7 +193,7 @@ module SingleConfig = %graphql(`
       title
       council @ppxAs(type: "council_t") {
         id
-        name @ppxCustom(module: "Council.CouncilNameParser")
+        name @ppxCustom(module: "CouncilNameParser")
         account @ppxAs(type: "account_t") {
           address @ppxCustom(module:"GraphQLParserModule.Address")
         }
@@ -255,7 +240,7 @@ module MultiConfig = %graphql(`
       title
       council @ppxAs(type: "council_t") {
         id
-        name @ppxCustom(module: "Council.CouncilNameParser")
+        name @ppxCustom(module: "CouncilNameParser")
         account @ppxAs(type: "account_t") {
           address @ppxCustom(module:"GraphQLParserModule.Address")
         }
@@ -317,10 +302,10 @@ let getFilter = str =>
 
 let parseProposalType = councilName =>
   switch councilName {
-  | Council.BandDaoCouncil => BandDAO
+  | BandDaoCouncil => BandDAO
   | GrantCouncil => Grant
   | TechCouncil => Tech
-  | Unknown => Unknown
+  | Unspecified => Unknown
   }
 
 // percent of yes vote required for proposal to win

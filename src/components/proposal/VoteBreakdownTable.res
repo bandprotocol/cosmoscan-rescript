@@ -34,7 +34,7 @@ module VoteRow = {
     }
   }
 
-  let memberToVoteRow = (member: CouncilProposalSub.council_member_t) => {
+  let memberToVoteRow = (member: Council.council_member_t) => {
     {
       address: member.account.address,
       transactionOpt: None,
@@ -162,10 +162,7 @@ let choiceString = choice =>
   }
 
 @react.component
-let make = (
-  ~members: array<CouncilProposalSub.council_member_t>,
-  ~votes: array<CouncilVoteSub.t>,
-) => {
+let make = (~members: array<Council.council_member_t>, ~votes: array<CouncilVoteSub.t>) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let (filter, setFilter) = React.useState(_ => All)
 

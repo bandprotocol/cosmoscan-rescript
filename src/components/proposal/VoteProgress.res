@@ -31,6 +31,14 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
 
   let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
+  let {
+    yesVoteByWeight,
+    noVoteByWeight,
+    yesVotePercent,
+    noVotePercent,
+    totalWeight,
+  } = Council.calculateVote(votes, proposal.council.councilMembers)
+
   <>
     <Row>
       <Col col=Col.Twelve>
@@ -54,9 +62,9 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
         <ProgressBar.Voting2
           slots={ProgressBar.Slot.getYesNoSlot(
             theme,
-            ~yes={proposal.yesVote},
-            ~no={proposal.noVote},
-            ~totalWeight={proposal.totalWeight},
+            ~yes={yesVoteByWeight->Belt.Int.toFloat},
+            ~no={noVoteByWeight->Belt.Int.toFloat},
+            ~totalWeight={totalWeight},
           )}
           fullWidth=true
         />
@@ -75,17 +83,16 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
               marginRight=8
             />
             <Text
-              value={proposal.yesVotePercent->Format.fVotePercent}
+              value={yesVotePercent->Format.fVotePercent}
               size=Text.Body2
               weight=Text.Regular
               color={theme.neutral_900}
             />
           </div>
           <Text
-            value={
-              let yesVote = votes->CouncilVoteSub.getVoteCount(Yes)
-              `${yesVote->Belt.Int.toString} ${yesVote > 1 ? "votes" : "vote"}`
-            }
+            value={`${yesVoteByWeight->Belt.Int.toString} ${yesVoteByWeight > 1
+                ? "votes"
+                : "vote"}`}
             size=Text.Body2
             weight=Text.Regular
             color={theme.neutral_600}
@@ -109,10 +116,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
             />
           </div>
           <Text
-            value={
-              let noVote = votes->CouncilVoteSub.getVoteCount(No)
-              `${noVote->Belt.Int.toString} ${noVote > 1 ? "votes" : "vote"}`
-            }
+            value={`${noVoteByWeight->Belt.Int.toString} ${noVoteByWeight > 1 ? "votes" : "vote"}`}
             size=Text.Body2
             weight=Text.Regular
             color={theme.neutral_600}
