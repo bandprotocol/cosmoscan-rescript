@@ -818,7 +818,7 @@ module SubmitProposal = {
       {title: "Proposer", content: Address(msg.proposer), order: 1},
       {
         title: "Title",
-        content: PlainText(msg.title),
+        content: PlainText(msg.title->Belt.Option.getWithDefault("")),
         order: 3,
       },
       {
