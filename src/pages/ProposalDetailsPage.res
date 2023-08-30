@@ -66,22 +66,21 @@ module VoteButton = {
     let vote = () => Vote(proposalID, proposalName)->SubmitTx->OpenModal->dispatchModal
     let accountQuery = AccountQuery.get(address)
 
-    // TODO: (proposal) uncomment before launch
-    // switch accountQuery {
-    // | Data({councilOpt}) =>
-    //   switch councilOpt {
-    //   | Some(council) =>
-    //     <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
-    //       {"Vote"->React.string}
-    //     </Button>
-    //   | None => React.null
-    //   }
-    // | _ => React.null
-    // }
+    switch accountQuery {
+    | Data({councilMembers}) =>
+      switch councilMembers->Belt.Array.length > 0 {
+      | true =>
+        <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
+          {"Vote"->React.string}
+        </Button>
+      | false => React.null
+      }
+    | _ => React.null
+    }
 
-    <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
-      {"Vote"->React.string}
-    </Button>
+    // <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
+    //   {"Vote"->React.string}
+    // </Button>
   }
 }
 
@@ -189,16 +188,23 @@ module RenderData = {
             {switch accountOpt {
             | Some({address}) =>
               <Col col=Col.Two>
-                {switch proposal.vetoProposalOpt {
-                | Some({totalDeposit}) =>
-                  <OpenVetoButton
-                    proposalID=proposal.id proposalName=proposal.title address totalDeposit
-                  />
-                | None => React.null
-                }}
                 {switch proposal.status {
                 | VotingPeriod =>
                   <VoteButton proposalID=proposal.id proposalName=proposal.title address />
+                | WaitingVeto =>
+                  switch proposal.vetoProposalOpt {
+                  | Some({totalDeposit}) =>
+                    <OpenVetoButton
+                      proposalID=proposal.id proposalName=proposal.title address totalDeposit
+                    />
+                  | None =>
+                    <OpenVetoButton
+                      proposalID=proposal.id
+                      proposalName=proposal.title
+                      address
+                      totalDeposit={list{Coin.newCoin("uband", 0.)}}
+                    />
+                  }
                 | _ => React.null
                 }}
               </Col>

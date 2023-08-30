@@ -834,7 +834,7 @@ module SubmitProposal = {
         title: "Proposal ID",
         content: ID(
           <div className={CssHelper.flexBox()}>
-            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+            <TypeID.LegacyProposal position=TypeID.Subtitle id={msg.proposalID} />
           </div>,
         ),
         order: 2,
@@ -923,7 +923,7 @@ module Vote = {
         title: "Proposal ID",
         content: ID(
           <div className={CssHelper.flexBox()}>
-            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+            <TypeID.LegacyProposal position=TypeID.Subtitle id={msg.proposalID} />
           </div>,
         ),
         order: 2,
@@ -983,7 +983,7 @@ module VoteWeighted = {
         title: "Proposal ID",
         content: ID(
           <div className={CssHelper.flexBox()}>
-            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+            <TypeID.LegacyProposal position=TypeID.Subtitle id={msg.proposalID} />
           </div>,
         ),
         order: 2,

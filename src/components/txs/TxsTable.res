@@ -52,7 +52,7 @@ module RenderBody = {
           {switch txSub {
           | Data({messages, txHash, success, errMsg}) =>
             <div>
-              // <TxMessages txHash messages={messages->Belt.List.map(msgTransform)} success errMsg />
+              <TxMessages txHash messages={messages->Belt.List.map(msgTransform)} success errMsg />
             </div>
           | _ =>
             <>

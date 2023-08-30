@@ -137,14 +137,14 @@ let make = (~msg: Msg.result_t) => {
     | LegacyVoteMsg(msg) =>
       switch msg {
       | Msg.Gov.Vote.Success(m) =>
-        <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
-      | Msg.Gov.Vote.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
+        <ProposalMsg.LegacyVote.Success proposalID={m.proposalID} title={m.title} />
+      | Msg.Gov.Vote.Failure(f) => <ProposalMsg.LegacyVote.Fail proposalID={f.proposalID} />
       }
     | LegacyVoteWeightedMsg(msg) =>
       switch msg {
       | Msg.Gov.VoteWeighted.Success(m) =>
-        <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
-      | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
+        <ProposalMsg.LegacyVote.Success proposalID={m.proposalID} title={m.title} />
+      | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.LegacyVote.Fail proposalID={f.proposalID} />
       }
     | VoteMsg(msg) => <ProposalMsg.Vote.Fail proposalID={msg.proposalID} />
     | SubmitCouncilProposalMsg(msg) =>

@@ -22,7 +22,7 @@ module SubmitProposal = {
     @react.component
     let make = (~proposalID, ~title) =>
       <BadgeWrapper>
-        <TypeID.Proposal id=proposalID />
+        <TypeID.LegacyProposal id=proposalID />
         <Text value=title size=Text.Body2 nowrap=true block=true />
       </BadgeWrapper>
   }
@@ -87,13 +87,32 @@ module Deposit = {
   }
 }
 
+module LegacyVote = {
+  module Success = {
+    @react.component
+    let make = (~proposalID, ~title) =>
+      <BadgeWrapper>
+        <TypeID.LegacyProposal id=proposalID />
+        <Text value=title size=Text.Body2 nowrap=true block=true marginLeft=8 />
+      </BadgeWrapper>
+  }
+
+  module Fail = {
+    @react.component
+    let make = (~proposalID) =>
+      <BadgeWrapper>
+        <TypeID.LegacyProposal id=proposalID />
+      </BadgeWrapper>
+  }
+}
+
 module Vote = {
   module Success = {
     @react.component
     let make = (~proposalID, ~title) =>
       <BadgeWrapper>
         <TypeID.Proposal id=proposalID />
-        <Text value=title size=Text.Body2 nowrap=true block=true />
+        <Text value=title size=Text.Body2 nowrap=true block=true marginLeft=8 />
       </BadgeWrapper>
   }
 

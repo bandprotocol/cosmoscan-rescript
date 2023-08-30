@@ -82,7 +82,6 @@ module VetoProposal = {
   type t = {
     id: ID.LegacyProposal.t,
     status: CurrentStatus.t,
-    turnOut: float,
     yesVote: float,
     noVote: float,
     noWithVetoVote: float,
@@ -121,7 +120,6 @@ module VetoProposal = {
       | true => CurrentStatus.Pass
       | false => Reject
       },
-      turnOut: totalVote,
       yesVote,
       noVote,
       noWithVetoVote,

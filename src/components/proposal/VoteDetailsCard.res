@@ -44,7 +44,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
             | _ => Col.Six
             }}
             colSm=Col.Twelve
-            mb=7
+            mb=21
             mbSm=0
             style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}>
             <div>

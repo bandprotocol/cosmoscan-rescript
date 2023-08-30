@@ -66,7 +66,7 @@ let createMsg = (msg: Msg.Input.t) => {
       validatorAddress->Address.toOperatorBech32,
     )
   | VetoMsg({proposalID, voterAddress, option}) =>
-    MsgVote.create(proposalID->ID.Proposal.toInt, voterAddress->Address.toBech32, option)
+    MsgVote.create(proposalID->ID.LegacyProposal.toInt, voterAddress->Address.toBech32, option)
   | VoteMsg({proposalID, voterAddress, option}) =>
     MsgVoteCouncil.create(proposalID->ID.Proposal.toInt, voterAddress->Address.toBech32, option)
   | IBCTransfer({sourcePort, sourceChannel, receiver, token, timeoutTimestamp, sender}) =>

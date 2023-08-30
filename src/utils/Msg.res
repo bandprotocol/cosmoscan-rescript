@@ -693,7 +693,7 @@ module Gov = {
       proposalID: 'a,
     }
 
-    type success_t = t<ID.Proposal.t>
+    type success_t = t<ID.LegacyProposal.t>
     type fail_t = t<unit>
 
     type decoded_t =
@@ -713,7 +713,7 @@ module Gov = {
 
     let decodeSuccess: JsonUtils.Decode.t<success_t> = {
       open JsonUtils.Decode
-      decodeFactory(json => json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder))
+      decodeFactory(json => json.required(list{"msg", "proposal_id"}, ID.LegacyProposal.decoder))
     }
 
     let decodeFail: JsonUtils.Decode.t<fail_t> = {
@@ -773,7 +773,7 @@ module Gov = {
 
     type t<'a> = {
       voterAddress: Address.t,
-      proposalID: ID.Proposal.t,
+      proposalID: ID.LegacyProposal.t,
       option: string,
       title: 'a,
     }
@@ -782,7 +782,7 @@ module Gov = {
     type fail_t = t<unit>
     type input_t = {
       voterAddress: Address.t,
-      proposalID: ID.Proposal.t,
+      proposalID: ID.LegacyProposal.t,
       option: BandChainJS.voteOption,
     }
 
@@ -794,7 +794,7 @@ module Gov = {
       open JsonUtils.Decode
       buildObject(json => {
         voterAddress: json.required(list{"msg", "voter"}, address),
-        proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+        proposalID: json.required(list{"msg", "proposal_id"}, ID.LegacyProposal.decoder),
         option: json.required(list{"msg", "option"}, int)->parse,
         title: json->titleD,
       })
@@ -829,7 +829,7 @@ module Gov = {
 
     type t<'a> = {
       voterAddress: Address.t,
-      proposalID: ID.Proposal.t,
+      proposalID: ID.LegacyProposal.t,
       options: list<Options.t>,
       title: 'a,
     }
@@ -845,7 +845,7 @@ module Gov = {
       open JsonUtils.Decode
       buildObject(json => {
         voterAddress: json.required(list{"msg", "voter"}, address),
-        proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+        proposalID: json.required(list{"msg", "proposal_id"}, ID.LegacyProposal.decoder),
         options: json.required(list{"msg", "options"}, list(Options.decoder)),
         title: json->titleD,
       })

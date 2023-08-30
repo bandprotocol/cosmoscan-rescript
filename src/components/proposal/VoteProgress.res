@@ -32,6 +32,8 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
   let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
   let {
+    yesCount,
+    noCount,
     yesVoteByWeight,
     noVoteByWeight,
     yesVotePercent,
@@ -90,9 +92,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
             />
           </div>
           <Text
-            value={`${yesVoteByWeight->Belt.Int.toString} ${yesVoteByWeight > 1
-                ? "votes"
-                : "vote"}`}
+            value={`${yesCount->Belt.Int.toString} ${yesCount > 1 ? "votes" : "vote"}`}
             size=Text.Body2
             weight=Text.Regular
             color={theme.neutral_600}
@@ -116,7 +116,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
             />
           </div>
           <Text
-            value={`${noVoteByWeight->Belt.Int.toString} ${noVoteByWeight > 1 ? "votes" : "vote"}`}
+            value={`${noCount->Belt.Int.toString} ${noCount > 1 ? "votes" : "vote"}`}
             size=Text.Body2
             weight=Text.Regular
             color={theme.neutral_600}
