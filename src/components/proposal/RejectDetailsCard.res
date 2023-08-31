@@ -121,6 +121,8 @@ module Vote = {
   let make = (
     ~vetoProposal: CouncilProposalSub.VetoProposal.t,
     ~status: CouncilProposalSub.Status.t,
+    ~voteStat: VoteSub.vote_stat_t,
+    ~bondedToken: float,
   ) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
@@ -129,6 +131,70 @@ module Vote = {
       vetoProposal.id->ID.LegacyProposal.toInt->Depositors->OpenModal->dispatchModal
     let vote = () =>
       (vetoProposal.id, "vetoProposal name")->SubmitMsg.VetoVote->SubmitTx->OpenModal->dispatchModal
+
+    let turnout = switch status {
+    | VetoPeriod => voteStat.total /. bondedToken
+    | _ => vetoProposal.turnout
+    }
+
+    let isTurnoutPassed = switch status {
+    | VetoPeriod =>
+      (turnout > CouncilProposalSub.VetoProposal.turnoutTheshold)
+        ->CouncilProposalSub.CurrentStatus.fromBool
+    | _ => vetoProposal.isTurnoutPassed
+    }
+
+    let isYesPassed = switch status {
+    | VetoPeriod =>
+      (voteStat.totalYes /. voteStat.total > CouncilProposalSub.VetoProposal.yesTheshold)
+        ->CouncilProposalSub.CurrentStatus.fromBool
+    | _ => vetoProposal.isYesPassed
+    }
+
+    let yesVote = switch status {
+    | VetoPeriod => voteStat.totalYes
+    | _ => vetoProposal.yesVote
+    }
+
+    let yesVotePercent = switch status {
+    | VetoPeriod => voteStat.totalYesPercent
+    | _ => vetoProposal.yesVotePercent
+    }
+
+    let noVote = switch status {
+    | VetoPeriod => voteStat.totalNo
+    | _ => vetoProposal.noVote
+    }
+
+    let noVotePercent = switch status {
+    | VetoPeriod => voteStat.totalNoPercent
+    | _ => vetoProposal.noVotePercent
+    }
+
+    let noWithVetoVote = switch status {
+    | VetoPeriod => voteStat.totalNoWithVeto
+    | _ => vetoProposal.noWithVetoVote
+    }
+
+    let noWithVetoVotePercent = switch status {
+    | VetoPeriod => voteStat.totalNoWithVetoPercent
+    | _ => vetoProposal.noWithVetoVotePercent
+    }
+
+    let abstainVote = switch status {
+    | VetoPeriod => voteStat.totalAbstain
+    | _ => vetoProposal.abstainVote
+    }
+
+    let abstainVotePercent = switch status {
+    | VetoPeriod => voteStat.totalAbstainPercent
+    | _ => vetoProposal.abstainVotePercent
+    }
+
+    let totalVote = switch status {
+    | VetoPeriod => voteStat.total
+    | _ => vetoProposal.totalVote
+    }
 
     <Row marginTopSm=24>
       <Col col=Col.Twelve mb=8 style={CssHelper.flexBox()}>
@@ -180,15 +246,15 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                 <Col col=Col.Five colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <img
-                      src={switch vetoProposal.isTurnoutPassed {
+                      src={switch isTurnoutPassed {
                       | Pass => Images.yesRed
                       | Reject => Images.noGreen
                       }}
-                      alt={vetoProposal.isTurnoutPassed->CouncilProposalSub.CurrentStatus.getStatusText}
+                      alt={isTurnoutPassed->CouncilProposalSub.CurrentStatus.getStatusText}
                       className=Styles.yesnoImg
                     />
                     <Text
-                      value={vetoProposal.turnout->Format.fVotePercent}
+                      value={turnout->Format.fVotePercent}
                       size=Text.Body1
                       weight=Text.Bold
                       color={theme.neutral_900}
@@ -218,15 +284,15 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                 <Col col=Col.Five colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <img
-                      src={switch vetoProposal.isYesPassed {
+                      src={switch isYesPassed {
                       | Pass => Images.yesRed
                       | Reject => Images.noGreen
                       }}
-                      alt={vetoProposal.isYesPassed->CouncilProposalSub.CurrentStatus.getStatusText}
+                      alt={isYesPassed->CouncilProposalSub.CurrentStatus.getStatusText}
                       className=Styles.yesnoImg
                     />
                     <Text
-                      value={vetoProposal.yesVotePercent->Format.fVotePercent}
+                      value={yesVotePercent->Format.fVotePercent}
                       size=Text.Body1
                       weight=Text.Bold
                       color={theme.neutral_900}
@@ -238,7 +304,10 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                 <Col col=Col.Seven colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
-                      value="Current Status"
+                      value={switch status {
+                      | VetoPeriod => "Current Status"
+                      | _ => "Status"
+                      }}
                       size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
@@ -281,7 +350,22 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
           <SeperatedLine mt=24 mb=24 color=theme.neutral_300 />
           <Row marginTop=16>
             <Col>
-              <VoteProgress.Veto vetoProposal />
+              <VoteProgress.Veto
+                props={{
+                  proposal_id: vetoProposal.id,
+                  yesVote,
+                  noVote,
+                  noWithVetoVote,
+                  abstainVote,
+                  totalVote,
+                  yesVotePercent,
+                  noVotePercent,
+                  noWithVetoVotePercent,
+                  abstainVotePercent,
+                  totalBondedTokens: bondedToken,
+                  turnout,
+                }}
+              />
             </Col>
           </Row>
         </InfoContainer>

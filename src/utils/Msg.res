@@ -1447,6 +1447,7 @@ module Input = {
     // Council
     | VoteMsg(Council.Vote.input_t)
     | SubmitVetoProposal(Gov.SubmitProposal.input_t)
+  // | Deposir
 }
 
 type rec msg_t =

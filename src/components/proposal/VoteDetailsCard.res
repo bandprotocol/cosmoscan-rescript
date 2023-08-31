@@ -25,6 +25,21 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
   let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
   let isMobile = Media.isMobile()
 
+  let {
+    yesCount,
+    noCount,
+    yesVoteByWeight,
+    noVoteByWeight,
+    yesVotePercent,
+    noVotePercent,
+    totalWeight,
+  } = Council.calculateVote(votes, proposal.council.councilMembers)
+
+  let currentStatus = switch yesVotePercent >= CouncilProposalSub.passedTheshold {
+  | true => CouncilProposalSub.CurrentStatus.Pass
+  | false => Reject
+  }
+
   <Row>
     <Col col=Col.Twelve>
       <Heading
@@ -80,15 +95,15 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                   colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <img
-                      src={switch proposal.councilVoteStatus {
+                      src={switch currentStatus {
                       | Pass => Images.yesGreen
                       | Reject => Images.noRed
                       }}
-                      alt={proposal.councilVoteStatus->CouncilProposalSub.CurrentStatus.getStatusText}
+                      alt={currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
                       className=Styles.yesnoImg
                     />
                     <Text
-                      value={proposal.yesVotePercent->Format.fPercent(~digits=2)}
+                      value={yesVotePercent->Format.fPercent(~digits=2)}
                       size=Text.Body1
                       weight=Text.Bold
                       color={theme.neutral_900}
@@ -129,15 +144,28 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                   }}
                   colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
-                    <Text
-                      value={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
-                      size=Text.Body1
-                      weight=Text.Semibold
-                      color={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusColor(
-                        theme,
-                      )}
-                      block=true
-                    />
+                    {switch proposal.status {
+                    | VotingPeriod =>
+                      <Text
+                        value={currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
+                        size=Text.Body1
+                        weight=Text.Semibold
+                        color={currentStatus->CouncilProposalSub.CurrentStatus.getStatusColor(
+                          theme,
+                        )}
+                        block=true
+                      />
+                    | _ =>
+                      <Text
+                        value={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
+                        size=Text.Body1
+                        weight=Text.Semibold
+                        color={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusColor(
+                          theme,
+                        )}
+                        block=true
+                      />
+                    }}
                   </div>
                 </Col>
               </Row>

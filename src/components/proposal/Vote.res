@@ -75,7 +75,7 @@ module Full = {
     | Unknown => "Unknown"
     }
 
-  let toBandChainJsCouncilVote = vote =>
+  let toBandChainJsVote = vote =>
     switch vote {
     | Yes => BandChainJS.VOTE_OPTION_YES
     | No => BandChainJS.VOTE_OPTION_NO

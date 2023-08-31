@@ -101,7 +101,11 @@ module OpenVetoButton = {
 
 module RenderData = {
   @react.component
-  let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) => {
+  let make = (
+    ~proposal: CouncilProposalSub.t,
+    ~votes: array<CouncilVoteSub.t>,
+    ~bondedToken: float,
+  ) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
@@ -261,7 +265,17 @@ module RenderData = {
               </Col>
             | _ =>
               <Col col=Col.Six>
-                <RejectDetailsCard.Vote vetoProposal status=proposal.status />
+                {
+                  let voteStatByProposalIDSub = VoteSub.getVoteStatByProposalID(vetoProposal.id)
+
+                  switch voteStatByProposalIDSub {
+                  | Data(voteStat) =>
+                    <RejectDetailsCard.Vote
+                      vetoProposal status=proposal.status voteStat bondedToken
+                    />
+                  | _ => <Text value="sum ting wong" size=Text.Body1 weight=Text.Thin />
+                  }
+                }
               </Col>
             }
 
@@ -370,10 +384,12 @@ module RenderData = {
 let make = (~proposalID) => {
   let proposalSub = CouncilProposalSub.get(proposalID)
   let councilVoteSub = CouncilVoteSub.get(proposalID)
+  let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
 
-  let allSub = Sub.all2(proposalSub, councilVoteSub)
+  let allSub = Sub.all3(proposalSub, councilVoteSub, bondedTokenCountSub)
   switch allSub {
-  | Data(proposal, votes) => <RenderData proposal votes />
+  | Data(proposal, votes, bondedToken) =>
+    <RenderData proposal votes bondedToken={bondedToken->Coin.getUBandAmountFromCoin /. 1e6} />
   | Error(err) => <Heading value={err.message} />
   | Loading =>
     <div className=Styles.loadingContainer>

@@ -103,13 +103,13 @@ module VetoProposal = {
   let turnoutTheshold = 40.
 
   let fromProposal = (proposal: proposal_t) => {
-    let yesVote = proposal.yesVote->Belt.Option.getWithDefault(0.)
-    let noVote = proposal.noVote->Belt.Option.getWithDefault(0.)
-    let noWithVetoVote = proposal.noWithVetoVote->Belt.Option.getWithDefault(0.)
-    let abstainVote = proposal.abstainVote->Belt.Option.getWithDefault(0.)
+    let yesVote = proposal.yesVote->Belt.Option.getWithDefault(0.) /. 1e6
+    let noVote = proposal.noVote->Belt.Option.getWithDefault(0.) /. 1e6
+    let noWithVetoVote = proposal.noWithVetoVote->Belt.Option.getWithDefault(0.) /. 1e6
+    let abstainVote = proposal.abstainVote->Belt.Option.getWithDefault(0.) /. 1e6
     let totalVote = yesVote +. noVote +. noWithVetoVote +. abstainVote
     let yesVotePercent = totalVote == 0. ? 0. : yesVote /. totalVote *. 100.
-    let totalBondedTokens = proposal.totalBondedTokens->Belt.Option.getWithDefault(1.)
+    let totalBondedTokens = proposal.totalBondedTokens->Belt.Option.getWithDefault(0.) /. 1e6
     let turnout = totalVote /. totalBondedTokens *. 100.
     let isYesPassed = yesVotePercent >= yesTheshold
     let isTurnoutPassed = turnout >= turnoutTheshold
