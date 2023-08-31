@@ -127,7 +127,8 @@ module Vote = {
 
     let openDepositors = () =>
       vetoProposal.id->ID.LegacyProposal.toInt->Depositors->OpenModal->dispatchModal
-    let vote = () => Syncing->OpenModal->dispatchModal
+    let vote = () =>
+      (vetoProposal.id, "vetoProposal name")->SubmitMsg.VetoVote->SubmitTx->OpenModal->dispatchModal
 
     <Row marginTopSm=24>
       <Col col=Col.Twelve mb=8 style={CssHelper.flexBox()}>

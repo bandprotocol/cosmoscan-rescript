@@ -125,6 +125,45 @@ module Fee = {
   @send external getGranter: t => string = "getGranter"
 }
 
+module Proposal = {
+  type t
+  module TextProposal = {
+    @module("@bandprotocol/bandchain.js") @scope("Proposal") @new
+    external // (title: string, description: string)
+    create: (string, string) => t = "TextProposal"
+  }
+
+  module CommunityPoolSpendProposal = {
+    @module("@bandprotocol/bandchain.js") @scope("Proposal") @new
+    external // (title: string, description: string, recipient: string, amount: Coin[])
+    create: (string, string, string, array<Coin.t>) => t = "CommunityPoolSpendProposal"
+  }
+
+  module ParameterChangeProposal = {
+    @module("@bandprotocol/bandchain.js") @scope("Proposal") @new
+    external // (title: string, description: string, changes: ParamChange[])
+    create: (string, string, Js.Json.t) => t = "ParameterChangeProposal"
+  }
+
+  module SoftwareUpgradeProposal = {
+    @module("@bandprotocol/bandchain.js") @scope("Proposal") @new
+    external // (title: string, description: string, plan: Plan)
+    create: (string, string, Js.Json.t) => t = "SoftwareUpgradeProposal"
+  }
+
+  module CancelSoftwareUpgradeProposal = {
+    @module("@bandprotocol/bandchain.js") @scope("Proposal") @new
+    external // (title: string, description: string)
+    create: (string, string) => t = "CancelSoftwareUpgradeProposal"
+  }
+
+  module VetoProposal = {
+    @module("@bandprotocol/bandchain.js") @scope("Proposal") @new
+    external // (proposalId: number, description: string)
+    create: (int, string) => t = "VetoProposal"
+  }
+}
+
 module Message = {
   type t
   module MsgSend = {
@@ -165,7 +204,7 @@ module Message = {
   module MsgSubmitProposal = {
     //  (initialDepositList: Coin[], proposer: string, content?: Proposal.Content);
     @module("@bandprotocol/bandchain.js") @scope("Message") @new
-    external create: (array<Coin.t>, string, Js.Json.t) => t = "MsgSubmitProposal"
+    external create: (array<Coin.t>, string, Proposal.t) => t = "MsgSubmitProposal"
 
     @send external toJSON: t => Js.Json.t = "toJSON"
   }

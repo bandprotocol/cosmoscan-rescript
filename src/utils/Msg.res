@@ -693,6 +693,12 @@ module Gov = {
       proposalID: 'a,
     }
 
+    type input_t = {
+      initialDepositList: array<BandChainJS.Coin.t>,
+      proposer: Address.t,
+      proposalID: ID.Proposal.t,
+    }
+
     type success_t = t<ID.LegacyProposal.t>
     type fail_t = t<unit>
 
@@ -1440,6 +1446,7 @@ module Input = {
     | IBCTransfer(ibc_transfer_t)
     // Council
     | VoteMsg(Council.Vote.input_t)
+    | SubmitVetoProposal(Gov.SubmitProposal.input_t)
 }
 
 type rec msg_t =

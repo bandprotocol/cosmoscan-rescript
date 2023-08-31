@@ -69,6 +69,14 @@ let createMsg = (msg: Msg.Input.t) => {
     MsgVote.create(proposalID->ID.LegacyProposal.toInt, voterAddress->Address.toBech32, option)
   | VoteMsg({proposalID, voterAddress, option}) =>
     MsgVoteCouncil.create(proposalID->ID.Proposal.toInt, voterAddress->Address.toBech32, option)
+  | SubmitVetoProposal({initialDepositList, proposer, proposalID}) => {
+      let vetoProposal = BandChainJS.Proposal.VetoProposal.create(
+        proposalID->ID.Proposal.toInt,
+        `Veto Proposal against ${proposalID->ID.Proposal.toString}`,
+      )
+      MsgSubmitProposal.create(initialDepositList, proposer->Address.toBech32, vetoProposal)
+    }
+
   | IBCTransfer({sourcePort, sourceChannel, receiver, token, timeoutTimestamp, sender}) =>
     MsgTransfer.create(
       sourcePort,

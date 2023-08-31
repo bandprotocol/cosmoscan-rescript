@@ -6,7 +6,7 @@ type t =
   | WithdrawReward(Address.t)
   | Reinvest(Address.t, float)
   | Vote(ID.Proposal.t, string)
-  | VetoVote(ID.Proposal.t, string)
+  | VetoVote(ID.LegacyProposal.t, string)
   | OpenVeto(ID.Proposal.t, string, list<Coin.t>)
 
 let toString = x =>

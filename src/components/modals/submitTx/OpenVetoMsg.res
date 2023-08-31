@@ -6,26 +6,28 @@ module Styles = {
 
 @react.component
 let make = (~address, ~proposalID, ~totalDeposit, ~proposalName, ~setMsgsOpt) => {
-  let (answerOpt, setAnswerOpt) = React.useState(_ => Vote.YesNo.Unknown)
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   let accountSub = AccountSub.get(address)
 
   let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
-  // React.useEffect1(_ => {
-  //   let msgsOpt = {
-  //     let answer = answerOpt->Belt.Option.getWithDefault(1)
-  //     Some([
-  //       Msg.Input.VoteMsg({
-  //         voterAddress: address,
-  //         proposalID,
-  //         option: answer,
-  //       }),
-  //     ])
-  //   }
-  //   setMsgsOpt(_ => msgsOpt)
-  //   None
-  // }, [answerOpt])
+  React.useEffect1(_ => {
+    let msgsOpt = {
+      Some([
+        Msg.Input.SubmitVetoProposal({
+          initialDepositList: [
+            Coin.newUBANDFromAmount(
+              amount.value->Belt.Option.getWithDefault(0.),
+            )->Coin.toBandChainJsCoin,
+          ],
+          proposer: address,
+          proposalID,
+        }),
+      ])
+    }
+    setMsgsOpt(_ => msgsOpt)
+    None
+  }, [amount])
 
   <>
     <div className=Styles.container>

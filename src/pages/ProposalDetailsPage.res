@@ -205,7 +205,13 @@ module RenderData = {
                       totalDeposit={list{Coin.newCoin("uband", 0.)}}
                     />
                   }
-                | _ => React.null
+                | _ =>
+                  <OpenVetoButton
+                    proposalID=proposal.id
+                    proposalName=proposal.title
+                    address
+                    totalDeposit={list{Coin.newCoin("uband", 0.)}}
+                  />
                 }}
               </Col>
             | None => React.null

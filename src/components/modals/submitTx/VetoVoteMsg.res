@@ -57,7 +57,7 @@ let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
       />
       <VSpacing size=Spacing.xs />
       <Text
-        value={`${proposalID->ID.Proposal.toString} ${proposalName}`}
+        value={`${proposalID->ID.LegacyProposal.toString} ${proposalName}`}
         size=Text.Body1
         weight=Text.Semibold
         color=theme.neutral_900
