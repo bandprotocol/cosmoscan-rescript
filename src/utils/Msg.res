@@ -731,13 +731,13 @@ module Gov = {
   module Deposit = {
     type t<'a> = {
       depositor: Address.t,
-      proposalID: ID.Proposal.t,
+      proposalID: ID.LegacyProposal.t,
       amount: list<Coin.t>,
       title: 'a,
     }
 
     type input_t = {
-      proposalID: ID.Proposal.t,
+      proposalID: ID.LegacyProposal.t,
       depositor: Address.t,
       amount: list<Coin.t>,
     }
@@ -753,7 +753,7 @@ module Gov = {
       open JsonUtils.Decode
       buildObject(json => {
         depositor: json.required(list{"msg", "depositor"}, address),
-        proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+        proposalID: json.required(list{"msg", "proposal_id"}, ID.LegacyProposal.decoder),
         amount: json.required(list{"msg", "amount"}, list(Coin.decodeCoin)),
         title: json->titleD,
       })

@@ -79,7 +79,7 @@ let createMsg = (msg: Msg.Input.t) => {
 
   | DepositMsg({proposalID, depositor, amount}) =>
     MsgDeposit.create(
-      proposalID->ID.Proposal.toInt,
+      proposalID->ID.LegacyProposal.toInt,
       depositor->Address.toBech32,
       amount->Coin.toBandChainJsCoins,
     )

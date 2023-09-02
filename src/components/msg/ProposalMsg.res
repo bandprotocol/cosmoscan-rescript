@@ -73,7 +73,7 @@ module Deposit = {
       <BadgeWrapper>
         <AmountRender coins=amount size={Body2} />
         <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
-        <TypeID.Proposal id=proposalID />
+        <TypeID.LegacyProposal id=proposalID />
         <Text value=title size=Text.Body2 nowrap=true block=true />
       </BadgeWrapper>
   }
@@ -82,7 +82,7 @@ module Deposit = {
     @react.component
     let make = (~proposalID) =>
       <BadgeWrapper>
-        <TypeID.Proposal id=proposalID />
+        <TypeID.LegacyProposal id=proposalID />
       </BadgeWrapper>
   }
 }

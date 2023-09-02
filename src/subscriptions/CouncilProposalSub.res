@@ -99,8 +99,8 @@ module VetoProposal = {
   }
 
   // percent of yes vote to win
-  let yesTheshold = 50.
-  let turnoutTheshold = 40.
+  let yesThreshold = 50.
+  let turnoutThreshold = 40.
 
   let fromProposal = (proposal: proposal_t) => {
     let yesVote = proposal.yesVote->Belt.Option.getWithDefault(0.) /. 1e6
@@ -111,8 +111,8 @@ module VetoProposal = {
     let yesVotePercent = totalVote == 0. ? 0. : yesVote /. totalVote *. 100.
     let totalBondedTokens = proposal.totalBondedTokens->Belt.Option.getWithDefault(0.) /. 1e6
     let turnout = totalVote /. totalBondedTokens *. 100.
-    let isYesPassed = yesVotePercent >= yesTheshold
-    let isTurnoutPassed = turnout >= turnoutTheshold
+    let isYesPassed = yesVotePercent >= yesThreshold
+    let isTurnoutPassed = turnout >= turnoutThreshold
 
     {
       id: proposal.id,
@@ -307,7 +307,7 @@ let parseProposalType = councilName =>
   }
 
 // percent of yes vote required for proposal to win
-let passedTheshold = 50.
+let passedThreshold = 50.
 
 let toExternal = (
   {
@@ -361,11 +361,11 @@ let toExternal = (
     submitTime,
     totalWeight,
     proposalType: council.name->parseProposalType,
-    councilVoteStatus: switch yesVotePercent >= passedTheshold {
+    councilVoteStatus: switch yesVotePercent >= passedThreshold {
     | true => Pass
     | false => Reject
     },
-    currentStatus: switch yesVotePercent >= passedTheshold {
+    currentStatus: switch yesVotePercent >= passedThreshold {
     | true =>
       switch vetoProposalOpt {
       | Some(vetoProposal) =>
@@ -377,7 +377,7 @@ let toExternal = (
       }
     | false => Reject
     },
-    isCurrentRejectByVeto: switch yesVotePercent >= passedTheshold {
+    isCurrentRejectByVeto: switch yesVotePercent >= passedThreshold {
     | true =>
       switch vetoProposalOpt {
       | Some(vetoProposal) =>

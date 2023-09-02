@@ -12,15 +12,46 @@ module Styles = {
       backgroundColor(color),
       marginRight(#px(8)),
     ])
+
+  let underline = style(. [textDecoration(#underline)])
+}
+
+module DepositButton = {
+  @react.component
+  let make = (
+    ~accountOpt: option<AccountContext.t>,
+    ~proposalID,
+    ~proposalName,
+    ~vetoID,
+    ~totalDeposit,
+  ) => {
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+    let openVeto = () =>
+      Deposit(proposalID, proposalName, vetoID, totalDeposit)->SubmitTx->OpenModal->dispatchModal
+
+    switch accountOpt {
+    | Some({address}) =>
+      <Button variant={Text} onClick={_ => openVeto()} style=Styles.underline>
+        {"Deposit"->React.string}
+      </Button>
+    | None => React.null
+    }
+  }
 }
 
 module Wait = {
   @react.component
-  let make = (~vetoId: int, ~totalDepositOpt: option<float>) => {
+  let make = (
+    ~proposal: CouncilProposalSub.t,
+    ~vetoProposal: CouncilProposalSub.VetoProposal.t,
+    ~totalDeposit: Coin.t,
+  ) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let (accountOpt, _) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-    let openDepositors = () => vetoId->Depositors->OpenModal->dispatchModal
+    let openDepositors = () =>
+      vetoProposal.id->ID.LegacyProposal.toInt->Depositors->OpenModal->dispatchModal
 
     <Row marginTopSm=24>
       <Col col=Col.Twelve mb=8 style={CssHelper.flexBox()}>
@@ -83,16 +114,21 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
             <Col col=Col.Seven>
               <div className={CssHelper.flexBox()}>
                 <Text
-                  // if none totalDepositOpt exist getWithDefault with 0
-                  value={`${totalDepositOpt
-                    ->Belt.Option.getWithDefault(0.)
+                  value={`${totalDeposit
+                    ->Coin.getBandAmountFromCoin
                     ->Format.fPretty(~digits=0)}/1,000 BAND`}
                   size=Text.Body1
                   code=true
                   color=theme.neutral_900
                 />
                 <HSpacing size=Spacing.sm />
-                <Button variant={Text}> {"Deposit"->React.string} </Button>
+                <DepositButton
+                  accountOpt
+                  proposalID=proposal.id
+                  proposalName=proposal.title
+                  vetoID=vetoProposal.id
+                  totalDeposit={list{totalDeposit}}
+                />
               </div>
             </Col>
           </Row>
@@ -116,6 +152,28 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
   }
 }
 
+module VetoVoteButton = {
+  @react.component
+  let make = (
+    ~accountOpt: option<AccountContext.t>,
+    ~vetoProposal: CouncilProposalSub.VetoProposal.t,
+  ) => {
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+    let vote = () =>
+      (vetoProposal.id, "vetoProposal name")->SubmitMsg.VetoVote->SubmitTx->OpenModal->dispatchModal
+
+    switch accountOpt {
+    | Some({address}) =>
+      <Button
+        variant={Outline} px=70 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
+        {"Vote"->React.string}
+      </Button>
+
+    | None => React.null
+    }
+  }
+}
+
 module Vote = {
   @react.component
   let make = (
@@ -125,28 +183,27 @@ module Vote = {
     ~bondedToken: float,
   ) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    let (accountOpt, _) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
     let openDepositors = () =>
       vetoProposal.id->ID.LegacyProposal.toInt->Depositors->OpenModal->dispatchModal
-    let vote = () =>
-      (vetoProposal.id, "vetoProposal name")->SubmitMsg.VetoVote->SubmitTx->OpenModal->dispatchModal
 
     let turnout = switch status {
-    | VetoPeriod => voteStat.total /. bondedToken
+    | VetoPeriod => voteStat.total /. bondedToken *. 100.
     | _ => vetoProposal.turnout
     }
 
     let isTurnoutPassed = switch status {
     | VetoPeriod =>
-      (turnout > CouncilProposalSub.VetoProposal.turnoutTheshold)
+      (turnout > CouncilProposalSub.VetoProposal.turnoutThreshold)
         ->CouncilProposalSub.CurrentStatus.fromBool
     | _ => vetoProposal.isTurnoutPassed
     }
 
     let isYesPassed = switch status {
     | VetoPeriod =>
-      (voteStat.totalYes /. voteStat.total > CouncilProposalSub.VetoProposal.yesTheshold)
+      (voteStat.totalYes /. voteStat.total >= CouncilProposalSub.VetoProposal.yesThreshold)
         ->CouncilProposalSub.CurrentStatus.fromBool
     | _ => vetoProposal.isYesPassed
     }
@@ -235,8 +292,8 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                       marginRight=8
                     />
                     <Text
-                      // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
-                      value={`min ${CouncilProposalSub.VetoProposal.turnoutTheshold->Belt.Float.toString}%`}
+                      // minimum yes vote to pass set in CouncilProposalSub.passedThreshold
+                      value={`min ${CouncilProposalSub.VetoProposal.turnoutThreshold->Belt.Float.toString}%`}
                       size=Text.Body2
                       weight=Text.Regular
                       color={theme.neutral_600}
@@ -273,8 +330,8 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
                       marginRight=8
                     />
                     <Text
-                      // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
-                      value={`min ${CouncilProposalSub.VetoProposal.yesTheshold->Belt.Float.toString}%`}
+                      // minimum yes vote to pass set in CouncilProposalSub.passedThreshold
+                      value={`min ${CouncilProposalSub.VetoProposal.yesThreshold->Belt.Float.toString}%`}
                       size=Text.Body2
                       weight=Text.Regular
                       color={theme.neutral_600}
@@ -333,15 +390,7 @@ A veto proposal will pass and the proposal being vetoed will be rejected if the 
             | VetoPeriod =>
               <Hidden variant={Mobile}>
                 <Col col=Col.Six style={CssHelper.flexBox(~justify=#end_, ~align=#flexStart, ())}>
-                  <Button
-                    variant={Outline}
-                    px=70
-                    py=10
-                    fsize=14
-                    style={CssHelper.flexBox()}
-                    onClick={_ => vote()}>
-                    {"Vote"->React.string}
-                  </Button>
+                  <VetoVoteButton accountOpt vetoProposal />
                 </Col>
               </Hidden>
             | _ => React.null

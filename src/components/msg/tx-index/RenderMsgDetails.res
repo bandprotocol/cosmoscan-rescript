@@ -903,7 +903,7 @@ module Deposit = {
         title: "Proposal ID",
         content: ID(
           <div className={CssHelper.flexBox()}>
-            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+            <TypeID.LegacyProposal position=TypeID.Subtitle id={msg.proposalID} />
           </div>,
         ),
         order: 2,

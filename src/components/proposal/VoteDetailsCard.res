@@ -35,7 +35,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
     totalWeight,
   } = Council.calculateVote(votes, proposal.council.councilMembers)
 
-  let currentStatus = switch yesVotePercent >= CouncilProposalSub.passedTheshold {
+  let currentStatus = switch yesVotePercent >= CouncilProposalSub.passedThreshold {
   | true => CouncilProposalSub.CurrentStatus.Pass
   | false => Reject
   }
@@ -79,8 +79,8 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                       marginRight=8
                     />
                     <Text
-                      // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
-                      value={`min ${CouncilProposalSub.passedTheshold->Belt.Float.toString}%`}
+                      // minimum yes vote to pass set in CouncilProposalSub.passedThreshold
+                      value={`min ${CouncilProposalSub.passedThreshold->Belt.Float.toString}%`}
                       size=Text.Body2
                       weight=Text.Regular
                       color={theme.neutral_600}
@@ -245,7 +245,7 @@ module Legacy = {
                       marginRight=8
                     />
                     <Text
-                      // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
+                      // minimum yes vote to pass set in CouncilProposalSub.passedThreshold
                       value="min 40%"
                       size=Text.Body2
                       weight=Text.Regular
@@ -284,7 +284,7 @@ module Legacy = {
                       marginRight=8
                     />
                     <Text
-                      // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
+                      // minimum yes vote to pass set in CouncilProposalSub.passedThreshold
                       value="min 50%"
                       size=Text.Body2
                       weight=Text.Regular

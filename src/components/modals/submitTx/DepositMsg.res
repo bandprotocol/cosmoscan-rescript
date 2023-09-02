@@ -5,7 +5,7 @@ module Styles = {
 }
 
 @react.component
-let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
+let make = (~address, ~proposalID, ~vetoProposalID, ~totalDeposit, ~proposalName, ~setMsgsOpt) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   let accountSub = AccountSub.get(address)
@@ -13,14 +13,10 @@ let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
   let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
   React.useEffect1(_ => {
     let msgsOpt = Some([
-      Msg.Input.SubmitVetoProposal({
-        initialDepositList: [
-          Coin.newUBANDFromAmount(
-            amount.value->Belt.Option.getWithDefault(0.),
-          )->Coin.toBandChainJsCoin,
-        ],
-        proposer: address,
-        proposalID,
+      Msg.Input.DepositMsg({
+        amount: list{Coin.newUBANDFromAmount(amount.value->Belt.Option.getWithDefault(0.))},
+        depositor: address,
+        proposalID: vetoProposalID,
       }),
     ])
 
@@ -63,6 +59,34 @@ let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
         nowrap=true
         block=true
       />
+      <VSpacing size=Spacing.md />
+      <Text
+        value="Total Deposit (BAND)"
+        size=Text.Body2
+        weight=Text.Regular
+        color={theme.neutral_900}
+        nowrap=true
+        block=true
+      />
+      <VSpacing size=Spacing.xs />
+      <div className={CssHelper.flexBox()}>
+        <Text
+          value={`${totalDeposit->Coin.getBandAmountFromCoins->Belt.Float.toString}/1,000`}
+          size=Text.Body1
+          weight=Text.Bold
+          color=theme.neutral_900
+          code=true
+        />
+        <Text
+          value={`(${(1000. -. totalDeposit->Coin.getBandAmountFromCoins)
+              ->Belt.Float.toString} left)`}
+          size=Text.Body2
+          weight=Text.Regular
+          color=theme.neutral_600
+          code=true
+        />
+      </div>
+      <VSpacing size=Spacing.md />
     </div>
     {switch accountSub {
     | Data({balance}) =>
