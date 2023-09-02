@@ -86,10 +86,10 @@ module VoteButton = {
 
 module OpenVetoButton = {
   @react.component
-  let make = (~proposalID, ~address, ~proposalName, ~totalDeposit) => {
+  let make = (~proposalID, ~address, ~proposalName, ~totalDepositOpt) => {
     let (_, dispatchModal) = React.useContext(ModalContext.context)
     let openVeto = () =>
-      OpenVeto(proposalID, proposalName, totalDeposit)->SubmitTx->OpenModal->dispatchModal
+      OpenVeto(proposalID, proposalName, totalDepositOpt)->SubmitTx->OpenModal->dispatchModal
     let accountQuery = AccountQuery.get(address)
 
     <Button
@@ -199,23 +199,20 @@ module RenderData = {
                   switch proposal.vetoProposalOpt {
                   | Some({totalDeposit}) =>
                     <OpenVetoButton
-                      proposalID=proposal.id proposalName=proposal.title address totalDeposit
+                      proposalID=proposal.id
+                      proposalName=proposal.title
+                      address
+                      totalDepositOpt={Some(totalDeposit)}
                     />
                   | None =>
                     <OpenVetoButton
                       proposalID=proposal.id
                       proposalName=proposal.title
                       address
-                      totalDeposit={list{Coin.newCoin("uband", 0.)}}
+                      totalDepositOpt=None
                     />
                   }
-                | _ =>
-                  <OpenVetoButton
-                    proposalID=proposal.id
-                    proposalName=proposal.title
-                    address
-                    totalDeposit={list{Coin.newCoin("uband", 0.)}}
-                  />
+                | _ => React.null
                 }}
               </Col>
             | None => React.null

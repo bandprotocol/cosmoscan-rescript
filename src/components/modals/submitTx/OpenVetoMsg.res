@@ -5,14 +5,24 @@ module Styles = {
 }
 
 @react.component
-let make = (~address, ~proposalID, ~totalDeposit, ~proposalName, ~setMsgsOpt) => {
+let make = (~address, ~proposalID, ~totalDepositOpt, ~proposalName, ~setMsgsOpt) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   let accountSub = AccountSub.get(address)
 
   let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
   React.useEffect1(_ => {
-    let msgsOpt = {
+    let msgsOpt = switch totalDepositOpt {
+    | Some(totalDeposit) =>
+      Some([
+        Msg.Input.DepositMsg({
+          amount: list{Coin.newUBANDFromAmount(amount.value->Belt.Option.getWithDefault(0.))},
+          depositor: address,
+          proposalID,
+        }),
+      ])
+
+    | None =>
       Some([
         Msg.Input.SubmitVetoProposal({
           initialDepositList: [
@@ -65,8 +75,8 @@ let make = (~address, ~proposalID, ~totalDeposit, ~proposalName, ~setMsgsOpt) =>
         block=true
       />
       <VSpacing size=Spacing.md />
-      {switch totalDeposit->Coin.getBandAmountFromCoins > 0. {
-      | true =>
+      {switch totalDepositOpt {
+      | Some(totalDeposit) =>
         <>
           <Text
             value="Total Deposit (BAND)"
@@ -96,7 +106,7 @@ let make = (~address, ~proposalID, ~totalDeposit, ~proposalName, ~setMsgsOpt) =>
           </div>
           <VSpacing size=Spacing.md />
         </>
-      | false => React.null
+      | None => React.null
       }}
     </div>
     {switch accountSub {

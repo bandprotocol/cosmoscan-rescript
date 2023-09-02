@@ -77,6 +77,13 @@ let createMsg = (msg: Msg.Input.t) => {
       MsgSubmitProposal.create(initialDepositList, proposer->Address.toBech32, vetoProposal)
     }
 
+  | DepositMsg({proposalID, depositor, amount}) =>
+    MsgDeposit.create(
+      proposalID->ID.Proposal.toInt,
+      depositor->Address.toBech32,
+      amount->Coin.toBandChainJsCoins,
+    )
+
   | IBCTransfer({sourcePort, sourceChannel, receiver, token, timeoutTimestamp, sender}) =>
     MsgTransfer.create(
       sourcePort,

@@ -736,6 +736,12 @@ module Gov = {
       title: 'a,
     }
 
+    type input_t = {
+      proposalID: ID.Proposal.t,
+      depositor: Address.t,
+      amount: list<Coin.t>,
+    }
+
     type success_t = t<string>
     type fail_t = t<unit>
 
@@ -1447,7 +1453,7 @@ module Input = {
     // Council
     | VoteMsg(Council.Vote.input_t)
     | SubmitVetoProposal(Gov.SubmitProposal.input_t)
-  // | Deposir
+    | DepositMsg(Gov.Deposit.input_t)
 }
 
 type rec msg_t =

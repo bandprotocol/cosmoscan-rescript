@@ -7,7 +7,7 @@ type t =
   | Reinvest(Address.t, float)
   | Vote(ID.Proposal.t, string)
   | VetoVote(ID.LegacyProposal.t, string)
-  | OpenVeto(ID.Proposal.t, string, list<Coin.t>)
+  | OpenVeto(ID.Proposal.t, string, option<list<Coin.t>>)
 
 let toString = x =>
   switch x {
