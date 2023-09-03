@@ -21,9 +21,19 @@ module Styles = {
       ]),
     ])
   let links = style(. [
-    selector("a", [marginRight(#px(40))]),
-    selector("a:last-child", [marginRight(#px(0))]),
-    Media.mobile([selector("a", [marginRight(#px(16))])]),
+    selector(
+      "a",
+      [
+        marginRight(#px(40)),
+        Media.mobile([
+          marginRight(#zero),
+          width(#percent(100.)),
+          justifyContent(#center),
+          marginBottom(#px(16)),
+        ]),
+      ],
+    ),
+    selector("a:last-child", [marginRight(#px(0)), Media.mobile([marginBottom(#px(0))])]),
   ])
 }
 
@@ -55,7 +65,8 @@ let make = () => {
     })}>
     <div className=CssHelper.container>
       <Row alignItems=Row.Center>
-        <Col col=Col.Six mbSm=24>
+        <Col col=Col.Eight colSm={Twelve} mbSm=24>
+          {isMobile ? <SocialList /> : React.null}
           <div
             className={Css.merge(list{
               CssHelper.flexBox(~justify=isMobile ? #center : #flexStart, ()),
@@ -70,7 +81,7 @@ let make = () => {
             ->React.array}
           </div>
         </Col>
-        <Col col=Col.Six>
+        <Col col=Col.Four colSm={Twelve}>
           <div className={CssHelper.flexBox(~justify=isMobile ? #center : #flexEnd, ())}>
             <Text block=true value="Band Protocol" weight=Text.Semibold color=theme.neutral_600 />
             <HSpacing size=#px(5) />

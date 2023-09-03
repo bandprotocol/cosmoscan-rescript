@@ -27,7 +27,6 @@ module Styles = {
   ])
 
   let menuContainer = style(. [
-    marginLeft(#px(16)),
     display(#flex),
     alignItems(#center),
     justifyContent(#center),
@@ -39,39 +38,48 @@ module Styles = {
 }
 
 @react.component
-let make = (~toggleSidebar, ~show) => {
+let make = (~setShow, ~show) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let isMobile = Media.isMobile()
+  let currentRoute = RescriptReactRouter.useUrl()->Route.fromUrl
 
   <div className={Css.merge(list{"header-top", Styles.headerTop})}>
     <header className={Styles.header(theme)}>
       <div className=CssHelper.container>
         <Row alignItems=Row.Center>
-          <Col col=Col.Six colSm=Col.Eight>
+          {isMobile
+            ? <Col col=Col.One colSm=Col.One>
+                <div className={CssHelper.flexBox(~justify=#flexEnd, ~wrap=#nowrap, ())}>
+                  {isMobile
+                    ? <div className=Styles.menuContainer onClick={_ => setShow(_ => !show)}>
+                        {show
+                          ? <Icon name="fal fa-times" color={theme.neutral_900} size=24 />
+                          : <Icon name="fal fa-bars" color={theme.neutral_900} size=24 />}
+                      </div>
+                    : React.null}
+                </div>
+              </Col>
+            : React.null}
+          <Col col=Col.Six colSm=Col.Eleven>
             <div className={CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ())}>
               <SearchBar />
             </div>
           </Col>
-          <Col col=Col.Six colSm=Col.Four>
-            <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-              {isMobile
-                ? React.null
-                : <>
-                    <UserAccount />
-                    <HSpacing size=#px(10) />
-                  </>}
-              <div className={CssHelper.flexBox(~justify=#flexEnd, ~wrap=#nowrap, ())}>
-                <ToggleThemeButton />
-                {isMobile
-                  ? <div className=Styles.menuContainer onClick={_ => toggleSidebar()}>
-                      {show
-                        ? <Icon name="fal fa-times" color={theme.neutral_900} size=24 />
-                        : <Icon name="fal fa-bars" color={theme.neutral_900} size=24 />}
-                    </div>
-                  : React.null}
-              </div>
-            </div>
-          </Col>
+          {isMobile
+            ? React.null
+            : <Col col=Col.Six colSm=Col.Four>
+                <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+                  {isMobile
+                    ? React.null
+                    : <>
+                        <UserAccount />
+                        <HSpacing size=#px(10) />
+                      </>}
+                  <div className={CssHelper.flexBox(~justify=#flexEnd, ~wrap=#nowrap, ())}>
+                    {isMobile ? React.null : <ToggleThemeButton />}
+                  </div>
+                </div>
+              </Col>}
         </Row>
       </div>
     </header>

@@ -37,22 +37,31 @@ module NavContent = {
   }
 
   @react.component
-  let make = (~routes: list<array<(string, Route.t, string)>>) => {
-    let currentRoute = RescriptReactRouter.useUrl()->Route.fromUrl
+  let make = (~routes: list<array<(string, Route.t, string, string)>>) => {
+    let currentRoute = RescriptReactRouter.useUrl()
 
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <div className={"nav-container"} id="navigationBar">
       {routes
-      ->Belt.List.mapWithIndex((v, section) =>
+      ->Belt.List.mapWithIndex((v, route) =>
         <div
           className={Css.merge(list{"nav-item-wrapper", Styles.navItemWrapper(theme)})}
           key={v->Belt.Int.toString}>
           <ul>
-            {section
-            ->Belt.Array.mapWithIndex((i, (label, link, icon)) => {
+            {route
+            ->Belt.Array.mapWithIndex((i, (label, link, icon, urlSet)) => {
               <li key={i->Belt.Int.toString} className={Styles.navItem}>
-                <Link className={Styles.navLink(currentRoute == link, theme)} route=link>
+                <Link
+                  className={Styles.navLink(
+                    currentRoute.path
+                    ->Belt.List.toArray
+                    ->Belt.Array.get(0)
+                    ->Belt.Option.getWithDefault("")
+                    ->Js.String2.includes(urlSet) || currentRoute->Route.fromUrl == link,
+                    theme,
+                  )}
+                  route=link>
                   {<div className={CssHelper.flexBox(~direction=#row, ~align=#center, ())}>
                     <ReactSvg src={icon} className={Styles.iconSidebar} />
                     <HSpacing size={Spacing.sm} />
@@ -74,20 +83,20 @@ module NavContent = {
 @react.component
 let make = () => {
   let sidebarRoutes = list{
-    [("Home", Route.HomePage, Images.homeIconSidebar)],
+    [("Home", Route.HomePage, Images.homeIconSidebar, "/")],
     [
-      ("Blocks", BlockPage, Images.blockIconSidebar),
-      ("Transactions", TxHomePage, Images.txIconSidebar),
-      ("Validators", ValidatorsPage, Images.validatorIconSidebar),
-      ("Proposals", ProposalPage, Images.proposalIconSidebar),
+      ("Blocks", BlockPage, Images.blockIconSidebar, "block"),
+      ("Transactions", TxHomePage, Images.txIconSidebar, "tx"),
+      ("Validators", ValidatorsPage, Images.validatorIconSidebar, "validator"),
+      ("Proposals", ProposalPage, Images.proposalIconSidebar, "proposal"),
     ],
     [
-      ("Data Sources", DataSourcePage, Images.datasourceIconSidebar),
-      ("Oracle Scripts", OracleScriptPage, Images.oracleIconSidebar),
-      ("Requests", RequestHomePage, Images.requestIconSidebar),
+      ("Data Sources", DataSourcePage, Images.datasourceIconSidebar, "data-source"),
+      ("Oracle Scripts", OracleScriptPage, Images.oracleIconSidebar, "oracle-script"),
+      ("Requests", RequestHomePage, Images.requestIconSidebar, "request"),
     ],
-    [("Group Module", GroupPage(Group), Images.groupIconSidebar)],
-    [("IBCs", RelayersHomepage, Images.ibcIconSidebar)],
+    [("Group Module", GroupPage(Group), Images.groupIconSidebar, "group")],
+    [("IBCs", RelayersHomepage, Images.ibcIconSidebar, "relayer")],
   }
 
   <NavContent routes=sidebarRoutes />

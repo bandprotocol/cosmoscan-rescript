@@ -50,24 +50,22 @@ module Styles = {
 
 @react.component
 let make = () => {
-  let currentRoute = RescriptReactRouter.useUrl()->Route.fromUrl
   let isMobile = Media.isMobile()
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-  let (show, setShow) = React.useState(_ => false)
 
-  let toggleSidebar = () => {
-    setShow(_ => !show)
-  }
+  let (show, setShow) = React.useState(_ => false)
+  let currentPath = RescriptReactRouter.useUrl().path
+  let currentRoute = RescriptReactRouter.useUrl()->Route.fromUrl
 
   React.useEffect1(_ => {
     setShow(_ => false)
     None
-  }, [currentRoute])
+  }, [currentPath])
 
   <div className={Css.merge(list{"page-wrapper", Styles.pageWrapper})}>
-    <Sidebar isOpen=show />
+    <Sidebar show setShow />
     <div className={Css.merge(list{"main-content", Styles.container(theme), Styles.mainContent})}>
-      <Header toggleSidebar show />
+      <Header setShow show />
       <div className=Styles.routeContainer>
         {switch currentRoute {
         | HomePage => <HomePage />
@@ -99,6 +97,6 @@ let make = () => {
     </div>
     <Modal />
     <CookieBar />
-    <div onClick={_ => toggleSidebar()} className={Styles.backdropContainer(show)} />
+    <div onClick={_ => setShow(_ => false)} className={Styles.backdropContainer(show)} />
   </div>
 }
