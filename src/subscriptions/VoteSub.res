@@ -18,40 +18,67 @@ type internal_t = {
   transactionOpt: option<transaction_t>,
 }
 
+type internal_all_t = {
+  yes: int,
+  no: int,
+  noWithVeto: int,
+  abstain: int,
+  account: account_t,
+  transactionOpt: option<transaction_t>,
+}
+
+type vote_t = Vote.Full.t
+
+let toString = (~withSpace=false, x) =>
+  switch x {
+  | Vote.Full.Yes => "Yes"
+  | No => "No"
+  | NoWithVeto => withSpace ? "No With Veto" : "NoWithVeto"
+  | Abstain => "Abstain"
+  | Unknown => "Unknown"
+  }
+
 type t = {
   voter: Address.t,
   txHashOpt: option<Hash.t>,
   timestampOpt: option<MomentRe.Moment.t>,
   validator: option<validator_t>,
+  option: vote_t,
 }
 
-let toExternal = ({account: {address, validator}, transactionOpt}) => {
+let toExternal = (
+  option: Vote.Full.t,
+  {account: {address, validator}, transactionOpt}: internal_t,
+) => {
   voter: address,
   txHashOpt: transactionOpt->Belt.Option.map(({hash}) => hash),
   timestampOpt: transactionOpt->Belt.Option.map(({block}) => block.timestamp),
   validator,
+  option,
 }
 
-type vote_t =
-  | Yes
-  | No
-  | NoWithVeto
-  | Abstain
-
-let toString = (~withSpace=false, x) =>
-  switch x {
-  | Yes => "Yes"
-  | No => "No"
-  | NoWithVeto => withSpace ? "No With Veto" : "NoWithVeto"
-  | Abstain => "Abstain"
-  }
+let toExternalAll = (
+  {account: {address, validator}, transactionOpt, yes, no, noWithVeto, abstain}: internal_all_t,
+) => {
+  voter: address,
+  txHashOpt: transactionOpt->Belt.Option.map(({hash}) => hash),
+  timestampOpt: transactionOpt->Belt.Option.map(({block}) => block.timestamp),
+  validator,
+  option: switch (yes, no, noWithVeto, abstain) {
+  | (1, 0, 0, 0) => Yes
+  | (0, 1, 0, 0) => No
+  | (0, 0, 1, 0) => NoWithVeto
+  | (0, 0, 0, 1) => Abstain
+  | _ => Yes
+  },
+}
 
 type answer_vote_t = {
   validatorID: int,
   valPower: float,
   valVote: option<vote_t>,
   delVotes: vote_t => float,
-  proposalID: ID.Proposal.t,
+  proposalID: ID.LegacyProposal.t,
 }
 
 type internal_vote_t = {
@@ -65,11 +92,11 @@ type result_val_t = {
   validatorID: int,
   validatorPower: float,
   validatorAns: option<vote_t>,
-  proposalID: ID.Proposal.t,
+  proposalID: ID.LegacyProposal.t,
 }
 
 type vote_stat_t = {
-  proposalID: ID.Proposal.t,
+  proposalID: ID.LegacyProposal.t,
   totalYes: float,
   totalYesPercent: float,
   totalNo: float,
@@ -92,13 +119,38 @@ let getAnswer = json => {
   exception NoChoice(string)
   let answer = json->GraphQLParser.jsonToStringExn
   switch answer {
-  | "Yes" => Yes
+  | "Yes" => Vote.Full.Yes
   | "No" => No
   | "NoWithVeto" => NoWithVeto
   | "Abstain" => Abstain
   | _ => raise(NoChoice("There is no choice"))
   }
 }
+
+module AllVoteConfig = %graphql(`
+    subscription Votes($limit: Int!, $offset: Int!, $proposalID: Int! ) {
+      votes(limit: $limit, offset: $offset, where: {proposal_id: {_eq: $proposalID}}, order_by: [{transaction: {block_height: desc}}]) @ppxAs(type: "internal_all_t")  {
+        yes @ppxCustom(module:"GraphQLParserModule.IntString")
+        no @ppxCustom(module:"GraphQLParserModule.IntString")
+        noWithVeto: no_with_veto @ppxCustom(module:"GraphQLParserModule.IntString")
+        abstain @ppxCustom(module:"GraphQLParserModule.IntString")
+        account @ppxAs(type: "account_t")  {
+          address @ppxCustom(module:"GraphQLParserModule.Address")
+          validator @ppxAs(type: "validator_t")  {
+            moniker
+            operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
+            identity
+          }
+        }
+        transactionOpt: transaction @ppxAs(type: "transaction_t")  {
+          hash @ppxCustom(module: "GraphQLParserModule.Hash")
+          block @ppxAs(type: "block_t")  {
+            timestamp @ppxCustom(module: "GraphQLParserModule.Date")
+          }
+        }
+      }
+    }
+`)
 
 module YesVoteConfig = %graphql(`
     subscription Votes($limit: Int!, $offset: Int!, $proposalID: Int! ) {
@@ -268,87 +320,132 @@ module DelegatorVoteByProposalIDConfig = %graphql(`
 //     }
 // `)
 
-let getList = (proposalID, answer, ~page, ~pageSize, ()) => {
-  let offset = (page - 1) * pageSize
-
-  switch answer {
-  | Yes =>
-    YesVoteConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
-      limit: pageSize,
-      offset,
-    })
-    ->Sub.fromData
-    ->Sub.map(x => x.votes->Belt.Array.map(toExternal))
-
-  | No =>
-    NoVoteConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
-      limit: pageSize,
-      offset,
-    })
-    ->Sub.fromData
-    ->Sub.map(x => x.votes->Belt.Array.map(toExternal))
-
-  | NoWithVeto =>
-    NoWithVetoVoteConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
-      limit: pageSize,
-      offset,
-    })
-    ->Sub.fromData
-    ->Sub.map(x => x.votes->Belt.Array.map(toExternal))
-
-  | Abstain =>
-    AbstainVoteConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
-      limit: pageSize,
-      offset,
-    })
-    ->Sub.fromData
-    ->Sub.map(x => x.votes->Belt.Array.map(toExternal))
-  }
-}
-
 let count = (proposalID, answer) => {
   switch answer {
-  | Yes =>
+  | Vote.Full.Yes =>
     YesVoteCountConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
     })
     ->Sub.fromData
     ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
 
   | No =>
     NoVoteCountConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
     })
     ->Sub.fromData
     ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
 
   | NoWithVeto =>
     NoWithVetoVoteCountConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
     })
     ->Sub.fromData
     ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
 
   | Abstain =>
     AbstainVoteCountConfig.use({
-      proposalID: proposalID->ID.Proposal.toInt,
+      proposalID: proposalID->ID.LegacyProposal.toInt,
     })
     ->Sub.fromData
     ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+  | Unknown => Sub.NoData
   }
+}
+
+let getListAll = (proposalID, ~page, ~pageSize, ()) => {
+  let offset = (page - 1) * pageSize
+  AllVoteConfig.use({
+    proposalID: proposalID->ID.LegacyProposal.toInt,
+    limit: pageSize,
+    offset,
+  })
+  ->Sub.fromData
+  ->Sub.map(x => x.votes->Belt.Array.map(toExternalAll))
+}
+
+let getList = (proposalID, answer, ~page, ~pageSize, ()) => {
+  let offset = (page - 1) * pageSize
+
+  switch answer {
+  | Vote.Full.Yes =>
+    YesVoteConfig.use({
+      proposalID: proposalID->ID.LegacyProposal.toInt,
+      limit: pageSize,
+      offset,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes->Belt.Array.map(toExternal(Vote.Full.Yes)))
+
+  | No =>
+    NoVoteConfig.use({
+      proposalID: proposalID->ID.LegacyProposal.toInt,
+      limit: pageSize,
+      offset,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes->Belt.Array.map(toExternal(Vote.Full.No)))
+
+  | NoWithVeto =>
+    NoWithVetoVoteConfig.use({
+      proposalID: proposalID->ID.LegacyProposal.toInt,
+      limit: pageSize,
+      offset,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes->Belt.Array.map(toExternal(Vote.Full.NoWithVeto)))
+
+  | Abstain =>
+    AbstainVoteConfig.use({
+      proposalID: proposalID->ID.LegacyProposal.toInt,
+      limit: pageSize,
+      offset,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes->Belt.Array.map(toExternal(Vote.Full.Abstain)))
+  | Unknown => Sub.NoData
+  }
+}
+
+let countAll = proposalID => {
+  let yesVoteSub =
+    YesVoteCountConfig.use({
+      proposalID: proposalID->ID.LegacyProposal.toInt,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+
+  let noVoteSub =
+    NoVoteCountConfig.use({
+      proposalID: proposalID->ID.LegacyProposal.toInt,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+
+  let noWithVetoVoteSub =
+    NoWithVetoVoteCountConfig.use({
+      proposalID: proposalID->ID.LegacyProposal.toInt,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+
+  let abstainVoteSub =
+    AbstainVoteCountConfig.use({
+      proposalID: proposalID->ID.LegacyProposal.toInt,
+    })
+    ->Sub.fromData
+    ->Sub.map(x => x.votes_aggregate.aggregate->Belt.Option.mapWithDefault(0, y => y.count))
+
+  Sub.all4(yesVoteSub, noVoteSub, noWithVetoVoteSub, abstainVoteSub)
 }
 
 // TODO: mess a lot with option need to clean
 let getVoteStatByProposalID = proposalID => {
   let validatorVotes = ValidatorVoteByProposalIDConfig.use({
-    proposalID: proposalID->ID.Proposal.toInt,
+    proposalID: proposalID->ID.LegacyProposal.toInt,
   })
   let delegatorVotes = DelegatorVoteByProposalIDConfig.use({
-    proposalID: proposalID->ID.Proposal.toInt,
+    proposalID: proposalID->ID.LegacyProposal.toInt,
   })
 
   let val_votes =

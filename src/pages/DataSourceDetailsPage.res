@@ -173,14 +173,9 @@ module Content = {
                   <Col col=Col.Nine>
                     {switch dataSourceSub {
                     | Data({timestamp}) =>
-                      switch timestamp {
-                      | Some(time) =>
-                        <Timestamp
-                          time code=true size={Body1} color={theme.neutral_900} weight={Thin}
-                        />
-                      | None =>
-                        <Text value="N/A" code=true size={Body1} color={theme.neutral_900} />
-                      }
+                      <Timestamp
+                        timeOpt=timestamp size={Body1} color={theme.neutral_900} weight={Thin}
+                      />
                     | _ => <LoadingCensorBar width=284 height=15 />
                     }}
                   </Col>

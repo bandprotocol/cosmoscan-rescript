@@ -1,288 +1,257 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [Media.mobile([margin2(~h=#px(-12), ~v=#zero)])])
-
-  let header = (theme: Theme.t) =>
+  let chip = style(. [borderRadius(#px(20)), marginRight(#px(8))])
+  let voteRowContainer = (theme: Theme.t, isDarkMode) =>
     style(. [
-      borderBottom(#px(1), #solid, theme.neutral_100),
-      selector("> div + div", [marginLeft(#px(32))]),
-      Media.mobile([overflow(#auto), padding2(~v=#px(1), ~h=#px(15))]),
+      backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
+      padding2(~v=#px(16), ~h=#px(32)),
+      borderRadius(#px(16)),
+      marginBottom(#px(8)),
+      boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), rgba(16, 18, 20, #num(0.15)))),
+      border(#px(1), #solid, theme.neutral_100),
+      Media.mobile([padding2(~v=#px(16), ~h=#px(24))]),
     ])
 
-  let buttonContainer = (theme: Theme.t, active) =>
-    style(. [
-      display(#inlineFlex),
-      justifyContent(#center),
-      alignItems(#center),
-      cursor(#pointer),
-      padding3(~top=#zero, ~bottom=#px(16), ~h=#zero),
-      borderBottom(#px(4), #solid, active ? theme.primary_600 : #transparent),
-      Media.mobile([whiteSpace(#nowrap), padding2(~v=#px(24), ~h=#zero)]),
-    ])
-
-  let childrenContainer = style(. [Media.mobile([padding2(~h=#px(16), ~v=#zero)])])
-
-  let tableWrapper = style(. [Media.mobile([padding2(~v=#px(16), ~h=#zero)])])
-  let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
+  let filterButtonGroup = style(. [display(#flex), width(#vw(75.)), overflow(#scroll)])
+  let innerContainer = style(. [display(#flex), width(#vw(100.)), whiteSpace(#nowrap)])
 }
 
-module RenderBody = {
-  @react.component
-  let make = (~voteSub: Sub.variant<VoteSub.t>) => {
-    <TBody>
-      <Row alignItems=Row.Center>
-        <Col col=Col.Five>
-          {switch voteSub {
-          | Data({voter, validator}) =>
-            switch validator {
-            | Some({moniker, operatorAddress, identity}) =>
-              <ValidatorMonikerLink
-                validatorAddress=operatorAddress
-                moniker
-                identity
-                width={#percent(100.)}
-                avatarWidth=20
-              />
-            | None => <AddressRender address=voter />
-            }
-          | _ => <LoadingCensorBar width=200 height=20 />
-          }}
-        </Col>
-        <Col col=Col.Four>
-          {switch voteSub {
-          | Data({txHashOpt}) =>
-            switch txHashOpt {
-            | Some(txHash) => <TxLink txHash width=200 />
-            | None => <Text value="Voted on Wenchang" />
-            }
-          | _ => <LoadingCensorBar width=200 height=20 />
-          }}
-        </Col>
-        <Col col=Col.Three>
-          <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-            {switch voteSub {
-            | Data({timestampOpt}) =>
-              switch timestampOpt {
-              | Some(timestamp) =>
-                <Timestamp
-                  time=timestamp size=Text.Body2 weight=Text.Regular textAlign=Text.Right
-                />
-              | None => <Text value="Created on Wenchang" />
-              }
-            | _ => <LoadingCensorBar width=80 height=15 />
-            }}
-          </div>
-        </Col>
-      </Row>
-    </TBody>
+module VoteRow = {
+  type t = {
+    address: Address.t,
+    transactionOpt: option<CouncilVoteSub.transaction_t>,
+    optionOpt: option<Vote.YesNo.t>,
+    timestampOpt: option<MomentRe.Moment.t>,
   }
-}
 
-module RenderBodyMobile = {
-  @react.component
-  let make = (~reserveIndex, ~voteSub: Sub.variant<VoteSub.t>) => {
-    switch voteSub {
-    | Data({voter, txHashOpt, timestampOpt, validator}) =>
-      let key_ = voter->Address.toBech32
-
-      <MobileCard
-        values={
-          open InfoMobileCard
-          [
-            (
-              "Voter",
-              {
-                switch validator {
-                | Some({operatorAddress, moniker, identity}) =>
-                  Validator(operatorAddress, moniker, identity)
-                | None => Address(voter, 200, #account)
-                }
-              },
-            ),
-            (
-              "TX Hash",
-              switch txHashOpt {
-              | Some(txHash) => TxHash(txHash, 200)
-              | None => Text("Voted on Wenchang")
-              },
-            ),
-            (
-              "Timestamp",
-              switch timestampOpt {
-              | Some(timestamp) => Timestamp(timestamp)
-              | None => Text("Created on Wenchang")
-              },
-            ),
-          ]
-        }
-        key=key_
-        idx=key_
-      />
-    | _ =>
-      <MobileCard
-        values={
-          open InfoMobileCard
-          [("Voter", Loading(230)), ("TX Hash", Loading(100)), ("Timestamp", Loading(100))]
-        }
-        key={reserveIndex->Belt.Int.toString}
-        idx={reserveIndex->Belt.Int.toString}
-      />
+  let voteToVoteRow = (vote: CouncilVoteSub.t) => {
+    {
+      address: vote.account.address,
+      transactionOpt: vote.transactionOpt,
+      optionOpt: Some(vote.option),
+      timestampOpt: vote.timestampOpt,
     }
   }
-}
 
-module TabButton = {
+  let memberToVoteRow = (member: CouncilProposalSub.council_member_t) => {
+    {
+      address: member.account.address,
+      transactionOpt: None,
+      optionOpt: None,
+      timestampOpt: None,
+    }
+  }
+
   @react.component
-  let make = (~tab, ~active, ~setTab) => {
-    let tabString = tab->VoteSub.toString(~withSpace=true)
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-
-    <div className={Styles.buttonContainer(theme, active)} onClick={_ => setTab(_ => tab)}>
-      <Text value=tabString weight={active ? Text.Semibold : Text.Regular} size=Text.Body1 />
+  let make = (~vote: t) => {
+    let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = React.useContext(ThemeContext.context)
+    let isMobile = Media.isMobile()
+    <div
+      key={vote.address->Address.toBech32} className={Styles.voteRowContainer(theme, isDarkMode)}>
+      {switch isMobile {
+      | true =>
+        <>
+          <Row>
+            <Col colSm=Col.Three>
+              <Text block=true value="VOTERS" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col colSm=Col.Nine>
+              <AddressRender address={vote.address} position={Subtitle} ellipsis=true />
+            </Col>
+          </Row>
+          <Row marginTopSm=16>
+            <Col colSm=Col.Three>
+              <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col colSm=Col.Nine>
+              {switch vote.transactionOpt {
+              | Some(tx) =>
+                <TxLink
+                  txHash=tx.hash width=110 size=Text.Body1 weight=Text.Regular fullHash=false
+                />
+              | None => <Text value="n/a" color=theme.neutral_600 size={Body2} />
+              }}
+            </Col>
+          </Row>
+          <Row marginTopSm=16>
+            <Col colSm=Col.Three>
+              <Text block=true value="ANSWER" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col colSm=Col.Nine>
+              {switch vote.optionOpt {
+              | Some(option_) =>
+                <Text
+                  value={option_->Vote.YesNo.toString}
+                  weight=Text.Medium
+                  color={switch option_ {
+                  | Yes => theme.success_600
+                  | _ => theme.error_600
+                  }}
+                  size={Body1}
+                />
+              | None => <Text value="n/a" color=theme.neutral_600 size={Body2} />
+              }}
+            </Col>
+          </Row>
+          <Row marginTopSm=16>
+            <Col colSm=Col.Three>
+              <Text block=true value="TIME" size=Text.Caption weight=Text.Semibold />
+            </Col>
+            <Col colSm=Col.Nine>
+              <Timestamp
+                timeOpt=vote.timestampOpt
+                size=Text.Body1
+                weight=Text.Regular
+                textAlign=Text.Right
+                defaultText="-"
+              />
+            </Col>
+          </Row>
+        </>
+      | false =>
+        <Row>
+          <Col col=Col.Three>
+            <AddressRender address={vote.address} position={Subtitle} ellipsis=true />
+          </Col>
+          <Col col=Col.Four>
+            {switch vote.transactionOpt {
+            | Some(tx) =>
+              <TxLink txHash=tx.hash width=110 size=Text.Body1 weight=Text.Regular fullHash=false />
+            | None => <Text value="n/a" color=theme.neutral_600 size={Body2} />
+            }}
+          </Col>
+          <Col col=Col.Two>
+            {switch vote.optionOpt {
+            | Some(option_) =>
+              <Text
+                value={option_->Vote.YesNo.toString}
+                weight=Text.Medium
+                color={switch option_ {
+                | Yes => theme.success_600
+                | _ => theme.error_600
+                }}
+                size={Body1}
+              />
+            | None => <Text value="n/a" color=theme.neutral_600 size={Body2} />
+            }}
+          </Col>
+          <Col col=Col.Three style={CssHelper.flexBox(~justify=#end_, ())}>
+            <Timestamp
+              timeOpt=vote.timestampOpt
+              size=Text.Body1
+              weight=Text.Regular
+              textAlign=Text.Right
+              defaultText="-"
+            />
+          </Col>
+        </Row>
+      }}
     </div>
   }
 }
 
+type filterChoice = All | Yes | No | DidNotVote
+
+let choiceString = choice =>
+  switch choice {
+  | All => "ALL"
+  | Yes => "YES"
+  | No => "NO"
+  | DidNotVote => "DID NOT VOTE"
+  }
+
 @react.component
-let make = (~proposalID) => {
-  let isMobile = Media.isMobile()
-  let (currentTab, setTab) = React.useState(_ => VoteSub.Yes)
-  let (page, setPage) = React.useState(_ => 1)
-  let pageSize = 5
-  let votesSub = VoteSub.getList(proposalID, currentTab, ~pageSize, ~page, ())
-  let voteCountSub = VoteSub.count(proposalID, currentTab)
-
+let make = (
+  ~members: array<CouncilProposalSub.council_member_t>,
+  ~votes: array<CouncilVoteSub.t>,
+) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let (filter, setFilter) = React.useState(_ => All)
 
-  <Table>
-    <div className=Styles.container>
-      <div className={Css.merge(list{Styles.header(theme), CssHelper.flexBox(~wrap=#nowrap, ())})}>
-        {[VoteSub.Yes, VoteSub.No, VoteSub.NoWithVeto, VoteSub.Abstain]
-        ->Belt.Array.map(tab =>
-          <TabButton key={tab->VoteSub.toString} tab setTab active={tab == currentTab} />
-        )
-        ->React.array}
-      </div>
-      <div className=Styles.childrenContainer>
-        <div className=Styles.tableWrapper>
-          {isMobile
-            ? <Row marginBottom=16>
-                <Col>
-                  {switch voteCountSub {
-                  | Data(voteCount) =>
-                    <div className={CssHelper.flexBox()}>
-                      <Text
-                        block=true
-                        value={voteCount->Belt.Int.toString}
-                        weight=Text.Semibold
-                        size=Text.Caption
-                        transform=Text.Uppercase
-                      />
-                      <HSpacing size=Spacing.xs />
-                      <Text
-                        block=true
-                        value="Voters"
-                        weight=Text.Semibold
-                        size=Text.Caption
-                        transform=Text.Uppercase
-                      />
-                    </div>
-                  | _ => <LoadingCensorBar width=100 height=15 />
-                  }}
-                </Col>
-              </Row>
-            : <THead>
-                <Row alignItems=Row.Center>
-                  <Col col=Col.Five>
-                    {switch voteCountSub {
-                    | Data(voteCount) =>
-                      <div className={CssHelper.flexBox()}>
-                        <Text
-                          block=true
-                          value={voteCount->Belt.Int.toString}
-                          weight=Text.Semibold
-                          size=Text.Caption
-                          transform=Text.Uppercase
-                        />
-                        <HSpacing size=Spacing.xs />
-                        <Text
-                          block=true
-                          value="Voters"
-                          weight=Text.Semibold
-                          size=Text.Caption
-                          transform=Text.Uppercase
-                        />
-                      </div>
-                    | _ => <LoadingCensorBar width=100 height=15 />
-                    }}
-                  </Col>
-                  <Col col=Col.Four>
-                    <Text
-                      block=true
-                      value="TX Hash"
-                      weight=Text.Semibold
-                      size=Text.Caption
-                      transform=Text.Uppercase
-                    />
-                  </Col>
-                  <Col col=Col.Three>
-                    <Text
-                      block=true
-                      value="Timestamp"
-                      weight=Text.Semibold
-                      size=Text.Caption
-                      transform=Text.Uppercase
-                      align=Text.Right
-                    />
-                  </Col>
-                </Row>
-              </THead>}
-          {switch votesSub {
-          | Data(votes) =>
-            votes->Belt.Array.length > 0
-              ? votes
-                ->Belt.Array.mapWithIndex((i, e) =>
-                  isMobile
-                    ? <RenderBodyMobile
-                        reserveIndex=i key={e.voter->Address.toBech32} voteSub={Sub.resolve(e)}
-                      />
-                    : <RenderBody key={e.voter->Address.toBech32} voteSub={Sub.resolve(e)} />
-                )
-                ->React.array
-              : <EmptyContainer height={#px(250)}>
-                  <img
-                    alt="No Voters"
-                    src={isDarkMode ? Images.noDelegatorDark : Images.noDelegatorLight}
-                    className=Styles.noDataImage
-                  />
-                  <Heading
-                    size=Heading.H4
-                    value="No Voters"
-                    align=Heading.Center
-                    weight=Heading.Regular
-                    color={theme.neutral_600}
-                  />
-                </EmptyContainer>
-          | _ =>
-            Belt.Array.make(pageSize, Sub.NoData)
-            ->Belt.Array.mapWithIndex((i, noData) =>
-              isMobile
-                ? <RenderBodyMobile reserveIndex=i key={i->Belt.Int.toString} voteSub=noData />
-                : <RenderBody key={i->Belt.Int.toString} voteSub=noData />
-            )
-            ->React.array
-          }}
-          {switch voteCountSub {
-          | Data(voteCount) =>
-            let pageCount = Page.getPageCount(voteCount, pageSize)
-            <Pagination
-              currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
-            />
-          | _ => React.null
-          }}
+  let yesVotes = votes->Belt.Array.keep(vote => vote.option == Yes)
+  let noVotes = votes->Belt.Array.keep(vote => vote.option == No)
+
+  let choiceVoteCount = choice =>
+    switch choice {
+    | All => members->Belt.Array.length
+    | Yes => yesVotes->Belt.Array.length
+    | No => noVotes->Belt.Array.length
+    | DidNotVote => members->Belt.Array.length - votes->Belt.Array.length
+    }
+
+  let voteAddressList = votes->Belt.Array.map(vote => vote.account.address)->Belt.List.fromArray
+
+  let notVoteMember =
+    members->Belt.Array.keep(member =>
+      !(voteAddressList->Belt.List.has(member.account.address, (a, b) => Address.isEqual(a, b)))
+    )
+
+  <>
+    <Row marginBottom=16>
+      <Col>
+        <div className={CssHelper.flexBox(~align=#center, ())}>
+          <Heading
+            value={`Votes`}
+            size=Heading.H4
+            weight=Heading.Semibold
+            color={theme.neutral_600}
+            marginRight=24
+          />
+          // TODO: remove visibility of scollbar on Mobile
+          <div className={Styles.filterButtonGroup}>
+            <div className={Styles.innerContainer}>
+              {[All, Yes, No, DidNotVote]
+              ->Belt.Array.map(choice =>
+                <React.Fragment key={choice->choiceString}>
+                  <ChipButton
+                    variant={ChipButton.Primary}
+                    onClick={_ => setFilter(_ => choice)}
+                    isActive={filter == choice}
+                    color=theme.neutral_700
+                    activeColor=theme.white
+                    bgColor=theme.neutral_100
+                    activeBgColor=theme.neutral_700
+                    style={Styles.chip}>
+                    {`${choice->choiceString} (${choice
+                      ->choiceVoteCount
+                      ->Belt.Int.toString})`->React.string}
+                  </ChipButton>
+                </React.Fragment>
+              )
+              ->React.array}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </Table>
+      </Col>
+    </Row>
+    <Hidden variant={Mobile}>
+      <Row marginBottom=8 style={CssHelper.px(~size=32, ())}>
+        <Col col=Col.Three>
+          <Text block=true value="VOTERS" size=Text.Caption weight=Text.Semibold />
+        </Col>
+        <Col col=Col.Four>
+          <Text block=true value="TX HASH" size=Text.Caption weight=Text.Semibold />
+        </Col>
+        <Col col=Col.Two>
+          <Text block=true value="ANSWER" size=Text.Caption weight=Text.Semibold />
+        </Col>
+        <Col col=Col.Three>
+          <Text block=true value="TIME" size=Text.Caption weight=Text.Semibold align=Text.Right />
+        </Col>
+      </Row>
+    </Hidden>
+    {switch filter {
+    | All =>
+      votes
+      ->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.voteToVoteRow} />)
+      ->Belt.Array.concat(
+        notVoteMember->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.memberToVoteRow} />),
+      )
+    | Yes => yesVotes->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.voteToVoteRow} />)
+    | No => noVotes->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.voteToVoteRow} />)
+    | DidNotVote =>
+      notVoteMember->Belt.Array.map(vote => <VoteRow vote={vote->VoteRow.memberToVoteRow} />)
+    }->React.array}
+  </>
 }

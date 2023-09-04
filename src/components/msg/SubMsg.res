@@ -131,18 +131,19 @@ let make = (~msg: Msg.result_t) => {
         <ProposalMsg.Deposit.Success amount={m.amount} proposalID={m.proposalID} title={m.title} />
       | Msg.Gov.Deposit.Failure(f) => <ProposalMsg.Deposit.Fail proposalID={f.proposalID} />
       }
-    | VoteMsg(msg) =>
+    | LegacyVoteMsg(msg) =>
       switch msg {
       | Msg.Gov.Vote.Success(m) =>
         <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
       | Msg.Gov.Vote.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
-    | VoteWeightedMsg(msg) =>
+    | LegacyVoteWeightedMsg(msg) =>
       switch msg {
       | Msg.Gov.VoteWeighted.Success(m) =>
         <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
       | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
       }
+    | VoteMsg(msg) => <ProposalMsg.Vote.Fail proposalID={msg.proposalID} />
     | CreateClientMsg(_) => React.null
     | UpgradeClientMsg({clientID})
     | UpdateClientMsg({clientID})

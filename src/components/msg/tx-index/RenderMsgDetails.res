@@ -116,7 +116,7 @@ let renderValue = v => {
         KVTable.Value(rawReport.data->JsBuffer.toUTF8),
       ])}
     />
-  | Timestamp(timestamp) => <Timestamp time={timestamp} size=Text.Body1 />
+  | Timestamp(timestamp) => <Timestamp timeOpt={Some(timestamp)} size=Text.Body1 />
   | ValidatorLink(address, moniker, identity) =>
     switch (moniker, identity) {
     | ("", "") => <AddressRender position={Subtitle} address accountType={#validator} />
@@ -916,6 +916,30 @@ module Vote = {
     ])
 
   let failed = (msg: Msg.Gov.Vote.fail_t) => msg->factory([])
+}
+
+module CouncilVote = {
+  let factory = (msg: Msg.Council.Vote.t) => [
+    {
+      title: "Voter",
+      content: Address(msg.voterAddress),
+      order: 1,
+    },
+    {
+      title: "Proposal ID",
+      content: ID(
+        <div className={CssHelper.flexBox()}>
+          <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+        </div>,
+      ),
+      order: 2,
+    },
+    {
+      title: "Option",
+      content: PlainText(msg.option),
+      order: 4,
+    },
+  ]
 }
 
 module VoteWeighted = {
@@ -1819,16 +1843,17 @@ let getContent = msg => {
     | Msg.Gov.Deposit.Success(data) => Deposit.success(data)
     | Msg.Gov.Deposit.Failure(data) => Deposit.failed(data)
     }
-  | Msg.VoteMsg(m) =>
+  | Msg.LegacyVoteMsg(m) =>
     switch m {
     | Msg.Gov.Vote.Success(data) => Vote.success(data)
     | Msg.Gov.Vote.Failure(data) => Vote.failed(data)
     }
-  | Msg.VoteWeightedMsg(m) =>
+  | Msg.LegacyVoteWeightedMsg(m) =>
     switch m {
     | Msg.Gov.VoteWeighted.Success(data) => VoteWeighted.success(data)
     | Msg.Gov.VoteWeighted.Failure(data) => VoteWeighted.failed(data)
     }
+  | Msg.VoteMsg(data) => CouncilVote.factory(data)
   | Msg.CreateClientMsg(data) => CreateClient.factory(data)
   | Msg.UpdateClientMsg(data)
   | Msg.UpgradeClientMsg(data)

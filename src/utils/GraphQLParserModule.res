@@ -8,6 +8,12 @@ module Date = {
   let serialize = date => date->MomentRe.Moment.toJSON->Belt.Option.getExn->Js.Json.string
 }
 
+module DateOpt = {
+  type t = MomentRe.Moment.t
+  let parse = jsonOpt => jsonOpt->GraphQLParser.timestampOpt
+  let serialize = date => date->MomentRe.Moment.toJSON->Belt.Option.getExn->Js.Json.string
+}
+
 module Hash = {
   type t = Hash.t
   let parse = json => json->GraphQLParser.hash
@@ -36,6 +42,12 @@ module FloatString = {
   type t = float
   let parse = json => json->GraphQLParser.floatString
   let serialize = float => float->Js.Float.toString->Js.Json.string
+}
+
+module IntString = {
+  type t = float
+  let parse = json => json->GraphQLParser.int64
+  let serialize = float => float->Js.Int.toString->Js.Json.string
 }
 
 module FloatWithDefault = {
@@ -112,6 +124,12 @@ module ProposalID = {
   type t = ID.Proposal.t
   let parse = proposalID => proposalID->ID.Proposal.fromInt
   let serialize = proposalID => proposalID->ID.Proposal.toInt
+}
+
+module LegacyProposalID = {
+  type t = ID.Proposal.t
+  let parse = proposalID => proposalID->ID.LegacyProposal.fromInt
+  let serialize = proposalID => proposalID->ID.LegacyProposal.toInt
 }
 
 module OracleScriptID = {

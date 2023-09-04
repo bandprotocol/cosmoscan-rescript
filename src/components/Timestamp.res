@@ -6,19 +6,20 @@ module Styles = {
 
 @react.component
 let make = (
-  ~time,
+  ~timeOpt,
   ~prefix="",
   ~suffix="",
   ~size=Text.Caption,
   ~weight=Text.Regular,
   ~spacing=Text.Unset,
-  ~code=false,
   ~textAlign=Text.Left,
   ~color=?,
+  ~defaultText="N/A",
+  ~style="",
 ) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  <div className=Styles.timeContainer>
+  <div className={Css.merge(list{Styles.timeContainer, style})}>
     {prefix != ""
       ? <>
           <Text
@@ -27,21 +28,35 @@ let make = (
             weight
             color={color->Belt.Option.getWithDefault(theme.neutral_600)}
             spacing
-            code
+            code=true
           />
           <HSpacing size=Spacing.sm />
         </>
       : React.null}
-    <Text
-      value={time->MomentRe.Moment.format("YYYY-MM-DD HH:mm:ss", _)}
-      size
-      weight
-      spacing
-      code
-      block=true
-      align=textAlign
-      color={color->Belt.Option.getWithDefault(theme.neutral_600)}
-    />
+    {switch timeOpt {
+    | Some(time) =>
+      <Text
+        value={time->MomentRe.Moment.format("YYYY-MM-DD HH:mm:ss", _)}
+        size
+        weight
+        spacing
+        code=true
+        block=true
+        align=textAlign
+        color={color->Belt.Option.getWithDefault(theme.neutral_600)}
+      />
+    | None =>
+      <Text
+        value={defaultText}
+        size
+        weight
+        spacing
+        code=true
+        block=true
+        align=textAlign
+        color={color->Belt.Option.getWithDefault(theme.neutral_600)}
+      />
+    }}
     {suffix != ""
       ? <>
           <HSpacing size=Spacing.sm />
@@ -50,7 +65,7 @@ let make = (
             size
             weight
             spacing
-            code
+            code=true
             color={color->Belt.Option.getWithDefault(theme.neutral_600)}
           />
         </>

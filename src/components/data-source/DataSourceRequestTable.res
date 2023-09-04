@@ -62,14 +62,13 @@ module RenderBody = {
           <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
             {switch requestsSub {
             | Data({txTimestamp}) =>
-              switch txTimestamp {
-              | Some(txTimestamp') =>
-                <Timestamp
-                  time=txTimestamp' size=Text.Body2 weight=Text.Regular textAlign=Text.Right
-                />
-              | None => <Text value="Syncing" />
-              }
-
+              <Timestamp
+                timeOpt=txTimestamp
+                size=Text.Body2
+                weight=Text.Regular
+                textAlign=Text.Right
+                defaultText="Syncing"
+              />
             | _ => <LoadingCensorBar width=120 height=15 />
             }}
           </div>

@@ -17,7 +17,6 @@ let make = () => {
 
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
 
-
   <Section>
     <div className={CssHelper.container}>
       <div className={CssHelper.mb(~size=24, ())}>

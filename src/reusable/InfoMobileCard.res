@@ -68,7 +68,7 @@ let make = (~info) => {
   switch info {
   | Address(address, width, accountType) =>
     <div className={Styles.addressContainer(width)}>
-      <AddressRender address position=AddressRender.Text clickable=true accountType />
+      <AddressRender address position=AddressRender.Text clickable=true accountType ellipsis=true />
     </div>
   | Height(height) =>
     <div className=Styles.vFlex>
@@ -133,7 +133,7 @@ let make = (~info) => {
     <CopyButton data={calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125 />
   | Percentage(value, digits) => <Text value={value->Format.fPercent(~digits?)} />
   | Text(text) => <Text value=text spacing={Text.Em(0.02)} nowrap=true ellipsis=true block=true />
-  | Timestamp(time) => <Timestamp time size=Text.Body2 weight=Text.Regular />
+  | Timestamp(time) => <Timestamp timeOpt=Some(time) size=Text.Body2 weight=Text.Regular />
   | Validator(address, moniker, identity) =>
     <ValidatorMonikerLink
       validatorAddress=address moniker size=Text.Body2 identity width={#px(230)}

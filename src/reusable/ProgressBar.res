@@ -24,6 +24,24 @@ module Styles = {
       transition(~duration=200, "all"),
       background(success ? theme.primary_600 : theme.error_600),
     ])
+
+  let progressSlotContainer = (fullWidth: bool) =>
+    style(. [
+      width(fullWidth ? #percent(100.) : #px(100)),
+      height(#px(8)),
+      borderRadius(#px(2)),
+      overflow(#hidden),
+      Media.mobile([width(fullWidth ? #percent(100.) : #px(60))]),
+    ])
+
+  let progressSlot = (widthPercent, color, isLast) =>
+    style(. [
+      width(isLast ? #percent(widthPercent) : #calc(#sub, #percent(widthPercent), #px(1))),
+      height(#percent(100.)),
+      background(color),
+      marginRight(isLast ? #px(0) : #px(1)),
+    ])
+
   let leftText = style(. [
     position(absolute),
     top(zero),
@@ -180,6 +198,100 @@ module Voting = {
       <div className={Styles.progressOuter(theme)}>
         <div className={Styles.progressInner(percent, true, theme)} />
       </div>
+    </div>
+  }
+}
+
+module Slot = {
+  type t = {
+    percent: float,
+    color: Theme.color_t,
+  }
+
+  let getYesNoSlot = (theme: Theme.t, ~yes: float, ~no: float, ~totalWeight: int) => {
+    let totalWeightF = totalWeight->Belt.Float.fromInt
+    [
+      {
+        percent: yes /. totalWeightF *. 100.,
+        color: Vote.YesNo.Yes->Vote.YesNo.getColor(theme),
+      },
+      {
+        percent: no /. totalWeightF *. 100.,
+        color: Vote.YesNo.No->Vote.YesNo.getColor(theme),
+      },
+      {
+        percent: (totalWeightF -. yes -. no) /. totalWeightF *. 100.,
+        color: theme.neutral_300,
+      },
+    ]->Belt.Array.keep(x => x.percent > 0.)
+  }
+
+  let getFullSlot = (
+    theme: Theme.t,
+    ~invertColor=false,
+    ~yes: float,
+    ~no: float,
+    ~noWithVeto: float,
+    ~abstain: float,
+    ~totalBondedTokens: float,
+    (),
+  ) =>
+    [
+      {
+        percent: yes /. totalBondedTokens *. 100.,
+        color: invertColor
+          ? Vote.Full.Yes->Vote.Full.getColorInvert(theme)
+          : Vote.Full.Yes->Vote.Full.getColor(theme),
+      },
+      {
+        percent: no /. totalBondedTokens *. 100.,
+        color: invertColor
+          ? Vote.Full.No->Vote.Full.getColorInvert(theme)
+          : Vote.Full.No->Vote.Full.getColor(theme),
+      },
+      {
+        percent: noWithVeto /. totalBondedTokens *. 100.,
+        color: invertColor
+          ? Vote.Full.NoWithVeto->Vote.Full.getColorInvert(theme)
+          : Vote.Full.NoWithVeto->Vote.Full.getColor(theme),
+      },
+      {
+        percent: abstain /. totalBondedTokens *. 100.,
+        color: invertColor
+          ? Vote.Full.Abstain->Vote.Full.getColorInvert(theme)
+          : Vote.Full.Abstain->Vote.Full.getColor(theme),
+      },
+      {
+        percent: (totalBondedTokens -. (yes +. no +. noWithVeto +. abstain)) /.
+        totalBondedTokens *. 100.,
+        color: theme.neutral_200,
+      },
+    ]->Belt.Array.keep(x => x.percent > 0.)
+}
+
+module Voting2 = {
+  @react.component
+  let make = (~slots: array<Slot.t>, ~fullWidth=false) => {
+    let isMobile = Media.isMobile()
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+
+    <div
+      className={CssJs.merge(. [
+        CssHelper.flexBox(~wrap=#nowrap, ()),
+        Styles.progressSlotContainer(fullWidth),
+      ])}>
+      {slots
+      ->Belt.Array.mapWithIndex((index, slot) =>
+        <div
+          key={index->Belt.Int.toString}
+          className={Styles.progressSlot(
+            slot.percent,
+            slot.color,
+            index == slots->Belt.Array.length - 1,
+          )}
+        />
+      )
+      ->React.array}
     </div>
   }
 }

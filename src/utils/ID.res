@@ -33,6 +33,13 @@ module RawProposalID = {
   let defaultTab = ()
 }
 
+module RawLegacyProposalID = {
+  type tab_t = unit
+  let prefix = "#LP"
+  let route = (id, _) => Route.LegacyProposalDetailsPage(id)
+  let defaultTab = ()
+}
+
 module RawBlock = {
   type tab_t = unit
   let prefix = "#B"
@@ -77,4 +84,5 @@ module DataSource = IDCreator(RawDataSourceID)
 module OracleScript = IDCreator(RawOracleScriptID)
 module Request = IDCreator(RawRequestID)
 module Proposal = IDCreator(RawProposalID)
+module LegacyProposal = IDCreator(RawLegacyProposalID)
 module Block = IDCreator(RawBlock)

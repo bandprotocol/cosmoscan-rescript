@@ -39,7 +39,10 @@ module RenderBody = {
             {switch unbondingListSub {
             | Data({completionTime}) =>
               <Timestamp
-                time=completionTime size=Text.Body2 weight=Text.Regular textAlign=Text.Right
+                timeOpt=Some(completionTime)
+                size=Text.Body2
+                weight=Text.Regular
+                textAlign=Text.Right
               />
             | _ => <LoadingCensorBar width=200 height=20 />
             }}

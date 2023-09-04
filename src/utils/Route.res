@@ -38,6 +38,8 @@ type t =
   | ValidatorDetailsPage(Address.t, validator_tab_t)
   | ProposalPage
   | ProposalDetailsPage(int)
+  | LegacyProposalPage
+  | LegacyProposalDetailsPage(int)
   | RelayersHomepage
   | ChannelDetailsPage(string, string, string)
   | Test
@@ -116,7 +118,12 @@ let fromUrl = (url: RescriptReactRouter.url) =>
     | Some(proposal) => ProposalDetailsPage(proposal)
     | None => NotFound
     }
-
+  | (list{"legacy", "proposals"}, _) => LegacyProposalPage
+  | (list{"legacy", "proposal", proposalID}, _) =>
+    switch proposalID->Belt.Int.fromString {
+    | Some(proposal) => LegacyProposalDetailsPage(proposal)
+    | None => NotFound
+    }
   | (list{"relayers"}, _) => RelayersHomepage
   | (list{"relayers", counterparty, port, channelID}, _) =>
     ChannelDetailsPage(counterparty, port, channelID)
@@ -187,6 +194,8 @@ let toString = route =>
 
   | ProposalPage => "/proposals"
   | ProposalDetailsPage(proposalID) => `/proposal/${proposalID->Belt.Int.toString}`
+  | LegacyProposalPage => "/legacy/proposals"
+  | LegacyProposalDetailsPage(proposalID) => `/legacy/proposal/${proposalID->Belt.Int.toString}`
   | RelayersHomepage => "/relayers"
   | ChannelDetailsPage(chainID, port, channel) => `/relayers/${chainID}/${port}/${channel}`
   | HomePage => "/"

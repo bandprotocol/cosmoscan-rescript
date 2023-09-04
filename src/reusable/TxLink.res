@@ -17,6 +17,7 @@ let make = (
   ~size=Text.Body2,
   ~weight=Text.Medium,
   ~fullHash=true,
+  ~ellipsisLimit=6,
 ) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -28,7 +29,7 @@ let make = (
           block=true
           code=true
           spacing={Text.Em(0.02)}
-          value={Ellipsis.center(~text=txHash->Hash.toHex(~upper=true), ())}
+          value={Ellipsis.center(~text=txHash->Hash.toHex(~upper=true), ~limit=ellipsisLimit, ())}
           weight
           ellipsis=false
           size

@@ -15,6 +15,11 @@ module Styles = {
       style(. [visibility(#hidden)])
     }
 
+  let proposalId = style(. [
+    fontFamilies([#custom("Roboto Mono"), #monospace]),
+    Media.mobile([display(#block), marginBottom(#px(8))]),
+  ])
+
   let chartContainer = style(. [paddingRight(#px(20)), Media.mobile([paddingRight(#zero)])])
 
   let parameterChanges = (theme: Theme.t, isDarkMode) =>
@@ -31,522 +36,340 @@ module Styles = {
       display(#inlineBlock),
       selector(" > p", [color(theme.primary_600)]),
     ])
-}
 
-module ProposalTypeBadge = {
-  @react.component
-  let make = (~proposalType) => {
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let loadingContainer = style(. [
+    display(#flex),
+    alignItems(#center),
+    width(#percent(100.)),
+    height(#vh(80.)),
+  ])
 
-    <div className={Styles.proposalTypeBadge(theme, isDarkMode)}>
-      <Text
-        value={proposalType->ProposalSub.ProposalType.getBadgeText}
-        size=Text.Body2
-        block=true
-        weight={Semibold}
-      />
-    </div>
-  }
+  let buttonStyled = style(. [
+    backgroundColor(#transparent),
+    border(#zero, #solid, #transparent),
+    outlineStyle(#none),
+    cursor(#pointer),
+    padding2(~v=#zero, ~h=#zero),
+    margin4(~top=#zero, ~right=#zero, ~bottom=#px(40), ~left=#zero),
+    Media.mobile([margin4(~top=#zero, ~right=#zero, ~bottom=#px(16), ~left=#zero)]),
+  ])
+
+  let badge = style(. [marginTop(#px(8))])
+  let header = style(. [marginBottom(#px(24))])
+  let msgContainer = style(. [selector("> div + div", [marginTop(#px(24))])])
 }
 
 module VoteButton = {
   @react.component
-  let make = (~proposalID, ~proposalName) => {
-    let trackingSub = TrackingSub.use()
+  let make = (~proposalID, ~proposalName, ~address) => {
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+    let vote = () => Vote(proposalID, proposalName)->SubmitTx->OpenModal->dispatchModal
+    let accountQuery = AccountQuery.get(address)
 
+    // TODO: (proposal) uncomment before launch
+    // switch accountQuery {
+    // | Data({councilOpt}) =>
+    //   switch councilOpt {
+    //   | Some(council) =>
+    //     <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
+    //       {"Vote"->React.string}
+    //     </Button>
+    //   | None => React.null
+    //   }
+    // | _ => React.null
+    // }
+
+    <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
+      {"Vote"->React.string}
+    </Button>
+  }
+}
+
+module OpenVetoButton = {
+  @react.component
+  let make = (~proposalID, ~address, ~proposalName, ~totalDeposit) => {
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+    let openVeto = () =>
+      OpenVeto(proposalID, proposalName, totalDeposit)->SubmitTx->OpenModal->dispatchModal
+    let accountQuery = AccountQuery.get(address)
+
+    <Button
+      variant={Outline} px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => openVeto()}>
+      {"Open Veto"->React.string}
+    </Button>
+  }
+}
+
+module RenderData = {
+  @react.component
+  let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) => {
+    let isMobile = Media.isMobile()
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-    let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
-    let vote = () => Vote(proposalID, proposalName)->SubmitTx->OpenModal->dispatchModal
+    let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
-    switch accountOpt {
-    | Some(_) =>
-      <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
-        {"Vote"->React.string}
-      </Button>
-    | None =>
-      switch trackingSub {
-      | Data({chainID}) =>
-        <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => connect(chainID)}>
-          {"Vote"->React.string}
-        </Button>
-      | Error(err) =>
-        // log for err details
-        Js.Console.log(err)
-        <Text value="chain id not found" />
-      | _ => <LoadingCensorBar width=90 height=26 />
-      }
-    }
+    <Section ptSm=16>
+      <div className=CssHelper.container>
+        <button
+          className={Css.merge(list{CssHelper.flexBox(), Styles.buttonStyled})}
+          onClick={_ => Route.redirect(ProposalPage)}>
+          <Icon name="fa fa-angle-left" mr=8 size=16 />
+          <Text
+            value="Back to all proposals" size=Text.Xl weight=Text.Semibold color=theme.neutral_600
+          />
+        </button>
+        <Row style=Styles.header>
+          <Col col=Col.Twelve>
+            <div className={CssHelper.flexBox()}>
+              // TODO: seem like this Header reused in every detail page should created component for it
+              <Heading size=Heading.H1 weight=Heading.Semibold>
+                <span className=Styles.proposalId>
+                  {`#P${proposal.id->ID.Proposal.toInt->Belt.Int.toString} `->React.string}
+                </span>
+                <span> {proposal.title->React.string} </span>
+              </Heading>
+              <HSpacing size=Spacing.sm />
+              {isMobile ? React.null : <ProposalBadge status=proposal.status tooltip=true />}
+            </div>
+            {isMobile
+              ? <div className={Css.merge(list{CssHelper.flexBox(), Styles.badge})}>
+                  <ProposalBadge status=proposal.status tooltip=true />
+                </div>
+              : React.null}
+          </Col>
+        </Row>
+        <Row justify=Row.Between>
+          <Col col=Col.Six>
+            <Row>
+              <Col col=Col.Four colSm=Col.Twelve mtSm=24>
+                <Heading
+                  value="Submit & Voting Starts"
+                  size=Heading.H4
+                  marginBottom=8
+                  weight=Heading.Semibold
+                  color={theme.neutral_600}
+                />
+                <Timestamp
+                  size=Text.Body1 timeOpt={Some(proposal.submitTime)} color={theme.neutral_900}
+                />
+              </Col>
+              <Col col=Col.Four colSm=Col.Twelve mtSm=24>
+                <Heading
+                  value="Voting Ends"
+                  size=Heading.H4
+                  marginBottom=8
+                  weight=Heading.Semibold
+                  color={theme.neutral_600}
+                />
+                <Timestamp
+                  size=Text.Body1 timeOpt={Some(proposal.votingEndTime)} color={theme.neutral_900}
+                />
+              </Col>
+              {switch proposal.vetoEndTime {
+              | Some(vetoEndTime) =>
+                <Col col=Col.Four colSm=Col.Twelve mtSm=24>
+                  <Heading
+                    value="Waiting for Veto Ends"
+                    size=Heading.H4
+                    marginBottom=8
+                    weight=Heading.Semibold
+                    color={theme.neutral_600}
+                  />
+                  <Timestamp
+                    size=Text.Body1 timeOpt={proposal.vetoEndTime} color={theme.neutral_900}
+                  />
+                </Col>
+              | None => React.null
+              }}
+            </Row>
+          </Col>
+          <Hidden variant={Mobile}>
+            {switch accountOpt {
+            | Some({address}) =>
+              <Col col=Col.Two>
+                {switch proposal.vetoProposalOpt {
+                | Some({totalDeposit}) =>
+                  <OpenVetoButton
+                    proposalID=proposal.id proposalName=proposal.title address totalDeposit
+                  />
+                | None => React.null
+                }}
+                // TODO: uncomment before launch
+                // {switch proposal.status {
+                // | VotingPeriod => <VoteButton proposalID=proposal.id proposalName=proposal.title address />
+                // | _ => <OpenVetoButton
+                //   proposalID=proposal.id proposalName=proposal.title address totalDeposit
+                // />
+                // | _ => React.null
+                // }}
+              </Col>
+            | None => React.null
+            }}
+          </Hidden>
+        </Row>
+        <SeperatedLine mt=32 mb=24 mtSm=24 mbSm=24 color=theme.neutral_200 />
+        <Row marginBottom=24>
+          <Col
+            col={switch proposal.vetoProposalOpt {
+            | Some(_) =>
+              switch proposal.status {
+              | WaitingVeto => Col.Seven
+              | _ => Col.Six
+              }
+            | None => Col.Twelve
+            }}>
+            <VoteDetailsCard
+              proposal
+              votes
+              variant={switch proposal.vetoProposalOpt {
+              | Some(_) =>
+                switch proposal.status {
+                | WaitingVeto => Short
+                | _ => Half
+                }
+              | None => Full
+              }}
+            />
+          </Col>
+          {switch proposal.vetoProposalOpt {
+          | Some(vetoProposal) =>
+            switch proposal.status {
+            | WaitingVeto =>
+              <Col col=Col.Five>
+                {switch proposal.vetoId {
+                | Some(vetoId) => {
+                    let totalDepositSub = ProposalSub.totalDeposit(vetoId)
+                    switch totalDepositSub {
+                    | Data(totalDepositOpt) => <RejectDetailsCard.Wait vetoId totalDepositOpt />
+                    | _ => <LoadingCensorBar width=153 height=30 />
+                    }
+                  }
+
+                | None => React.null
+                }}
+              </Col>
+            | _ =>
+              <Col col=Col.Six>
+                <RejectDetailsCard.Vote vetoProposal status=proposal.status />
+              </Col>
+            }
+
+          | None => React.null
+          }}
+        </Row>
+        <Hidden variant={Desktop}>
+          <SeperatedLine mtSm=24 mbSm=24 color=theme.neutral_300 />
+        </Hidden>
+        <Row marginBottom=24>
+          <Col col=Col.Twelve>
+            <Heading
+              value="Proposal Details"
+              size=Heading.H4
+              weight=Heading.Semibold
+              color={theme.neutral_600}
+              marginBottom=8
+            />
+          </Col>
+          <Col col=Col.Twelve>
+            <InfoContainer>
+              <Row marginBottom=16 alignItems=Row.Center>
+                <Col col=Col.Two colSm=Col.Four>
+                  <Heading
+                    value="Proposer" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Ten colSm=Col.Eight>
+                  <AddressRender
+                    address={proposal.account.address}
+                    position=AddressRender.Subtitle
+                    copy=true
+                    ellipsis=isMobile
+                  />
+                </Col>
+              </Row>
+              <Row marginBottom=16 alignItems=Row.Center>
+                <Col col=Col.Two colSm=Col.Four>
+                  <Heading
+                    value="Vote by" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Ten colSm=Col.Eight>
+                  <div className={CssHelper.clickable} onClick={_ => openMembers()}>
+                    <Text
+                      value={proposal.council.name->CouncilSub.getCouncilNameString}
+                      size=Text.Body1
+                      weight=Text.Thin
+                      color=theme.primary_600
+                      spacing=Text.Em(0.05)
+                      block=true
+                    />
+                  </div>
+                </Col>
+              </Row>
+              <Row marginBottom=16 alignItems=Row.Center>
+                <Col col=Col.Two colSm=Col.Four>
+                  <Heading
+                    value="Description"
+                    size=Heading.H4
+                    weight=Heading.Thin
+                    color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Ten colSm=Col.Eight>
+                  // TODO: where is description in database?
+                  <MarkDown value=proposal.metadata />
+                </Col>
+              </Row>
+            </InfoContainer>
+          </Col>
+        </Row>
+        <Row marginBottom=16>
+          <Col>
+            <Heading
+              value={`Messages (${proposal.messages->Belt.List.length->Belt.Int.toString})`}
+              size=Heading.H4
+              weight=Heading.Semibold
+              color={theme.neutral_600}
+            />
+          </Col>
+        </Row>
+        <Row marginBottom=24>
+          <Col>
+            <div className=Styles.msgContainer>
+              {proposal.messages
+              ->Belt.List.mapWithIndex((index, msg) => {
+                let badge = msg.decoded->Msg.getBadge
+                <MsgDetailCard key={index->Belt.Int.toString ++ badge.name} msg />
+              })
+              ->Array.of_list
+              ->React.array}
+            </div>
+          </Col>
+        </Row>
+        <Hidden variant={Mobile}>
+          <SeperatedLine mt=40 mb=40 color=theme.neutral_200 />
+        </Hidden>
+        <VoteBreakdownTable members=proposal.council.councilMembers votes />
+      </div>
+    </Section>
   }
 }
 
 @react.component
 let make = (~proposalID) => {
-  let isMobile = Media.isMobile()
-  let proposalSub = ProposalSub.get(proposalID)
-  let voteStatByProposalIDSub = VoteSub.getVoteStatByProposalID(proposalID)
-  let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
+  let proposalSub = CouncilProposalSub.get(proposalID)
+  let councilVoteSub = CouncilVoteSub.get(proposalID)
 
-  let allSub = Sub.all3(proposalSub, voteStatByProposalIDSub, bondedTokenCountSub)
-
-  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-
-  <Section>
-    <div className=CssHelper.container>
-      <Row>
-        <Col>
-          <Heading value="Proposal Details" size=Heading.H2 marginBottom=40 marginBottomSm=24 />
-        </Col>
-      </Row>
-      <Row alignItems=Row.Center marginBottom=40 marginBottomSm=16>
-        {switch allSub {
-        | Data(({id, name, status}, _, _)) =>
-          <>
-            <Col col=Col.Eight mbSm=16>
-              <div
-                className={Css.merge(list{
-                  CssHelper.flexBox(),
-                  CssHelper.flexBoxSm(~direction=#column, ~align=#flexStart, ()),
-                })}>
-                <div className={CssHelper.flexBox()}>
-                  <TypeID.Proposal id position=TypeID.Title />
-                  <HSpacing size=Spacing.sm />
-                  <Heading size=Heading.H3 value=name />
-                  <HSpacing size={#px(16)} />
-                </div>
-                <div className={CssHelper.mtSm(~size=16, ())}>
-                  <ProposalBadge status />
-                </div>
-              </div>
-            </Col>
-            <Col col=Col.Four>
-              {isMobile
-                ? React.null
-                : <div
-                    className={Css.merge(list{
-                      CssHelper.flexBox(~direction=#column, ~align=#flexEnd, ()),
-                    })}>
-                    <div className={Styles.voteButton(status)}>
-                      <VoteButton proposalID proposalName=name />
-                    </div>
-                  </div>}
-            </Col>
-          </>
-        | _ =>
-          <Col col=Col.Eight mbSm=16>
-            <div className={CssHelper.flexBox()}>
-              <LoadingCensorBar width=270 height=15 />
-              <HSpacing size={#px(16)} />
-              <div className={CssHelper.mtSm(~size=16, ())}>
-                <LoadingCensorBar width=100 height=15 radius=50 />
-              </div>
-            </div>
-          </Col>
-        }}
-      </Row>
-      <Row marginBottom=24>
-        <Col>
-          <InfoContainer>
-            <Heading value="Proposal Details" size=Heading.H4 />
-            <SeperatedLine mt=32 mb=24 />
-            <Row marginBottom=24 alignItems=Row.Center>
-              <Col col=Col.Four mbSm=8>
-                <Heading
-                  value="Proposer" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
-                />
-              </Col>
-              <Col col=Col.Eight>
-                {switch allSub {
-                | Data(({proposerAddressOpt}, _, _)) =>
-                  switch proposerAddressOpt {
-                  | Some(proposerAddress) =>
-                    <AddressRender address=proposerAddress position=AddressRender.Subtitle />
-                  | None => <Text value="Proposed on Wenchang" />
-                  }
-                | _ => <LoadingCensorBar width=270 height=15 />
-                }}
-              </Col>
-            </Row>
-            <Row marginBottom=24 alignItems=Row.Center>
-              <Col col=Col.Four mbSm=8>
-                <Heading
-                  value="Submit Time" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
-                />
-              </Col>
-              <Col col=Col.Eight>
-                {switch allSub {
-                | Data(({submitTime}, _, _)) => <Timestamp size=Text.Body1 time=submitTime />
-                | _ => <LoadingCensorBar width={isMobile ? 120 : 270} height=15 />
-                }}
-              </Col>
-            </Row>
-            <Row marginBottom=24 alignItems=Row.Center>
-              <Col col=Col.Four mbSm=8>
-                <Heading
-                  value="Proposal Type"
-                  size=Heading.H4
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
-                />
-              </Col>
-              <Col col=Col.Eight>
-                {switch allSub {
-                | Data(({proposalType}, _, _)) => <ProposalTypeBadge proposalType />
-                | _ => <LoadingCensorBar width=90 height=15 />
-                }}
-              </Col>
-            </Row>
-            <Row marginBottom=24>
-              <Col col=Col.Four mbSm=8>
-                <Heading
-                  value="Description" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
-                />
-              </Col>
-              <Col col=Col.Eight>
-                {switch allSub {
-                | Data(({description}, _, _)) => <MarkDown value=description />
-                | _ => <LoadingCensorBar width=270 height=15 />
-                }}
-              </Col>
-            </Row>
-          </InfoContainer>
-        </Col>
-      </Row>
-      {switch allSub {
-      | Data(({content}, _, _)) =>
-        <Row marginBottom=24>
-          <Col>
-            <InfoContainer>
-              <Heading value="Messages" size=Heading.H4 />
-              <SeperatedLine mt=32 mb=24 />
-              {switch content {
-              | CommunityPoolSpend({recipient, amount}) =>
-                <>
-                  <Row marginBottom=24>
-                    <Col col=Col.Four mbSm=8>
-                      <Heading
-                        value="Recipient Address"
-                        size=Heading.H4
-                        weight=Heading.Thin
-                        color={theme.neutral_600}
-                      />
-                    </Col>
-                    <Col col=Col.Eight>
-                      <AddressRender address=recipient position=AddressRender.Subtitle />
-                    </Col>
-                  </Row>
-                  <Row marginBottom=24>
-                    <Col col=Col.Four mbSm=8>
-                      <Heading
-                        value="Amount" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
-                      />
-                    </Col>
-                    <Col col=Col.Eight>
-                      <AmountRender coins=amount pos=AmountRender.TxIndex />
-                    </Col>
-                  </Row>
-                </>
-              | SoftwareUpgrade({name, height}) =>
-                <>
-                  <Row marginBottom=24>
-                    <Col col=Col.Four mbSm=8>
-                      <Heading
-                        value="Upgrade Name"
-                        size=Heading.H4
-                        weight=Heading.Thin
-                        color={theme.neutral_600}
-                      />
-                    </Col>
-                    <Col col=Col.Eight>
-                      <Text value={name} size=Text.Body1 block=true />
-                    </Col>
-                  </Row>
-                  <Row marginBottom=24>
-                    <Col col=Col.Four mbSm=8>
-                      <Heading
-                        value="Upgrade Height"
-                        size=Heading.H4
-                        weight=Heading.Thin
-                        color={theme.neutral_600}
-                      />
-                    </Col>
-                    <Col col=Col.Eight>
-                      <Text value={height->Belt.Int.toString} size=Text.Body1 block=true />
-                    </Col>
-                  </Row>
-                </>
-              | ParameterChange(parameters) =>
-                <>
-                  <Row marginBottom=24>
-                    <Col col=Col.Twelve>
-                      <div className={Styles.parameterChanges(theme, isDarkMode)}>
-                        {parameters
-                        ->Belt.Array.mapWithIndex((i, value) =>
-                          <div key={i->Belt.Int.toString}>
-                            <Text
-                              value={value.subspace ++ "." ++ value.key ++ ": " ++ value.value}
-                              size=Text.Body1
-                              block=true
-                              code=true
-                            />
-                            {i < parameters->Belt.Array.length - 1
-                              ? <VSpacing size=Spacing.md />
-                              : React.null}
-                          </div>
-                        )
-                        ->React.array}
-                      </div>
-                    </Col>
-                  </Row>
-                </>
-              | _ => <Text value="Unable to show the proposal messages" />
-              }}
-            </InfoContainer>
-          </Col>
-        </Row>
-      | _ => React.null
-      }}
-      {switch allSub {
-      | Data((
-          {
-            status,
-            votingStartTime,
-            votingEndTime,
-            endTotalYes,
-            endTotalYesPercent,
-            endTotalNo,
-            endTotalNoPercent,
-            endTotalNoWithVeto,
-            endTotalNoWithVetoPercent,
-            endTotalAbstain,
-            endTotalAbstainPercent,
-            endTotalVote,
-            totalBondedTokens,
-          },
-          {
-            total,
-            totalYes,
-            totalYesPercent,
-            totalNo,
-            totalNoPercent,
-            totalNoWithVeto,
-            totalNoWithVetoPercent,
-            totalAbstain,
-            totalAbstainPercent,
-          },
-          bondedToken,
-        )) =>
-        switch status {
-        | Deposit => React.null
-        | Voting
-        | Passed
-        | Rejected
-        | Inactive
-        | Failed =>
-          <>
-            <Row>
-              <Col col=Col.Six mb=24 mbSm=16>
-                <InfoContainer>
-                  <Heading value="Voting Overview" size=Heading.H4 />
-                  <SeperatedLine mt=32 mb=24 />
-                  <Row marginTop=38 alignItems=Row.Center>
-                    <Col col=Col.Seven>
-                      <div
-                        className={Css.merge(list{
-                          CssHelper.flexBoxSm(~justify=#spaceAround, ()),
-                          CssHelper.flexBox(~justify=#flexEnd, ()),
-                        })}>
-                        {
-                          let turnoutPercent = switch totalBondedTokens {
-                          | Some(totalBondedTokensExn) =>
-                            endTotalVote /. totalBondedTokensExn *. 100.
-                          | None => total /. bondedToken->Coin.getBandAmountFromCoin *. 100.
-                          }
-                          <div className=Styles.chartContainer>
-                            <TurnoutChart percent=turnoutPercent />
-                          </div>
-                        }
-                      </div>
-                    </Col>
-                    <Col col=Col.Five>
-                      <Row justify=Row.Center marginTopSm=32>
-                        <Col mb=24>
-                          <Heading
-                            value="Total Vote"
-                            size=Heading.H5
-                            color={theme.neutral_600}
-                            marginBottom=4
-                          />
-                          {switch MomentRe.diff(
-                            MomentRe.momentNow(),
-                            votingEndTime,
-                            #seconds,
-                          ) < 0. {
-                          | true =>
-                            <Text
-                              value={total->Format.fPretty(~digits=2) ++ " BAND"}
-                              size=Text.Body1
-                              block=true
-                              color={theme.neutral_900}
-                            />
-                          | false =>
-                            <Text
-                              value={endTotalVote->Format.fPretty(~digits=2) ++ " BAND"}
-                              size=Text.Body1
-                              block=true
-                              color={theme.neutral_900}
-                            />
-                          }}
-                        </Col>
-                        <Col mb=24 mbSm=0 colSm=Col.Six>
-                          <Heading
-                            value="Voting Start"
-                            size=Heading.H5
-                            color={theme.neutral_600}
-                            marginBottom=4
-                          />
-                          <Timestamp.Grid
-                            size=Text.Body1 time=votingStartTime color={theme.neutral_900}
-                          />
-                        </Col>
-                        <Col mbSm=0 colSm=Col.Six>
-                          <Heading
-                            value="Voting End"
-                            size=Heading.H5
-                            color={theme.neutral_600}
-                            marginBottom=4
-                          />
-                          <Timestamp.Grid
-                            size=Text.Body1 time=votingEndTime color={theme.neutral_900}
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </InfoContainer>
-              </Col>
-              <Col col=Col.Six mb=24 mbSm=16>
-                <InfoContainer>
-                  <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
-                    <Heading value="Results" size=Heading.H4 />
-                  </div>
-                  <SeperatedLine mt=24 mb=35 />
-                  <div className=Styles.resultContainer>
-                    {switch totalBondedTokens {
-                    | Some(_) =>
-                      <>
-                        <ProgressBar.Voting
-                          label=VoteSub.Yes amount=endTotalYes percent=endTotalYesPercent
-                        />
-                        <ProgressBar.Voting
-                          label=VoteSub.No amount=endTotalNo percent=endTotalNoPercent
-                        />
-                        <ProgressBar.Voting
-                          label=VoteSub.NoWithVeto
-                          amount=endTotalNoWithVeto
-                          percent=endTotalNoWithVetoPercent
-                        />
-                        <ProgressBar.Voting
-                          label=VoteSub.Abstain
-                          amount=endTotalAbstain
-                          percent=endTotalAbstainPercent
-                        />
-                      </>
-                    | None =>
-                      <>
-                        <ProgressBar.Voting
-                          label=VoteSub.Yes amount=totalYes percent=totalYesPercent
-                        />
-                        <ProgressBar.Voting
-                          label=VoteSub.No amount=totalNo percent=totalNoPercent
-                        />
-                        <ProgressBar.Voting
-                          label=VoteSub.NoWithVeto
-                          amount=totalNoWithVeto
-                          percent=totalNoWithVetoPercent
-                        />
-                        <ProgressBar.Voting
-                          label=VoteSub.Abstain amount=totalAbstain percent=totalAbstainPercent
-                        />
-                      </>
-                    }}
-                  </div>
-                </InfoContainer>
-              </Col>
-            </Row>
-            <Row marginBottom=24>
-              <Col>
-                <InfoContainer>
-                  <VoteBreakdownTable proposalID />
-                </InfoContainer>
-              </Col>
-            </Row>
-          </>
-        }
-      | _ => React.null
-      }}
-      <Row marginBottom=24>
-        <Col>
-          <InfoContainer>
-            <Heading value="Deposit" size=Heading.H4 />
-            <SeperatedLine mt=32 mb=24 />
-            <Row marginBottom=24 alignItems=Row.Center>
-              <Col col=Col.Four mbSm=8>
-                <Heading
-                  value="Deposit Status"
-                  size=Heading.H4
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
-                />
-              </Col>
-              <Col col=Col.Eight>
-                {switch proposalSub {
-                | Data({totalDeposit, status}) =>
-                  switch status {
-                  | ProposalSub.Deposit => <ProgressBar.Deposit totalDeposit />
-                  | _ =>
-                    <div className={CssHelper.flexBox()}>
-                      <img alt="Success Icon" src=Images.success className=Styles.statusLogo />
-                      <HSpacing size=Spacing.sm />
-                      // TODO: remove hard-coded later
-                      <Text value="Completed Min Deposit 1,000 BAND" size=Text.Body1 />
-                    </div>
-                  }
-                | _ => <LoadingCensorBar width={isMobile ? 120 : 270} height=15 />
-                }}
-              </Col>
-            </Row>
-            <Row alignItems=Row.Center>
-              <Col col=Col.Four mbSm=8>
-                <Heading
-                  value="Deposit End Time"
-                  size=Heading.H4
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
-                />
-              </Col>
-              <Col col=Col.Eight>
-                {switch proposalSub {
-                | Data({depositEndTime}) => <Timestamp size=Text.Body1 time=depositEndTime />
-                | _ => <LoadingCensorBar width=90 height=15 />
-                }}
-              </Col>
-            </Row>
-          </InfoContainer>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <InfoContainer>
-            <Table>
-              <Heading value="Depositors" size=Heading.H4 marginTopSm=16 />
-              <SeperatedLine mt=32 mb=0 />
-              <DepositorTable proposalID />
-            </Table>
-          </InfoContainer>
-        </Col>
-      </Row>
+  let allSub = Sub.all2(proposalSub, councilVoteSub)
+  switch allSub {
+  | Data(proposal, votes) => <RenderData proposal votes />
+  | Error(err) => <Heading value={err.message} />
+  | Loading =>
+    <div className=Styles.loadingContainer>
+      <LoadingCensorBar.CircleSpin />
     </div>
-  </Section>
+  | NoData => <Heading value="NoData" />
+  }
 }

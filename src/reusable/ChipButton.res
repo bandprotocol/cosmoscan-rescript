@@ -15,6 +15,10 @@ module Styles = {
     theme: Theme.t,
     isDarkMode,
     ~isActive=false,
+    ~color_: Theme.color_t,
+    ~activeColor_: Theme.color_t,
+    ~bgColor_: Theme.color_t,
+    ~activeBgColor_: Theme.color_t,
     (),
   ) => {
     let base = style(. [
@@ -35,11 +39,11 @@ module Styles = {
     let custom = switch variant {
     | Primary =>
       style(. [
-        backgroundColor(theme.primary_600),
-        color(theme.white),
-        border(#px(1), #solid, theme.primary_600),
-        hover([backgroundColor(theme.primary_600)]),
-        active([backgroundColor(theme.primary_600)]),
+        backgroundColor(isActive ? activeBgColor_ : bgColor_),
+        color(isActive ? activeColor_ : color_),
+        border(#px(1), #solid, isActive ? activeBgColor_ : bgColor_),
+        hover([backgroundColor(isActive ? activeBgColor_ : bgColor_)]),
+        active([backgroundColor(isActive ? activeBgColor_ : bgColor_)]),
         disabled([
           backgroundColor(isDarkMode ? theme.primary_600 : theme.neutral_200),
           color(Theme.white),
@@ -49,16 +53,16 @@ module Styles = {
       ])
     | Outline =>
       style(. [
-        backgroundColor(isActive ? theme.primary_600 : #transparent),
-        color(isActive ? Theme.white : theme.neutral_900),
-        border(#px(1), #solid, theme.primary_600),
+        backgroundColor(isActive ? activeBgColor_ : #transparent),
+        color(isActive ? activeColor_ : color_),
+        border(#px(1), #solid, bgColor_),
         selector("i", [color(theme.neutral_900)]),
         hover([
-          backgroundColor(theme.primary_600),
+          backgroundColor(activeBgColor_),
           color(isDarkMode ? Theme.black : Theme.white),
           selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
         ]),
-        active([backgroundColor(theme.primary_600)]),
+        active([backgroundColor(activeBgColor_)]),
         disabled([
           borderColor(theme.neutral_600),
           color(theme.neutral_600),
@@ -68,7 +72,7 @@ module Styles = {
         selector(
           "&.selected",
           [
-            backgroundColor(theme.primary_600),
+            backgroundColor(activeBgColor_),
             color(isDarkMode ? Theme.black : Theme.white),
             selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
           ],
@@ -93,12 +97,31 @@ let make = (
   ~disabled=false,
   ~className="",
   ~isActive=false,
+  ~color=?,
+  ~activeColor=?,
+  ~bgColor=?,
+  ~activeBgColor=?,
 ) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <button
     className={CssJs.merge(. [
-      Styles.btn(~variant, ~px, ~py, ~pxSm, ~pySm, ~fsize, theme, isDarkMode, ~isActive, ()),
+      Styles.btn(
+        ~variant,
+        ~px,
+        ~py,
+        ~pxSm,
+        ~pySm,
+        ~fsize,
+        theme,
+        isDarkMode,
+        ~isActive,
+        ~color_=color->Belt.Option.getWithDefault(theme.neutral_900),
+        ~activeColor_=activeColor->Belt.Option.getWithDefault(theme.white),
+        ~bgColor_=bgColor->Belt.Option.getWithDefault(theme.primary_600),
+        ~activeBgColor_=activeBgColor->Belt.Option.getWithDefault(theme.primary_600),
+        (),
+      ),
       CssHelper.flexBox(~align=#center, ~justify=#center, ()),
       style,
       className,

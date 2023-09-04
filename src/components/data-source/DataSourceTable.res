@@ -294,12 +294,10 @@ module RenderBody = {
         </div>
         <div>
           {switch datasourceSub {
-          | Data({timestamp: timestampOpt}) =>
-            switch timestampOpt {
-            | Some(timestamp') =>
-              <Timestamp time=timestamp' size=Text.Body1 weight=Text.Regular textAlign=Text.Right />
-            | None => <Text size=Text.Body2 value="Genesis" align={Center} />
-            }
+          | Data({timestamp: timeOpt}) =>
+            <Timestamp
+              timeOpt defaultText="Genesis" size=Text.Body1 weight=Text.Regular textAlign=Text.Right
+            />
           | _ => <LoadingCensorBar width=150 height=15 />
           }}
         </div>
@@ -413,13 +411,11 @@ module RenderBodyMobile = {
         </Col>
         <Col colSm=Col.Seven>
           {switch datasourceSub {
-          | Data({timestamp: timestampOpt}) =>
+          | Data({timestamp: timeOpt}) =>
             /* TODO: change to last_request when data is ready */
-            switch timestampOpt {
-            | Some(timestamp') =>
-              <Timestamp time=timestamp' size=Text.Xl weight=Text.Regular textAlign=Text.Right />
-            | None => <Text size=Text.Xl value="Genesis" align={Center} />
-            }
+            <Timestamp
+              timeOpt defaultText="Genesis" size=Text.Xl weight=Text.Regular textAlign=Text.Right
+            />
           | _ => <LoadingCensorBar width=150 height=15 />
           }}
         </Col>

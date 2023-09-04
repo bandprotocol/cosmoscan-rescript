@@ -47,6 +47,7 @@ module Styles = {
     | Mini =>
       style(. [pointerEvents(#auto)])
     }
+  let mono = style(. [fontFamilies([#custom("Roboto Mono"), #monospace])])
 }
 
 module ComponentCreator = (RawID: ID.IDSig) => {
@@ -60,6 +61,8 @@ module ComponentCreator = (RawID: ID.IDSig) => {
     ~details="",
     ~block=false,
     ~isNotLink=false,
+    ~mono=false,
+    ~color=?,
   ) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -69,6 +72,7 @@ module ComponentCreator = (RawID: ID.IDSig) => {
         className={Css.merge(list{
           Styles.link(theme, details != ""),
           Styles.pointerEvents(position),
+          mono ? Styles.mono : "",
         })}>
         <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
           <Text
@@ -82,7 +86,7 @@ module ComponentCreator = (RawID: ID.IDSig) => {
             nowrap=true
             code=true
             block
-            color=theme.primary_600
+            color={color->Belt.Option.getWithDefault(theme.primary_600)}
           />
           {details != ""
             ? <>
@@ -94,7 +98,7 @@ module ComponentCreator = (RawID: ID.IDSig) => {
                   | None => position->fontSize
                   }}
                   weight=Text.Regular
-                  color=theme.neutral_900
+                  color={color->Belt.Option.getWithDefault(theme.neutral_900)}
                   ellipsis=true
                 />
               </>
@@ -106,6 +110,7 @@ module ComponentCreator = (RawID: ID.IDSig) => {
         className={Css.merge(list{
           Styles.link(theme, details != ""),
           Styles.pointerEvents(position),
+          mono ? Styles.mono : "",
         })}
         route={id->RawID.getRoute}>
         <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
@@ -120,7 +125,7 @@ module ComponentCreator = (RawID: ID.IDSig) => {
             nowrap=true
             code=true
             block
-            color=theme.primary_600
+            color={color->Belt.Option.getWithDefault(theme.primary_600)}
           />
           {details != ""
             ? <>
@@ -132,7 +137,7 @@ module ComponentCreator = (RawID: ID.IDSig) => {
                   | None => position->fontSize
                   }}
                   weight=Text.Regular
-                  color=theme.neutral_900
+                  color={color->Belt.Option.getWithDefault(theme.neutral_900)}
                   ellipsis=true
                 />
               </>
@@ -158,9 +163,11 @@ module OracleScript = ComponentCreator(ID.OracleScript)
 module Request = ComponentCreator(ID.Request)
 module Block = ComponentCreator(ID.Block)
 module Proposal = ComponentCreator(ID.Proposal)
+module LegacyProposal = ComponentCreator(ID.LegacyProposal)
 
 module DataSourceLink = PlainLinkCreator(ID.DataSource)
 module OracleScriptLink = PlainLinkCreator(ID.OracleScript)
 module RequestLink = PlainLinkCreator(ID.Request)
 module BlockLink = PlainLinkCreator(ID.Block)
 module ProposalLink = PlainLinkCreator(ID.Proposal)
+module LegacyProposalLink = PlainLinkCreator(ID.LegacyProposal)

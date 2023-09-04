@@ -6,6 +6,16 @@
 @module("./fail.svg") external fail: string = "default"
 @module("./loading-circle-light.png") external loadingCircleLight: string = "default"
 @module("./loading-circle-dark.png") external loadingCircleDark: string = "default"
+@module("./yes-green.png") external yesGreen: string = "default"
+@module("./yes-red.png") external yesRed: string = "default"
+@module("./yes-gray.png") external yesGray: string = "default"
+@module("./no-green.png") external noGreen: string = "default"
+@module("./no-red.png") external noRed: string = "default"
+@module("./no-gray.png") external noGray: string = "default"
+@module("./no-dark-green.png") external noDarkGreen: string = "default"
+@module("./question.png") external question: string = "default"
+@module("./abstain.png") external abstain: string = "default"
+@module("./abstain-gray.png") external abstainGray: string = "default"
 
 // Theme Toggle
 @module("./sun-icon.png") external sunIcon: string = "default"
