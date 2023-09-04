@@ -66,7 +66,7 @@ let defaultCompare = (a: ValidatorSub.t, b: ValidatorSub.t) =>
   if a.tokens != b.tokens {
     compare(b.tokens, a.tokens)
   } else {
-    compareString(b.moniker, a.moniker)
+    compareString(a.moniker, b.moniker)
   }
 
 let sorting = (validators: array<ValidatorSub.t>, sortedBy) => {
@@ -90,7 +90,10 @@ let sorting = (validators: array<ValidatorSub.t>, sortedBy) => {
     if result != 0 {
       result
     } else {
-      defaultCompare(a, b)
+      switch sortedBy {
+       | VotingPowerAsc => defaultCompare(b,a)
+       | _ => defaultCompare(a, b)
+      }
     }
   })
   ->Belt.List.toArray
@@ -415,13 +418,13 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
               isMobile
                 ? <RenderBodyMobile
                     key={idx->Belt.Int.toString}
-                    rank={idx + 1}
+                    rank={each.rank}
                     validatorSub={Sub.resolve(each)}
                     votingPower
                   />
                 : <RenderBody
                     key={idx->Belt.Int.toString}
-                    rank={idx + 1}
+                    rank={each.rank}
                     validatorSub={Sub.resolve(each)}
                     votingPower
                     dispatchModal
@@ -449,11 +452,11 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
       ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile
-              key={i->Belt.Int.toString} rank={i + 1} validatorSub=noData votingPower=1.0
+              key={i->Belt.Int.toString} rank={i} validatorSub=noData votingPower=1.0
             />
           : <RenderBody
               key={i->Belt.Int.toString}
-              rank={i + 1}
+              rank={i}
               validatorSub=noData
               votingPower=1.0
               isLogin
