@@ -56,18 +56,21 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
           <Col
             col={switch variant {
             | Full => Col.Four
-            | _ => Col.Six
+            | Short => Col.Six
+            | Half => Col.Twelve
             }}
             colSm=Col.Twelve
-            mb=21
+            mb=36
             mbSm=0
-            style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}>
+            // style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}
+          >
             <div>
               <Row>
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | _ => Col.Seven
+                  | Short => Col.Seven
+                  | Half => Col.Four
                   }}
                   colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
@@ -90,7 +93,8 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | _ => Col.Five
+                  | Short => Col.Five
+                  | Half => Col.Eight
                   }}
                   colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
@@ -115,35 +119,32 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | _ => Col.Seven
+                  | Short => Col.Seven
+                  | Half => Col.Four
                   }}
                   colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
-                      value="Current Status"
+                      value={switch proposal.status {
+                      | VotingPeriod
+                      | WaitingVeto
+                      | VetoPeriod => "Current Status"
+                      | _ => "Status"
+                      }}
                       size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                     />
-                    {proposal.isCurrentRejectByVeto
-                      ? <>
-                          <HSpacing size=Spacing.xs />
-                          <CTooltip
-                            tooltipPlacement=CTooltip.Bottom
-                            tooltipText="The proposal was rejected because a veto was passed.">
-                            <Icon name="fal fa-info-circle" size=16 color={theme.neutral_400} />
-                          </CTooltip>
-                        </>
-                      : React.null}
                   </div>
                 </Col>
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | _ => Col.Five
+                  | Short => Col.Five
+                  | Half => Col.Eight
                   }}
                   colSm=Col.Six>
-                  <div className={CssHelper.flexBox()}>
+                  <div className={CssHelper.flexBox(~direction=#row, ())}>
                     {switch proposal.status {
                     | VotingPeriod =>
                       <Text
@@ -165,6 +166,17 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                         )}
                         block=true
                       />
+                    }}
+                    {switch proposal.isCurrentRejectByVeto {
+                    | true =>
+                      <Text
+                        value="by Veto"
+                        size=Text.Body2
+                        weight=Text.Regular
+                        color={theme.neutral_600}
+                        marginLeft=8
+                      />
+                    | false => React.null
                     }}
                   </div>
                 </Col>

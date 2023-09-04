@@ -179,77 +179,81 @@ module Vote = {
   let make = (
     ~vetoProposal: CouncilProposalSub.VetoProposal.t,
     ~status: CouncilProposalSub.Status.t,
-    ~voteStat: VoteSub.vote_stat_t,
     ~bondedToken: float,
   ) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
+    let voteStatByProposalIDSub = VoteSub.getVoteStatByProposalID(vetoProposal.id)
+
     let openDepositors = () =>
       vetoProposal.id->ID.LegacyProposal.toInt->Depositors->OpenModal->dispatchModal
 
-    let turnout = switch status {
-    | VetoPeriod => voteStat.total /. bondedToken *. 100.
+    let turnout = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.total /. bondedToken *. 100.
     | _ => vetoProposal.turnout
     }
 
-    let isTurnoutPassed = switch status {
-    | VetoPeriod =>
+    let isTurnoutPassed = switch voteStatByProposalIDSub {
+    | Data(voteStat) =>
       (turnout > CouncilProposalSub.VetoProposal.turnoutThreshold)
         ->CouncilProposalSub.CurrentStatus.fromBool
     | _ => vetoProposal.isTurnoutPassed
     }
 
-    let isYesPassed = switch status {
-    | VetoPeriod =>
-      (voteStat.totalYes /. voteStat.total >= CouncilProposalSub.VetoProposal.yesThreshold)
-        ->CouncilProposalSub.CurrentStatus.fromBool
+    let isYesPassed = switch voteStatByProposalIDSub {
+    | Data(voteStat) =>
+      // veto passed mean Reject the Proposal
+      // so invert it status !(
+      !(
+        voteStat.totalYes /. voteStat.total >= CouncilProposalSub.VetoProposal.yesThreshold
+      )->CouncilProposalSub.CurrentStatus.fromBool
     | _ => vetoProposal.isYesPassed
     }
 
-    let yesVote = switch status {
-    | VetoPeriod => voteStat.totalYes
+    let yesVote = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.totalYes
     | _ => vetoProposal.yesVote
     }
 
-    let yesVotePercent = switch status {
-    | VetoPeriod => voteStat.totalYesPercent
+    let yesVotePercent = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.totalYesPercent
     | _ => vetoProposal.yesVotePercent
     }
 
-    let noVote = switch status {
-    | VetoPeriod => voteStat.totalNo
+    let noVote = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.totalNo
     | _ => vetoProposal.noVote
     }
 
-    let noVotePercent = switch status {
-    | VetoPeriod => voteStat.totalNoPercent
+    let noVotePercent = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.totalNoPercent
     | _ => vetoProposal.noVotePercent
     }
 
-    let noWithVetoVote = switch status {
-    | VetoPeriod => voteStat.totalNoWithVeto
+    let noWithVetoVote = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.totalNoWithVeto
     | _ => vetoProposal.noWithVetoVote
     }
 
-    let noWithVetoVotePercent = switch status {
-    | VetoPeriod => voteStat.totalNoWithVetoPercent
+    let noWithVetoVotePercent = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.totalNoWithVetoPercent
     | _ => vetoProposal.noWithVetoVotePercent
     }
 
-    let abstainVote = switch status {
-    | VetoPeriod => voteStat.totalAbstain
+    let abstainVote = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.totalAbstain
     | _ => vetoProposal.abstainVote
     }
 
-    let abstainVotePercent = switch status {
-    | VetoPeriod => voteStat.totalAbstainPercent
+    let abstainVotePercent = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.totalAbstainPercent
     | _ => vetoProposal.abstainVotePercent
     }
 
-    let totalVote = switch status {
-    | VetoPeriod => voteStat.total
+    let totalVote = switch voteStatByProposalIDSub {
+    | Data(voteStat) => voteStat.total
     | _ => vetoProposal.totalVote
     }
 

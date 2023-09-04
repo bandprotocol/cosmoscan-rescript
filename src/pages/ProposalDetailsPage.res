@@ -240,38 +240,22 @@ module RenderData = {
             switch proposal.status {
             | WaitingVeto =>
               <Col col=Col.Five>
-                {switch proposal.vetoId {
-                | Some(vetoId) => {
-                    let totalDepositSub = ProposalSub.totalDeposit(vetoId)
-                    switch totalDepositSub {
-                    | Data(totalDepositOpt) =>
-                      <RejectDetailsCard.Wait
-                        proposal
-                        totalDeposit={totalDepositOpt->Belt.Option.getWithDefault(
-                          Coin.newUBANDFromAmount(0.),
-                        )}
-                        vetoProposal
-                      />
-                    | _ => <LoadingCensorBar width=153 height=30 />
-                    }
-                  }
+                {switch proposal.vetoProposalOpt {
+                | Some({id, totalDeposit}) =>
+                  <RejectDetailsCard.Wait
+                    proposal
+                    totalDeposit={totalDeposit
+                    ->Belt.List.reduce(0., (acc, deposit) => acc +. deposit.amount)
+                    ->Coin.newUBANDFromAmount}
+                    vetoProposal
+                  />
 
                 | None => React.null
                 }}
               </Col>
             | _ =>
               <Col col=Col.Six>
-                {
-                  let voteStatByProposalIDSub = VoteSub.getVoteStatByProposalID(vetoProposal.id)
-
-                  switch voteStatByProposalIDSub {
-                  | Data(voteStat) =>
-                    <RejectDetailsCard.Vote
-                      vetoProposal status=proposal.status voteStat bondedToken
-                    />
-                  | _ => <Text value="sum ting wong" size=Text.Body1 weight=Text.Thin />
-                  }
-                }
+                <RejectDetailsCard.Vote vetoProposal status=proposal.status bondedToken />
               </Col>
             }
 
