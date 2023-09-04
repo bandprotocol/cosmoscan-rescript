@@ -17,13 +17,15 @@ module Styles = {
 
 @react.component
 let make = () => {
+  let (page, setPage) = React.useState(_ => 1)
   let pageSize = 10
   let (filterStr, setFilterStr) = React.useState(_ => "All")
 
-  let proposalsSub = ProposalSub.getList(~pageSize, ~page=1, ())
-  let councilProposalSub = CouncilProposalSub.getList(~filter=filterStr, ~pageSize, ~page=1, ())
-  let councilProposalCount = CouncilProposalSub.count()
+  let councilProposalSub = CouncilProposalSub.getList(~filter=filterStr, ~pageSize, ~page, ())
+  let councilProposalCount = CouncilProposalSub.count(~filter=filterStr)
   let proposalCount = ProposalSub.count()
+
+  let isMobile = Media.isMobile()
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -104,6 +106,27 @@ let make = () => {
           ->React.array
         }}
       </Row>
+      {switch isMobile {
+      | false =>
+        switch councilProposalCount {
+        | Data(count) => {
+            let pageCount = Page.getPageCount(count, pageSize)
+
+            {
+              switch count > pageSize {
+              | true =>
+                <Pagination
+                  currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+                />
+              | false => React.null
+              }
+            }
+          }
+
+        | _ => React.null
+        }
+      | true => React.null
+      }}
     </div>
   </Section>
 }

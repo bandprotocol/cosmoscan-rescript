@@ -279,8 +279,8 @@ module MultiConfig = %graphql(`
 `)
 
 module CountConfig = %graphql(`
-    subscription CouncilProposalCount {
-      council_proposals_aggregate {
+    subscription CouncilProposalCount($filter: String!) {
+      council_proposals_aggregate(where: {council: { name: { _ilike: $filter}}}) {
         aggregate {
           count
         }
@@ -412,8 +412,8 @@ let getList = (~filter, ~page, ~pageSize, ()) => {
   result->Sub.fromData->Sub.map(internal => internal.council_proposals->Belt.Array.map(toExternal))
 }
 
-let count = () => {
-  let result = CountConfig.use()
+let count = (~filter) => {
+  let result = CountConfig.use({filter: filter->getFilter})
 
   result
   ->Sub.fromData
