@@ -66,7 +66,7 @@ let defaultCompare = (a: ValidatorSub.t, b: ValidatorSub.t) =>
   if a.tokens != b.tokens {
     compare(b.tokens, a.tokens)
   } else {
-    compareString(b.moniker, a.moniker)
+    compareString(a.moniker, b.moniker)
   }
 
 let sorting = (validators: array<ValidatorSub.t>, sortedBy) => {
@@ -90,7 +90,10 @@ let sorting = (validators: array<ValidatorSub.t>, sortedBy) => {
     if result != 0 {
       result
     } else {
-      defaultCompare(a, b)
+      switch sortedBy {
+       | VotingPowerAsc => defaultCompare(b,a)
+       | _ => defaultCompare(a, b)
+      }
     }
   })
   ->Belt.List.toArray
@@ -410,19 +413,19 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
         {filteredValidator->Belt.Array.length > 0
           ? filteredValidator
             ->sorting(sortedBy)
-            ->Belt.Array.map(e => {
-              let votingPower = e.votingPower /. bondedTokenCount.amount *. 100.
+            ->Belt.Array.mapWithIndex((idx, each) => {
+              let votingPower = each.votingPower /. bondedTokenCount.amount *. 100.
               isMobile
                 ? <RenderBodyMobile
-                    key={e.rank->Belt.Int.toString}
-                    rank={e.rank}
-                    validatorSub={Sub.resolve(e)}
+                    key={idx->Belt.Int.toString}
+                    rank={each.rank}
+                    validatorSub={Sub.resolve(each)}
                     votingPower
                   />
                 : <RenderBody
-                    key={e.rank->Belt.Int.toString}
-                    rank={e.rank}
-                    validatorSub={Sub.resolve(e)}
+                    key={idx->Belt.Int.toString}
+                    rank={each.rank}
+                    validatorSub={Sub.resolve(each)}
                     votingPower
                     dispatchModal
                     isLogin
@@ -449,11 +452,11 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
       ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile
-              key={i->Belt.Int.toString} rank=i validatorSub=noData votingPower=1.0
+              key={i->Belt.Int.toString} rank={i} validatorSub=noData votingPower=1.0
             />
           : <RenderBody
               key={i->Belt.Int.toString}
-              rank=i
+              rank={i}
               validatorSub=noData
               votingPower=1.0
               isLogin
