@@ -22,7 +22,7 @@ let make = () => {
 
   <Section>
     <div className=CssHelper.container id="proposalsSection">
-      <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
+      <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24 marginTop=40 marginTopSm=24>
         <Col col=Col.Twelve style={CssHelper.flexBox()}>
           <Heading value="Proposals" size=Heading.H1 />
           <HSpacing size=Spacing.lg />

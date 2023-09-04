@@ -12,7 +12,6 @@ let make = (
   ~size=Text.Caption,
   ~weight=Text.Regular,
   ~spacing=Text.Unset,
-  ~code=false,
   ~textAlign=Text.Left,
   ~color=?,
   ~defaultText="N/A",
@@ -29,7 +28,7 @@ let make = (
             weight
             color={color->Belt.Option.getWithDefault(theme.neutral_600)}
             spacing
-            code
+            code=true
           />
           <HSpacing size=Spacing.sm />
         </>
@@ -41,7 +40,7 @@ let make = (
         size
         weight
         spacing
-        code
+        code=true
         block=true
         align=textAlign
         color={color->Belt.Option.getWithDefault(theme.neutral_600)}
@@ -52,7 +51,7 @@ let make = (
         size
         weight
         spacing
-        code
+        code=true
         block=true
         align=textAlign
         color={color->Belt.Option.getWithDefault(theme.neutral_600)}
@@ -66,7 +65,7 @@ let make = (
             size
             weight
             spacing
-            code
+            code=true
             color={color->Belt.Option.getWithDefault(theme.neutral_600)}
           />
         </>

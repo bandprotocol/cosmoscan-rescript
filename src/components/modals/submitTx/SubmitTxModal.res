@@ -5,7 +5,7 @@ module Styles = {
     width(#px(468)),
     minHeight(#px(300)),
     height(#auto),
-    padding(#px(32)),
+    padding(#px(24)),
     borderRadius(#px(5)),
     justifyContent(#flexStart),
   ])
@@ -69,7 +69,7 @@ module SubmitTxStep = {
     let (gasInput, setGasInput) = React.useState(_ => msg->SubmitMsg.defaultGasLimit)
 
     <div className={Css.merge(list{Styles.container, Styles.disable(isActive)})}>
-      <Heading value={SubmitMsg.toString(msg)} size=Heading.H4 marginBottom=24 />
+      <Heading value={SubmitMsg.toString(msg)} size=Heading.H4 marginBottom=16 />
       {switch msg {
       | SubmitMsg.Send(receiver, targetChain) =>
         <SendMsg address={account.address} receiver setMsgsOpt targetChain />
@@ -82,6 +82,10 @@ module SubmitTxStep = {
         <ReinvestMsg address={account.address} validator amount setMsgsOpt />
       | Vote(proposalID, proposalName) =>
         <VoteMsg address={account.address} proposalID proposalName setMsgsOpt />
+      | VetoVote(proposalID, proposalName) =>
+        <VetoVoteMsg address={account.address} proposalID proposalName setMsgsOpt />
+      | OpenVeto(proposalID, proposalName, totalDeposit) =>
+        <OpenVetoMsg address={account.address} proposalID proposalName totalDeposit setMsgsOpt />
       }}
       <EnhanceTxInput
         width=300

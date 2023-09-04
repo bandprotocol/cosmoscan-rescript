@@ -143,6 +143,27 @@ module Styles = {
   let breakAll = style(. [wordBreak(#breakAll)])
 
   let textColor = color_ => style(. [color(color_)])
+
+  let mb = (~mb, ~mbSm, ()) =>
+    style(. [
+      marginBottom(#px(mb)),
+      Media.mobile([marginBottom(#px(mbSm->Belt.Option.getWithDefault(mb)))]),
+    ])
+  let mt = (~mt, ~mtSm, ()) =>
+    style(. [
+      marginTop(#px(mt)),
+      Media.mobile([marginTop(#px(mtSm->Belt.Option.getWithDefault(mt)))]),
+    ])
+  let ml = (~ml, ~mlSm, ()) =>
+    style(. [
+      marginLeft(#px(ml)),
+      Media.mobile([marginLeft(#px(mlSm->Belt.Option.getWithDefault(ml)))]),
+    ])
+  let mr = (~mr, ~mrSm, ()) =>
+    style(. [
+      marginRight(#px(mr)),
+      Media.mobile([marginRight(#px(mrSm->Belt.Option.getWithDefault(mr)))]),
+    ])
 }
 
 @react.component
@@ -164,6 +185,14 @@ let make = (
   ~tooltipPlacement=AlignBottom,
   ~tooltipLeaveDelay=100,
   ~special=false,
+  ~marginTop=0,
+  ~marginTopSm=?,
+  ~marginBottom=0,
+  ~marginBottomSm=?,
+  ~marginLeft=-0,
+  ~marginLeftSm=?,
+  ~marginRight=-0,
+  ~marginRightSm=?,
   ~value="",
   ~children=?,
 ) => {
@@ -182,6 +211,10 @@ let make = (
           Styles.lineHeight(height),
           Styles.textTransform(transform),
           Styles.textColor(color->Belt.Option.getWithDefault(theme.neutral_600)),
+          Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),
+          Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
+          Styles.ml(~ml=marginLeft, ~mlSm=marginLeftSm, ()),
+          Styles.mr(~mr=marginRight, ~mrSm=marginRightSm, ()),
           nowrap ? Styles.noWrap : "",
           block ? Styles.block : "inline-block",
           code ? Styles.code : "",
@@ -208,6 +241,10 @@ let make = (
             Styles.lineHeight(height),
             Styles.textTransform(transform),
             Styles.textColor(color->Belt.Option.getWithDefault(theme.neutral_600)),
+            Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),
+            Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
+            Styles.ml(~ml=marginLeft, ~mlSm=marginLeftSm, ()),
+            Styles.mr(~mr=marginRight, ~mrSm=marginRightSm, ()),
             nowrap ? Styles.noWrap : "",
             block ? Styles.block : "inline-block",
             code ? Styles.code : "",

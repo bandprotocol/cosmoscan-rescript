@@ -1,11 +1,10 @@
-type t = {
-  depositor: Address.t,
-  amount: list<Coin.t>,
-  txHashOpt: option<Hash.t>,
-}
-
 type account_t = {address: Address.t}
-type transaction_t = {hash: Hash.t}
+type block_t = {timestamp: MomentRe.Moment.t}
+
+type transaction_t = {
+  hash: Hash.t,
+  block: block_t,
+}
 
 type internal_t = {
   account: account_t,
@@ -13,10 +12,18 @@ type internal_t = {
   transactionOpt: option<transaction_t>,
 }
 
+type t = {
+  depositor: Address.t,
+  amount: list<Coin.t>,
+  txHashOpt: option<Hash.t>,
+  timestampOpt: option<MomentRe.Moment.t>,
+}
+
 let toExternal = ({account, amount, transactionOpt}) => {
   depositor: account.address,
   amount,
   txHashOpt: transactionOpt->Belt.Option.map(({hash}) => hash),
+  timestampOpt: transactionOpt->Belt.Option.map(({block}) => block.timestamp),
 }
 
 module MultiConfig = %graphql(`
@@ -28,6 +35,9 @@ module MultiConfig = %graphql(`
         amount @ppxCustom(module: "GraphQLParserModule.Coins")
         transactionOpt: transaction @ppxAs(type: "transaction_t") {
           hash @ppxCustom(module: "GraphQLParserModule.Hash")
+          block @ppxAs(type: "block_t")  {
+            timestamp @ppxCustom(module: "GraphQLParserModule.Date")
+          }
         }
       }
     }
@@ -46,7 +56,7 @@ module DepositCountConfig = %graphql(`
 let getList = (proposalID, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({
-    proposal_id: proposalID->ID.Proposal.toInt,
+    proposal_id: proposalID->ID.LegacyProposal.toInt,
     limit: pageSize,
     offset,
   })
@@ -55,7 +65,7 @@ let getList = (proposalID, ~page, ~pageSize, ()) => {
 }
 
 let count = proposalID => {
-  let result = DepositCountConfig.use({proposal_id: proposalID->ID.Proposal.toInt})
+  let result = DepositCountConfig.use({proposal_id: proposalID->ID.LegacyProposal.toInt})
 
   result
   ->Sub.fromData

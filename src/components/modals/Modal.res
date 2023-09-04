@@ -115,7 +115,9 @@ let make = () => {
         | QRCode(address) => <QRCodeModal address />
         | IBCPacketError(reason) => <IBCPacketFail reason />
         | Syncing => <SyncingModal />
-        | CouncilMembers(council) => <CouncilMembers council />
+        | CouncilMembers(council) => <CouncilMembersModal council />
+        | Depositors(vetoId) => <DepositorsModal vetoId />
+        | VetoVote(vetoId) => <VetoVotesModal vetoId />
         }}
       </div>
     </div>

@@ -863,6 +863,36 @@ module Gov = {
   }
 }
 
+module Council = {
+  module Vote = {
+    type t = {
+      voterAddress: Address.t,
+      proposalID: ID.Proposal.t,
+      option: string,
+    }
+
+    exception ParseVoteNotMatch
+    // TODO: check option again
+    let parse = vote => {
+      switch vote {
+      | 0 => "Unspecified"
+      | 1 => "Yes"
+      | 2 => "No"
+      | _ => raise(ParseVoteNotMatch)
+      }
+    }
+
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        voterAddress: json.required(list{"msg", "voter"}, address),
+        proposalID: json.required(list{"msg", "proposal_id"}, ID.Proposal.decoder),
+        option: json.required(list{"msg", "option"}, int)->parse,
+      })
+    }
+  }
+}
+
 module Client = {
   type t = {
     signer: Address.t,
@@ -1363,6 +1393,7 @@ module Input = {
     | UndelegateMsg(Staking.Undelegate.input_t)
     | RedelegateMsg(Staking.Redelegate.input_t)
     | WithdrawRewardMsg(Distribution.WithdrawReward.input_t)
+    // change this when can create Counil Vote message
     | VoteMsg(Gov.Vote.input_t)
     | IBCTransfer(ibc_transfer_t)
 }
@@ -1392,8 +1423,9 @@ type rec msg_t =
   | UnjailMsg(Slashing.Unjail.t)
   | SubmitProposalMsg(Gov.SubmitProposal.decoded_t)
   | DepositMsg(Gov.Deposit.decoded_t)
-  | VoteMsg(Gov.Vote.decoded_t)
-  | VoteWeightedMsg(Gov.VoteWeighted.decoded_t)
+  | LegacyVoteMsg(Gov.Vote.decoded_t)
+  | LegacyVoteWeightedMsg(Gov.VoteWeighted.decoded_t)
+  | VoteMsg(Council.Vote.t)
   | CreateClientMsg(Client.Create.t)
   | UpdateClientMsg(Client.t)
   | UpgradeClientMsg(Client.t)
@@ -1463,8 +1495,9 @@ let getBadge = msg => {
   | SetWithdrawAddressMsg(_) => {name: "Set Withdraw Address", category: ValidatorMsg}
   | SubmitProposalMsg(_) => {name: "Submit Proposal", category: ProposalMsg}
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
+  | LegacyVoteMsg(_) => {name: "Legacy Vote", category: ProposalMsg}
+  | LegacyVoteWeightedMsg(_) => {name: "Legacy Vote Weighted", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
-  | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
   | CreateClientMsg(_) => {name: "Create Client", category: IBCMsg}
   | UpdateClientMsg(_) => {name: "Update Client", category: IBCMsg}
   | UpgradeClientMsg(_) => {name: "Upgrade Client", category: IBCMsg}
@@ -1648,26 +1681,27 @@ let rec decodeMsg = (json, isSuccess) => {
             (DepositMsg(Failure(msg)), msg.depositor, false)
           }
 
+    | "/cosmos.gov.v1.MsgVote"
     | "/cosmos.gov.v1beta1.MsgVote" =>
       isSuccess
         ? {
             let msg = json->mustDecode(Gov.Vote.decodeSuccess)
-            (VoteMsg(Success(msg)), msg.voterAddress, false)
+            (LegacyVoteMsg(Success(msg)), msg.voterAddress, false)
           }
         : {
             let msg = json->mustDecode(Gov.Vote.decodeFail)
-            (VoteMsg(Failure(msg)), msg.voterAddress, false)
+            (LegacyVoteMsg(Failure(msg)), msg.voterAddress, false)
           }
 
     | "/cosmos.gov.v1beta1.MsgVoteWeighted" =>
       isSuccess
         ? {
             let msg = json->mustDecode(Gov.VoteWeighted.decodeSuccess)
-            (VoteWeightedMsg(Success(msg)), msg.voterAddress, false)
+            (LegacyVoteWeightedMsg(Success(msg)), msg.voterAddress, false)
           }
         : {
             let msg = json->mustDecode(Gov.VoteWeighted.decodeFail)
-            (VoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
+            (LegacyVoteWeightedMsg(Failure(msg)), msg.voterAddress, false)
           }
 
     | "/ibc.core.client.v1.MsgCreateClient" =>
@@ -1746,6 +1780,9 @@ let rec decodeMsg = (json, isSuccess) => {
             (TransferMsg(Failure(msg)), msg.sender, true)
           }
 
+    | "/council.v1beta1.MsgVote" =>
+      let msg = json->mustDecode(Council.Vote.decode)
+      (VoteMsg(msg), msg.voterAddress, false)
     | "/cosmos.authz.v1beta1.MsgExec" =>
       let msg = json->mustDecode(decodeExecMsg(isSuccess))
       (ExecMsg(msg), msg.grantee, false)

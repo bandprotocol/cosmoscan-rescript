@@ -58,7 +58,9 @@ let fPercent = (~digits=?, value) => {
         value->Js.Float.toFixedWithPrecision(~digits=6)
       },
     )
-  } ++ " %"
+  } ++ "%"
 }
+
+let fVotePercent = value => (value < 10. ? "0" : "") ++ value->fPretty(~digits=2) ++ "%"
 
 let iPretty = value => withCommas(value->Belt.Int.toString)
