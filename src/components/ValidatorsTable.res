@@ -410,19 +410,19 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
         {filteredValidator->Belt.Array.length > 0
           ? filteredValidator
             ->sorting(sortedBy)
-            ->Belt.Array.map(e => {
-              let votingPower = e.votingPower /. bondedTokenCount.amount *. 100.
+            ->Belt.Array.mapWithIndex((idx, each) => {
+              let votingPower = each.votingPower /. bondedTokenCount.amount *. 100.
               isMobile
                 ? <RenderBodyMobile
-                    key={e.rank->Belt.Int.toString}
-                    rank={e.rank}
-                    validatorSub={Sub.resolve(e)}
+                    key={idx->Belt.Int.toString}
+                    rank={idx + 1}
+                    validatorSub={Sub.resolve(each)}
                     votingPower
                   />
                 : <RenderBody
-                    key={e.rank->Belt.Int.toString}
-                    rank={e.rank}
-                    validatorSub={Sub.resolve(e)}
+                    key={idx->Belt.Int.toString}
+                    rank={idx + 1}
+                    validatorSub={Sub.resolve(each)}
                     votingPower
                     dispatchModal
                     isLogin
@@ -449,11 +449,11 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
       ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile
-              key={i->Belt.Int.toString} rank=i validatorSub=noData votingPower=1.0
+              key={i->Belt.Int.toString} rank={i + 1} validatorSub=noData votingPower=1.0
             />
           : <RenderBody
               key={i->Belt.Int.toString}
-              rank=i
+              rank={i + 1}
               validatorSub=noData
               votingPower=1.0
               isLogin
