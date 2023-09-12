@@ -253,6 +253,7 @@ let getList = (~isActive, ()) => {
   ->Sub.map(({validators}) =>
     validators->Belt.Array.mapWithIndex((idx, each) => toExternal(each, idx + 1))
   )
+
 }
 
 let avgCommission = (~isActive, ()) => {
