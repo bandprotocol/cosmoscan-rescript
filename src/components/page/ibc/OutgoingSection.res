@@ -142,7 +142,7 @@ let make = (~chainID, ~channel, ~port) => {
     </Row>
     {switch packetCountSub {
     | Data(packetCount) =>
-      <Pagination2
+      <Pagination
         currentPage=page
         totalElement=packetCount
         pageSize

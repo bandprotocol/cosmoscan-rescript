@@ -275,9 +275,12 @@ let make = (~proposalID) => {
           }}
           {switch voteCountSub {
           | Data(voteCount) =>
-            let pageCount = Page.getPageCount(voteCount, pageSize)
             <Pagination
-              currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+              currentPage=page
+              totalElement=voteCount
+              pageSize
+              onPageChange={newPage => setPage(_ => newPage)}
+              onChangeCurrentPage={newPage => setPage(_ => newPage)}
             />
           | _ => React.null
           }}

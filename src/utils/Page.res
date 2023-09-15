@@ -6,5 +6,10 @@ let getPageCount = (amount, limit) =>
   }
 
 let getCurrentPageRange = (currentPage, pageSize, totalElement) =>
-  `${((currentPage - 1) * pageSize + 1)->Belt.Int.toString}-${(pageSize * currentPage)
-      ->Belt.Int.toString} of ${totalElement->Belt.Int.toString}`
+  `${((currentPage - 1) * pageSize + 1)->Belt.Int.toString}-${(
+      totalElement < pageSize
+        ? totalElement
+        : currentPage == pageSize
+        ? totalElement
+        : pageSize * currentPage
+    )->Belt.Int.toString} of ${totalElement->Belt.Int.toString}`

@@ -345,7 +345,6 @@ let make = (~address) => {
         </THead>}
     {switch allSub {
     | Data((reports, reportsCount)) =>
-      let pageCount = Page.getPageCount(reportsCount, pageSize)
       <>
         {reportsCount > 0
           ? reports
@@ -379,7 +378,11 @@ let make = (~address) => {
         {isMobile
           ? React.null
           : <Pagination
-              currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+              currentPage=page
+              totalElement=reportsCount
+              pageSize
+              onPageChange={newPage => setPage(_ => newPage)}
+              onChangeCurrentPage={newPage => setPage(_ => newPage)}
             />}
       </>
     | _ =>

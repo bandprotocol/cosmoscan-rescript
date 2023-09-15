@@ -112,7 +112,7 @@ let make = (~accountAddress: Address.t) => {
     <TxsTable txsSub msgTransform={transform(accountAddress)} />
     {switch txsCountSub {
     | Data(txsCount) =>
-      <Pagination2
+      <Pagination
         currentPage=page
         pageSize
         totalElement=txsCount

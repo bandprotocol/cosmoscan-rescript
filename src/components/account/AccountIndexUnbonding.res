@@ -226,8 +226,13 @@ let make = (~address) => {
     }}
     {switch unbondingCountSub {
     | Data(unbondingCount) =>
-      let pageCount = Page.getPageCount(unbondingCount, pageSize)
-      <Pagination currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)} />
+      <Pagination
+        currentPage=page
+        totalElement=unbondingCount
+        pageSize
+        onPageChange={newPage => setPage(_ => newPage)}
+        onChangeCurrentPage={newPage => setPage(_ => newPage)}
+      />
     | _ => React.null
     }}
   </div>
