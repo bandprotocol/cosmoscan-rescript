@@ -38,7 +38,7 @@ module Styles = {
     ])
 
   let paginationBox = style(. [
-    width(#px(80)),
+    minWidth(#px(80)),
     margin2(~v=zero, ~h=#px(16)),
     selector("> * + *", [marginLeft(#px(20))]),
     fontFamilies([#custom("Roboto Mono"), #monospace]),
@@ -116,13 +116,12 @@ let make = (
         <input
           className={Styles.inputPage(theme)}
           type_="number"
-          defaultValue={currentPage->Belt.Int.toString}
           value={inputPage}
           min="1"
           max={pageCount->Belt.Int.toString}
           onChange={event => {
             let newVal = ReactEvent.Form.target(event)["value"]
-            setInputPage(_ =>
+            setInputPage(_ => {
               if newVal->Belt.Int.fromString->Belt.Option.getWithDefault(0) > pageCount {
                 pageCount->Belt.Int.toString
               } else if newVal->Belt.Int.fromString->Belt.Option.getWithDefault(0) < 1 {
@@ -130,7 +129,7 @@ let make = (
               } else {
                 newVal
               }
-            )
+            })
           }}
           onKeyDown={event => {
             let nextIndexCount = 0
