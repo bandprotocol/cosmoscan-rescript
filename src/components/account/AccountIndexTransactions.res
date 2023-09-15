@@ -112,8 +112,13 @@ let make = (~accountAddress: Address.t) => {
     <TxsTable txsSub msgTransform={transform(accountAddress)} />
     {switch txsCountSub {
     | Data(txsCount) =>
-      let pageCount = Page.getPageCount(txsCount, pageSize)
-      <Pagination currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)} />
+      <Pagination2
+        currentPage=page
+        pageSize
+        totalElement=txsCount
+        onPageChange={newPage => setPage(_ => newPage)}
+        onChangeCurrentPage={newPage => setPage(_ => newPage)}
+      />
     | _ => React.null
     }}
   </div>
