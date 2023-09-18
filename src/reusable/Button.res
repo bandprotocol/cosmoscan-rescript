@@ -1,5 +1,6 @@
 type btn_style_t =
   | Primary
+  | Secondary
   | Outline
   | Text
 
@@ -49,6 +50,26 @@ module Styles = {
           opacity(0.5),
         ]),
       ])
+    | Secondary =>
+      style(. [
+        backgroundColor(theme.neutral_000),
+        color(theme.neutral_900),
+        border(#px(1), #solid, isDarkMode ? theme.neutral_600 : theme.neutral_400),
+        selector("i", [color(theme.neutral_900)]),
+        hover([
+          backgroundColor(theme.neutral_900),
+          border(#px(1), #solid, theme.neutral_900),
+          color(isDarkMode ? Theme.black : Theme.white),
+          selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
+        ]),
+        active([backgroundColor(theme.neutral_900)]),
+        disabled([
+          borderColor(theme.neutral_600),
+          color(theme.neutral_600),
+          hover([backgroundColor(#transparent)]),
+          opacity(0.5),
+        ]),
+      ])
     | Outline =>
       style(. [
         backgroundColor(#transparent),
@@ -60,7 +81,7 @@ module Styles = {
           color(isDarkMode ? Theme.black : Theme.white),
           selector("i", [color(isDarkMode ? Theme.black : Theme.white)]),
         ]),
-        active([backgroundColor(CssJs.hex("E5E8F7"))]),
+        active([backgroundColor(theme.neutral_900)]),
         disabled([
           borderColor(theme.neutral_600),
           color(theme.neutral_600),
@@ -80,7 +101,7 @@ module Styles = {
           color(theme.primary_600),
           selector("i", [color(theme.primary_600)]),
         ]),
-        active([backgroundColor(CssJs.hex("E5E8F7"))]),
+        active([backgroundColor(#transparent)]),
         disabled([color(theme.neutral_600), hover([backgroundColor(#transparent)]), opacity(0.5)]),
         selector(":focus", [outlineStyle(#none), backgroundColor(#transparent)]),
         Media.mobile([padding(#zero)]),

@@ -1,5 +1,7 @@
 // Logo
 @module("./band-blue-circle-logo.png") external bandLogo: string = "default"
+@module("./cosmoscan-logo-dark.svg") external bandLogoLight: string = "default"
+@module("./cosmoscan-logo-light.svg") external bandLogoDark: string = "default"
 
 @module("./closeButton.svg") external closeButton: string = "default"
 @module("./success.svg") external success: string = "default"
@@ -77,3 +79,16 @@
 @module("./ledger-cosmos-dark.svg") external ledgerCosmosDarkIcon: string = "default"
 @module("./ledger-step1.svg") external ledgerStep1: string = "default"
 @module("./ledger-step2-cosmos.svg") external ledgerStep2Cosmos: string = "default"
+
+// Sidebar
+@module("./icon-home.svg") external homeIconSidebar: string = "default"
+@module("./icon-blocks.svg") external blockIconSidebar: string = "default"
+@module("./icon-transaction.svg") external txIconSidebar: string = "default"
+@module("./icon-oracle.svg") external oracleIconSidebar: string = "default"
+@module("./icon-data-sources.svg") external datasourceIconSidebar: string = "default"
+@module("./icon-request.svg") external requestIconSidebar: string = "default"
+@module("./icon-validator.svg") external validatorIconSidebar: string = "default"
+@module("./icon-IBC.svg") external ibcIconSidebar: string = "default"
+@module("./icon-group.svg") external groupIconSidebar: string = "default"
+@module("./icon-TSS.svg") external tssIconSidebar: string = "default"
+@module("./icon-proposal.svg") external proposalIconSidebar: string = "default"

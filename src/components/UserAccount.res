@@ -48,7 +48,7 @@ module ConnectBtn = {
   @react.component
   let make = (~connect) =>
     <div id="connectButton" className={Styles.fullWidth}>
-      <Button variant=Button.Outline px=24 py=8 fullWidth=true onClick={_ => connect()}>
+      <Button variant=Button.Secondary px=24 py=8 fullWidth=true onClick={_ => connect()}>
         {"Connect Wallet"->React.string}
       </Button>
     </div>
