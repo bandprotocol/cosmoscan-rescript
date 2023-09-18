@@ -122,8 +122,11 @@ let make = (~msg: Msg.result_t) => {
     | SubmitProposalMsg(msg) =>
       switch msg {
       | Msg.Gov.SubmitProposal.Success(m) =>
-        <ProposalMsg.SubmitProposal.Success proposalID=m.proposalID title=m.title />
-      | Msg.Gov.SubmitProposal.Failure(f) => <ProposalMsg.SubmitProposal.Fail title=f.title />
+        <ProposalMsg.SubmitProposal.Success
+          proposalID=m.proposalID title={m.title->Belt.Option.getWithDefault("")}
+        />
+      | Msg.Gov.SubmitProposal.Failure(f) =>
+        <ProposalMsg.SubmitProposal.Fail title={f.title->Belt.Option.getWithDefault("")} />
       }
     | DepositMsg(msg) =>
       switch msg {
