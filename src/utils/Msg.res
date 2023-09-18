@@ -687,7 +687,7 @@ module Gov = {
   module SubmitProposal = {
     type t<'a> = {
       proposer: Address.t,
-      title: string,
+      title: option<string>,
       description: string,
       initialDeposit: list<Coin.t>,
       proposalID: 'a,
@@ -704,7 +704,7 @@ module Gov = {
       open JsonUtils.Decode
       buildObject(json => {
         proposer: json.required(list{"msg", "proposer"}, address),
-        title: json.required(list{"msg", "content", "title"}, string),
+        title: json.optional(list{"msg", "content", "title"}, string),
         description: json.required(list{"msg", "content", "description"}, string),
         initialDeposit: json.required(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
         proposalID: json->proposalIDD,

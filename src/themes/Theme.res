@@ -79,7 +79,7 @@ let get = mode =>
       warning_700: hex("A98C0A"),
       activeColor,
       pendingColor,
-      footer: hex("4520E6"),
+      footer: hex("FFFFFF"),
       // new theme
       neutral_000: hex("FFFFFF"),
       neutral_100: hex("F3F4F6"),
@@ -117,7 +117,7 @@ let get = mode =>
       warning_700: hex("F7DF73"),
       activeColor,
       pendingColor,
-      footer: hex("21262C"),
+      footer: hex("101214"),
       // new theme
       neutral_000: hex("101214"),
       neutral_100: hex("1A1E23"),

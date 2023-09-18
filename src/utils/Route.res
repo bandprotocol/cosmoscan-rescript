@@ -20,6 +20,10 @@ type validator_tab_t =
   | Reports
   | Reporters
 
+type group_tab_t =
+  | Group
+  | Proposal
+
 type t =
   | NotFound
   | HomePage
@@ -40,7 +44,7 @@ type t =
   | ProposalDetailsPage(int)
   | RelayersHomepage
   | ChannelDetailsPage(string, string, string)
-  | Test
+  | GroupPage(group_tab_t)
 
 let fromUrl = (url: RescriptReactRouter.url) =>
   switch (url.path, url.hash) {
@@ -120,7 +124,14 @@ let fromUrl = (url: RescriptReactRouter.url) =>
   | (list{"relayers"}, _) => RelayersHomepage
   | (list{"relayers", counterparty, port, channelID}, _) =>
     ChannelDetailsPage(counterparty, port, channelID)
-  | (list{"test"}, _) => Test
+  | (list{"group"}, hash) =>
+    let urlHash = hash =>
+      switch hash {
+      | "group" => Group
+      | "proposal" => Proposal
+      | _ => Group
+      }
+    GroupPage(urlHash(hash))
   | (list{}, _) => HomePage
   | (_, _) => NotFound
   }
@@ -189,9 +200,10 @@ let toString = route =>
   | ProposalDetailsPage(proposalID) => `/proposal/${proposalID->Belt.Int.toString}`
   | RelayersHomepage => "/relayers"
   | ChannelDetailsPage(chainID, port, channel) => `/relayers/${chainID}/${port}/${channel}`
+  | GroupPage(Group) => `/group/#group`
+  | GroupPage(Proposal) => `/group/#proposal`
   | HomePage => "/"
   | NotFound => "/notfound"
-  | Test => "/test"
   }
 
 let redirect = (route: t) => RescriptReactRouter.push(route->toString)
