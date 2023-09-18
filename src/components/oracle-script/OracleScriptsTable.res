@@ -606,7 +606,6 @@ let make = (~searchTerm) => {
     | Sub.Data(oracleScripts, oracleScriptsCount) =>
       oracleScripts->Belt.Array.length > 0
         ? {
-            let pageCount = Page.getPageCount(oracleScriptsCount, pageSize)
             <div className={CssHelper.mt(~size=8, ())}>
               {oracleScripts
               ->SortOSTable.sorting(~sortedBy, ~direction)
@@ -633,7 +632,11 @@ let make = (~searchTerm) => {
               )
               ->React.array}
               <Pagination
-                currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+                currentPage=page
+                totalElement=oracleScriptsCount
+                pageSize
+                onPageChange={newPage => setPage(_ => newPage)}
+                onChangeCurrentPage={newPage => setPage(_ => newPage)}
               />
             </div>
           }

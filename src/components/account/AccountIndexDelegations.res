@@ -269,8 +269,13 @@ let make = (~address) => {
     }}
     {switch delegationsCountSub {
     | Data(delegationsCount) =>
-      let pageCount = Page.getPageCount(delegationsCount, pageSize)
-      <Pagination currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)} />
+      <Pagination
+        currentPage=page
+        totalElement=delegationsCount
+        pageSize
+        onPageChange={newPage => setPage(_ => newPage)}
+        onChangeCurrentPage={newPage => setPage(_ => newPage)}
+      />
     | _ => React.null
     }}
   </div>

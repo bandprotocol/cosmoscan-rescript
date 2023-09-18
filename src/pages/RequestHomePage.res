@@ -247,7 +247,11 @@ let make = () => {
               {isMobile
                 ? React.null
                 : <Pagination
-                    currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+                    currentPage=page
+                    totalElement=requestsCount
+                    pageSize
+                    onPageChange={newPage => setPage(_ => newPage)}
+                    onChangeCurrentPage={newPage => setPage(_ => newPage)}
                   />}
             </>
           | _ =>

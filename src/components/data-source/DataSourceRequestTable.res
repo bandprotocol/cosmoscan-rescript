@@ -156,7 +156,6 @@ let make = (~dataSourceID: ID.DataSource.t) => {
   <div className=Styles.tableWrapper>
     {switch totalRequestCountSub {
     | Data(totalRequestCount) if totalRequestCount > 0 =>
-      let pageCount = Page.getPageCount(totalRequestCount, pageSize)
       <>
         {isMobile
           ? <Row marginBottom=16>
@@ -256,7 +255,11 @@ let make = (~dataSourceID: ID.DataSource.t) => {
             {isMobile
               ? React.null
               : <Pagination
-                  currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+                  currentPage=page
+                  totalElement=totalRequestCount
+                  pageSize
+                  onPageChange={newPage => setPage(_ => newPage)}
+                  onChangeCurrentPage={newPage => setPage(_ => newPage)}
                 />}
           </>
         | _ =>

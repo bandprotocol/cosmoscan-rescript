@@ -142,10 +142,10 @@ let make = (~chainID, ~channel, ~port) => {
     </Row>
     {switch packetCountSub {
     | Data(packetCount) =>
-      let pageCount = Page.getPageCount(packetCount, pageSize)
-      <Pagination2
+      <Pagination
         currentPage=page
-        pageCount
+        totalElement=packetCount
+        pageSize
         onPageChange={newPage => setPage(_ => newPage)}
         onChangeCurrentPage={newPage => setPage(_ => newPage)}
       />
