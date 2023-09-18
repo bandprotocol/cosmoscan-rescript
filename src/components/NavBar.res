@@ -95,7 +95,8 @@ let make = () => {
       ("Oracle Scripts", OracleScriptPage, Images.oracleIconSidebar, "oracle-script"),
       ("Requests", RequestHomePage, Images.requestIconSidebar, "request"),
     ],
-    [("Group Module", GroupPage(Group), Images.groupIconSidebar, "group")],
+    // TODO: enable only for devnet
+    // [("Group Module", GroupPage(Group), Images.groupIconSidebar, "group")],
     [("IBCs", RelayersHomepage, Images.ibcIconSidebar, "relayer")],
   }
 
