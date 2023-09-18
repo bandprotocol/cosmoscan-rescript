@@ -221,10 +221,11 @@ module AllGroupTabContent = {
           </Table>
         </InfoContainer>
         <div className={Css.merge(list{"table_content--footer"})}>
-          //TODO: hardcode pageCount
-          <Pagination2
+          //TODO: hardcode totalElement
+          <Pagination
             currentPage=page
-            pageCount=10
+            totalElement=10
+            pageSize
             onPageChange={newPage => setPage(_ => newPage)}
             onChangeCurrentPage={newPage => setPage(_ => newPage)}
           />
