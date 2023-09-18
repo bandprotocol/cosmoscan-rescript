@@ -11,7 +11,7 @@ module Styles = {
   let tabletContainer = (theme: Theme.t, isDarkMode) =>
     style(. [
       padding2(~v=#px(8), ~h=#px(24)),
-      backgroundColor(isDarkMode ? theme.neutral_200 : theme.neutral_100),
+      backgroundColor(isDarkMode ? theme.neutral_200 : theme.neutral_200),
       borderRadius(px(8)),
       Media.mobile([padding2(~v=#px(8), ~h=#px(12))]),
       width(#percent(100.)),
@@ -33,17 +33,20 @@ module Styles = {
 }
 
 let renderField = (field, maxWidth, theme: Theme.t) => {
+
+
   switch field {
   | Value(v) =>
-    <div className={Styles.valueContainer(maxWidth)}>
-      <Text value=v nowrap=true ellipsis=true block=true size=Text.Body1 color=theme.neutral_900 />
+      let fieldVals = v->Js.String2.split(",")->Js.Array.joinWith(", ", _)
+    <div>
+     <Text value=fieldVals weight=Text.Medium breakAll=true />
     </div>
   | Values(vals) =>
-    <div className={CssHelper.flexBox(~direction=#column, ())}>
+    <div>
       {vals
       ->Belt.Array.mapWithIndex((i, v) =>
-        <div key={i->Belt.Int.toString ++ v} className={Styles.valueContainer(maxWidth)}>
-          <Text value=v nowrap=true ellipsis=true block=true align=Text.Right />
+        <div key={i->Belt.Int.toString ++ v}>
+          <Text value=v weight=Text.Medium breakAll=true />
         </div>
       )
       ->React.array}
@@ -94,7 +97,7 @@ let make = (~headers=["Key", "Value"], ~rows) => {
         {headers
         ->Belt.Array.mapWithIndex((i, header) => {
           <Col key={header ++ i->Belt.Int.toString} col=columnSize colSm=columnSize>
-            <Text value=header weight=Text.Semibold height={Text.Px(18)} transform=Text.Uppercase />
+            <Text value=header weight=Text.Medium transform=Text.Uppercase />
           </Col>
         })
         ->React.array}
