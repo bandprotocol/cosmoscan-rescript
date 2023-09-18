@@ -263,8 +263,13 @@ let make = (~address) => {
     }}
     {switch redelegateCountSub {
     | Data(redelegateCount) =>
-      let pageCount = Page.getPageCount(redelegateCount, pageSize)
-      <Pagination currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)} />
+      <Pagination
+        currentPage=page
+        totalElement=redelegateCount
+        pageSize
+        onPageChange={newPage => setPage(_ => newPage)}
+        onChangeCurrentPage={newPage => setPage(_ => newPage)}
+      />
     | _ => React.null
     }}
   </div>

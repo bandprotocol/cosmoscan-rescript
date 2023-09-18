@@ -395,11 +395,11 @@ let make = (~connections: array<RelayerSub.connection_t>) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   let pageSize = 5
-  let (currentPage, setCurrentPage) = React.useState(_ => 1)
+  let (page, setPage) = React.useState(_ => 1)
 
   <>
     {connections
-    ->Belt.Array.slice(~offset=(currentPage - 1) * pageSize, ~len=pageSize)
+    ->Belt.Array.slice(~offset=(page - 1) * pageSize, ~len=pageSize)
     ->Belt.Array.map(connection => {
       connection.channels->Belt.Array.length > 0
         ? isMobile
@@ -411,7 +411,13 @@ let make = (~connections: array<RelayerSub.connection_t>) => {
     {
       let totalConnections = connections->Belt.Array.length
       let pageCount = Page.getPageCount(totalConnections, pageSize)
-      <Pagination currentPage pageCount onPageChange={newPage => setCurrentPage(_ => newPage)} />
+      <Pagination
+        currentPage=page
+        totalElement=totalConnections
+        pageSize
+        onPageChange={newPage => setPage(_ => newPage)}
+        onChangeCurrentPage={newPage => setPage(_ => newPage)}
+      />
     }
   </>
 }

@@ -519,7 +519,6 @@ let make = (~searchTerm) => {
     | Sub.Data(datasources, datasourcesCount) =>
       datasources->Belt.Array.length > 0
         ? {
-            let pageCount = Page.getPageCount(datasourcesCount, pageSize)
             <div className={CssHelper.mt(~size=8, ())}>
               {datasources
               ->Belt.Array.mapWithIndex((i, e) =>
@@ -539,7 +538,11 @@ let make = (~searchTerm) => {
               )
               ->React.array}
               <Pagination
-                currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
+                currentPage=page
+                totalElement=datasourcesCount
+                pageSize
+                onPageChange={newPage => setPage(_ => newPage)}
+                onChangeCurrentPage={newPage => setPage(_ => newPage)}
               />
             </div>
           }
