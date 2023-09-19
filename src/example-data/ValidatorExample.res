@@ -1,7 +1,14 @@
+type imported = {
+  validators: array<Validator.raw_t>,
+  reporters: array<string>,
+}
+
 // import from validators.json
-@module external rawValidators: array<Validator.raw_t> = "./validators.json"
+@module external importedJSON: imported = "./validators.json"
 
 let validators =
-  rawValidators->Belt.Array.mapWithIndex((idx, each) => Validator.toExternal(each, idx + 1))
+  importedJSON.validators->Belt.Array.mapWithIndex((idx, each) =>
+    Validator.toExternal(each, idx + 1)
+  )
 
 Belt.Array.forEach(validators, x => Js.log(x.rank))
