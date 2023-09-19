@@ -5,12 +5,12 @@ type policy_type = Threshold | Percentage
 type proposal_status = Passed | Rejected | VotingPeriod
 
 type group_proposal = {
-  id: int,
+  id: ID.GroupProposal.t,
   name: string,
   message: array<string>,
   _policy_type: policy_type,
   result: float,
-  status: string,
+  status: proposal_status,
 }
 
 type group_policy = {
@@ -38,7 +38,7 @@ type group_information = {
 }
 
 type group = {
-  id: int,
+  id: ID.Group.t,
   name: string,
   proposals: array<group_proposal>,
   members: array<group_member>,
@@ -47,11 +47,11 @@ type group = {
 }
 
 let mock: group = {
-  id: 1,
+  id: 1->ID.Group.fromInt,
   name: "mock group",
   proposals: [
     {
-      id: 1,
+      id: 1->ID.GroupProposal.fromInt,
       name: "mock group proposal 1",
       message: ["msg"],
       _policy_type: Threshold,
@@ -70,7 +70,7 @@ let mock: group = {
     {
       address: Address("band1dfc8q7h0auc8akhrkfaclln9nmaxuy49fpcjas"),
       _type: Threshold,
-      value: 1,
+      value: 1.,
       voting_period: 1,
       min_execution_period: 1,
     },

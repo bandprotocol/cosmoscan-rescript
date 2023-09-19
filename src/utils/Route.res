@@ -24,6 +24,12 @@ type group_tab_t =
   | Group
   | Proposal
 
+type group_details_tab_t =
+  | GroupProposal
+  | GroupPolicy
+  | GroupMember
+  | GroupInformation
+
 type t =
   | NotFound
   | HomePage
@@ -47,6 +53,7 @@ type t =
   | RelayersHomepage
   | ChannelDetailsPage(string, string, string)
   | GroupPage(group_tab_t)
+  | GroupDetailsPage(int, group_details_tab_t)
 
 let fromUrl = (url: RescriptReactRouter.url) =>
   switch (url.path, url.hash) {
@@ -131,6 +138,19 @@ let fromUrl = (url: RescriptReactRouter.url) =>
   | (list{"relayers"}, _) => RelayersHomepage
   | (list{"relayers", counterparty, port, channelID}, _) =>
     ChannelDetailsPage(counterparty, port, channelID)
+  | (list{"group", groupID}, hash) =>
+    let urlHash = hash =>
+      switch hash {
+      | "proposal" => GroupProposal
+      | "policy" => GroupPolicy
+      | "members" => GroupMember
+      | "information" => GroupInformation
+      | _ => GroupProposal
+      }
+    switch groupID->Belt.Int.fromString {
+    | Some(groupIDInt) => GroupDetailsPage(groupIDInt, urlHash(hash))
+    | None => NotFound
+    }
   | (list{"group"}, hash) =>
     let urlHash = hash =>
       switch hash {
@@ -209,8 +229,13 @@ let toString = route =>
   | LegacyProposalDetailsPage(proposalID) => `/legacy/proposal/${proposalID->Belt.Int.toString}`
   | RelayersHomepage => "/relayers"
   | ChannelDetailsPage(chainID, port, channel) => `/relayers/${chainID}/${port}/${channel}`
-  | GroupPage(Group) => `/group/#group`
-  | GroupPage(Proposal) => `/group/#proposal`
+  | GroupPage(Group) => `/group#group`
+  | GroupPage(Proposal) => `/group#proposal`
+  | GroupDetailsPage(groupID, GroupProposal) => `/group/${groupID->Belt.Int.toString}#proposal`
+  | GroupDetailsPage(groupID, GroupPolicy) => `/group/${groupID->Belt.Int.toString}#policy`
+  | GroupDetailsPage(groupID, GroupMember) => `/group/${groupID->Belt.Int.toString}#members`
+  | GroupDetailsPage(groupID, GroupInformation) =>
+    `/group/${groupID->Belt.Int.toString}#information`
   | HomePage => "/"
   | NotFound => "/notfound"
   }

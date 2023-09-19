@@ -51,6 +51,8 @@ let make = () => {
       | ChannelDetailsPage(chainID, port, channel) => <ChannelPage chainID channel port />
       | NotFound => <NotFound />
       | GroupPage(hashtag) => <GroupPage hashtag />
+      | GroupDetailsPage(groupID, hashtag) =>
+        <GroupDetailsPage groupID={ID.Group.fromInt(groupID)} hashtag />
       }}
     </div>
     <Footer />

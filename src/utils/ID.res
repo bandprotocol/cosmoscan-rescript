@@ -47,6 +47,22 @@ module RawBlock = {
   let defaultTab = ()
 }
 
+module RawGroupID = {
+  type tab_t = Route.group_details_tab_t
+  let prefix = "#G"
+  // TODO: change to group page
+  let route = (id, tab) => Route.GroupDetailsPage(id, tab)
+  let defaultTab = Route.GroupProposal
+}
+
+module RawGroupProposalID = {
+  type tab_t = unit
+  let prefix = "#P"
+  // TODO: change to group proposal page
+  let route = (id, _) => Route.RequestDetailsPage(id)
+  let defaultTab = ()
+}
+
 module type IDSig = {
   include RawIDSig
   type t
@@ -78,22 +94,6 @@ module IDCreator = (RawID: RawIDSig) => {
   let fromIntExn = x => ID(x->Belt.Option.getExn)
 
   let toJson = (ID(id)) => id->Belt.Int.toFloat->Js.Json.number
-}
-
-module RawGroupID = {
-  type tab_t = unit
-  let prefix = "#G"
-  // TODO: change to group page
-  let route = (id, _) => Route.RequestDetailsPage(id)
-  let defaultTab = ()
-}
-
-module RawGroupProposalID = {
-  type tab_t = unit
-  let prefix = "#P"
-  // TODO: change to group proposal page
-  let route = (id, _) => Route.RequestDetailsPage(id)
-  let defaultTab = ()
 }
 
 module DataSource = IDCreator(RawDataSourceID)
