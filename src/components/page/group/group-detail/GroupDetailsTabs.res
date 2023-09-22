@@ -20,12 +20,23 @@ module Styles = {
     flexWrap(#wrap),
     justifyContent(#spaceBetween),
     width(#percent(100.)),
+  ])
+
+  let proposalGrid = style(. [
     selector("> div:first-child", [minWidth(#percent(8.)), textAlign(#center)]),
     selector("> div:nth-child(2)", [width(#percent(24.))]),
     selector("> div:nth-child(3)", [width(#percent(16.))]),
     selector("> div:nth-child(4)", [width(#percent(16.))]),
     selector("> div:nth-child(5)", [width(#percent(12.))]),
     selector("> div:nth-child(6)", [width(#percent(14.))]),
+  ])
+
+  let policyGrid = style(. [
+    selector("> div:first-child", [minWidth(#percent(40.)), textAlign(#center)]),
+    selector("> div:nth-child(2)", [width(#percent(20.))]),
+    selector("> div:nth-child(3)", [width(#percent(10.))]),
+    selector("> div:nth-child(4)", [width(#percent(15.))]),
+    selector("> div:nth-child(5)", [width(#percent(15.))]),
   ])
 
   let outer = style(. [padding2(~v=#zero, ~h=#px(32))])
@@ -146,7 +157,7 @@ module Proposal = {
       {isMobile
         ? React.null
         : <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
-            <div className={Css.merge(list{Styles.tablehead})}>
+            <div className={Css.merge(list{Styles.tablehead, Styles.proposalGrid})}>
               <div>
                 <SortableTHead
                   title="ID" direction toggle value=SortGroupProposalTable.ID sortedBy
@@ -190,6 +201,7 @@ module Proposal = {
             "table_item",
             CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
             Styles.tableItem(theme),
+            Styles.proposalGrid,
           })}>
           <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
             <TypeID.GroupProposal id={proposal.id} size={Body1} weight={Bold} />
@@ -225,6 +237,123 @@ module Proposal = {
             <GroupProposalStatus
               value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
               color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+            />
+          </div>
+        </div>
+      )
+      ->React.array}
+    </div>
+  }
+}
+
+module Policy = {
+  @react.component
+  let make = (~polices: array<MockGroup.group_policy>) => {
+    let isMobile = Media.isMobile()
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    // TODO: wire up this when graphql is ready
+    let (sortedBy, setSortedBy) = React.useState(_ => SortGroupProposalTable.ID)
+    let (direction, setDirection) = React.useState(_ => SortGroupTable.DESC)
+
+    let toggle = (direction, sortValue) => {
+      setSortedBy(_ => sortValue)
+      setDirection(_ => {
+        switch direction {
+        | SortGroupTable.ASC => SortGroupTable.DESC
+        | SortGroupTable.DESC => SortGroupTable.ASC
+        }
+      })
+    }
+
+    <div>
+      {isMobile
+        ? React.null
+        : <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
+            <div className={Css.merge(list{Styles.tablehead, Styles.policyGrid})}>
+              <div>
+                <SortableTHead
+                  title="Policy Address" direction toggle value=SortGroupProposalTable.ID sortedBy
+                />
+              </div>
+              <div>
+                <SortableTHead
+                  title="Type" direction toggle sortedBy value=SortGroupProposalTable.Name
+                />
+              </div>
+              <div>
+                <SortableTHead
+                  title="Value" toggle sortedBy direction value=SortGroupProposalTable.Message
+                />
+              </div>
+              <div>
+                <SortableTHead
+                  title="Voting Period"
+                  toggle
+                  sortedBy
+                  direction
+                  value=SortGroupProposalTable.GroupID
+                />
+              </div>
+              <div>
+                <SortableTHead
+                  title="Min Execution Period"
+                  toggle
+                  sortedBy
+                  direction
+                  value=SortGroupProposalTable.GroupID
+                />
+              </div>
+            </div>
+          </div>}
+      {polices
+      ->Belt.Array.map(policy =>
+        <div
+          className={Css.merge(list{
+            "table_item",
+            CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
+            Styles.tableItem(theme),
+            Styles.policyGrid,
+          })}>
+          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+            <AddressRender
+              address={policy.address}
+              position=AddressRender.Subtitle
+              copy=true
+              clickable=false
+              ellipsis=true
+            />
+          </div>
+          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+            <Text
+              value={policy._type->MockGroup.policy_type_to_string}
+              ellipsis=true
+              color={theme.neutral_900}
+              size={Body1}
+            />
+          </div>
+          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+            <Text
+              value={policy.value->Belt.Float.toString}
+              ellipsis=true
+              color={theme.neutral_900}
+              size={Body1}
+            />
+          </div>
+          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+            <Text
+              value={policy.voting_period->Belt.Int.toString}
+              ellipsis=true
+              color={theme.neutral_900}
+              size={Body1}
+            />
+          </div>
+          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+            <Text
+              value={policy.min_execution_period->Belt.Int.toString}
+              ellipsis=true
+              color={theme.neutral_900}
+              size={Body1}
             />
           </div>
         </div>

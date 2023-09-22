@@ -76,7 +76,7 @@ module Content = {
               currentRoute={groupID->ID.Group.getRouteWithTab(hashtag)}>
               {switch hashtag {
               | GroupProposal => <GroupDetailsTabs.Proposal proposals={MockGroup.mock.proposals} />
-              | GroupPolicy => <Text value="GroupPolicy" size=Text.Xl weight=Text.Bold />
+              | GroupPolicy => <GroupDetailsTabs.Policy polices={MockGroup.mock.policies} />
               | GroupMember => <Text value="GroupMember" size=Text.Xl weight=Text.Bold />
               | GroupInformation => <Text value="GroupInformation" size=Text.Xl weight=Text.Bold />
               }}
