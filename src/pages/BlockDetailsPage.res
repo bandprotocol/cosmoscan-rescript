@@ -17,7 +17,7 @@ module Styles = {
   let rightArrow = style(. [width(#px(20)), filter([#saturate(50.0), #brightness(70.0)])])
 }
 
-let isIBCTx = (tx: TxSub.t) => {
+let isIBCTx = (tx: Transaction.t) => {
   tx.messages->Belt.List.reduce(false, (acc, message) => acc || message.isIBC)
 }
 
