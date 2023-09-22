@@ -36,7 +36,7 @@ module Content = {
       <div className=CssHelper.container>
         <button
           className={Css.merge(list{CssHelper.flexBox(), Styles.buttonStyled})}
-          onClick={_ => Route.redirect(OracleScriptPage)}>
+          onClick={_ => Route.redirect(GroupPage(Proposal))}>
           <Icon name="fa fa-angle-left" mr=8 size=16 />
           <Text
             value="Back to group module" size=Text.Xl weight=Text.Semibold color=theme.neutral_600
@@ -75,12 +75,7 @@ module Content = {
               ]
               currentRoute={groupID->ID.Group.getRouteWithTab(hashtag)}>
               {switch hashtag {
-              | GroupProposal =>
-                <Text
-                  value={groupID->ID.Group.getRouteWithTab(Route.GroupProposal)->Route.toString}
-                  size=Text.Xl
-                  weight=Text.Bold
-                />
+              | GroupProposal => <GroupDetailsTabs.Proposal proposals={MockGroup.mock.proposals} />
               | GroupPolicy => <Text value="GroupPolicy" size=Text.Xl weight=Text.Bold />
               | GroupMember => <Text value="GroupMember" size=Text.Xl weight=Text.Bold />
               | GroupInformation => <Text value="GroupInformation" size=Text.Xl weight=Text.Bold />

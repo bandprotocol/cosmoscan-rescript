@@ -9,7 +9,7 @@ type group_proposal = {
   name: string,
   message: array<string>,
   _policy_type: policy_type,
-  result: float,
+  result: string,
   status: proposal_status,
 }
 
@@ -46,6 +46,13 @@ type group = {
   information: group_information,
 }
 
+let policy_type_to_string = policy_type => {
+  switch policy_type {
+  | Threshold => "Threshold"
+  | Percentage => "Percentage"
+  }
+}
+
 let mock: group = {
   id: 1->ID.Group.fromInt,
   name: "mock group",
@@ -53,9 +60,25 @@ let mock: group = {
     {
       id: 1->ID.GroupProposal.fromInt,
       name: "mock group proposal 1",
-      message: ["msg"],
+      message: ["Send"],
       _policy_type: Threshold,
-      result: 100.,
+      result: "10 (min5)",
+      status: Passed,
+    },
+    {
+      id: 2->ID.GroupProposal.fromInt,
+      name: "mock group proposal 2",
+      message: ["Withdraw"],
+      _policy_type: Percentage,
+      result: "60% /50%",
+      status: Passed,
+    },
+    {
+      id: 3->ID.GroupProposal.fromInt,
+      name: "mock group proposal 3",
+      message: ["Delegate"],
+      _policy_type: Threshold,
+      result: "10%",
       status: Passed,
     },
   ],

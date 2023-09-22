@@ -57,7 +57,7 @@ module RawGroupID = {
 
 module RawGroupProposalID = {
   type tab_t = unit
-  let prefix = "#P"
+  let prefix = "#GP"
   // TODO: change to group proposal page
   let route = (id, _) => Route.RequestDetailsPage(id)
   let defaultTab = ()
