@@ -39,6 +39,12 @@ module Styles = {
     selector("> div:nth-child(5)", [width(#percent(15.))]),
   ])
 
+  let memberGrid = style(. [
+    selector("> div:first-child", [minWidth(#percent(45.)), textAlign(#center)]),
+    selector("> div:nth-child(2)", [width(#percent(10.))]),
+    selector("> div:nth-child(3)", [width(#percent(45.))]),
+  ])
+
   let outer = style(. [padding2(~v=#zero, ~h=#px(32))])
 
   let tableContentWrapper = style(. [
@@ -355,6 +361,73 @@ module Policy = {
               color={theme.neutral_900}
               size={Body1}
             />
+          </div>
+        </div>
+      )
+      ->React.array}
+    </div>
+  }
+}
+
+module Members = {
+  @react.component
+  let make = (~members: array<MockGroup.group_member>) => {
+    let isMobile = Media.isMobile()
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    // TODO: wire up this when graphql is ready
+    let (sortedBy, setSortedBy) = React.useState(_ => SortGroupProposalTable.ID)
+    let (direction, setDirection) = React.useState(_ => SortGroupTable.DESC)
+
+    let toggle = (direction, sortValue) => {
+      setSortedBy(_ => sortValue)
+      setDirection(_ => {
+        switch direction {
+        | SortGroupTable.ASC => SortGroupTable.DESC
+        | SortGroupTable.DESC => SortGroupTable.ASC
+        }
+      })
+    }
+
+    <div>
+      {isMobile
+        ? React.null
+        : <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
+            <div className={Css.merge(list{Styles.tablehead, Styles.memberGrid})}>
+              <div>
+                <SortableTHead
+                  title="Address" direction toggle value=SortGroupProposalTable.ID sortedBy
+                />
+              </div>
+              <div>
+                <SortableTHead
+                  title="Weight" direction toggle sortedBy value=SortGroupProposalTable.Name
+                />
+              </div>
+              <div>
+                <SortableTHead
+                  title="Metadata" toggle sortedBy direction value=SortGroupProposalTable.Message
+                />
+              </div>
+            </div>
+          </div>}
+      {members
+      ->Belt.Array.map(member =>
+        <div
+          className={Css.merge(list{
+            "table_item",
+            CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
+            Styles.tableItem(theme),
+            Styles.memberGrid,
+          })}>
+          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+            <AddressRender address={member.address} position=AddressRender.Text />
+          </div>
+          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+            <Text value={member.weight->Belt.Int.toString} color={theme.neutral_900} size={Body1} />
+          </div>
+          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+            <Text value={member.metadata} ellipsis=true color={theme.neutral_900} size={Body1} />
           </div>
         </div>
       )

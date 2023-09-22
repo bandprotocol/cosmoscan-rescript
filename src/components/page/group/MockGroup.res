@@ -84,14 +84,24 @@ let mock: group = {
   ],
   members: [
     {
-      address: Address("band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"),
+      address: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32,
       weight: 1,
+      metadata: "metadata",
+    },
+    {
+      address: "band10z6xjl9vjrk38zdmhsxc2w0tkl7ahzg954xw2y"->Address.fromBech32,
+      weight: 2,
+      metadata: "metadata",
+    },
+    {
+      address: "band1ts0txaqa0sgq3x2gevhvaxez55fzn8pzju9jl9"->Address.fromBech32,
+      weight: 3,
       metadata: "metadata",
     },
   ],
   policies: [
     {
-      address: Address("band1dfc8q7h0auc8akhrkfaclln9nmaxuy49fpcjas"),
+      address: "band1dfc8q7h0auc8akhrkfaclln9nmaxuy49fpcjas"->Address.fromBech32,
       _type: Threshold,
       value: 1.,
       voting_period: 1,
@@ -99,7 +109,7 @@ let mock: group = {
     },
   ],
   information: {
-    admin: Address("band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"),
+    admin: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32,
     total_member: 1,
     total_weight: 1,
     description: "description",

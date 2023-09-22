@@ -77,7 +77,7 @@ module Content = {
               {switch hashtag {
               | GroupProposal => <GroupDetailsTabs.Proposal proposals={MockGroup.mock.proposals} />
               | GroupPolicy => <GroupDetailsTabs.Policy polices={MockGroup.mock.policies} />
-              | GroupMember => <Text value="GroupMember" size=Text.Xl weight=Text.Bold />
+              | GroupMember => <GroupDetailsTabs.Members members={MockGroup.mock.members} />
               | GroupInformation => <Text value="GroupInformation" size=Text.Xl weight=Text.Bold />
               }}
               // {switch hashtag {
