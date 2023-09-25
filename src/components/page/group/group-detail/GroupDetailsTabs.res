@@ -55,7 +55,6 @@ module Styles = {
   // tableItem >>
   let tableItem = (theme: Theme.t) =>
     style(. [
-      borderBottom(#px(1), #solid, theme.neutral_200),
       padding2(~v=px(16), ~h=#zero),
       selector("> div:first-child", [minWidth(#percent(8.)), textAlign(#center)]),
       selector("> div:nth-child(2)", [width(#percent(24.))]),
@@ -73,6 +72,10 @@ module Styles = {
     ])
 
   let tableItemMobile = style(. [marginBottom(#px(16))])
+
+  let informationContainer = style(. [padding2(~v=#px(24), ~h=#px(0))])
+  let link = (theme: Theme.t) =>
+    style(. [color(theme.primary_600), fontSize(#px(14)), textDecoration(#underline)])
 }
 
 module SortableTHead = {
@@ -201,50 +204,55 @@ module Proposal = {
             </div>
           </div>}
       {proposals
-      ->Belt.Array.map(proposal =>
-        <div
-          className={Css.merge(list{
-            "table_item",
-            CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
-            Styles.tableItem(theme),
-            Styles.proposalGrid,
-          })}>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <TypeID.GroupProposal id={proposal.id} size={Body1} weight={Bold} />
-          </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Link
-              className={Css.merge(list{Styles.tableLink(theme)})}
-              route={OracleScriptDetailsPage(1, OracleScriptRequests)}>
+      ->Belt.Array.mapWithIndex((index, proposal) =>
+        <div>
+          <div
+            className={Css.merge(list{
+              "table_item",
+              CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
+              Styles.tableItem(theme),
+              Styles.proposalGrid,
+            })}>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <TypeID.GroupProposal id={proposal.id} size={Body1} weight={Bold} />
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <Link
+                className={Css.merge(list{Styles.tableLink(theme)})}
+                route={OracleScriptDetailsPage(1, OracleScriptRequests)}>
+                <Text
+                  value={proposal.name}
+                  ellipsis=true
+                  color={theme.primary_600}
+                  weight=Semibold
+                  size={Body1}
+                />
+              </Link>
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              {proposal.message->Belt.Array.map(msg => <MsgBadge name={msg} />)->React.array}
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
               <Text
-                value={proposal.name}
+                value={proposal._policy_type->MockGroup.policy_type_to_string}
                 ellipsis=true
-                color={theme.primary_600}
-                weight=Semibold
+                color={theme.neutral_600}
                 size={Body1}
               />
-            </Link>
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <Text value={proposal.result} ellipsis=true color={theme.neutral_600} size={Body1} />
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <GroupProposalStatus
+                value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
+                color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+              />
+            </div>
           </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            {proposal.message->Belt.Array.map(msg => <MsgBadge name={msg} />)->React.array}
-          </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Text
-              value={proposal._policy_type->MockGroup.policy_type_to_string}
-              ellipsis=true
-              color={theme.neutral_600}
-              size={Body1}
-            />
-          </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Text value={proposal.result} ellipsis=true color={theme.neutral_600} size={Body1} />
-          </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <GroupProposalStatus
-              value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
-              color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
-            />
-          </div>
+          {index < proposals->Belt.Array.length - 1
+            ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
+            : React.null}
         </div>
       )
       ->React.array}
@@ -313,55 +321,60 @@ module Policy = {
             </div>
           </div>}
       {polices
-      ->Belt.Array.map(policy =>
-        <div
-          className={Css.merge(list{
-            "table_item",
-            CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
-            Styles.tableItem(theme),
-            Styles.policyGrid,
-          })}>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <AddressRender
-              address={policy.address}
-              position=AddressRender.Subtitle
-              copy=true
-              clickable=false
-              ellipsis=true
-            />
+      ->Belt.Array.mapWithIndex((index, policy) =>
+        <div>
+          <div
+            className={Css.merge(list{
+              "table_item",
+              CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
+              Styles.tableItem(theme),
+              Styles.policyGrid,
+            })}>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <AddressRender
+                address={policy.address}
+                position=AddressRender.Subtitle
+                copy=true
+                clickable=false
+                ellipsis=true
+              />
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <Text
+                value={policy._type->MockGroup.policy_type_to_string}
+                ellipsis=true
+                color={theme.neutral_900}
+                size={Body1}
+              />
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <Text
+                value={policy.value->Belt.Float.toString}
+                ellipsis=true
+                color={theme.neutral_900}
+                size={Body1}
+              />
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <Text
+                value={policy.voting_period->Belt.Int.toString}
+                ellipsis=true
+                color={theme.neutral_900}
+                size={Body1}
+              />
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <Text
+                value={policy.min_execution_period->Belt.Int.toString}
+                ellipsis=true
+                color={theme.neutral_900}
+                size={Body1}
+              />
+            </div>
           </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Text
-              value={policy._type->MockGroup.policy_type_to_string}
-              ellipsis=true
-              color={theme.neutral_900}
-              size={Body1}
-            />
-          </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Text
-              value={policy.value->Belt.Float.toString}
-              ellipsis=true
-              color={theme.neutral_900}
-              size={Body1}
-            />
-          </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Text
-              value={policy.voting_period->Belt.Int.toString}
-              ellipsis=true
-              color={theme.neutral_900}
-              size={Body1}
-            />
-          </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Text
-              value={policy.min_execution_period->Belt.Int.toString}
-              ellipsis=true
-              color={theme.neutral_900}
-              size={Body1}
-            />
-          </div>
+          {index < polices->Belt.Array.length - 1
+            ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
+            : React.null}
         </div>
       )
       ->React.array}
@@ -412,26 +425,143 @@ module Members = {
             </div>
           </div>}
       {members
-      ->Belt.Array.map(member =>
-        <div
-          className={Css.merge(list{
-            "table_item",
-            CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
-            Styles.tableItem(theme),
-            Styles.memberGrid,
-          })}>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <AddressRender address={member.address} position=AddressRender.Text />
+      ->Belt.Array.mapWithIndex((index, member) =>
+        <div>
+          <div
+            className={Css.merge(list{
+              "table_item",
+              CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
+              Styles.tableItem(theme),
+              Styles.memberGrid,
+            })}>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <AddressRender address={member.address} position=AddressRender.Text />
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <Text
+                value={member.weight->Belt.Int.toString} color={theme.neutral_900} size={Body1}
+              />
+            </div>
+            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+              <Text value={member.metadata} ellipsis=true color={theme.neutral_900} size={Body1} />
+            </div>
           </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Text value={member.weight->Belt.Int.toString} color={theme.neutral_900} size={Body1} />
-          </div>
-          <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Text value={member.metadata} ellipsis=true color={theme.neutral_900} size={Body1} />
-          </div>
+          {index < members->Belt.Array.length - 1
+            ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
+            : React.null}
         </div>
       )
       ->React.array}
+    </div>
+  }
+}
+
+module Information = {
+  @react.component
+  let make = (~information: MockGroup.group_information) => {
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    <div className={Styles.informationContainer}>
+      <Row marginBottom=24 alignItems=Row.Center>
+        <Col col=Col.Four mbSm=8>
+          <div className={CssHelper.flexBox()}>
+            <Heading value="Admin" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600} />
+          </div>
+        </Col>
+        <Col col=Col.Eight>
+          <AddressRender
+            address={information.admin} position=AddressRender.Subtitle accountType=#validator
+          />
+        </Col>
+      </Row>
+      <Row marginBottom=24 alignItems=Row.Center>
+        <Col col=Col.Four mbSm=8>
+          <div className={CssHelper.flexBox()}>
+            <Heading
+              value="Total Members" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+            />
+          </div>
+        </Col>
+        <Col col=Col.Eight>
+          <Text
+            value={information.total_member->Belt.Int.toString}
+            color={theme.neutral_900}
+            size={Body1}
+            weight={Thin}
+          />
+        </Col>
+      </Row>
+      <Row marginBottom=24 alignItems=Row.Center>
+        <Col col=Col.Four mbSm=8>
+          <div className={CssHelper.flexBox()}>
+            <Heading
+              value="Total Members" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+            />
+          </div>
+        </Col>
+        <Col col=Col.Eight>
+          <Text
+            value={information.total_weight->Belt.Int.toString}
+            color={theme.neutral_900}
+            size={Body1}
+            weight={Thin}
+          />
+        </Col>
+      </Row>
+      <Row marginBottom=24 alignItems=Row.Center>
+        <Col col=Col.Four mbSm=8>
+          <div className={CssHelper.flexBox()}>
+            <Heading
+              value="Description" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+            />
+          </div>
+        </Col>
+        <Col col=Col.Eight>
+          <Text value={information.description} color={theme.neutral_900} size={Body1} />
+        </Col>
+      </Row>
+      <Row marginBottom=24 alignItems=Row.Center>
+        <Col col=Col.Four mbSm=8>
+          <div className={CssHelper.flexBox()}>
+            <Heading
+              value="Website url" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+            />
+          </div>
+        </Col>
+        <Col col=Col.Eight>
+          <AbsoluteLink href=information.website className={Styles.link(theme)}>
+            {information.website->React.string}
+          </AbsoluteLink>
+        </Col>
+      </Row>
+      <Row marginBottom=24 alignItems=Row.Center>
+        <Col col=Col.Four mbSm=8>
+          <div className={CssHelper.flexBox()}>
+            <Heading
+              value="Forum url" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+            />
+          </div>
+        </Col>
+        <Col col=Col.Eight>
+          <AbsoluteLink href=information.website className={Styles.link(theme)}>
+            {information.forum->React.string}
+          </AbsoluteLink>
+        </Col>
+      </Row>
+      <Row alignItems=Row.Center>
+        <Col col=Col.Four mbSm=8>
+          <div className={CssHelper.flexBox()}>
+            <Heading
+              value="Created Date" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+            />
+          </div>
+        </Col>
+        <Col col=Col.Eight>
+          <Text
+            value={information.created_date} color={theme.neutral_900} size={Body1} weight={Thin}
+          />
+        </Col>
+      </Row>
     </div>
   }
 }

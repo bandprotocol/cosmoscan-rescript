@@ -110,11 +110,11 @@ let mock: group = {
   ],
   information: {
     admin: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32,
-    total_member: 1,
-    total_weight: 1,
-    description: "description",
-    website: "website",
-    forum: "forum",
-    created_date: "created_date",
+    total_member: 3,
+    total_weight: 6,
+    description: "Praesent vulputate lacus sed facilisis venenatis. Fusce vel ullamcorper velit. Donec vel elit sit amet neque pellentesque blandit eget id elit. In sollicitudin ",
+    website: "example.com",
+    forum: "forum.example.com",
+    created_date: "2023-04-25 06:29:18",
   },
 }

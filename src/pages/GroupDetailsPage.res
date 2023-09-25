@@ -78,42 +78,9 @@ module Content = {
               | GroupProposal => <GroupDetailsTabs.Proposal proposals={MockGroup.mock.proposals} />
               | GroupPolicy => <GroupDetailsTabs.Policy polices={MockGroup.mock.policies} />
               | GroupMember => <GroupDetailsTabs.Members members={MockGroup.mock.members} />
-              | GroupInformation => <Text value="GroupInformation" size=Text.Xl weight=Text.Bold />
+              | GroupInformation =>
+                <GroupDetailsTabs.Information information={MockGroup.mock.information} />
               }}
-              // {switch hashtag {
-              // | OracleScriptExecute =>
-              //   switch oracleScriptSub {
-              //   | Data({schema}) => <OracleScriptExecute id=oracleScriptID schema />
-              //   | Error(_) | Loading | NoData => <LoadingCensorBar.CircleSpin height=400 />
-              //   }
-              // | OracleScriptCode =>
-              //   switch oracleScriptSub {
-              //   | Data({sourceCodeURL}) if sourceCodeURL !== "" =>
-              //     <OracleScriptCode url=sourceCodeURL />
-              //   | Loading => <LoadingCensorBar.CircleSpin height=400 />
-              //   | Data(_) | Error(_) | NoData =>
-              //     <EmptyContainer>
-              //       <img
-              //         src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
-              //         className=Styles.noDataImage
-              //         alt="Unable to access OWASM Code"
-              //       />
-              //       <Heading
-              //         size=Heading.H4
-              //         value="Unable to access OWASM Code"
-              //         align=Heading.Center
-              //         weight=Heading.Regular
-              //         color={theme.neutral_600}
-              //       />
-              //     </EmptyContainer>
-              //   }
-              // | OracleScriptBridgeCode =>
-              //   switch oracleScriptSub {
-              //   | Data({schema}) => <OracleScriptBridgeCode schema />
-              //   | Error(_) | Loading | NoData => <LoadingCensorBar.CircleSpin height=400 />
-              //   }
-              // | OracleScriptRequests => <OracleScriptRequestTable oracleScriptID />
-              // }}
             </Tab.Route>
           </Table>
         </InfoContainer>
@@ -124,6 +91,7 @@ module Content = {
 
 @react.component
 let make = (~groupID, ~hashtag) => {
+  // TODO: not have a subscription yet
   // switch oracleScriptSub {
   // | NoData => <NotFound />
   // | Data(_) | Error(_) | Loading => <Content groupID hashtag />
