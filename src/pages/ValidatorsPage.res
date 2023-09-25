@@ -168,20 +168,24 @@ let make = () => {
         {isMobile
           ? <Col col=Col.Six colSm=Col.Four mbSm=16>
               <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                //  <SortableDropdown
-                //    sortedBy
-                //    setSortedBy
-                //    sortList=ValidatorsTable.[
-                //      (NameAsc, getName(NameAsc)),
-                //      (NameDesc, getName(NameDesc)),
-                //      (VotingPowerAsc, getName(VotingPowerAsc)),
-                //      (VotingPowerDesc, getName(VotingPowerDesc)),
-                //      (CommissionAsc, getName(CommissionAsc)),
-                //      (CommissionDesc, getName(CommissionDesc)),
-                //      (UptimeAsc, getName(UptimeAsc)),
-                //      (UptimeDesc, getName(UptimeDesc)),
-                //    ]
-                //  />
+                // // TODO: modify this in new validator page UI
+                // <SortableDropdown
+                //   sortedBy
+                //   setSortedBy
+                //   sortList={
+                //     open ValidatorsTable
+                //     list{
+                //       (NameAsc, getName(NameAsc)),
+                //       (NameDesc, getName(NameDesc)),
+                //       (VotingPowerAsc, getName(VotingPowerAsc)),
+                //       (VotingPowerDesc, getName(VotingPowerDesc)),
+                //       (CommissionAsc, getName(CommissionAsc)),
+                //       (CommissionDesc, getName(CommissionDesc)),
+                //       (UptimeAsc, getName(UptimeAsc)),
+                //       (UptimeDesc, getName(UptimeDesc)),
+                //     }
+                //   }
+                // />
               </div>
             </Col>
           : React.null}

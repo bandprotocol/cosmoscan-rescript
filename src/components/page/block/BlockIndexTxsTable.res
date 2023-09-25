@@ -6,7 +6,7 @@ module Styles = {
 
 module RenderBody = {
   @react.component
-  let make = (~txSub: Sub.variant<TxSub.t>) => {
+  let make = (~txSub: Sub.variant<Transaction.t>) => {
     <TBody>
       <Row>
         <Col col=Col.Two>
@@ -44,7 +44,7 @@ module RenderBody = {
 
 module RenderBodyMobile = {
   @react.component
-  let make = (~reserveIndex, ~txSub: Sub.variant<TxSub.t>) => {
+  let make = (~reserveIndex, ~txSub: Sub.variant<Transaction.t>) => {
     switch txSub {
     | Data({txHash, gasFee, success, messages, errMsg}) =>
       <MobileCard
@@ -72,7 +72,7 @@ module RenderBodyMobile = {
 }
 
 @react.component
-let make = (~txsSub: Sub.variant<array<TxSub.t>>) => {
+let make = (~txsSub: Sub.variant<array<Transaction.t>>) => {
   let isMobile = Media.isMobile()
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 

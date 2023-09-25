@@ -8,7 +8,7 @@ module Styles = {
 
 module RenderBody = {
   @react.component
-  let make = (~txSub: Sub.variant<TxSub.t>) => {
+  let make = (~txSub: Sub.variant<Transaction.t>) => {
     <TBody paddingV=#px(16)>
       <Row alignItems=Row.Center>
         <Col col=Col.Four>
@@ -50,7 +50,7 @@ module RenderBody = {
 
 module RenderBodyMobile = {
   @react.component
-  let make = (~reserveIndex, ~txSub: Sub.variant<TxSub.t>) => {
+  let make = (~reserveIndex, ~txSub: Sub.variant<Transaction.t>) => {
     let isSmallMobile = Media.isSmallMobile()
 
     switch txSub {
