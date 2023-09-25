@@ -1,65 +1,3 @@
-type t = {
-  rank: int,
-  isActive: bool,
-  oracleStatus: bool,
-  operatorAddress: Address.t,
-  consensusAddress: Address.t,
-  moniker: string,
-  identity: string,
-  website: string,
-  details: string,
-  uptime: option<float>,
-  tokens: Coin.t,
-  commission: float,
-  commissionMaxChange: float,
-  commissionMaxRate: float,
-  votingPower: float,
-}
-
-type internal_t = {
-  oracleStatus: bool,
-  operatorAddress: Address.t,
-  consensusAddress: string,
-  moniker: string,
-  identity: string,
-  website: string,
-  jailed: bool,
-  details: string,
-  tokens: Coin.t,
-  commissionRate: float,
-  commissionMaxChange: float,
-  commissionMaxRate: float,
-}
-
-type validator_voted_status_t =
-  | Missed
-  | Signed
-  | Proposed
-
-type validator_single_uptime_t = {
-  blockHeight: ID.Block.t,
-  status: validator_voted_status_t,
-}
-
-type validator_single_uptime_status_t = {
-  validatorVotes: array<validator_single_uptime_t>,
-  proposedCount: int,
-  missedCount: int,
-  signedCount: int,
-}
-
-type validator_vote_t = {
-  consensusAddress: Address.t,
-  count: int,
-  voted: bool,
-}
-
-type historical_oracle_statuses_count_t = {
-  oracleStatusReports: array<HistoryOracleParser.t>,
-  uptimeCount: int,
-  downtimeCount: int,
-}
-
 module Mini = {
   type t = {
     consensusAddress: string,
@@ -67,40 +5,6 @@ module Mini = {
     moniker: string,
     identity: string,
   }
-}
-
-let toExternal = (
-  {
-    operatorAddress,
-    consensusAddress,
-    moniker,
-    identity,
-    website,
-    jailed,
-    oracleStatus,
-    details,
-    tokens,
-    commissionRate,
-    commissionMaxChange,
-    commissionMaxRate,
-  }: internal_t,
-  rank,
-) => {
-  rank,
-  isActive: !jailed,
-  operatorAddress,
-  consensusAddress: consensusAddress->Address.fromHex,
-  tokens,
-  commission: commissionRate *. 100.,
-  commissionMaxChange: commissionMaxChange *. 100.,
-  commissionMaxRate: commissionMaxRate *. 100.,
-  moniker,
-  identity,
-  website,
-  oracleStatus,
-  details,
-  uptime: None,
-  votingPower: tokens.amount,
 }
 
 module ValidatorAggCount = {
@@ -122,7 +26,7 @@ module TotalBondedAmount = {
 
 module SingleConfig = %graphql(`
       subscription Validator($operator_address: String!) {
-        validators_by_pk(operator_address: $operator_address) @ppxAs(type: "internal_t") {
+        validators_by_pk(operator_address: $operator_address) @ppxAs(type: "Validator.raw_t") {
           operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
           consensusAddress: consensus_address
           moniker
@@ -141,7 +45,7 @@ module SingleConfig = %graphql(`
 
 module MultiConfig = %graphql(`
   subscription Validators($jailed: Boolean!) {
-    validators(where: {jailed: {_eq: $jailed}}, order_by: [{tokens: desc, moniker: asc}]) @ppxAs(type: "internal_t") {
+    validators(where: {jailed: {_eq: $jailed}}, order_by: [{tokens: desc, moniker: asc}]) @ppxAs(type: "Validator.raw_t") {
       operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
       consensusAddress: consensus_address
       moniker
@@ -239,7 +143,7 @@ let get = operator_address => {
   ->Sub.fromData
   ->Sub.flatMap(({validators_by_pk}) => {
     switch validators_by_pk {
-    | Some(data) => Sub.resolve(data->toExternal(0))
+    | Some(data) => Sub.resolve(data->Validator.toExternal(0))
     | None => Sub.NoData
     }
   })
@@ -251,9 +155,8 @@ let getList = (~isActive, ()) => {
   result
   ->Sub.fromData
   ->Sub.map(({validators}) =>
-    validators->Belt.Array.mapWithIndex((idx, each) => toExternal(each, idx + 1))
+    validators->Belt.Array.mapWithIndex((idx, each) => Validator.toExternal(each, idx + 1))
   )
-
 }
 
 let avgCommission = (~isActive, ()) => {
@@ -312,7 +215,7 @@ let getListVotesBlock = () => {
   result
   ->Sub.fromData
   ->Sub.map(x =>
-    x.validator_last_100_votes->Belt.Array.map(each => {
+    x.validator_last_100_votes->Belt.Array.map((each): Validator.validator_vote_t => {
       consensusAddress: each.consensus_address->Belt.Option.getExn->Address.fromHex,
       count: each.count->Belt.Option.getExn->GraphQLParser.int64,
       voted: each.voted->Belt.Option.getExn,
@@ -362,7 +265,7 @@ let getBlockUptimeByValidator = consensusAddress => {
   ->Sub.flatMap(({validator_votes}) => {
     let validatorVotes =
       validator_votes
-      ->Belt.Array.map(each => {
+      ->Belt.Array.map((each): Validator.validator_single_uptime_t => {
         blockHeight: each.block_height->ID.Block.fromInt,
         status: switch (each.voted, each.block.proposer == consensusAddress->Address.toHex) {
         | (false, _) => Missed
@@ -373,7 +276,7 @@ let getBlockUptimeByValidator = consensusAddress => {
       ->Sub.resolve
 
     {
-      validatorVotes->Sub.map(each => {
+      validatorVotes->Sub.map((each): Validator.validator_single_uptime_status_t => {
         validatorVotes: each,
         proposedCount: each->Belt.Array.keep(({status}) => status == Proposed)->Belt.Array.length,
         signedCount: each->Belt.Array.keep(({status}) => status == Signed)->Belt.Array.length,
@@ -419,11 +322,15 @@ let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
       rawParsedReports
     }
 
-    Sub.resolve({
-      oracleStatusReports: parsedReports,
-      uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.length,
-      downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.length,
-    })
+    Sub.resolve(
+      (
+        {
+          oracleStatusReports: parsedReports,
+          uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.length,
+          downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.length,
+        }: Validator.historical_oracle_statuses_count_t
+      ),
+    )
   })
 }
 
@@ -437,7 +344,7 @@ let getBlockUptimeByValidator = consensusAddress => {
   ->Sub.flatMap(({validator_votes}) => {
     let validatorVotes =
       validator_votes
-      ->Belt.Array.map(each => {
+      ->Belt.Array.map((each): Validator.validator_single_uptime_t => {
         blockHeight: each.block_height->ID.Block.fromInt,
         status: switch (each.voted, each.block.proposer == consensusAddress->Address.toHex) {
         | (false, _) => Missed
@@ -448,7 +355,7 @@ let getBlockUptimeByValidator = consensusAddress => {
       ->Sub.resolve
 
     {
-      validatorVotes->Sub.map(each => {
+      validatorVotes->Sub.map((each): Validator.validator_single_uptime_status_t => {
         validatorVotes: each,
         proposedCount: each->Belt.Array.keep(({status}) => status == Proposed)->Belt.Array.length,
         signedCount: each->Belt.Array.keep(({status}) => status == Signed)->Belt.Array.length,
@@ -521,10 +428,14 @@ let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
       rawParsedReports
     }
 
-    Sub.resolve({
-      oracleStatusReports: parsedReports,
-      uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.length,
-      downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.length,
-    })
+    Sub.resolve(
+      (
+        {
+          oracleStatusReports: parsedReports,
+          uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.length,
+          downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.length,
+        }: Validator.historical_oracle_statuses_count_t
+      ),
+    )
   })
 }

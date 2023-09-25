@@ -70,7 +70,7 @@ module DstValidatorSelection = {
   type indicatorSeparator_t = {display: string}
 
   @react.component
-  let make = (~filteredValidators: array<ValidatorSub.t>, ~setDstValidatorOpt) => {
+  let make = (~filteredValidators: array<Validator.t>, ~setDstValidatorOpt) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     let (selectedValidator, setSelectedValidator) = React.useState(_ => {

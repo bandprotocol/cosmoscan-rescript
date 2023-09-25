@@ -62,14 +62,14 @@ let compareString = (a, b) => {
   Js.String2.localeCompare(a_, b_)->Belt.Float.toInt
 }
 
-let defaultCompare = (a: ValidatorSub.t, b: ValidatorSub.t) =>
+let defaultCompare = (a: Validator.t, b: Validator.t) =>
   if a.tokens != b.tokens {
     compare(b.tokens, a.tokens)
   } else {
     compareString(a.moniker, b.moniker)
   }
 
-let sorting = (validators: array<ValidatorSub.t>, sortedBy) => {
+let sorting = (validators: array<Validator.t>, sortedBy) => {
   validators
   ->Belt.List.fromArray
   ->Belt.List.sort((a, b) => {
@@ -91,8 +91,8 @@ let sorting = (validators: array<ValidatorSub.t>, sortedBy) => {
       result
     } else {
       switch sortedBy {
-       | VotingPowerAsc => defaultCompare(b,a)
-       | _ => defaultCompare(a, b)
+      | VotingPowerAsc => defaultCompare(b, a)
+      | _ => defaultCompare(a, b)
       }
     }
   })
@@ -100,8 +100,8 @@ let sorting = (validators: array<ValidatorSub.t>, sortedBy) => {
 }
 
 let addUptimeOnValidators = (
-  validators: array<ValidatorSub.t>,
-  votesBlock: array<ValidatorSub.validator_vote_t>,
+  validators: array<Validator.t>,
+  votesBlock: array<Validator.validator_vote_t>,
 ) => {
   validators->Belt.Array.map(validator => {
     let signedBlock =
@@ -171,7 +171,7 @@ module RenderBody = {
   @react.component
   let make = (
     ~rank,
-    ~validatorSub: Sub.variant<ValidatorSub.t>,
+    ~validatorSub: Sub.variant<Validator.t>,
     ~votingPower,
     ~dispatchModal: ModalContext.a => unit,
     ~isLogin,
@@ -283,7 +283,7 @@ module RenderBody = {
 
 module RenderBodyMobile = {
   @react.component
-  let make = (~rank, ~validatorSub: Sub.variant<ValidatorSub.t>, ~votingPower) => {
+  let make = (~rank, ~validatorSub: Sub.variant<Validator.t>, ~votingPower) => {
     switch validatorSub {
     | Data({operatorAddress, moniker, identity, tokens, commission, uptime, oracleStatus}) =>
       <MobileCard
