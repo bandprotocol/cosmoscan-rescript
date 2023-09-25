@@ -47,6 +47,13 @@ module Styles = {
 
   let outer = style(. [padding2(~v=#zero, ~h=#px(32))])
 
+  let memberHeaderMobile = (theme: Theme.t) =>
+    style(. [
+      marginTop(#px(24)),
+      paddingBottom(#px(8)),
+      borderBottom(#px(1), #solid, theme.neutral_200),
+    ])
+
   let tableContentWrapper = style(. [
     Media.mobile([marginTop(#px(16))]),
     selector("> div:last-child", [borderBottom(#px(0), #solid, #transparent)]),
@@ -70,8 +77,6 @@ module Styles = {
       selector("&:hover span", [color(theme.primary_800)]),
       selector("> span", [transition(~duration=200, "all")]),
     ])
-
-  let tableItemMobile = style(. [marginBottom(#px(16))])
 
   let informationContainer = style(. [padding2(~v=#px(24), ~h=#px(0))])
   let link = (theme: Theme.t) =>
@@ -162,101 +167,183 @@ module Proposal = {
       })
     }
 
-    <div>
-      {isMobile
-        ? React.null
-        : <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
-            <div className={Css.merge(list{Styles.tablehead, Styles.proposalGrid})}>
+    {
+      isMobile
+        ? {
+            proposals
+            ->Belt.Array.mapWithIndex((index, proposal) =>
               <div>
-                <SortableTHead
-                  title="ID" direction toggle value=SortGroupProposalTable.ID sortedBy
-                />
+                <Row marginTop={16}>
+                  <Col col=Col.Twelve>
+                    <TypeID.GroupProposalLink id={proposal.id}>
+                      <div className={Css.merge(list{CssHelper.flexBox()})}>
+                        <TypeID.GroupProposal
+                          id={proposal.id} position=TypeID.Subtitle isNotLink=true weight={Semibold}
+                        />
+                        <HSpacing size=Spacing.sm />
+                        <Heading
+                          size=Heading.H4
+                          value={proposal.name}
+                          weight=Heading.Semibold
+                          color={theme.primary_600}
+                        />
+                      </div>
+                    </TypeID.GroupProposalLink>
+                  </Col>
+                </Row>
+                <Row marginTop={16}>
+                  <Col colSm=Col.Four>
+                    <Text value="Message" size={Body1} weight={Semibold} />
+                  </Col>
+                  <Col colSm=Col.Eight>
+                    <MsgBadge name="Message" />
+                  </Col>
+                </Row>
+                <Row marginTop={16}>
+                  <Col colSm=Col.Four>
+                    <Text value="Policy Type" size={Body1} weight={Semibold} />
+                  </Col>
+                  <Col colSm=Col.Eight>
+                    <Text
+                      value={proposal._policy_type->MockGroup.policy_type_to_string}
+                      ellipsis=true
+                      color={theme.neutral_900}
+                      size={Body1}
+                    />
+                  </Col>
+                </Row>
+                <Row marginTop={16}>
+                  <Col colSm=Col.Four>
+                    <Text value="Status" size={Body1} weight={Semibold} />
+                  </Col>
+                  <Col colSm=Col.Eight>
+                    <GroupProposalStatus
+                      value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
+                      color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+                    />
+                  </Col>
+                </Row>
+                {index < proposals->Belt.Array.length - 1
+                  ? <SeperatedLine color=theme.neutral_200 />
+                  : React.null}
               </div>
+            )
+            ->React.array
+          }
+        : <div>
+            {isMobile
+              ? React.null
+              : <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
+                  <div className={Css.merge(list{Styles.tablehead, Styles.proposalGrid})}>
+                    <div>
+                      <SortableTHead
+                        title="ID" direction toggle value=SortGroupProposalTable.ID sortedBy
+                      />
+                    </div>
+                    <div>
+                      <SortableTHead
+                        title="Proposal Name"
+                        direction
+                        toggle
+                        sortedBy
+                        value=SortGroupProposalTable.Name
+                      />
+                    </div>
+                    <div>
+                      <SortableTHead
+                        title="Message"
+                        toggle
+                        sortedBy
+                        direction
+                        value=SortGroupProposalTable.Message
+                      />
+                    </div>
+                    <div>
+                      <SortableTHead
+                        title="Policy Type"
+                        toggle
+                        sortedBy
+                        direction
+                        value=SortGroupProposalTable.GroupID
+                      />
+                    </div>
+                    <div>
+                      <SortableTHead
+                        title="Result"
+                        toggle
+                        sortedBy
+                        direction
+                        value=SortGroupProposalTable.GroupID
+                      />
+                    </div>
+                    <div>
+                      <SortableTHead
+                        title="Status"
+                        toggle
+                        sortedBy
+                        direction
+                        value=SortGroupProposalTable.ProposalStatus
+                      />
+                    </div>
+                  </div>
+                </div>}
+            {proposals
+            ->Belt.Array.mapWithIndex((index, proposal) =>
               <div>
-                <SortableTHead
-                  title="Proposal Name" direction toggle sortedBy value=SortGroupProposalTable.Name
-                />
+                <div
+                  className={Css.merge(list{
+                    "table_item",
+                    CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
+                    Styles.tableItem(theme),
+                    Styles.proposalGrid,
+                  })}>
+                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                    <TypeID.GroupProposal id={proposal.id} size={Body1} weight={Bold} />
+                  </div>
+                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                    <Link
+                      className={Css.merge(list{Styles.tableLink(theme)})}
+                      route={OracleScriptDetailsPage(1, OracleScriptRequests)}>
+                      <Text
+                        value={proposal.name}
+                        ellipsis=true
+                        color={theme.primary_600}
+                        weight=Semibold
+                        size={Body1}
+                      />
+                    </Link>
+                  </div>
+                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                    {proposal.message->Belt.Array.map(msg => <MsgBadge name={msg} />)->React.array}
+                  </div>
+                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                    <Text
+                      value={proposal._policy_type->MockGroup.policy_type_to_string}
+                      ellipsis=true
+                      color={theme.neutral_600}
+                      size={Body1}
+                    />
+                  </div>
+                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                    <Text
+                      value={proposal.result} ellipsis=true color={theme.neutral_600} size={Body1}
+                    />
+                  </div>
+                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                    <GroupProposalStatus
+                      value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
+                      color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+                    />
+                  </div>
+                </div>
+                {index < proposals->Belt.Array.length - 1
+                  ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
+                  : React.null}
               </div>
-              <div>
-                <SortableTHead
-                  title="Message" toggle sortedBy direction value=SortGroupProposalTable.Message
-                />
-              </div>
-              <div>
-                <SortableTHead
-                  title="Policy Type" toggle sortedBy direction value=SortGroupProposalTable.GroupID
-                />
-              </div>
-              <div>
-                <SortableTHead
-                  title="Result" toggle sortedBy direction value=SortGroupProposalTable.GroupID
-                />
-              </div>
-              <div>
-                <SortableTHead
-                  title="Status"
-                  toggle
-                  sortedBy
-                  direction
-                  value=SortGroupProposalTable.ProposalStatus
-                />
-              </div>
-            </div>
-          </div>}
-      {proposals
-      ->Belt.Array.mapWithIndex((index, proposal) =>
-        <div>
-          <div
-            className={Css.merge(list{
-              "table_item",
-              CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
-              Styles.tableItem(theme),
-              Styles.proposalGrid,
-            })}>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <TypeID.GroupProposal id={proposal.id} size={Body1} weight={Bold} />
-            </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <Link
-                className={Css.merge(list{Styles.tableLink(theme)})}
-                route={OracleScriptDetailsPage(1, OracleScriptRequests)}>
-                <Text
-                  value={proposal.name}
-                  ellipsis=true
-                  color={theme.primary_600}
-                  weight=Semibold
-                  size={Body1}
-                />
-              </Link>
-            </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              {proposal.message->Belt.Array.map(msg => <MsgBadge name={msg} />)->React.array}
-            </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <Text
-                value={proposal._policy_type->MockGroup.policy_type_to_string}
-                ellipsis=true
-                color={theme.neutral_600}
-                size={Body1}
-              />
-            </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <Text value={proposal.result} ellipsis=true color={theme.neutral_600} size={Body1} />
-            </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <GroupProposalStatus
-                value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
-                color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
-              />
-            </div>
+            )
+            ->React.array}
           </div>
-          {index < proposals->Belt.Array.length - 1
-            ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
-            : React.null}
-        </div>
-      )
-      ->React.array}
-    </div>
+    }
   }
 }
 
@@ -323,55 +410,124 @@ module Policy = {
       {polices
       ->Belt.Array.mapWithIndex((index, policy) =>
         <div>
-          <div
-            className={Css.merge(list{
-              "table_item",
-              CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
-              Styles.tableItem(theme),
-              Styles.policyGrid,
-            })}>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <AddressRender
-                address={policy.address}
-                position=AddressRender.Subtitle
-                copy=true
-                clickable=false
-                ellipsis=true
-              />
-            </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <Text
-                value={policy._type->MockGroup.policy_type_to_string}
-                ellipsis=true
-                color={theme.neutral_900}
-                size={Body1}
-              />
-            </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <Text
-                value={policy.value->Belt.Float.toString}
-                ellipsis=true
-                color={theme.neutral_900}
-                size={Body1}
-              />
-            </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <Text
-                value={policy.voting_period->Belt.Int.toString}
-                ellipsis=true
-                color={theme.neutral_900}
-                size={Body1}
-              />
-            </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <Text
-                value={policy.min_execution_period->Belt.Int.toString}
-                ellipsis=true
-                color={theme.neutral_900}
-                size={Body1}
-              />
-            </div>
-          </div>
+          {isMobile
+            ? <div>
+                <Row marginTop={16}>
+                  <Col colSm=Col.Four>
+                    <Text value="Policy Address" size={Body1} weight={Semibold} />
+                  </Col>
+                  <Col colSm=Col.Eight>
+                    <AddressRender
+                      address={policy.address}
+                      position=AddressRender.Subtitle
+                      copy=true
+                      clickable=false
+                      ellipsis=true
+                    />
+                  </Col>
+                </Row>
+                <Row marginTop={16}>
+                  <Col colSm=Col.Four>
+                    <Text value="Type" size={Body1} weight={Semibold} />
+                  </Col>
+                  <Col colSm=Col.Eight>
+                    <Text
+                      value={policy._type->MockGroup.policy_type_to_string}
+                      ellipsis=true
+                      color={theme.neutral_900}
+                      size={Body1}
+                    />
+                  </Col>
+                </Row>
+                <Row marginTop={16}>
+                  <Col colSm=Col.Four>
+                    <Text value="Value" size={Body1} weight={Semibold} />
+                  </Col>
+                  <Col colSm=Col.Eight>
+                    <Text
+                      value={policy.value->Belt.Float.toString}
+                      ellipsis=true
+                      color={theme.neutral_900}
+                      size={Body1}
+                    />
+                  </Col>
+                </Row>
+                <Row marginTop={16}>
+                  <Col colSm=Col.Four>
+                    <Text value="Voting Period" size={Body1} weight={Semibold} />
+                  </Col>
+                  <Col colSm=Col.Eight>
+                    <Text
+                      value={policy.voting_period->Belt.Int.toString}
+                      ellipsis=true
+                      color={theme.neutral_900}
+                      size={Body1}
+                    />
+                  </Col>
+                </Row>
+                <Row marginTop={16}>
+                  <Col colSm=Col.Four>
+                    <Text value="Min Execution Period" size={Body1} weight={Semibold} />
+                  </Col>
+                  <Col colSm=Col.Eight>
+                    <Text
+                      value={policy.min_execution_period->Belt.Int.toString}
+                      ellipsis=true
+                      color={theme.neutral_900}
+                      size={Body1}
+                    />
+                  </Col>
+                </Row>
+              </div>
+            : <div
+                className={Css.merge(list{
+                  "table_item",
+                  CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
+                  Styles.tableItem(theme),
+                  Styles.policyGrid,
+                })}>
+                <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                  <AddressRender
+                    address={policy.address}
+                    position=AddressRender.Subtitle
+                    copy=true
+                    clickable=false
+                    ellipsis=true
+                  />
+                </div>
+                <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                  <Text
+                    value={policy._type->MockGroup.policy_type_to_string}
+                    ellipsis=true
+                    color={theme.neutral_900}
+                    size={Body1}
+                  />
+                </div>
+                <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                  <Text
+                    value={policy.value->Belt.Float.toString}
+                    ellipsis=true
+                    color={theme.neutral_900}
+                    size={Body1}
+                  />
+                </div>
+                <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                  <Text
+                    value={policy.voting_period->Belt.Int.toString}
+                    ellipsis=true
+                    color={theme.neutral_900}
+                    size={Body1}
+                  />
+                </div>
+                <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                  <Text
+                    value={policy.min_execution_period->Belt.Int.toString}
+                    ellipsis=true
+                    color={theme.neutral_900}
+                    size={Body1}
+                  />
+                </div>
+              </div>}
           {index < polices->Belt.Array.length - 1
             ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
             : React.null}
@@ -404,7 +560,14 @@ module Members = {
 
     <div>
       {isMobile
-        ? React.null
+        ? <div
+            className={Css.merge(list{
+              CssHelper.flexBox(~justify=#spaceBetween, ()),
+              Styles.memberHeaderMobile(theme),
+            })}>
+            <Text value="Adress" color={theme.neutral_600} size={Body1} />
+            <Text value="Weight" color={theme.neutral_600} size={Body1} />
+          </div>
         : <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
             <div className={Css.merge(list{Styles.tablehead, Styles.memberGrid})}>
               <div>
@@ -425,32 +588,57 @@ module Members = {
             </div>
           </div>}
       {members
-      ->Belt.Array.mapWithIndex((index, member) =>
-        <div>
-          <div
-            className={Css.merge(list{
-              "table_item",
-              CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
-              Styles.tableItem(theme),
-              Styles.memberGrid,
-            })}>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <AddressRender address={member.address} position=AddressRender.Text />
+      ->Belt.Array.mapWithIndex((index, member) => {
+        isMobile
+          ? <div>
+              <Row marginTop={16}>
+                <Col
+                  col=Col.Twelve
+                  style={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
+                  <AddressRender
+                    address={member.address} position=AddressRender.Text ellipsis=true
+                  />
+                  <Text
+                    value={member.weight->Belt.Int.toString} color={theme.neutral_900} size={Body1}
+                  />
+                </Col>
+                <Col col=Col.Twelve>
+                  <Text
+                    value={member.metadata} ellipsis=true color={theme.neutral_900} size={Body1}
+                  />
+                </Col>
+              </Row>
+              {index < members->Belt.Array.length - 1
+                ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
+                : React.null}
             </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <Text
-                value={member.weight->Belt.Int.toString} color={theme.neutral_900} size={Body1}
-              />
+          : <div>
+              <div
+                className={Css.merge(list{
+                  "table_item",
+                  CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
+                  Styles.tableItem(theme),
+                  Styles.memberGrid,
+                })}>
+                <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                  <AddressRender address={member.address} position=AddressRender.Text />
+                </div>
+                <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                  <Text
+                    value={member.weight->Belt.Int.toString} color={theme.neutral_900} size={Body1}
+                  />
+                </div>
+                <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                  <Text
+                    value={member.metadata} ellipsis=true color={theme.neutral_900} size={Body1}
+                  />
+                </div>
+              </div>
+              {index < members->Belt.Array.length - 1
+                ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
+                : React.null}
             </div>
-            <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-              <Text value={member.metadata} ellipsis=true color={theme.neutral_900} size={Body1} />
-            </div>
-          </div>
-          {index < members->Belt.Array.length - 1
-            ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
-            : React.null}
-        </div>
-      )
+      })
       ->React.array}
     </div>
   }

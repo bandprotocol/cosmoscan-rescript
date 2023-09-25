@@ -6,7 +6,7 @@ module Styles = {
   let noPadding = style(. [padding(#zero)])
   let groupID = style(. [
     fontFamilies([#custom("Roboto Mono"), #monospace]),
-    Media.mobile([display(#block), marginBottom(#px(8))]),
+    Media.mobile([display(#block), marginRight(#px(8))]),
   ])
 
   let buttonStyled = style(. [
@@ -44,7 +44,7 @@ module Content = {
         </button>
         <Row marginBottom=24 marginBottomSm=24 marginLeft=0 alignItems=Row.Center>
           <div className={Css.merge(list{CssHelper.flexBox(), Styles.idCointainer})}>
-            <Heading size=Heading.H1 weight=Heading.Bold>
+            <Heading size=Heading.H1 weight=Heading.Bold style={CssHelper.flexBox()}>
               <span className=Styles.groupID>
                 {`#G${mock.id->ID.Group.toInt->Belt.Int.toString} `->React.string}
               </span>
@@ -57,15 +57,15 @@ module Content = {
             <Tab.Route
               tabs=[
                 {
-                  name: "Proposal",
+                  name: `Proposal (${mock.proposals->Belt.Array.length->Belt.Int.toString})`,
                   route: groupID->ID.Group.getRouteWithTab(Route.GroupProposal),
                 },
                 {
-                  name: "Policy",
+                  name: `Policy (${mock.policies->Belt.Array.length->Belt.Int.toString})`,
                   route: groupID->ID.Group.getRouteWithTab(Route.GroupPolicy),
                 },
                 {
-                  name: "Members",
+                  name: `Members (${mock.members->Belt.Array.length->Belt.Int.toString})`,
                   route: groupID->ID.Group.getRouteWithTab(Route.GroupMember),
                 },
                 {
@@ -75,11 +75,10 @@ module Content = {
               ]
               currentRoute={groupID->ID.Group.getRouteWithTab(hashtag)}>
               {switch hashtag {
-              | GroupProposal => <GroupDetailsTabs.Proposal proposals={MockGroup.mock.proposals} />
-              | GroupPolicy => <GroupDetailsTabs.Policy polices={MockGroup.mock.policies} />
-              | GroupMember => <GroupDetailsTabs.Members members={MockGroup.mock.members} />
-              | GroupInformation =>
-                <GroupDetailsTabs.Information information={MockGroup.mock.information} />
+              | GroupProposal => <GroupDetailsTabs.Proposal proposals={mock.proposals} />
+              | GroupPolicy => <GroupDetailsTabs.Policy polices={mock.policies} />
+              | GroupMember => <GroupDetailsTabs.Members members={mock.members} />
+              | GroupInformation => <GroupDetailsTabs.Information information={mock.information} />
               }}
             </Tab.Route>
           </Table>
