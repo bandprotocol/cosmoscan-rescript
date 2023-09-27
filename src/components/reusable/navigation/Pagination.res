@@ -55,6 +55,7 @@ module Styles = {
       border(#px(1), #solid, theme.neutral_400),
       outlineStyle(#none),
       color(theme.neutral_900),
+      backgroundColor(#transparent),
       fontFamilies([#custom("Roboto Mono"), #monospace]),
       textAlign(#center),
       marginLeft(#px(16)),
