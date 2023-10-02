@@ -46,6 +46,7 @@ type chainID =
   | LaoziTestnet
   | LaoziMainnet
   | LaoziPOA
+  | HackathonMainnet
   | Unknown
 
 let parseChainID = x =>
@@ -74,6 +75,7 @@ let parseChainID = x =>
     LaoziTestnet
   | "laozi-mainnet" => LaoziMainnet
   | "band-laozi-poa" => LaoziPOA
+  | "band-laozi-internalnet" => HackathonMainnet
   | _ => Unknown
   }
 
@@ -88,6 +90,7 @@ let getLink = x =>
   | LaoziTestnet => "https://laozi-testnet6.cosmoscan.io/"
   | LaoziMainnet => "https://cosmoscan.io/"
   | LaoziPOA => "https://laozi-poa.cosmoscan.io/"
+  | HackathonMainnet => "https://laozi-hackathon.cosmoscan.io/"
   | Unknown => ""
   }
 
@@ -102,6 +105,7 @@ let getName = x =>
   | LaoziTestnet => "laozi-testnet"
   | LaoziMainnet => "laozi-mainnet"
   | LaoziPOA => "laozi-poa"
+  | HackathonMainnet => "band-laozi-internalnet"
   | Unknown => "unknown"
   }
 
