@@ -179,7 +179,7 @@ let make = () => {
               {switch trackingSub {
               | Data({chainID}) => {
                   let currentChainID = chainID->ChainIDBadge.parseChainID
-                  currentChainID == LaoziTestnet || HackathonMainnet ? <FaucetBtn address /> : React.null
+                  currentChainID == LaoziTestnet ||  currentChainID == HackathonMainnet ? <FaucetBtn address /> : React.null
                 }
 
               | _ => React.null
