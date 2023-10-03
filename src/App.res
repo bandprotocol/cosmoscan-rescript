@@ -66,6 +66,7 @@ let make = () => {
     <Sidebar show setShow />
     <div className={Css.merge(list{"main-content", Styles.container(theme), Styles.mainContent})}>
       <Header setShow show />
+      <Notibar />
       <div className=Styles.routeContainer>
         {switch currentRoute {
         | HomePage => <HomePage />

@@ -114,6 +114,14 @@ module SingleConfig = %graphql(`
   }
 `)
 
+module LatestBlockConfig = %graphql(`
+  subscription LatestBlock {
+    blocks(limit: 1, order_by: [{ height: desc }]) {
+      timestamp @ppxCustom(module: "GraphQLParserModule.Date")
+    }
+  }
+`)
+
 module PastDayBlockCountConfig = %graphql(`
   subscription AvgDayBlocksCount($greater: timestamp!, $less: timestamp!) {
     blocks_aggregate(where: {timestamp: {_lte: $less, _gte: $greater}}) @ppxAs(type: "blocks_aggregate_t") {
@@ -215,4 +223,31 @@ let getListByConsensusAddress = (~address, ~page, ~pageSize, ()) => {
   // ->Sub.map(({blocks_aggregate}) =>
   //   blocks_aggregate.aggregate->Belt.Option.getExn->(y => y.count)->BlockSum.toExternal
   // )
+}
+
+let isUnderMaintenance = () => {
+  let result = LatestBlockConfig.use()
+
+  let timestampSub =
+    result
+    ->Sub.fromData
+    ->Sub.flatMap(({blocks}) => {
+      switch blocks->Belt.Array.get(0) {
+      | Some(latestBlock) => latestBlock.timestamp->Sub.resolve
+
+      | None => NoData
+      }
+    })
+
+  switch timestampSub {
+  | Sub.Data(timestamp) => {
+      // Check if timestamp is more than 5 mins
+      let now = MomentRe.momentNow()
+      let diff = now->MomentRe.diff(timestamp, #minutes)
+
+      diff > 5.
+    }
+
+  | _ => false
+  }
 }
