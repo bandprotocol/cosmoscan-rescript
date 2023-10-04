@@ -182,9 +182,14 @@ let getAvgBlockTime = (greater, less) => {
 
   result
   ->Sub.fromData
-  ->Sub.map(({blocks_aggregate}) =>
-    blocks_aggregate.aggregate->Belt.Option.getExn->(y => y.count)->BlockSum.toExternal
-  )
+  ->Sub.map(({blocks_aggregate}) => {
+    // blocks_aggregate.aggregate->Belt.Option.getExn->(y => y.count)->BlockSum.toExternal
+
+    switch blocks_aggregate.aggregate {
+    | Some(aggregate) => aggregate.count->BlockSum.toExternal
+    | None => 0.0
+    }
+  })
 }
 
 let getLatest = () => {
