@@ -83,7 +83,7 @@ let parseChainID = x =>
     LaoziTestnet
   | "laozi-mainnet" => LaoziMainnet
   | "band-laozi-poa" => LaoziPOA
-  | "band-laozi-internalnet" => HackathonMainnet
+  | "band-laozi-hackathon" => HackathonMainnet
   | _ => Unknown
   }
 

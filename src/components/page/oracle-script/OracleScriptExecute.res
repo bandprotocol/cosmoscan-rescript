@@ -494,6 +494,7 @@ module ExecutionPart = {
                                 id: (),
                                 oracleScriptName: (),
                                 schema: (),
+                                tssGroupId: 1,
                               }),
                             ],
                             (gaslimit->Belt.Int.toFloat *. 0.0025)->Js.Math.ceil_int,

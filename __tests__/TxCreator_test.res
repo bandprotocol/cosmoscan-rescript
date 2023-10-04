@@ -57,6 +57,7 @@ describe("Expect createMsg Functionality to work correctly", () => {
           id: (),
           oracleScriptName: (),
           schema: (),
+          tssGroupId: 0,
         }),
       )
     })->toEqual({
