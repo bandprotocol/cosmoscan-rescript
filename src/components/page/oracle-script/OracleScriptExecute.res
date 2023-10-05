@@ -491,6 +491,7 @@ module ExecutionPart = {
                                 },
                                 prepareGas,
                                 executeGas,
+                                tssGroupId: 1,
                                 id: (),
                                 oracleScriptName: (),
                                 schema: (),

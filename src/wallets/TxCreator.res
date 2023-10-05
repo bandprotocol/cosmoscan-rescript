@@ -22,6 +22,7 @@ let createMsg = (msg: Msg.Input.t) => {
       clientID,
       sender,
       feeLimit,
+      tssGroupId,
       prepareGas,
       executeGas,
     }) =>

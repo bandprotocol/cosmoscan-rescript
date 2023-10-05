@@ -54,6 +54,7 @@ describe("Expect createMsg Functionality to work correctly", () => {
           feeLimit: list{feeCoin},
           prepareGas: 50000,
           executeGas: 200000,
+          tssGroupId: 0,
           id: (),
           oracleScriptName: (),
           schema: (),

@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",
-    "@bandprotocol/bandchain.js": "^2.1.4",
+    "@bandprotocol/bandchain.js": "2.4.0-rc",
     "@cosmostation/cosmosjs": "0.5.5",
     "@glennsl/rescript-json-combinators": "^1.0.0",
     "@ledgerhq/hw-transport-webhid": "^6.4.1",
