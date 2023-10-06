@@ -690,6 +690,27 @@ let make = (~reqID) => {
             </InfoContainer>
           </Col>
         </Row>
+        // TSS Proof
+        {switch requestSub {
+        | Data({signingDatumIDOpt}) =>
+          switch signingDatumIDOpt {
+          | Some(signingDatumID) =>
+            <Row marginBottom=24>
+              <Col>
+                <InfoContainer>
+                  <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
+                    <Heading value="TSS Proof" size=Heading.H4 />
+                  </div>
+                  <SeperatedLine mt=32 />
+                  <TSSProof signingDatumID />
+                </InfoContainer>
+              </Col>
+            </Row>
+          | None => React.null
+          }
+
+        | _ => React.null
+        }}
         // External Data Table
         <Row marginBottom=24>
           <Col>

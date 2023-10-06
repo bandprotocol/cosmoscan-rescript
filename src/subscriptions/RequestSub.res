@@ -363,6 +363,8 @@ type requested_validator_internal_t = {validator: ValidatorSub.Mini.t}
 type aggregate_t = {count: int}
 type aggregate_wrapper_intenal_t = {aggregate: option<aggregate_t>}
 
+type signing_datum_t = {id: int}
+
 type internal_t = {
   id: ID.Request.t,
   clientID: string,
@@ -387,6 +389,7 @@ type internal_t = {
   rawDataRequests: array<raw_data_request_t>,
   reports: array<report_t>,
   result: option<JsBuffer.t>,
+  signingDatum: option<signing_datum_t>,
 }
 
 type t = {
@@ -413,6 +416,7 @@ type t = {
   rawDataRequests: array<raw_data_request_t>,
   reports: array<report_t>,
   result: option<JsBuffer.t>,
+  signingDatumIDOpt: option<int>,
 }
 
 let toExternal = ({
@@ -439,6 +443,7 @@ let toExternal = ({
   rawDataRequests,
   reports,
   result,
+  signingDatum,
 }) => {
   id,
   clientID,
@@ -463,6 +468,7 @@ let toExternal = ({
   rawDataRequests,
   reports,
   result,
+  signingDatumIDOpt: signingDatum->Belt.Option.map(x => x.id),
 }
 
 module SingleRequestConfig = %graphql(`
@@ -537,6 +543,9 @@ module SingleRequestConfig = %graphql(`
         calldata @ppxCustom(module: "GraphQLParserModule.Buffer")
       }
       result @ppxCustom(module: "GraphQLParserModule.Buffer")
+      signingDatum: signing_datum @ppxAs(type: "signing_datum_t") {
+        id
+      }
     }
   }
 `)
@@ -613,6 +622,9 @@ module MultiRequestConfig = %graphql(`
           calldata @ppxCustom(module: "GraphQLParserModule.Buffer")
         }
         result @ppxCustom(module: "GraphQLParserModule.Buffer")
+        signingDatum: signing_datum @ppxAs(type: "signing_datum_t") {
+          id
+        }
       }
     }
 `)
