@@ -155,6 +155,7 @@ module Message = {
       array<Coin.t>,
       option<int>,
       option<int>,
+      int,
     ) => t = "MsgRequestData"
 
     @send external toJSON: t => Js.Json.t = "toJSON"

@@ -251,6 +251,7 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
         [coin],
         Some(50000),
         Some(200000),
+        1,
       )
       ->Message.MsgRequest.toJSON
       ->Js.Json.stringifyAny
