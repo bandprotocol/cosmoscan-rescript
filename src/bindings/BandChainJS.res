@@ -10,6 +10,15 @@ type tx_response = {
   rawLog: string,
 }
 
+type voteOption =
+  | VOTE_OPTION_UNSPECIFIED
+  | VOTE_OPTION_YES
+  | VOTE_OPTION_ABSTAIN
+  | VOTE_OPTION_NO
+  | VOTE_OPTION_NO_WITH_VETO
+
+type groupExecMap = EXEC_UNSPECIFIED | EXEC_TRY
+
 module Client = {
   type t
   type reference_data_t = {
@@ -154,6 +163,13 @@ module Message = {
   module MsgTransfer = {
     @module("@bandprotocol/bandchain.js") @scope("Message") @new
     external create: (string, string, string, string, Coin.t, float) => t = "MsgTransfer"
+
+    @send external toJSON: t => Js.Json.t = "toJSON"
+  }
+
+  module MsgVoteGroup = {
+    @module("@bandprotocol/bandchain.js") @scope("Message") @new
+    external create: (int, string, voteOption, string, groupExecMap) => t = "MsgVoteGroup"
 
     @send external toJSON: t => Js.Json.t = "toJSON"
   }
