@@ -179,7 +179,9 @@ let make = (~msg: Msg.result_t) => {
     | AcknowledgePacketMsg(_)
     | TimeoutMsg(_)
     | TimeoutOnCloseMsg(_)
-    | ActivateMsg(_) => React.null
+    | ActivateMsg(_)
+    | TSSActive
+    | TSSSubmitSignature => React.null
     | TransferMsg(msg) =>
       switch msg {
       | Msg.Application.Transfer.Success({receiver, token}) =>
