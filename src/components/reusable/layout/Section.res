@@ -10,7 +10,7 @@ module Styles = {
 }
 
 @react.component
-let make = (~children, ~pt=60, ~pb=60, ~ptSm=32, ~pbSm=32, ~bg=?, ~style="") => {
+let make = (~children, ~pt=24, ~pb=24, ~ptSm=32, ~pbSm=32, ~bg=?, ~style="") => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let css = CssJs.merge(. [
     Styles.bgColor(bg->Belt.Option.getWithDefault(theme.neutral_000)),

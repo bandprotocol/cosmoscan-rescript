@@ -20,11 +20,7 @@ module Styles = {
     overflow(#auto),
     paddingBottom(#px(70)),
     paddingTop(#px(70)),
-    Media.mobile([
-      paddingTop(#px(100)),
-      paddingBottom(#px(0)),
-      minHeight(#calc(#sub, #vh(100.), #px(193))),
-    ]),
+    Media.mobile([paddingBottom(#px(0)), minHeight(#calc(#sub, #vh(100.), #px(193)))]),
   ])
 
   let backdropContainer = show =>

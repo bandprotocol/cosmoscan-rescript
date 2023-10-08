@@ -17,7 +17,7 @@ let getPrevDay = _ =>
 @react.component
 let make = () => {
   let isMobile = Media.isMobile()
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
   let currentTime =
     React.useContext(TimeContext.context)->MomentRe.Moment.format(Config.timestampUseFormat, _)
 
@@ -30,6 +30,8 @@ let make = () => {
     let timeOutID = Js.Global.setInterval(() => {setPrevDayTime(getPrevDay)}, 60_000)
     Some(() => {Js.Global.clearInterval(timeOutID)})
   })
+
+  let infoSub = React.useContext(GlobalContext.context)
 
   let validatorsSub = ValidatorSub.getList(~isActive, ())
   let validatorsCountSub = ValidatorSub.count()
@@ -48,117 +50,138 @@ let make = () => {
   )
 
   let allSub = Sub.all3(topPartAllSub, validatorsSub, votesBlockSub)
+  let infoBondSub = Sub.all2(infoSub, bondedTokenCountSub)
 
-  <Section ptSm=32 pbSm=32>
+  <Section>
     <div className=CssHelper.container id="validatorsSection">
-      <Row alignItems=Row.Center marginBottom=40 marginBottomSm=24>
+      // Heading
+      <Row alignItems=Row.Center marginBottom=24 marginBottomSm=24>
         <Col col=Col.Twelve>
-          <Heading value="All Validators" size=Heading.H2 marginBottom=16 marginBottomSm=8 />
-          {switch topPartAllSub {
-          | Data((validatorCount, _, _, _, _)) =>
-            <Heading
-              value={validatorCount->Belt.Int.toString ++ " In total"}
-              size=Heading.H3
-              weight=Heading.Thin
-              color={theme.neutral_600}
-            />
-          | _ => <LoadingCensorBar width=65 height=21 />
-          }}
+          <div className={CssHelper.flexBox()}>
+            <Heading value="Validators" size=Heading.H1 weight=Heading.Semibold />
+            <HSpacing size=Spacing.lg />
+            {switch topPartAllSub {
+            | Data((validatorCount, _, _, _, _)) =>
+              <div className={CssHelper.mt(~size=4, ())}>
+                <Text value={validatorCount->Belt.Int.toString ++ " In total"} size=Text.Xl />
+              </div>
+            | _ => <LoadingCensorBar width=65 height=20 />
+            }}
+          </div>
         </Col>
       </Row>
-      <Row marginBottom=24>
-        <Col>
-          <Row>
-            <Col col=Col.Three colSm=Col.Six mbSm=24>
-              <InfoContainer style=Styles.infoContainer>
-                <Heading
-                  value="Active Validators"
-                  size=Heading.H4
-                  marginBottom=28
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
+      // Infomation Cards
+      <Row marginBottom=40>
+        <Col col=Col.Three colSm=Col.Six mbSm=24>
+          <InfoContainer style=Styles.infoContainer px=24 py=16 pxSm=16 pySm=16 radius=8>
+            <Heading
+              value="Active Validators"
+              size=Heading.H4
+              marginBottom=8
+              weight=Regular
+              color={theme.neutral_600}
+            />
+            {switch topPartAllSub {
+            | Data((_, isActiveValidatorCount, _, _, _)) =>
+              <Text
+                value={isActiveValidatorCount->Belt.Int.toString}
+                size=Text.Xxxl
+                block=true
+                weight=Text.Bold
+                color={theme.neutral_900}
+              />
+            | _ => <LoadingCensorBar width=100 height=24 />
+            }}
+          </InfoContainer>
+        </Col>
+        <Col col=Col.Three colSm=Col.Six mbSm=24>
+          <InfoContainer style=Styles.infoContainer px=24 py=16 pxSm=16 pySm=16 radius=8>
+            <Heading
+              value="BAND Bonded"
+              size=Heading.H4
+              marginBottom=8
+              weight=Regular
+              color={theme.neutral_600}
+            />
+            {switch infoBondSub {
+            | Data({financial}, bondedTokenCount) =>
+              <div className={CssHelper.flexBox()}>
+                // TODO: update formatter
+                <Text
+                  value={bondedTokenCount->Coin.getBandAmountFromCoin->Format.fCurrency}
+                  size=Text.Xxxl
+                  block=true
+                  weight=Text.Bold
+                  color={theme.neutral_900}
                 />
-                {switch topPartAllSub {
-                | Data((_, isActiveValidatorCount, _, _, _)) =>
-                  <Text
-                    value={isActiveValidatorCount->Belt.Int.toString}
-                    size=Text.Xxxl
-                    block=true
-                    weight=Text.Semibold
-                    color={theme.neutral_900}
-                  />
-                | _ => <LoadingCensorBar width=100 height=24 />
-                }}
-              </InfoContainer>
-            </Col>
-            <Col col=Col.Three colSm=Col.Six mbSm=24>
-              <InfoContainer style=Styles.infoContainer>
-                <Heading
-                  value="Bonded Tokens"
-                  size=Heading.H4
-                  marginBottom=28
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
+                // TODO: update formatter
+                <Text
+                  value={"/" ++ financial.totalSupply->Format.fCurrency}
+                  size=Text.Xl
+                  block=true
+                  code=true
                 />
-                {switch topPartAllSub {
-                | Data((_, _, bondedTokenCount, _, _)) =>
-                  <Text
-                    value={bondedTokenCount->Coin.getBandAmountFromCoin->Format.fCurrency}
-                    size=Text.Xxxl
-                    block=true
-                    weight=Text.Semibold
-                    color={theme.neutral_900}
-                  />
-                | _ => <LoadingCensorBar width=100 height=24 />
-                }}
-              </InfoContainer>
-            </Col>
-            <Col col=Col.Three colSm=Col.Six>
-              <InfoContainer style=Styles.infoContainer>
-                <Heading
-                  value="Inflation Rate"
-                  size=Heading.H4
-                  marginBottom=28
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
-                />
-                {switch topPartAllSub {
-                | Data((_, _, _, _, {inflation})) =>
-                  <Text
-                    value={(inflation *. 100.)->Format.fPretty(~digits=2) ++ "%"}
-                    size=Text.Xxxl
-                    color={theme.neutral_900}
-                    block=true
-                    weight=Text.Semibold
-                  />
-
-                | _ => <LoadingCensorBar width=100 height=24 />
-                }}
-              </InfoContainer>
-            </Col>
-            <Col col=Col.Three colSm=Col.Six>
-              <InfoContainer style=Styles.infoContainer>
-                <Heading
-                  value="24 Hour AVG Block Time"
-                  size=Heading.H4
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
-                  marginBottom=28
-                />
-                {switch topPartAllSub {
-                | Data((_, _, _, avgBlockTime, _)) =>
-                  <Text
-                    value={avgBlockTime->Format.fPretty(~digits=2) ++ " secs"}
-                    size=Text.Xxxl
-                    color={theme.neutral_900}
-                    block=true
-                    weight=Text.Semibold
-                  />
-                | _ => <LoadingCensorBar width=100 height=24 />
-                }}
-              </InfoContainer>
-            </Col>
-          </Row>
+                {isMobile
+                  ? React.null
+                  : <Text
+                      value={"(" ++
+                      (bondedTokenCount->Coin.getBandAmountFromCoin /.
+                      financial.totalSupply *. 100.)->Format.fPretty(~digits=2) ++ "%)"}
+                      size=Text.Xl
+                      block=true
+                      code=true
+                    />}
+              </div>
+            | _ => <LoadingCensorBar width=100 height=24 />
+            }}
+          </InfoContainer>
+        </Col>
+        <Col col=Col.Three colSm=Col.Six>
+          <InfoContainer style=Styles.infoContainer px=24 py=16 pxSm=16 pySm=16 radius=8>
+            <Heading
+              value="Est. APR"
+              size=Heading.H4
+              marginBottom=8
+              weight=Regular
+              color={theme.neutral_600}
+            />
+            // TODO: wire up Est. APR
+            {switch topPartAllSub {
+            | Data((_, _, _, _, {inflation})) =>
+              <Text
+                value={(inflation *. 100.)->Format.fPretty(~digits=2) ++ "%"}
+                size=Text.Xxxl
+                color={theme.neutral_900}
+                block=true
+                code=true
+                weight=Text.Bold
+              />
+            | _ => <LoadingCensorBar width=100 height=24 />
+            }}
+          </InfoContainer>
+        </Col>
+        <Col col=Col.Three colSm=Col.Six>
+          <InfoContainer style=Styles.infoContainer px=24 py=16 pxSm=16 pySm=16 radius=8>
+            <Heading
+              value="24h AVG Block Time"
+              size=Heading.H4
+              color={theme.neutral_600}
+              weight=Regular
+              marginBottom=8
+            />
+            {switch topPartAllSub {
+            | Data((_, _, _, avgBlockTime, _)) =>
+              <Text
+                value={avgBlockTime->Format.fPretty(~digits=2) ++ " secs"}
+                size=Text.Xxxl
+                color={theme.neutral_900}
+                block=true
+                weight=Text.Bold
+                code=true
+              />
+            | _ => <LoadingCensorBar width=100 height=24 />
+            }}
+          </InfoContainer>
         </Col>
       </Row>
       <Row marginTop=32 marginBottom=16>

@@ -21,6 +21,7 @@ let setThemeMode = x =>
 
 type props = {value: (t, unit => unit), children: React.element}
 let context = React.createContext(({isDarkMode: false, theme: Theme.get(Day)}, () => ()))
+let use = () => React.useContext(context)
 
 module Provider = {
   @react.component
