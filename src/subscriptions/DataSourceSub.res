@@ -1,7 +1,3 @@
-type sort_direction_t =
-  | ASC
-  | DESC
-
 type sort_t =
   | ID
   | Name
@@ -164,7 +160,7 @@ let getList = (~page, ~pageSize, ~searchTerm, ~sortDirection, ~sortBy, ()) => {
 
   let orderBy: MultiConfig.MultiConfig_inner.t_variables_data_sources_order_by = {
     switch (sortBy, sortDirection) {
-    | (ID, ASC) => {
+    | (ID, Sort.ASC) => {
         ...defaultSortBy,
         id: Some(#asc),
       }
@@ -228,12 +224,5 @@ let parseSortString = sortOption => {
   | Name => "Data Source Name"
   | TotalRequest => "Total Request" // TODO: will change to 24 hr requests
   | _ => ""
-  }
-}
-
-let parseDirection = dir => {
-  switch dir {
-  | ASC => "ASC"
-  | DESC => "DESC"
   }
 }
