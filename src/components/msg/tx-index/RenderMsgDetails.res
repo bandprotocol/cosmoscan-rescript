@@ -1876,6 +1876,9 @@ let getContent = msg => {
         order: 2,
       },
     ]
+  // TODO: review these blank TSS message
+  | TSSActive
+  | TSSSubmitSignature
   | Msg.UnknownMsg => []
   }
 }

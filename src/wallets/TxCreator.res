@@ -22,9 +22,9 @@ let createMsg = (msg: Msg.Input.t) => {
       clientID,
       sender,
       feeLimit,
-      tssGroupId,
       prepareGas,
       executeGas,
+      tssGroupId,
     }) =>
     MsgRequest.create(
       oracleScriptID->ID.OracleScript.toInt,
@@ -36,6 +36,7 @@ let createMsg = (msg: Msg.Input.t) => {
       feeLimit->Coin.toBandChainJsCoins,
       prepareGas == 0 ? None : Some(prepareGas),
       executeGas == 0 ? None : Some(executeGas),
+      1,
     )
   | DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
     MsgDelegate.create(

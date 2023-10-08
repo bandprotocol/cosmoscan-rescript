@@ -140,7 +140,7 @@ module ResultRender = {
                 <Text value="Output" />
               </Col>
               <Col col=Col.Ten>
-                <Text value={stdout} color={theme.neutral_900} />
+                <Text breakAll={true} value={stdout} color={theme.neutral_900} />
               </Col>
             </Row>}
         {stderr == ""

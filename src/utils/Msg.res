@@ -1416,6 +1416,9 @@ type rec msg_t =
   | ConnectionOpenConfirmMsg(Connection.ConnectionOpenConfirm.t)
   | ActivateMsg(Activate.t)
   | TransferMsg(Application.Transfer.decoded_t)
+  // TODO: blank TSS msg
+  | TSSActive
+  | TSSSubmitSignature
   | ExecMsg(Authz.Exec.t<msg_t>)
   | UnknownMsg
 
@@ -1432,6 +1435,7 @@ type msg_cat_t =
   | ProposalMsg
   | OracleMsg
   | IBCMsg
+  | TSS
   | UnknownMsg
 
 type badge_theme_t = {
@@ -1487,6 +1491,8 @@ let getBadge = msg => {
   | ChannelCloseConfirmMsg(_) => {name: "Channel Close Confirm", category: IBCMsg}
   | ActivateMsg(_) => {name: "Activate", category: IBCMsg}
   | TransferMsg(_) => {name: "Transfer", category: IBCMsg}
+  | TSSActive => {name: "TSSActive", category: TSS}
+  | TSSSubmitSignature => {name: "TSSSubmitSignature", category: TSS}
   | ExecMsg(_) => {name: "Exec", category: ValidatorMsg}
   | _ => {name: "Unknown msg", category: UnknownMsg}
   }
@@ -1737,6 +1743,17 @@ let rec decodeMsg = (json, isSuccess) => {
     | "/oracle.v1.MsgActivate" =>
       let msg = json->mustDecode(Activate.decode)
       (ActivateMsg(msg), msg.validatorAddress, true)
+    // TODO: mock sender address
+    | "/tss.v1beta1.MsgActive" => (
+        TSSActive,
+        Address.fromBech32("band1f6htx23e4xfu0dkpa2ck2kk63la2ej94jwyvt7"),
+        false,
+      )
+    | "/tss.v1beta1.MsgSubmitSignature" => (
+        TSSSubmitSignature,
+        Address.fromBech32("band1f6htx23e4xfu0dkpa2ck2kk63la2ej94jwyvt7"),
+        false,
+      )
     | "/ibc.applications.transfer.v1.MsgTransfer" =>
       isSuccess
         ? {

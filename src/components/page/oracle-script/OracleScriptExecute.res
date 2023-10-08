@@ -346,8 +346,9 @@ module ExecutionPart = {
     let (prepareGas, setPrepareGas) = React.useState(_ => 20000)
     let (executeGas, setExecuteGas) = React.useState(_ => 100000)
     let (gaslimit, setGaslimit) = React.useState(_ => 2000000)
-    let (askCount, setAskCount) = React.useState(_ => "16")
-    let (minCount, setMinCount) = React.useState(_ => "10")
+    // TODO: temporary set for hackathon
+    let (askCount, setAskCount) = React.useState(_ => "1")
+    let (minCount, setMinCount) = React.useState(_ => "1")
     let (result, setResult) = React.useState(_ => Nothing)
 
     // TODO: Change when input can be empty
