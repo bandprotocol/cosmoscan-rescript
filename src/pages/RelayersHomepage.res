@@ -134,7 +134,7 @@ let make = () => {
           <SearchInput
             placeholder="Search by Relayer / connection ID / Channel ID"
             onChange=setSearchTerm
-            maxWidth=500
+            maxWidth=#px(500)
           />
         </Col>
       </Row>

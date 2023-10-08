@@ -3,26 +3,26 @@ module Styles = {
   let cardContainer = (theme: Theme.t) =>
     style(. [
       position(relative),
-      padding2(~v=px(22), ~h=zero),
-      selector("+ div", [marginTop(px(10)), borderTop(px(1), solid, theme.neutral_300)]),
+      padding2(~v=px(6), ~h=zero),
+      selector("+ div", [marginTop(px(8)), borderTop(px(1), solid, theme.neutral_300)]),
     ])
   let cardItem = (alignItems_, isOneColumn) =>
     style(. [
       display(isOneColumn ? #block : #flex),
       alignItems(alignItems_),
-      padding2(~v=px(9), ~h=zero),
+      padding2(~v=px(16), ~h=zero),
     ])
   let cardItemHeading = style(. [
     display(#flex),
     flexDirection(column),
     flexGrow(0.),
     flexShrink(0.),
-    flexBasis(#percent(25.)),
+    flexBasis(#percent(40.)),
   ])
   let logo = style(. [width(px(20)), position(absolute), top(px(25)), right(zero)])
   let cardItemHeadingLg = style(. [padding2(~v=px(10), ~h=zero)])
   let infoContainer = isOneColumn =>
-    style(. [width(#percent(100.)), marginTop(isOneColumn ? px(10) : zero), overflow(hidden)])
+    style(. [width(#percent(100.)), marginTop(isOneColumn ? px(10) : zero)])
   let toggle = (theme: Theme.t) =>
     style(. [
       borderTop(px(1), solid, theme.neutral_300),
@@ -65,20 +65,22 @@ module InnerPanel = {
       }
       <div
         className={Styles.cardItem(alignItem, isOneColumn)} key={idx ++ index->Belt.Int.toString}>
-        <div className=Styles.cardItemHeading>
-          {heading
-          ->Js.String2.split("\n")
-          ->Belt.Array.map(each => {
-            switch value {
-            | InfoMobileCard.Nothing =>
-              <div className=Styles.cardItemHeadingLg>
-                <Text key=each value=each size=Text.Body2 />
-              </div>
-            | _ => <Text key=each value=each size=Text.Body2 weight=Text.Semibold />
-            }
-          })
-          ->React.array}
-        </div>
+        {heading->Js.String2.trim->Js.String2.length === 0
+          ? React.null
+          : <div className=Styles.cardItemHeading>
+              {heading
+              ->Js.String2.split("\n")
+              ->Belt.Array.map(each => {
+                switch value {
+                | InfoMobileCard.Nothing =>
+                  <div className=Styles.cardItemHeadingLg>
+                    <Text key=each value=each size=Text.Body2 />
+                  </div>
+                | _ => <Text key=each value=each size=Text.Xl weight=Text.Semibold />
+                }
+              })
+              ->React.array}
+            </div>}
         <div className={Styles.infoContainer(isOneColumn)}>
           <InfoMobileCard info=value />
         </div>

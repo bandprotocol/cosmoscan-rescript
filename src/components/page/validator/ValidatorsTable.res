@@ -10,49 +10,30 @@ module Styles = {
       cursor(#pointer),
       justifyContent(isRight ? #flexEnd : #flexStart),
     ])
+  let uptimeContainer = (~isLogin, ()) =>
+    style(. [width(#percent(isLogin ? 100. : 60.)), marginLeft(#auto)])
   let oracleStatus = style(. [display(#flex), justifyContent(#center)])
   let logo = style(. [width(#px(20))])
 }
 
-type sort_direction_t =
-  | ASC
-  | DESC
+type sort_t =
+  | Rank
+  | Name
+  | VotingPower
+  | Commission
+  | APR
+  | Uptime
 
-type sort_by_t =
-  | NameAsc
-  | NameDesc
-  | VotingPowerAsc
-  | VotingPowerDesc
-  | CommissionAsc
-  | CommissionDesc
-  | UptimeAsc
-  | UptimeDesc
-
-let getDirection = x =>
-  switch x {
-  | NameAsc
-  | VotingPowerAsc
-  | CommissionAsc
-  | UptimeAsc =>
-    ASC
-  | NameDesc
-  | VotingPowerDesc
-  | CommissionDesc
-  | UptimeDesc =>
-    DESC
+let parseSortString = sortOption => {
+  switch sortOption {
+  | Rank => "Rank"
+  | Name => "Name"
+  | VotingPower => "Voting Power"
+  | Commission => "Commission"
+  | APR => "Est. APR"
+  | Uptime => "Uptime"
   }
-
-let getName = x =>
-  switch x {
-  | NameAsc => "Validator Name (A-Z)"
-  | NameDesc => "Validator name (Z-A)"
-  | VotingPowerAsc => "Voting Power (Low-High)"
-  | VotingPowerDesc => "Voting Power (High-Low)"
-  | CommissionAsc => "Commission (Low-High)"
-  | CommissionDesc => "Commission (High-Low)"
-  | UptimeAsc => "Uptime (Low-High)"
-  | UptimeDesc => "Uptime (High-Low)"
-  }
+}
 
 let compareString = (a, b) => {
   let removeEmojiRegex = %re(`/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g`)
@@ -69,29 +50,33 @@ let defaultCompare = (a: Validator.t, b: Validator.t) =>
     compareString(a.moniker, b.moniker)
   }
 
-let sorting = (validators: array<Validator.t>, sortedBy) => {
+let sorting = (validators: array<Validator.t>, sortedBy, sortDirection) => {
   validators
   ->Belt.List.fromArray
   ->Belt.List.sort((a, b) => {
     let result = {
-      switch sortedBy {
-      | NameAsc => compareString(b.moniker, a.moniker)
-      | NameDesc => compareString(a.moniker, b.moniker)
-      | VotingPowerAsc => compare(a.tokens, b.tokens)
-      | VotingPowerDesc => compare(b.tokens, a.tokens)
-      | CommissionAsc => compare(a.commission, b.commission)
-      | CommissionDesc => compare(b.commission, a.commission)
-      | UptimeAsc =>
+      switch (sortedBy, sortDirection) {
+      | (Rank, Sort.ASC) => compare(b.rank, a.rank)
+      | (Rank, DESC) => compare(a.rank, b.rank)
+      | (Name, ASC) => compareString(a.moniker, b.moniker)
+      | (Name, DESC) => compareString(b.moniker, a.moniker)
+      | (VotingPower, ASC) => compare(a.tokens, b.tokens)
+      | (VotingPower, DESC) => compare(b.tokens, a.tokens)
+      | (Commission, ASC) => compare(a.commission, b.commission)
+      | (Commission, DESC) => compare(b.commission, a.commission)
+      | (APR, ASC) => compare(a.commission, b.commission) // TODO: change to APR
+      | (APR, DESC) => compare(b.commission, a.commission) // TODO: change to APR
+      | (Uptime, ASC) =>
         compare(a.uptime->Belt.Option.getWithDefault(0.), b.uptime->Belt.Option.getWithDefault(0.))
-      | UptimeDesc =>
+      | (Uptime, DESC) =>
         compare(b.uptime->Belt.Option.getWithDefault(0.), a.uptime->Belt.Option.getWithDefault(0.))
       }
     }
     if result != 0 {
       result
     } else {
-      switch sortedBy {
-      | VotingPowerAsc => defaultCompare(b, a)
+      switch (sortedBy, sortDirection) {
+      | (VotingPower, Sort.ASC) => defaultCompare(b, a)
       | _ => defaultCompare(a, b)
       }
     }
@@ -131,42 +116,6 @@ let addUptimeOnValidators = (
   })
 }
 
-module SortableTHead = {
-  @react.component
-  let make = (
-    ~title,
-    ~asc,
-    ~desc,
-    ~toggle,
-    ~sortedBy,
-    ~isRight=false,
-    ~tooltipItem=?,
-    ~tooltipPlacement=Text.AlignBottomStart,
-  ) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-
-    <div className={Styles.sortableTHead(isRight)} onClick={_ => toggle(asc, desc)}>
-      <Text
-        block=true
-        value=title
-        size=Text.Caption
-        weight=Text.Semibold
-        transform=Text.Uppercase
-        tooltipItem={tooltipItem->Belt.Option.mapWithDefault(React.null, React.string)}
-        tooltipPlacement
-      />
-      <HSpacing size=Spacing.xs />
-      {if sortedBy == asc {
-        <Icon name="fas fa-caret-down" color={theme.neutral_600} />
-      } else if sortedBy == desc {
-        <Icon name="fas fa-caret-up" color={theme.neutral_600} />
-      } else {
-        <Icon name="fas fa-sort" color={theme.neutral_600} />
-      }}
-    </div>
-  }
-}
-
 module RenderBody = {
   @react.component
   let make = (
@@ -175,108 +124,139 @@ module RenderBody = {
     ~votingPower,
     ~dispatchModal: ModalContext.a => unit,
     ~isLogin,
+    ~templateColumns,
   ) => {
-    <TBody>
-      <Row alignItems=Row.Center>
-        <Col col=Col.One>
-          {switch validatorSub {
-          | Data(_) => <Text value={rank->Belt.Int.toString} block=true />
-          | _ => <LoadingCensorBar width=20 height=15 />
-          }}
-        </Col>
-        <Col col=Col.Two>
-          {switch validatorSub {
-          | Data({operatorAddress, moniker, identity}) =>
-            <ValidatorMonikerLink
-              validatorAddress=operatorAddress moniker identity width={#px(180)}
+    let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
+
+    <TBody paddingV=#px(16)>
+      <TableGrid templateColumns>
+        // rank
+        {switch validatorSub {
+        | Data(_) => <Text value={rank->Belt.Int.toString} block=true />
+        | _ => <LoadingCensorBar width=20 height=15 />
+        }}
+        // moniker
+        {switch validatorSub {
+        | Data({operatorAddress, moniker, identity, isActive}) =>
+          <ValidatorMonikerLink
+            validatorAddress=operatorAddress
+            moniker
+            identity
+            width={#px(180)}
+            avatarWidth=24
+            isActive
+          />
+        | _ => <LoadingCensorBar width=150 height=15 />
+        }}
+        // voting power
+        {switch validatorSub {
+        | Data({tokens}) =>
+          <div
+            className={CssHelper.flexBox(
+              ~justify=#center,
+              ~direction=#column,
+              ~align=#flexEnd,
+              (),
+            )}>
+            <Text
+              value={votingPower->Format.fPercent(~digits=2)}
+              block=true
+              size=Text.Body1
+              weight=Text.Bold
+              color={theme.neutral_900}
             />
-          | _ => <LoadingCensorBar width=150 height=15 />
-          }}
-        </Col>
-        <Col col=Col.Two>
-          {switch validatorSub {
-          | Data({tokens}) =>
-            <div>
-              <Text
-                value={tokens->Coin.getBandAmountFromCoin->Format.fPretty(~digits=0)} block=true
-              />
-              <VSpacing size=Spacing.sm />
-              <Text value={"(" ++ votingPower->Format.fPercent(~digits=2) ++ ")"} block=true />
+            <VSpacing size=Spacing.sm />
+            <Text
+              value={tokens->Coin.getBandAmountFromCoin->Format.fPretty(~digits=0)}
+              block=true
+              code=true
+            />
+          </div>
+        | _ =>
+          <div
+            className={CssHelper.flexBox(
+              ~justify=#center,
+              ~direction=#column,
+              ~align=#flexEnd,
+              (),
+            )}>
+            <LoadingCensorBar width=40 height=25 />
+            <VSpacing size=Spacing.sm />
+            <LoadingCensorBar width=80 height=15 />
+          </div>
+        }}
+        // commission
+        {switch validatorSub {
+        | Data({commission}) =>
+          <Text
+            value={commission->Format.fPercent(~digits=2)}
+            block=true
+            align=Right
+            code=true
+            size=Body1
+          />
+        | _ => <LoadingCensorBar width=70 height=15 isRight=true />
+        }}
+        // apr
+        // TODO: wire up
+        <Text value="00.00%" code=true align=Right size=Body1 />
+        // uptime
+        {switch validatorSub {
+        | Data({uptime}) =>
+          switch uptime {
+          | Some(uptime') =>
+            <div className={Styles.uptimeContainer(~isLogin, ())}>
+              <Text value={uptime'->Format.fPercent(~digits=2)} code=true align=Right size=Body1 />
+              <VSpacing size=Spacing.xs />
+              <ProgressBar.Uptime percent=uptime' />
             </div>
-          | _ =>
-            <>
-              <LoadingCensorBar width=100 height=15 />
-              <VSpacing size=Spacing.sm />
-              <LoadingCensorBar width=40 height=15 />
-            </>
-          }}
-        </Col>
-        <Col col=Col.Two>
+          | None => <Text value="N/A" block=true />
+          }
+        | _ =>
+          <div>
+            <LoadingCensorBar width=60 height=15 isRight=true />
+            <VSpacing size=Spacing.xs />
+            <LoadingCensorBar width=70 height=15 isRight=true />
+          </div>
+        }}
+        // oracle status
+        <div className=Styles.oracleStatus>
           {switch validatorSub {
-          | Data({commission}) => <Text value={commission->Format.fPercent(~digits=2)} block=true />
-          | _ => <LoadingCensorBar width=70 height=15 />
+          | Data({oracleStatus}) =>
+            <img
+              alt="Status Icon"
+              src={oracleStatus ? Images.success : Images.fail}
+              className=Styles.logo
+            />
+          | _ => <LoadingCensorBar width=20 height=20 radius=50 />
           }}
-        </Col>
-        <Col col={isLogin ? Col.Two : Three}>
-          {switch validatorSub {
-          | Data({uptime}) =>
-            switch uptime {
-            | Some(uptime') =>
-              <>
-                <Text value={uptime'->Format.fPercent(~digits=2)} block=true />
-                <VSpacing size=Spacing.sm />
-                <ProgressBar.Uptime percent=uptime' />
-              </>
-            | None => <Text value="N/A" block=true />
-            }
-          | _ =>
-            <>
-              <LoadingCensorBar width=50 height=15 />
-              <VSpacing size=Spacing.sm />
-              <LoadingCensorBar width=130 height=15 />
-            </>
-          }}
-        </Col>
-        <Col col={isLogin ? Col.Three : Two}>
-          <div className={CssHelper.flexBox(~justify=isLogin ? #spaceBetween : #center, ())}>
-            <div className=Styles.oracleStatus>
+        </div>
+        // delegation
+        {isLogin
+          ? <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
               {switch validatorSub {
-              | Data({oracleStatus}) =>
-                <img
-                  alt="Status Icon"
-                  src={oracleStatus ? Images.success : Images.fail}
-                  className=Styles.logo
-                />
-              | _ => <LoadingCensorBar width=20 height=20 radius=50 />
+              | Data({operatorAddress, commission}) =>
+                let delegate = () =>
+                  operatorAddress->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
+                <Button
+                  variant=Button.Outline
+                  onClick={_ => {
+                    commission == 100.
+                      ? {
+                          open Webapi.Dom
+                          window->Window.alert(
+                            "Delegation to foundation validator nodes is not advised.",
+                          )
+                        }
+                      : delegate()
+                  }}>
+                  {"Delegate"->React.string}
+                </Button>
+              | _ => <LoadingCensorBar width=90 height=33 radius=8 />
               }}
             </div>
-            {isLogin
-              ? <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                  {switch validatorSub {
-                  | Data({operatorAddress, commission}) =>
-                    let delegate = () =>
-                      operatorAddress->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
-                    <Button
-                      variant=Button.Outline
-                      onClick={_ => {
-                        commission == 100.
-                          ? {
-                              open Webapi.Dom
-                              window->Window.alert(
-                                "Delegation to foundation validator nodes is not advised.",
-                              )
-                            }
-                          : delegate()
-                      }}>
-                      {"Delegate"->React.string}
-                    </Button>
-                  | _ => <LoadingCensorBar width=90 height=33 radius=8 />
-                  }}
-                </div>
-              : React.null}
-          </div>
-        </Col>
-      </Row>
+          : React.null}
+      </TableGrid>
     </TBody>
   }
 }
@@ -285,19 +265,26 @@ module RenderBodyMobile = {
   @react.component
   let make = (~rank, ~validatorSub: Sub.variant<Validator.t>, ~votingPower) => {
     switch validatorSub {
-    | Data({operatorAddress, moniker, identity, tokens, commission, uptime, oracleStatus}) =>
+    | Data({
+        operatorAddress,
+        moniker,
+        identity,
+        tokens,
+        commission,
+        uptime,
+        oracleStatus,
+        isActive,
+      }) =>
       <MobileCard
-        values={
-          open InfoMobileCard
-          [
-            ("Rank", Count(rank)),
-            ("Validator", Validator(operatorAddress, moniker, identity)),
-            ("Voting\nPower", VotingPower(tokens, votingPower)),
-            ("Commission", Float(commission, Some(2))),
-            ("Uptime (%)", Uptime(uptime)),
-            ("Oracle Status", Status(oracleStatus)),
-          ]
-        }
+        values={[
+          ("", Count(rank)),
+          ("", Validator({address: operatorAddress, moniker, identity, isActive})),
+          ("Voting Power", InfoMobileCard.VotingPower(tokens, votingPower)),
+          ("Commission", Percentage(commission, Some(2))),
+          ("Est. APR", Percentage(19., Some(2))), // TODO: wire up
+          ("Uptime", InfoMobileCard.Uptime(uptime)),
+          ("Oracle Status", Status(oracleStatus)),
+        ]}
         key={rank->Belt.Int.toString}
         idx={rank->Belt.Int.toString}
       />
@@ -306,11 +293,12 @@ module RenderBodyMobile = {
         values={
           open InfoMobileCard
           [
-            ("Rank", Loading(70)),
-            ("Validator", Loading(166)),
-            ("Voting\nPower", Loading(166)),
+            ("", Loading(70)),
+            ("", Loading(166)),
+            ("Voting Power", Loading(166)),
             ("Commission", Loading(136)),
-            ("Uptime (%)", Loading(200)),
+            ("Est. APR", Loading(136)),
+            ("Uptime", Loading(200)),
             ("Oracle Status", Loading(20)),
           ]
         }
@@ -322,83 +310,79 @@ module RenderBodyMobile = {
 }
 
 @react.component
-let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
+let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy, ~direction, ~setDirection) => {
   let isMobile = Media.isMobile()
   let pageSize = 10
-  let toggle = (sortedByAsc, sortedByDesc) =>
-    if sortedBy == sortedByDesc {
-      setSortedBy(_ => sortedByAsc)
-    } else {
-      setSortedBy(_ => sortedByDesc)
-    }
+
+  let toggle = (direction, sortValue) => {
+    setSortedBy(_ => sortValue)
+    setDirection(_ => {
+      switch direction {
+      | Sort.ASC => Sort.DESC
+      | DESC => ASC
+      }
+    })
+  }
 
   let (accountOpt, _) = React.useContext(AccountContext.context)
   let (_, dispatchModal) = React.useContext(ModalContext.context)
-  let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.isDarkMode: isDarkMode, theme}, _) = ThemeContext.use()
 
   let isLogin = accountOpt->Belt.Option.isSome
+
+  let templateColumns = [#fr(0.5), #fr(1.5), #repeat(#num(isLogin ? 6 : 5), #fr(1.))]
+
   <>
     {isMobile
       ? React.null
-      : <THead>
-          <Row alignItems=Row.Center>
-            <Col col=Col.One>
-              <Text
-                block=true
-                value="Rank"
-                weight=Text.Semibold
-                transform=Text.Uppercase
-                size=Text.Caption
-              />
-            </Col>
-            <Col col=Col.Two>
-              <SortableTHead
-                title="Validator" asc=NameAsc desc=NameDesc toggle sortedBy isRight=false
-              />
-            </Col>
-            <Col col=Col.Two>
-              <SortableTHead
-                title="Voting Power"
-                asc=VotingPowerAsc
-                desc=VotingPowerDesc
-                toggle
-                sortedBy
-                tooltipItem="Sum of self-bonded and delegated tokens"
-              />
-            </Col>
-            <Col col=Col.Two>
-              <SortableTHead
-                title="Commision"
-                asc=CommissionAsc
-                desc=CommissionDesc
-                toggle
-                sortedBy
-                tooltipItem="Validator service fees charged to delegators"
-              />
-            </Col>
-            <Col col={isLogin ? Col.Two : Three}>
-              <SortableTHead
-                title="Uptime (%)"
-                asc=UptimeAsc
-                desc=UptimeDesc
-                toggle
-                sortedBy
-                isRight=false
-                tooltipItem="Percentage of the blocks that the validator is active for out of the last 100"
-              />
-            </Col>
-            <Col col=Col.Two>
-              <Text
-                block=true
-                transform=Text.Uppercase
-                size=Text.Caption
-                weight=Text.Semibold
-                align={isLogin ? Text.Left : Center}
-                value="Oracle Status"
-                tooltipItem={"The validator's Oracle status"->React.string}
-              />
-            </Col>
-          </Row>
+      : <THead height=36>
+          <TableGrid templateColumns={templateColumns}>
+            <SortableTHead title="Rank" direction toggle value=Rank sortedBy />
+            <SortableTHead title="Validator Name" direction toggle value=Name sortedBy />
+            <SortableTHead
+              title="Voting Power"
+              direction
+              toggle
+              value=VotingPower
+              sortedBy
+              justify=Right
+              tooltipItem="Sum of self-bonded and delegated tokens"
+            />
+            <SortableTHead
+              title="Commision"
+              direction
+              toggle
+              value=Commission
+              sortedBy
+              justify=Right
+              tooltipItem="Fee charged by the validator for their services, deducted from delegators' rewards."
+            />
+            <SortableTHead
+              title="Est. APR"
+              direction
+              toggle
+              value=APR
+              sortedBy
+              justify=Right
+              tooltipItem="Estimated annual return on staked tokens with a validator, calculated based on rewards and commission rate"
+            />
+            <SortableTHead
+              title="Uptime"
+              direction
+              toggle
+              value=Uptime
+              sortedBy
+              justify=Right
+              tooltipItem="Percentage of time the validator's node has been operational and connected to the network out of the last 100 blocks. High uptime is important for validators, as it affects the security of the blockchain network and their ability to earn rewards."
+            />
+            <Text
+              block=true
+              weight=Text.Semibold
+              align=Center
+              value="Oracle Status"
+              tooltipItem={"The validator's Oracle status"->React.string}
+            />
+          </TableGrid>
         </THead>}
     {switch allSub {
     | Sub.Data(((_, _, bondedTokenCount: Coin.t, _, _), rawValidators, votesBlock)) =>
@@ -412,7 +396,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
       <>
         {filteredValidator->Belt.Array.length > 0
           ? filteredValidator
-            ->sorting(sortedBy)
+            ->sorting(sortedBy, direction)
             ->Belt.Array.mapWithIndex((idx, each) => {
               let votingPower = each.votingPower /. bondedTokenCount.amount *. 100.
               isMobile
@@ -429,6 +413,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
                     votingPower
                     dispatchModal
                     isLogin
+                    templateColumns={templateColumns}
                   />
             })
             ->React.array
@@ -461,6 +446,7 @@ let make = (~allSub, ~searchTerm, ~sortedBy, ~setSortedBy) => {
               votingPower=1.0
               isLogin
               dispatchModal={_ => ()}
+              templateColumns={templateColumns}
             />
       )
       ->React.array

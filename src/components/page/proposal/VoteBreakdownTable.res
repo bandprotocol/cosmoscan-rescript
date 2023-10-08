@@ -95,7 +95,7 @@ module RenderBodyMobile = {
               {
                 switch validator {
                 | Some({operatorAddress, moniker, identity}) =>
-                  Validator(operatorAddress, moniker, identity)
+                  Validator({address: operatorAddress, moniker, identity})
                 | None => Address(voter, 200, #account)
                 }
               },

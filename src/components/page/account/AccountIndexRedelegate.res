@@ -91,8 +91,14 @@ module RenderBodyMobile = {
         values={
           open InfoMobileCard
           [
-            ("Source\nValidator", Validator(srcAddress, srcMoniker, srcIdentity)),
-            ("Destination\nValidator", Validator(dstAddress, dstMoniker, dstIdentity)),
+            (
+              "Source\nValidator",
+              Validator({address: srcAddress, moniker: srcMoniker, identity: srcIdentity}),
+            ),
+            (
+              "Destination\nValidator",
+              Validator({address: dstAddress, moniker: dstMoniker, identity: dstIdentity}),
+            ),
             ("Amount\n(BAND)", Coin({value: list{amount}, hasDenom: false})),
             ("Redelegate\nComplete At", Timestamp(completionTime)),
           ]

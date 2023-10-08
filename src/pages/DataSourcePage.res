@@ -17,7 +17,6 @@ let make = () => {
 
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
 
-
   <Section>
     <div className={CssHelper.container}>
       <div className={CssHelper.mb(~size=24, ())}>
@@ -35,7 +34,7 @@ let make = () => {
     <div className={CssHelper.container}>
       <div id="section_datasource">
         <SearchInput
-          placeholder="Search Data Source Name / ID" onChange=setSearchTerm maxWidth=460
+          placeholder="Search Data Source Name / ID" onChange=setSearchTerm maxWidth=#px(460)
         />
       </div>
       <div className={Styles.tableWrapper}>

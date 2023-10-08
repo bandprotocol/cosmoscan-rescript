@@ -33,7 +33,7 @@ type t =
   | Timestamp(MomentRe.Moment.t)
   | TxHash(Hash.t, int)
   | BlockHash(Hash.t)
-  | Validator(Address.t, string, string)
+  | Validator({address: Address.t, moniker: string, identity: string, isActive?: bool})
   | Messages(Hash.t, list<Msg.result_t>, bool, string)
   | MsgBadgeGroup(Hash.t, list<Msg.result_t>)
   | PubKey(PubKey.t)
@@ -59,11 +59,13 @@ module Styles = {
       borderRadius(px(15)),
     ])
   let logo = style(. [width(px(20))])
+
+  let uptimeContainer = style(. [width(#percent(70.))])
 }
 
 @react.component
 let make = (~info) => {
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
 
   switch info {
   | Address(address, width, accountType) =>
@@ -76,7 +78,7 @@ let make = (~info) => {
     </div>
   | Coin({value, hasDenom}) =>
     <AmountRender coins=value pos={hasDenom ? AmountRender.TxIndex : Fee} />
-  | Count(value) => <Text value={value->Format.iPretty} size=Text.Body2 />
+  | Count(value) => <Text value={value->Format.iPretty} size=Xl />
   | DataSource(id, name) =>
     <div className=Styles.vFlex>
       <TypeID.DataSource id position=TypeID.MobileCard />
@@ -101,7 +103,7 @@ let make = (~info) => {
   | RequestStatus(resolveStatus, text) => <RequestStatus resolveStatus text size=Text.Xl />
   | ProgressBar({reportedValidators, minimumValidators, requestValidators}) =>
     <ProgressBar reportedValidators minimumValidators requestValidators />
-  | Float(value, digits) => <Text value={value->Format.fPretty(~digits?)} />
+  | Float(value, digits) => <Text value={value->Format.fPretty(~digits?)} code=true size=Xl />
   | KVTableReport(heading, rawReports) =>
     <KVTable
       headers=heading
@@ -131,12 +133,12 @@ let make = (~info) => {
     }
   | CopyButton(calldata) =>
     <CopyButton data={calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125 />
-  | Percentage(value, digits) => <Text value={value->Format.fPercent(~digits?)} />
+  | Percentage(value, digits) => <Text value={value->Format.fPercent(~digits?)} code=true size=Xl />
   | Text(text) => <Text value=text spacing={Text.Em(0.02)} nowrap=true ellipsis=true block=true />
   | Timestamp(time) => <Timestamp time size=Text.Body2 weight=Text.Regular />
-  | Validator(address, moniker, identity) =>
+  | Validator({address, moniker, identity, ?isActive}) =>
     <ValidatorMonikerLink
-      validatorAddress=address moniker size=Text.Body2 identity width={#px(230)}
+      validatorAddress=address moniker size=Text.Xl identity width={#px(230)} ?isActive
     />
   | PubKey(publicKey) => <PubKeyRender alignLeft=true pubKey=publicKey display=#block />
   | TxHash(txHash, width) => <TxLink txHash width size=Text.Xl />
@@ -154,10 +156,21 @@ let make = (~info) => {
   | Badge(_) => React.null
   | VotingPower(tokens, votingPercent) =>
     <div className=Styles.vFlex>
-      <Text value={tokens->Coin.getBandAmountFromCoin->Format.fPretty(~digits=0)} block=true />
+      <Text
+        value={votingPercent->Format.fPercent(~digits=2)}
+        block=true
+        size=Xl
+        weight=Bold
+        color=theme.neutral_900
+        code=true
+      />
       <HSpacing size=Spacing.sm />
       <Text
-        value={"(" ++ votingPercent->Format.fPercent(~digits=2) ++ ")"} weight=Text.Thin block=true
+        value={"(" ++ tokens->Coin.getBandAmountFromCoin->Format.fPretty(~digits=0) ++ ")"}
+        weight=Text.Thin
+        block=true
+        size=Xl
+        code=true
       />
     </div>
   | Status(status) => <StatusIcon status />
@@ -165,8 +178,14 @@ let make = (~info) => {
   | Uptime(uptimeOpt) =>
     switch uptimeOpt {
     | Some(uptime) =>
-      <div className=Styles.vFlex>
-        <Text value={uptime->Format.fPercent(~digits=2)} spacing={Text.Em(0.02)} nowrap=true />
+      <div className={Css.merge(list{Styles.vFlex, Styles.uptimeContainer})}>
+        <Text
+          value={uptime->Format.fPercent(~digits=2)}
+          spacing={Text.Em(0.02)}
+          nowrap=true
+          code=true
+          size=Xl
+        />
         <HSpacing size=Spacing.lg />
         <ProgressBar.Uptime percent=uptime />
       </div>

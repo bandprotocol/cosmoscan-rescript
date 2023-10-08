@@ -10,6 +10,19 @@ module Styles = {
       selector("> span:hover", [color(theme.primary_600)]),
       selector("> span", [transition(~duration=200, "all")]),
     ])
+
+  let avatarContainer = style(. [position(relative)])
+
+  let validatorStatus = (~isActive, ~theme: Theme.t, ()) =>
+    style(. [
+      width(#px(10)),
+      height(#px(10)),
+      backgroundColor(isActive ? theme.success_600 : theme.error_600),
+      position(absolute),
+      right(#px(-3)),
+      top(#px(-3)),
+      borderRadius(#percent(50.)),
+    ])
 }
 
 @react.component
@@ -22,8 +35,9 @@ let make = (
   ~underline=false,
   ~width=#auto,
   ~avatarWidth=20,
+  ~isActive=?,
 ) => {
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
 
   <Link
     className={Styles.container(width, theme)}
@@ -31,7 +45,13 @@ let make = (
     {switch identity {
     | Some(identity') =>
       <>
-        <Avatar moniker identity=identity' width=avatarWidth />
+        <div className=Styles.avatarContainer>
+          <Avatar moniker identity=identity' width=avatarWidth />
+          {switch isActive {
+          | None => React.null
+          | Some(value) => <div className={Styles.validatorStatus(~isActive=value, ~theme, ())} />
+          }}
+        </div>
         <HSpacing size=Spacing.sm />
       </>
     | None => React.null

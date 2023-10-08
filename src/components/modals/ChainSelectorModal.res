@@ -70,7 +70,7 @@ let make = (~targetChain) => {
       {"Back"->React.string}
     </Button>
     <Heading value="Select Chain" size=Heading.H4 marginBottom=24 marginTop=24 />
-    <SearchInput placeholder="Search Chain" onChange=setSearchTerm maxWidth=512 />
+    <SearchInput placeholder="Search Chain" onChange=setSearchTerm maxWidth=#px(512) />
     <div className=Styles.selectorPanel>
       {switch transferableChainsQuery {
       | Data(transferableChains) =>

@@ -77,7 +77,11 @@ module BodyMobile = {
             ("Block Hash", BlockHash(hash)),
             (
               "Proposer",
-              Validator(validator.operatorAddress, validator.moniker, validator.identity),
+              Validator({
+                address: validator.operatorAddress,
+                moniker: validator.moniker,
+                identity: validator.identity,
+              }),
             ),
             ("Txn", Count(txn)),
             ("Timestamp", Timestamp(timestamp)),

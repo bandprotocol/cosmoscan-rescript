@@ -7,7 +7,7 @@ module Styles = {
       boxSizing(#borderBox),
       zIndex(1),
       position(#relative),
-      maxWidth(#px(maxWidth_)),
+      maxWidth(maxWidth_),
       Media.mobile([maxWidth(#percent(100.))]),
     ])
 
@@ -59,7 +59,7 @@ module Styles = {
 }
 
 @react.component
-let make = (~placeholder, ~onChange, ~debounce=500, ~maxWidth=240) => {
+let make = (~placeholder, ~onChange, ~debounce=500, ~maxWidth=#px(240)) => {
   let (changeValue, setChangeValue) = React.useState(_ => "")
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let (isSearching, setIsSearching) = React.useState(_ => false)

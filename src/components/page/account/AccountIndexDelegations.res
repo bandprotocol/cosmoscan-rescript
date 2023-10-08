@@ -116,7 +116,7 @@ module RenderBodyMobile = {
         values={
           open InfoMobileCard
           [
-            ("Validator", Validator(operatorAddress, moniker, identity)),
+            ("Validator", Validator({address: operatorAddress, moniker, identity})),
             ("Amount\n(BAND)", Coin({value: list{amount}, hasDenom: false})),
             ("Reward\n(BAND)", Coin({value: list{reward}, hasDenom: false})),
           ]

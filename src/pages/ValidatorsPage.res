@@ -23,8 +23,11 @@ let make = () => {
 
   let (prevDayTime, setPrevDayTime) = React.useState(getPrevDay)
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
-  let (sortedBy, setSortedBy) = React.useState(_ => ValidatorsTable.VotingPowerDesc)
+  // TODO: wire up
   let (isActive, setIsActive) = React.useState(_ => true)
+  let (filterType, setFilterType) = React.useState(_ => ValidatorsFilter.Active)
+  let (sortedBy, setSortedBy) = React.useState(_ => ValidatorsTable.VotingPower)
+  let (direction, setDirection) = React.useState(_ => Sort.DESC)
 
   React.useEffect0(() => {
     let timeOutID = Js.Global.setInterval(() => {setPrevDayTime(getPrevDay)}, 60_000)
@@ -184,43 +187,44 @@ let make = () => {
           </InfoContainer>
         </Col>
       </Row>
-      <Row marginTop=32 marginBottom=16>
-        <Col col=Col.Six colSm=Col.Eight mbSm=16>
-          <SearchInput placeholder="Search Validator" onChange=setSearchTerm />
+      // Search and filter
+      <Row marginTop=40 marginBottom=16 marginTopSm=24 marginBottomSm=24 alignItems=Center>
+        {isMobile
+          ? <Col>
+              <Heading value="All Validators" size=H3 weight=Semibold color=theme.neutral_900 />
+              <ValidatorsFilter setFilterType filterType />
+            </Col>
+          : React.null}
+        <Col col=Col.Four>
+          <SearchInput
+            placeholder="Search by Validator Name" onChange=setSearchTerm maxWidth=#percent(100.)
+          />
         </Col>
         {isMobile
-          ? <Col col=Col.Six colSm=Col.Four mbSm=16>
-              <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                // // TODO: modify this in new validator page UI
-                // <SortableDropdown
-                //   sortedBy
-                //   setSortedBy
-                //   sortList={
-                //     open ValidatorsTable
-                //     list{
-                //       (NameAsc, getName(NameAsc)),
-                //       (NameDesc, getName(NameDesc)),
-                //       (VotingPowerAsc, getName(VotingPowerAsc)),
-                //       (VotingPowerDesc, getName(VotingPowerDesc)),
-                //       (CommissionAsc, getName(CommissionAsc)),
-                //       (CommissionDesc, getName(CommissionDesc)),
-                //       (UptimeAsc, getName(UptimeAsc)),
-                //       (UptimeDesc, getName(UptimeDesc)),
-                //     }
-                //   }
-                // />
+          ? React.null
+          : <Col col=Col.Eight>
+              <ValidatorsFilter setFilterType filterType />
+            </Col>}
+        {isMobile
+          ? <Col mtSm=24>
+              <div className={CssHelper.flexBox(~align=#center, ())}>
+                <Text value="Sort By" size=Xl />
+                <HSpacing size=Spacing.sm />
+                <SortDropdown
+                  sortedBy
+                  setSortedBy
+                  direction
+                  setDirection
+                  options={[ValidatorsTable.Rank, Name, VotingPower, Commission, APR, Uptime]}
+                  optionToString={ValidatorsTable.parseSortString}
+                />
               </div>
             </Col>
           : React.null}
-        <Col col=Col.Six>
-          <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-            <ToggleButton state=isActive setState=setIsActive nameArray=["Active", "Inactive"] />
-          </div>
-        </Col>
       </Row>
-      <InfoContainer>
+      <InfoContainer py=24>
         <Table>
-          <ValidatorsTable allSub searchTerm sortedBy setSortedBy />
+          <ValidatorsTable allSub searchTerm sortedBy setSortedBy direction setDirection />
         </Table>
       </InfoContainer>
     </div>

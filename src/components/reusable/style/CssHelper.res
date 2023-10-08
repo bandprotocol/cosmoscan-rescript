@@ -1,14 +1,32 @@
 open CssJs
 
-let flexBox = (~align=#center, ~justify=#flexStart, ~wrap=#wrap, ~direction=#row, ()) =>
+let flexBox = (
+  ~align=#center,
+  ~justify=#flexStart,
+  ~wrap=#wrap,
+  ~direction=#row,
+  ~cGap=#zero,
+  ~rGap=#zero,
+  (),
+) =>
   style(. [
     display(#flex),
     alignItems(align),
     justifyContent(justify),
     flexDirection(direction),
     flexWrap(wrap),
+    columnGap(cGap),
+    rowGap(rGap),
   ])
-let flexBoxSm = (~align=#center, ~justify=#flexStart, ~wrap=#wrap, ~direction=#row, ()) =>
+let flexBoxSm = (
+  ~align=#center,
+  ~justify=#flexStart,
+  ~wrap=#wrap,
+  ~direction=#row,
+  ~cGap=#zero,
+  ~rGap=#zero,
+  (),
+) =>
   style(. [
     Media.mobile([
       display(#flex),
@@ -16,6 +34,8 @@ let flexBoxSm = (~align=#center, ~justify=#flexStart, ~wrap=#wrap, ~direction=#r
       justifyContent(justify),
       flexDirection(direction),
       flexWrap(wrap),
+      columnGap(cGap),
+      rowGap(rGap),
     ]),
   ])
 
