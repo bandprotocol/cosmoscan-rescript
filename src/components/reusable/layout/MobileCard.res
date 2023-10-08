@@ -10,7 +10,7 @@ module Styles = {
     style(. [
       display(isOneColumn ? #block : #flex),
       alignItems(alignItems_),
-      padding2(~v=px(16), ~h=zero),
+      padding2(~v=px(8), ~h=zero),
     ])
   let cardItemHeading = style(. [
     display(#flex),

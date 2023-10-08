@@ -42,7 +42,7 @@ type t =
   | Uptime(option<float>)
   | Loading(int)
   | Text(string)
-  | Status(bool)
+  | Status({status: bool, withText?: bool})
   | Nothing
 
 module Styles = {
@@ -173,7 +173,7 @@ let make = (~info) => {
         code=true
       />
     </div>
-  | Status(status) => <StatusIcon status />
+  | Status({status, ?withText}) => <StatusIcon status ?withText />
   // Special case for uptime to have loading state inside.
   | Uptime(uptimeOpt) =>
     switch uptimeOpt {

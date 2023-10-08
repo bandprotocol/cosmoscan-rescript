@@ -56,8 +56,8 @@ let sorting = (validators: array<Validator.t>, sortedBy, sortDirection) => {
   ->Belt.List.sort((a, b) => {
     let result = {
       switch (sortedBy, sortDirection) {
-      | (Rank, Sort.ASC) => compare(b.rank, a.rank)
-      | (Rank, DESC) => compare(a.rank, b.rank)
+      | (Rank, Sort.ASC) => compare(a.rank, b.rank)
+      | (Rank, DESC) => compare(b.rank, a.rank)
       | (Name, ASC) => compareString(a.moniker, b.moniker)
       | (Name, DESC) => compareString(b.moniker, a.moniker)
       | (VotingPower, ASC) => compare(a.tokens, b.tokens)
@@ -283,7 +283,7 @@ module RenderBodyMobile = {
           ("Commission", Percentage(commission, Some(2))),
           ("Est. APR", Percentage(19., Some(2))), // TODO: wire up
           ("Uptime", InfoMobileCard.Uptime(uptime)),
-          ("Oracle Status", Status(oracleStatus)),
+          ("Oracle Status", Status({status: oracleStatus})),
         ]}
         key={rank->Belt.Int.toString}
         idx={rank->Belt.Int.toString}

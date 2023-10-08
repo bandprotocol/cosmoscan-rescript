@@ -62,7 +62,7 @@ module RenderBodyMobile = {
             ("Tx Hash", TxHash(txHash, isSmallMobile ? 170 : 200)),
             ("Block", Height(blockHeight)),
             ("Actions", MsgBadgeGroup(txHash, messages)),
-            ("Status", Status(success)),
+            ("Status", Status({status: success})),
           ]
         }
         key={txHash->Hash.toHex}

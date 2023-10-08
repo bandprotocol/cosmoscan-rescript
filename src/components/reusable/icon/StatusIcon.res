@@ -5,13 +5,13 @@ module Styles = {
 }
 
 @react.component
-let make = (~status) => {
+let make = (~status, ~withText=false) => {
   let isMobile = Media.isMobile()
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   <div className={CssHelper.flexBox(~align=#center, ())}>
     <img alt="Status Icon" src={status ? Images.success : Images.fail} className=Styles.statusImg />
-    {isMobile
+    {withText
       ? <Text
           value={status ? "Success" : "Fail"}
           size={isMobile ? Text.Body1 : Text.Body2}
