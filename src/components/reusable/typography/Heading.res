@@ -19,7 +19,14 @@ type align =
 
 module Styles = {
   open CssJs
-  let lineHeight = style(. [lineHeight(#em(1.41))])
+  let lineHeight = x =>
+    switch x {
+    | H1 => style(. [lineHeight(#px(40)), Media.mobile([lineHeight(#px(32))])])
+    | H2 => style(. [lineHeight(#px(32)), Media.mobile([lineHeight(#px(28))])])
+    | H3 => style(. [lineHeight(#px(28)), Media.mobile([lineHeight(#px(26))])])
+    | H4 => style(. [lineHeight(#px(22)), Media.mobile([lineHeight(#px(20))])])
+    | H5 => style(. [lineHeight(#px(20)), Media.mobile([lineHeight(#px(20))])])
+    }
   let fontSize = x =>
     switch x {
     | H1 => style(. [fontSize(#px(24)), Media.mobile([fontSize(#px(20))])])
@@ -86,7 +93,7 @@ let make = (
       Styles.fontWeight(weight),
       Styles.textColor(color->Belt.Option.getWithDefault(theme.neutral_900)),
       Styles.textAlign(align),
-      Styles.lineHeight,
+      Styles.lineHeight(size),
       Styles.mt(~mt=marginTop, ~mtSm=marginTopSm, ()),
       Styles.mb(~mb=marginBottom, ~mbSm=marginBottomSm, ()),
       mono ? Styles.mono : "",
