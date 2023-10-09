@@ -149,3 +149,9 @@ module RequestID = {
   let parse = datasourceID => datasourceID->ID.Request.fromInt
   let serialize = datasourceID => datasourceID->ID.Request.toInt
 }
+
+module GroupID = {
+  type t = ID.Group.t
+  let parse = groupID => groupID->ID.Group.fromInt
+  let serialize = groupID => groupID->ID.Group.toInt
+}

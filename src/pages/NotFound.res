@@ -27,27 +27,52 @@ module Styles = {
 @react.component
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let groupSub = GroupSub.getList(~pageSize=10, ~page=1, ())
+
   <Section>
     <div className=CssHelper.container>
       <VSpacing size=Spacing.xxxl />
       <div className={Styles.pageContainer(theme)}>
-        <div className={CssHelper.flexBox()}>
-          <img
-            src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
-            alt="Not Found"
-            className=Styles.logo
-          />
-        </div>
-        <VSpacing size=Spacing.xxxl />
-        <Text value="Oops! We cannot find the page you're looking for." size=Text.Body1 />
-        <VSpacing size=Spacing.lg />
-        <Link className=Styles.linkToHome route=Route.HomePage>
-          <Text value="Back to Homepage" weight=Text.Bold size=Text.Body1 color=theme.neutral_900 />
-          <HSpacing size=Spacing.md />
-          <Icon name="far fa-arrow-right" color=theme.neutral_900 />
-        </Link>
-        <VSpacing size=Spacing.xxxl />
+        {switch groupSub {
+        | Data(groupList) =>
+          groupList
+          ->Belt.Array.map(({id, admin, totalWeight}) =>
+            <div>
+              <Text value={id->ID.Group.toString} size=Text.Body1 />
+              <AddressRender address={admin} />
+              <Text value={totalWeight->Belt.Int.toString} size=Text.Body1 />
+              <VSpacing size=Spacing.md />
+            </div>
+          )
+          ->React.array
+
+        | _ => <Text value="" size=Text.Body1 />
+        }}
       </div>
     </div>
   </Section>
+
+  // <Section>
+  //   <div className=CssHelper.container>
+  //     <VSpacing size=Spacing.xxxl />
+  //     <div className={Styles.pageContainer(theme)}>
+  //       <div className={CssHelper.flexBox()}>
+  //         <img
+  //           src={isDarkMode ? Images.noOracleDark : Images.noOracleLight}
+  //           alt="Not Found"
+  //           className=Styles.logo
+  //         />
+  //       </div>
+  //       <VSpacing size=Spacing.xxxl />
+  //       <Text value="Oops! We cannot find the page you're looking for." size=Text.Body1 />
+  //       <VSpacing size=Spacing.lg />
+  //       <Link className=Styles.linkToHome route=Route.HomePage>
+  //         <Text value="Back to Homepage" weight=Text.Bold size=Text.Body1 color=theme.neutral_900 />
+  //         <HSpacing size=Spacing.md />
+  //         <Icon name="far fa-arrow-right" color=theme.neutral_900 />
+  //       </Link>
+  //       <VSpacing size=Spacing.xxxl />
+  //     </div>
+  //   </div>
+  // </Section>
 }
