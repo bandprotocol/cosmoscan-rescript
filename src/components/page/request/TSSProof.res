@@ -58,7 +58,6 @@ let make = (~signingDatumID: int) => {
 
   React.useEffect1(() => {
     let intervalID = Js.Global.setInterval(() => {
-      Js.log("interval")
 
       switch proofOpt {
       | Some(_) => ()
