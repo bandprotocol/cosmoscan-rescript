@@ -14,8 +14,6 @@ let make = () => {
   let (filterStr, setFilterStr) = React.useState(_ => "All")
 
   let proposalsSub = ProposalSub.getList(~pageSize, ~page=1, ())
-  let councilProposalSub = CouncilProposalSub.getList(~filter=filterStr, ~pageSize, ~page=1, ())
-  let councilProposalCount = CouncilProposalSub.count()
   let proposalCount = ProposalSub.count()
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)

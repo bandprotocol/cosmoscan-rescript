@@ -65,8 +65,25 @@ let createMsg = (msg: Msg.Input.t) => {
       delegatorAddress->Address.toBech32,
       validatorAddress->Address.toOperatorBech32,
     )
-  | VoteMsg({proposalID, option, voterAddress}) =>
-    MsgVote.create(proposalID->ID.Proposal.toInt, voterAddress->Address.toBech32, option)
+  | VetoMsg({proposalID, voterAddress, option}) =>
+    MsgVote.create(proposalID->ID.LegacyProposal.toInt, voterAddress->Address.toBech32, option)
+  | VoteMsg({proposalID, voterAddress, option}) =>
+    MsgVoteCouncil.create(proposalID->ID.Proposal.toInt, voterAddress->Address.toBech32, option)
+  | SubmitVetoProposal({initialDepositList, proposer, proposalID}) => {
+      let vetoProposal = BandChainJS.Proposal.VetoProposal.create(
+        proposalID->ID.Proposal.toInt,
+        `Veto Proposal against ${proposalID->ID.Proposal.toString}`,
+      )
+      MsgSubmitProposal.create(initialDepositList, proposer->Address.toBech32, vetoProposal)
+    }
+
+  | DepositMsg({proposalID, depositor, amount}) =>
+    MsgDeposit.create(
+      proposalID->ID.LegacyProposal.toInt,
+      depositor->Address.toBech32,
+      amount->Coin.toBandChainJsCoins,
+    )
+
   | IBCTransfer({sourcePort, sourceChannel, receiver, token, timeoutTimestamp, sender}) =>
     MsgTransfer.create(
       sourcePort,
@@ -121,7 +138,7 @@ let signTx = async (account: AccountContext.t, rawTx) => {
 
 let broadcastTx = async (client, signedTx) => {
   try {
-    let response = await client->BandChainJS.Client.sendTxBlockMode(signedTx)
+    let response = await client->BandChainJS.Client.sendTxSyncMode(signedTx)
     Belt.Result.Ok({
       txHash: response.txhash->Hash.fromHex,
       code: response.code,

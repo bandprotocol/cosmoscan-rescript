@@ -1,9 +1,10 @@
-type council_t = {name: CouncilSub.council_name_t}
+type council_t = {name: Council.council_name_t}
+type council_member_t = {since: MomentRe.Moment.t}
 
 type t = {
   balance: list<Coin.t>,
   commission: list<Coin.t>,
-  councilOpt: option<council_t>,
+  councilMembers: array<council_member_t>,
 }
 
 type validator_t = {commission: list<Coin.t>}
@@ -11,16 +12,16 @@ type validator_t = {commission: list<Coin.t>}
 type internal_t = {
   balance: list<Coin.t>,
   validator: option<validator_t>,
-  councilOpt: option<council_t>,
+  councilMembers: array<council_member_t>,
 }
 
-let toExternal = ({balance, validator, councilOpt}) => {
+let toExternal = ({balance, validator, councilMembers}) => {
   balance,
   commission: switch validator {
   | Some(validator') => validator'.commission
   | None => list{}
   },
-  councilOpt,
+  councilMembers,
 }
 
 module SingleConfig = %graphql(`
@@ -30,8 +31,8 @@ module SingleConfig = %graphql(`
       validator @ppxAs(type: "validator_t"){
         commission: accumulated_commission @ppxCustom(module: "GraphQLParserModule.Coins")
       }
-      councilOpt: council @ppxAs(type: "council_t") {
-        name @ppxCustom(module: "CouncilSub.CouncilName")
+      councilMembers: council_members @ppxAs(type: "council_member_t") {
+        since @ppxCustom(module: "GraphQLParserModule.Date")
       }
     }
   }
@@ -45,7 +46,7 @@ let get = address => {
   ->Query.flatMap(({accounts_by_pk}) => {
     switch accounts_by_pk {
     | Some(data) => Query.resolve(data->toExternal)
-    | None => Query.resolve({balance: list{}, commission: list{}, councilOpt: None})
+    | None => Query.resolve({balance: list{}, commission: list{}, councilMembers: []})
     }
   })
 }

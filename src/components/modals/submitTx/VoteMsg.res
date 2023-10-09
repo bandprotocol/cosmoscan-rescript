@@ -15,7 +15,11 @@ module VoteInput = {
       ->Belt.Array.map(option =>
         <React.Fragment key={option->Vote.YesNo.toString}>
           <VoteButton
-            isActive={answerOpt == option} variant=option onClick={_ => setAnswerOpt(_ => option)}
+            isActive={answerOpt->Belt.Option.getWithDefault(
+              BandChainJS.VOTE_OPTION_COUNCIL_UNSPECIFIED,
+            ) == option->Vote.YesNo.toBandChainJsCouncilVote}
+            variant=option
+            onClick={_ => setAnswerOpt(_ => Some(option->Vote.YesNo.toBandChainJsCouncilVote))}
           />
           <VSpacing size=Spacing.sm />
         </React.Fragment>
@@ -27,23 +31,23 @@ module VoteInput = {
 
 @react.component
 let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
-  let (answerOpt, setAnswerOpt) = React.useState(_ => Vote.YesNo.Unknown)
+  let (answerOpt, setAnswerOpt) = React.useState(_ => None)
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  // React.useEffect1(_ => {
-  //   let msgsOpt = {
-  //     let answer = answerOpt->Belt.Option.getWithDefault(1)
-  //     Some([
-  //       Msg.Input.VoteMsg({
-  //         voterAddress: address,
-  //         proposalID,
-  //         option: answer,
-  //       }),
-  //     ])
-  //   }
-  //   setMsgsOpt(_ => msgsOpt)
-  //   None
-  // }, [answerOpt])
+  React.useEffect1(_ => {
+    let msgsOpt = Belt.Option.flatMap(answerOpt, answer => {
+      Some([
+        Msg.Input.VoteMsg({
+          voterAddress: address,
+          proposalID,
+          option: answer,
+        }),
+      ])
+    })
+
+    setMsgsOpt(_ => msgsOpt)
+    None
+  }, [answerOpt])
 
   <>
     <div className=Styles.container>

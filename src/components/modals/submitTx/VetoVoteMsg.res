@@ -15,7 +15,10 @@ module VoteInput = {
       ->Belt.Array.map(option =>
         <React.Fragment key={option->Vote.Full.toString}>
           <VetoVoteButton
-            isActive={answerOpt == option} variant=option onClick={_ => setAnswerOpt(_ => option)}
+            isActive={answerOpt->Belt.Option.getWithDefault(BandChainJS.VOTE_OPTION_UNSPECIFIED) ==
+              option->Vote.Full.toBandChainJsVote}
+            variant=option
+            onClick={_ => setAnswerOpt(_ => Some(option->Vote.Full.toBandChainJsVote))}
           />
           <VSpacing size=Spacing.sm />
         </React.Fragment>
@@ -27,23 +30,22 @@ module VoteInput = {
 
 @react.component
 let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
-  let (answerOpt, setAnswerOpt) = React.useState(_ => Vote.Full.Unknown)
+  let (answerOpt, setAnswerOpt) = React.useState(_ => None)
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  // React.useEffect1(_ => {
-  //   let msgsOpt = {
-  //     let answer = answerOpt->Belt.Option.getWithDefault(1)
-  //     Some([
-  //       Msg.Input.VoteMsg({
-  //         voterAddress: address,
-  //         proposalID,
-  //         option: answer,
-  //       }),
-  //     ])
-  //   }
-  //   setMsgsOpt(_ => msgsOpt)
-  //   None
-  // }, [answerOpt])
+  React.useEffect1(_ => {
+    let msgsOpt = Belt.Option.flatMap(answerOpt, answer => {
+      Some([
+        Msg.Input.VetoMsg({
+          voterAddress: address,
+          proposalID,
+          option: answer,
+        }),
+      ])
+    })
+    setMsgsOpt(_ => msgsOpt)
+    None
+  }, [answerOpt])
 
   <>
     <div className=Styles.container>
@@ -57,7 +59,7 @@ let make = (~address, ~proposalID, ~proposalName, ~setMsgsOpt) => {
       />
       <VSpacing size=Spacing.xs />
       <Text
-        value={`${proposalID->ID.Proposal.toString} ${proposalName}`}
+        value={`${proposalID->ID.LegacyProposal.toString} ${proposalName}`}
         size=Text.Body1
         weight=Text.Semibold
         color=theme.neutral_900

@@ -122,8 +122,11 @@ let make = (~msg: Msg.result_t) => {
     | SubmitProposalMsg(msg) =>
       switch msg {
       | Msg.Gov.SubmitProposal.Success(m) =>
-        <ProposalMsg.SubmitProposal.Success proposalID=m.proposalID title=m.title />
-      | Msg.Gov.SubmitProposal.Failure(f) => <ProposalMsg.SubmitProposal.Fail title=f.title />
+        <ProposalMsg.SubmitProposal.Success
+          proposalID=m.proposalID title={m.title->Belt.Option.getWithDefault("")}
+        />
+      | Msg.Gov.SubmitProposal.Failure(f) =>
+        <ProposalMsg.SubmitProposal.Fail title={f.title->Belt.Option.getWithDefault("")} />
       }
     | DepositMsg(msg) =>
       switch msg {
@@ -134,16 +137,23 @@ let make = (~msg: Msg.result_t) => {
     | LegacyVoteMsg(msg) =>
       switch msg {
       | Msg.Gov.Vote.Success(m) =>
-        <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
-      | Msg.Gov.Vote.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
+        <ProposalMsg.LegacyVote.Success proposalID={m.proposalID} title={m.title} />
+      | Msg.Gov.Vote.Failure(f) => <ProposalMsg.LegacyVote.Fail proposalID={f.proposalID} />
       }
     | LegacyVoteWeightedMsg(msg) =>
       switch msg {
       | Msg.Gov.VoteWeighted.Success(m) =>
-        <ProposalMsg.Vote.Success proposalID={m.proposalID} title={m.title} />
-      | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.Vote.Fail proposalID={f.proposalID} />
+        <ProposalMsg.LegacyVote.Success proposalID={m.proposalID} title={m.title} />
+      | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.LegacyVote.Fail proposalID={f.proposalID} />
       }
     | VoteMsg(msg) => <ProposalMsg.Vote.Fail proposalID={msg.proposalID} />
+    | SubmitCouncilProposalMsg(msg) =>
+      switch msg {
+      | Msg.Council.SubmitProposal.Success({proposalID, council}) =>
+        <ProposalMsg.SubmitCouncilProposal.Success proposalID council />
+      | Msg.Council.SubmitProposal.Failure({council}) =>
+        <ProposalMsg.SubmitCouncilProposal.Fail council />
+      }
     | CreateClientMsg(_) => React.null
     | UpgradeClientMsg({clientID})
     | UpdateClientMsg({clientID})

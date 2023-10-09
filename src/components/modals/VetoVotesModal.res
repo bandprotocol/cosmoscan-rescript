@@ -4,7 +4,7 @@ module Styles = {
     style(. [
       backgroundColor(theme.neutral_000),
       width(#percent(100.)),
-      minWidth(#px(568)),
+      minWidth(#px(700)),
       minHeight(#px(360)),
       padding2(~v=#px(40), ~h=#px(16)),
       Media.mobile([minWidth(#px(300))]),
@@ -133,7 +133,10 @@ let make = (~vetoId) => {
       }
     | Error(err) =>
       <Text value={err.message} color={theme.error_600} align=Text.Center breakAll=true />
-    | Loading | NoData => <LoadingCensorBar width=153 height=30 />
+    | Loading | NoData =>
+      <EmptyContainer height={#px(200)}>
+        <LoadingCensorBar.CircleSpin />
+      </EmptyContainer>
     }}
   </div>
 }

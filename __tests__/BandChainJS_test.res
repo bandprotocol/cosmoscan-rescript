@@ -213,7 +213,7 @@ describe("Expect BandChainJS Message Module binding work correctly", () => {
 
   test("MsgVote", () =>
     expect({
-      Message.MsgVote.create(2, "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj", 1)
+      Message.MsgVote.create(2, "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj", VOTE_OPTION_YES)
       ->Message.MsgVote.toJSON
       ->Js.Json.stringifyAny
     })->toEqual(

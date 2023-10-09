@@ -818,7 +818,7 @@ module SubmitProposal = {
       {title: "Proposer", content: Address(msg.proposer), order: 1},
       {
         title: "Title",
-        content: PlainText(msg.title),
+        content: PlainText(msg.title->Belt.Option.getWithDefault("")),
         order: 3,
       },
       {
@@ -834,7 +834,7 @@ module SubmitProposal = {
         title: "Proposal ID",
         content: ID(
           <div className={CssHelper.flexBox()}>
-            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+            <TypeID.LegacyProposal position=TypeID.Subtitle id={msg.proposalID} />
           </div>,
         ),
         order: 2,
@@ -842,6 +842,35 @@ module SubmitProposal = {
     ])
 
   let failed = (msg: Msg.Gov.SubmitProposal.fail_t) => msg->factory([])
+}
+
+module SubmitCouncilProposal = {
+  let factory = (msg: Msg.Council.SubmitProposal.t<'a>, firsts) =>
+    firsts->Belt.Array.concat([
+      {title: "Proposer", content: Address(msg.proposer), order: 1},
+      {
+        title: "Council",
+        content: PlainText(
+          msg.council->Council.CouncilNameParser.parse->Council.getCouncilNameString,
+        ),
+        order: 3,
+      },
+    ])
+
+  let success = (msg: Msg.Council.SubmitProposal.success_t) =>
+    msg->factory([
+      {
+        title: "Proposal ID",
+        content: ID(
+          <div className={CssHelper.flexBox()}>
+            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+          </div>,
+        ),
+        order: 2,
+      },
+    ])
+
+  let failed = (msg: Msg.Council.SubmitProposal.fail_t) => msg->factory([])
 }
 
 module Deposit = {
@@ -874,7 +903,7 @@ module Deposit = {
         title: "Proposal ID",
         content: ID(
           <div className={CssHelper.flexBox()}>
-            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+            <TypeID.LegacyProposal position=TypeID.Subtitle id={msg.proposalID} />
           </div>,
         ),
         order: 2,
@@ -894,7 +923,7 @@ module Vote = {
         title: "Proposal ID",
         content: ID(
           <div className={CssHelper.flexBox()}>
-            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+            <TypeID.LegacyProposal position=TypeID.Subtitle id={msg.proposalID} />
           </div>,
         ),
         order: 2,
@@ -954,7 +983,7 @@ module VoteWeighted = {
         title: "Proposal ID",
         content: ID(
           <div className={CssHelper.flexBox()}>
-            <TypeID.Proposal position=TypeID.Subtitle id={msg.proposalID} />
+            <TypeID.LegacyProposal position=TypeID.Subtitle id={msg.proposalID} />
           </div>,
         ),
         order: 2,
@@ -1837,6 +1866,11 @@ let getContent = msg => {
     switch m {
     | Msg.Gov.SubmitProposal.Success(data) => SubmitProposal.success(data)
     | Msg.Gov.SubmitProposal.Failure(data) => SubmitProposal.failed(data)
+    }
+  | Msg.SubmitCouncilProposalMsg(m) =>
+    switch m {
+    | Msg.Council.SubmitProposal.Success(data) => SubmitCouncilProposal.success(data)
+    | Msg.Council.SubmitProposal.Failure(data) => SubmitCouncilProposal.failed(data)
     }
   | Msg.DepositMsg(m) =>
     switch m {
