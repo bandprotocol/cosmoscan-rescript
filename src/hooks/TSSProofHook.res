@@ -13,7 +13,7 @@ let get = (requestID: int) => {
   open! JsonUtils.Decode
 
   Axios.get(
-    `https://devnet.d3n.xyz/rest/tss/v1beta1/signings/${requestID->Belt.Int.toString}`,
+    `https://laozi-hackathon.bandchain.org/api/tss/v1beta1/signings/${requestID->Belt.Int.toString}`,
   )->Promise.then(result => {
     Promise.resolve(
       result->Belt.Option.map(json => JsonUtils.Decode.mustDecode(json, Response.decode)),
