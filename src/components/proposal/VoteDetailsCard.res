@@ -25,6 +25,21 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
   let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
   let isMobile = Media.isMobile()
 
+  let {
+    yesCount,
+    noCount,
+    yesVoteByWeight,
+    noVoteByWeight,
+    yesVotePercent,
+    noVotePercent,
+    totalWeight,
+  } = Council.calculateVote(votes, proposal.council.councilMembers)
+
+  let currentStatus = switch yesVotePercent >= CouncilProposalSub.passedThreshold {
+  | true => CouncilProposalSub.CurrentStatus.Pass
+  | false => Reject
+  }
+
   <Row>
     <Col col=Col.Twelve>
       <Heading
@@ -41,18 +56,21 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
           <Col
             col={switch variant {
             | Full => Col.Four
-            | _ => Col.Six
+            | Short => Col.Six
+            | Half => Col.Twelve
             }}
             colSm=Col.Twelve
-            mb=7
+            mb=36
             mbSm=0
-            style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}>
+            // style={CssHelper.flexBox(~direction=#column, ~justify=#center, ~align=#left, ())}
+          >
             <div>
               <Row>
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | _ => Col.Seven
+                  | Short => Col.Seven
+                  | Half => Col.Four
                   }}
                   colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
@@ -64,8 +82,8 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                       marginRight=8
                     />
                     <Text
-                      // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
-                      value={`min ${CouncilProposalSub.passedTheshold->Belt.Float.toString}%`}
+                      // minimum yes vote to pass set in CouncilProposalSub.passedThreshold
+                      value={`min ${CouncilProposalSub.passedThreshold->Belt.Float.toString}%`}
                       size=Text.Body2
                       weight=Text.Regular
                       color={theme.neutral_600}
@@ -75,20 +93,21 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | _ => Col.Five
+                  | Short => Col.Five
+                  | Half => Col.Eight
                   }}
                   colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <img
-                      src={switch proposal.councilVoteStatus {
+                      src={switch currentStatus {
                       | Pass => Images.yesGreen
                       | Reject => Images.noRed
                       }}
-                      alt={proposal.councilVoteStatus->CouncilProposalSub.CurrentStatus.getStatusText}
+                      alt={currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
                       className=Styles.yesnoImg
                     />
                     <Text
-                      value={proposal.yesVotePercent->Format.fPercent(~digits=2)}
+                      value={yesVotePercent->Format.fPercent(~digits=2)}
                       size=Text.Body1
                       weight=Text.Bold
                       color={theme.neutral_900}
@@ -100,44 +119,65 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>, ~v
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | _ => Col.Seven
+                  | Short => Col.Seven
+                  | Half => Col.Four
                   }}
                   colSm=Col.Six>
                   <div className={CssHelper.flexBox()}>
                     <Heading
-                      value="Current Status"
+                      value={switch proposal.status {
+                      | VotingPeriod
+                      | WaitingVeto
+                      | VetoPeriod => "Current Status"
+                      | _ => "Status"
+                      }}
                       size=Heading.H4
                       weight=Heading.Regular
                       color={theme.neutral_900}
                     />
-                    {proposal.isCurrentRejectByVeto
-                      ? <>
-                          <HSpacing size=Spacing.xs />
-                          <CTooltip
-                            tooltipPlacement=CTooltip.Bottom
-                            tooltipText="The proposal was rejected because a veto was passed.">
-                            <Icon name="fal fa-info-circle" size=16 color={theme.neutral_400} />
-                          </CTooltip>
-                        </>
-                      : React.null}
                   </div>
                 </Col>
                 <Col
                   col={switch variant {
                   | Full => Col.Six
-                  | _ => Col.Five
+                  | Short => Col.Five
+                  | Half => Col.Eight
                   }}
                   colSm=Col.Six>
-                  <div className={CssHelper.flexBox()}>
-                    <Text
-                      value={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
-                      size=Text.Body1
-                      weight=Text.Semibold
-                      color={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusColor(
-                        theme,
-                      )}
-                      block=true
-                    />
+                  <div className={CssHelper.flexBox(~direction=#row, ())}>
+                    {switch proposal.status {
+                    | VotingPeriod =>
+                      <Text
+                        value={currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
+                        size=Text.Body1
+                        weight=Text.Semibold
+                        color={currentStatus->CouncilProposalSub.CurrentStatus.getStatusColor(
+                          theme,
+                        )}
+                        block=true
+                      />
+                    | _ =>
+                      <Text
+                        value={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusText}
+                        size=Text.Body1
+                        weight=Text.Semibold
+                        color={proposal.currentStatus->CouncilProposalSub.CurrentStatus.getStatusColor(
+                          theme,
+                        )}
+                        block=true
+                      />
+                    }}
+                    {switch proposal.isCurrentRejectByVeto {
+                    | true =>
+                      <Text
+                        value="by Veto"
+                        size=Text.Body2
+                        weight=Text.Regular
+                        color={theme.neutral_600}
+                        marginLeft=8
+                      />
+                    | false => React.null
+                    }}
                   </div>
                 </Col>
               </Row>
@@ -217,7 +257,7 @@ module Legacy = {
                       marginRight=8
                     />
                     <Text
-                      // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
+                      // minimum yes vote to pass set in CouncilProposalSub.passedThreshold
                       value="min 40%"
                       size=Text.Body2
                       weight=Text.Regular
@@ -256,7 +296,7 @@ module Legacy = {
                       marginRight=8
                     />
                     <Text
-                      // minimum yes vote to pass set in CouncilProposalSub.passedTheshold
+                      // minimum yes vote to pass set in CouncilProposalSub.passedThreshold
                       value="min 50%"
                       size=Text.Body2
                       weight=Text.Regular

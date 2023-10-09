@@ -6,8 +6,9 @@ type t =
   | WithdrawReward(Address.t)
   | Reinvest(Address.t, float)
   | Vote(ID.Proposal.t, string)
-  | VetoVote(ID.Proposal.t, string)
-  | OpenVeto(ID.Proposal.t, string, list<Coin.t>)
+  | VetoVote(ID.LegacyProposal.t, string)
+  | OpenVeto(ID.Proposal.t, string)
+  | Deposit(ID.Proposal.t, string, ID.LegacyProposal.t, list<Coin.t>)
 
 let toString = x =>
   switch x {
@@ -20,6 +21,7 @@ let toString = x =>
   | Vote(_) => "Vote"
   | VetoVote(_) => "Veto Vote"
   | OpenVeto(_) => "Open Veto Proposal"
+  | Deposit(_) => "Open Veto Proposal"
   }
 
 let defaultGasLimit = x =>
@@ -30,6 +32,7 @@ let defaultGasLimit = x =>
   | Vote(_)
   | VetoVote(_)
   | OpenVeto(_)
+  | Deposit(_)
   | WithdrawReward(_)
   | Reinvest(_)
   | Redelegate(_) => 300000

@@ -31,6 +31,16 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
 
   let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
+  let {
+    yesCount,
+    noCount,
+    yesVoteByWeight,
+    noVoteByWeight,
+    yesVotePercent,
+    noVotePercent,
+    totalWeight,
+  } = Council.calculateVote(votes, proposal.council.councilMembers)
+
   <>
     <Row>
       <Col col=Col.Twelve>
@@ -43,7 +53,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
           <span
             className={Css.merge(list{Styles.councilMember(theme), CssHelper.clickable})}
             onClick={_ => openMembers()}>
-            {proposal.council.name->CouncilSub.getCouncilNameString->React.string}
+            {proposal.council.name->Council.getCouncilNameString->React.string}
           </span>
           <span> {" member votes"->React.string} </span>
         </Text>
@@ -54,9 +64,9 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
         <ProgressBar.Voting2
           slots={ProgressBar.Slot.getYesNoSlot(
             theme,
-            ~yes={proposal.yesVote},
-            ~no={proposal.noVote},
-            ~totalWeight={proposal.totalWeight},
+            ~yes={yesVoteByWeight->Belt.Int.toFloat},
+            ~no={noVoteByWeight->Belt.Int.toFloat},
+            ~totalWeight={totalWeight},
           )}
           fullWidth=true
         />
@@ -75,17 +85,14 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
               marginRight=8
             />
             <Text
-              value={proposal.yesVotePercent->Format.fVotePercent}
+              value={yesVotePercent->Format.fVotePercent}
               size=Text.Body2
               weight=Text.Regular
               color={theme.neutral_900}
             />
           </div>
           <Text
-            value={
-              let yesVote = votes->CouncilVoteSub.getVoteCount(Yes)
-              `${yesVote->Belt.Int.toString} ${yesVote > 1 ? "votes" : "vote"}`
-            }
+            value={`${yesCount->Belt.Int.toString} ${yesCount > 1 ? "votes" : "vote"}`}
             size=Text.Body2
             weight=Text.Regular
             color={theme.neutral_600}
@@ -109,10 +116,7 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
             />
           </div>
           <Text
-            value={
-              let noVote = votes->CouncilVoteSub.getVoteCount(No)
-              `${noVote->Belt.Int.toString} ${noVote > 1 ? "votes" : "vote"}`
-            }
+            value={`${noCount->Belt.Int.toString} ${noCount > 1 ? "votes" : "vote"}`}
             size=Text.Body2
             weight=Text.Regular
             color={theme.neutral_600}
@@ -123,19 +127,49 @@ let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) =>
   </>
 }
 
+type veto_props = {
+  proposal_id: ID.LegacyProposal.t,
+  yesVote: float,
+  noVote: float,
+  noWithVetoVote: float,
+  abstainVote: float,
+  totalVote: float,
+  yesVotePercent: float,
+  noVotePercent: float,
+  noWithVetoVotePercent: float,
+  abstainVotePercent: float,
+  totalBondedTokens: float,
+  turnout: float,
+}
+
 module Veto = {
   @react.component
-  let make = (~vetoProposal: CouncilProposalSub.VetoProposal.t, ~legacy=false) => {
+  let make = (~props: veto_props) => {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-    let openVetos = () => vetoProposal.id->VetoVote->OpenModal->dispatchModal
+    let openVetos = () => props.proposal_id->VetoVote->OpenModal->dispatchModal
 
+    let {
+      yesVote,
+      noVote,
+      noWithVetoVote,
+      abstainVote,
+      totalVote,
+      yesVotePercent,
+      noVotePercent,
+      noWithVetoVotePercent,
+      abstainVotePercent,
+      totalBondedTokens,
+      turnout,
+    } = props
     <>
       <Row>
         <Col col=Col.Twelve mb=8 style={Styles.rejectVoteDetail}>
           <Text
-            value={`${vetoProposal.totalVote->Format.fCurrency} of ${vetoProposal.totalBondedTokens->Format.fCurrency} BAND voted (${vetoProposal.turnout->Belt.Float.toString}%)`}
+            value={`${totalVote->Format.fCurrency} of ${totalBondedTokens->Format.fCurrency} BAND voted (${turnout->Format.fPretty(
+                ~digits=2,
+              )}%)`}
             size=Text.Body2
             weight=Text.Semibold
             color={theme.neutral_600}
@@ -158,11 +192,11 @@ module Veto = {
           <ProgressBar.Voting2
             slots={ProgressBar.Slot.getFullSlot(
               theme,
-              ~yes={vetoProposal.yesVote},
-              ~no={vetoProposal.noVote},
-              ~noWithVeto={vetoProposal.noWithVetoVote},
-              ~abstain={vetoProposal.abstainVote},
-              ~totalBondedTokens={vetoProposal.totalBondedTokens},
+              ~yes={yesVote},
+              ~no={noVote},
+              ~noWithVeto={noWithVetoVote},
+              ~abstain={abstainVote},
+              ~totalBondedTokens={totalBondedTokens},
               ~invertColor=true,
               (),
             )}
@@ -187,14 +221,14 @@ module Veto = {
                     marginRight=8
                   />
                   <Text
-                    value={vetoProposal.yesVotePercent->Format.fVotePercent}
+                    value={yesVotePercent->Format.fVotePercent}
                     size=Text.Body2
                     weight=Text.Regular
                     color={theme.neutral_900}
                   />
                 </div>
                 <Text
-                  value={`${vetoProposal.yesVote->Format.fPretty(~digits=0)} BAND`}
+                  value={`${yesVote->Format.fPretty(~digits=0)} BAND`}
                   size=Text.Body2
                   weight=Text.Regular
                   color={theme.neutral_600}
@@ -211,14 +245,14 @@ module Veto = {
                     marginRight=8
                   />
                   <Text
-                    value={vetoProposal.noVotePercent->Format.fVotePercent}
+                    value={noVotePercent->Format.fVotePercent}
                     size=Text.Body2
                     weight=Text.Regular
                     color={theme.neutral_900}
                   />
                 </div>
                 <Text
-                  value={`${vetoProposal.noVote->Format.fPretty(~digits=0)} BAND`}
+                  value={`${noVote->Format.fPretty(~digits=0)} BAND`}
                   size=Text.Body2
                   weight=Text.Regular
                   color={theme.neutral_600}
@@ -241,14 +275,14 @@ module Veto = {
                     marginRight=8
                   />
                   <Text
-                    value={vetoProposal.noWithVetoVotePercent->Format.fVotePercent}
+                    value={noWithVetoVotePercent->Format.fVotePercent}
                     size=Text.Body2
                     weight=Text.Regular
                     color={theme.neutral_900}
                   />
                 </div>
                 <Text
-                  value={`${vetoProposal.noWithVetoVote->Format.fPretty(~digits=0)} BAND`}
+                  value={`${noWithVetoVote->Format.fPretty(~digits=0)} BAND`}
                   size=Text.Body2
                   weight=Text.Regular
                   color={theme.neutral_600}
@@ -267,14 +301,14 @@ module Veto = {
                     marginRight=8
                   />
                   <Text
-                    value={vetoProposal.abstainVotePercent->Format.fVotePercent}
+                    value={abstainVotePercent->Format.fVotePercent}
                     size=Text.Body2
                     weight=Text.Regular
                     color={theme.neutral_900}
                   />
                 </div>
                 <Text
-                  value={`${vetoProposal.abstainVote->Format.fPretty(~digits=0)} BAND`}
+                  value={`${abstainVote->Format.fPretty(~digits=0)} BAND`}
                   size=Text.Body2
                   weight=Text.Regular
                   color={theme.neutral_600}

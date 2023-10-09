@@ -88,7 +88,7 @@ describe("Expect MsgVote decodeMsg to work correctly", () => {
       decoded: LegacyVoteMsg(
         Success({
           voterAddress: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32,
-          proposalID: 5->ID.Proposal.fromInt,
+          proposalID: 5->ID.LegacyProposal.fromInt,
           option: "Yes",
           title: "upgrade",
         }),
@@ -124,7 +124,7 @@ describe("Expect MsgVote decodeMsg to work correctly", () => {
       decoded: LegacyVoteMsg(
         Success({
           voterAddress: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32,
-          proposalID: 5->ID.Proposal.fromInt,
+          proposalID: 5->ID.LegacyProposal.fromInt,
           option: "No",
           title: "upgrade",
         }),
@@ -160,7 +160,7 @@ describe("Expect MsgVote decodeMsg to work correctly", () => {
       decoded: LegacyVoteMsg(
         Failure({
           voterAddress: "band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"->Address.fromBech32,
-          proposalID: 5->ID.Proposal.fromInt,
+          proposalID: 5->ID.LegacyProposal.fromInt,
           option: "Yes",
           title: (),
         }),

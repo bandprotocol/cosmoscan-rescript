@@ -380,10 +380,9 @@ let totalDeposit = id => {
     x.proposals
     ->Belt.Array.get(0)
     ->Belt.Option.map(proposal =>
-      proposal.deposits->Belt.Array.reduce(
-        0.,
-        (acc, deposit) => acc +. deposit.amount->Coin.getBandAmountFromCoins,
-      )
+      proposal.deposits
+      ->Belt.Array.reduce(0., (acc, deposit) => acc +. deposit.amount->Coin.getUBandAmountFromCoins)
+      ->Coin.newUBANDFromAmount
     )
   })
 }

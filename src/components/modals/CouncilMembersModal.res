@@ -14,7 +14,7 @@ module Styles = {
 }
 module RenderBody = {
   @react.component
-  let make = (~members: array<CouncilProposalSub.council_member_t>) => {
+  let make = (~members: array<Council.council_member_t>) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <TBody paddingV=#px(12)>
@@ -52,7 +52,7 @@ module RenderBody = {
 }
 module RenderBodyMobile = {
   @react.component
-  let make = (~name: string, ~members: array<CouncilProposalSub.council_member_t>) => {
+  let make = (~name: string, ~members: array<Council.council_member_t>) => {
     members
     ->Belt.Array.mapWithIndex((index, member) =>
       <MobileCard
@@ -81,19 +81,19 @@ module RenderBodyMobile = {
 }
 
 @react.component
-let make = (~council: CouncilProposalSub.council_t) => {
+let make = (~council: Council.council_t) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let isMobile = Media.isMobile()
 
   <div className={Styles.container(theme)}>
     <Heading
       size=Heading.H2
-      value={council.name->CouncilSub.getCouncilNameString ++ " Members"}
+      value={council.name->Council.getCouncilNameString ++ " Members"}
       marginBottom=8
       marginBottomSm=8
     />
     <div className={Css.merge(list{CssHelper.flexBox(), Styles.description})}>
-      <Text value={council.name->CouncilSub.getCouncilNameString ++ " Address"} size=Text.Body1 />
+      <Text value={council.name->Council.getCouncilNameString ++ " Address"} size=Text.Body1 />
       <HSpacing size=Spacing.sm />
       <AddressRender
         address=council.account.address position=AddressRender.Subtitle copy=true ellipsis=true
@@ -102,7 +102,7 @@ let make = (~council: CouncilProposalSub.council_t) => {
     {isMobile
       ? <>
           <RenderBodyMobile
-            name={council.name->CouncilSub.getCouncilNameString} members=council.councilMembers
+            name={council.name->Council.getCouncilNameString} members=council.councilMembers
           />
         </>
       : <>

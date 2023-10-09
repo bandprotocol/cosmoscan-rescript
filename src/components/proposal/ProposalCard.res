@@ -15,6 +15,8 @@ let make = (~reserveIndex, ~proposal: CouncilProposalSub.t) => {
 
   let openMembers = () => proposal.council->CouncilMembers->OpenModal->dispatchModal
 
+  let councilVoteSub = CouncilVoteSub.get(proposal.id)
+
   <Col key={reserveIndex->Belt.Int.toString} style=Styles.proposalCardContainer mb=24 mbSm=16>
     <InfoContainer py=24>
       <Row>
@@ -56,7 +58,7 @@ let make = (~reserveIndex, ~proposal: CouncilProposalSub.t) => {
           />
           <div className={CssHelper.clickable} onClick={_ => openMembers()}>
             <Text
-              value={proposal.council.name->CouncilSub.getCouncilNameString}
+              value={proposal.council.name->Council.getCouncilNameString}
               size=Text.Body1
               weight=Text.Thin
               color=theme.primary_600
@@ -91,27 +93,40 @@ let make = (~reserveIndex, ~proposal: CouncilProposalSub.t) => {
             weight=Heading.Thin
             color={theme.neutral_600}
           />
-          <div className={CssHelper.flexBox()}>
-            <Text
-              value={(proposal.yesVotePercent < 10. ? "0" : "") ++
-              proposal.yesVotePercent->Format.fPretty(~digits=2) ++ "%"}
-              size=Text.Body1
-              weight=Text.Thin
-              color=theme.neutral_900
-              spacing=Text.Em(0.05)
-              block=true
-              code=true
-            />
-            <HSpacing size=Spacing.sm />
-            <ProgressBar.Voting2
-              slots={ProgressBar.Slot.getYesNoSlot(
-                theme,
-                ~yes={proposal.yesVote},
-                ~no={proposal.noVote},
-                ~totalWeight={proposal.totalWeight},
-              )}
-            />
-          </div>
+          {switch councilVoteSub {
+          | Data(votes) =>
+            let {
+              yesCount,
+              noCount,
+              yesVoteByWeight,
+              noVoteByWeight,
+              yesVotePercent,
+              noVotePercent,
+              totalWeight,
+            } = Council.calculateVote(votes, proposal.council.councilMembers)
+            <div className={CssHelper.flexBox()}>
+              <Text
+                value={(yesVotePercent < 10. ? "0" : "") ++
+                yesVotePercent->Format.fPretty(~digits=2) ++ "%"}
+                size=Text.Body1
+                weight=Text.Thin
+                color=theme.neutral_900
+                spacing=Text.Em(0.05)
+                block=true
+                code=true
+              />
+              <HSpacing size=Spacing.sm />
+              <ProgressBar.Voting2
+                slots={ProgressBar.Slot.getYesNoSlot(
+                  theme,
+                  ~yes={yesVoteByWeight->Belt.Int.toFloat},
+                  ~no={noVoteByWeight->Belt.Int.toFloat},
+                  ~totalWeight={totalWeight},
+                )}
+              />
+            </div>
+          | _ => <LoadingCensorBar width=153 height=30 />
+          }}
         </Col>
         {isMobile
           ? React.null

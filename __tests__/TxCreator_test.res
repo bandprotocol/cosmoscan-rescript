@@ -200,11 +200,15 @@ describe("Expect createMsg Functionality to work correctly", () => {
         Msg.Input.VoteMsg({
           proposalID: 10->ID.Proposal.fromInt,
           voterAddress: "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj"->Address.fromBech32,
-          option: 1,
+          option: VOTE_OPTION_COUNCIL_YES,
         }),
       )
     })->toEqual({
-      BandChainJS.Message.MsgVote.create(10, "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj", 1)
+      BandChainJS.Message.MsgVoteCouncil.create(
+        10,
+        "band1dgstnw0m2cshvh4ymnlcxdj0wr3x797efzrexj",
+        VOTE_OPTION_COUNCIL_YES,
+      )
     })
   )
 

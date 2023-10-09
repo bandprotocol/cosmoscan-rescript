@@ -61,48 +61,58 @@ module Styles = {
 
 module VoteButton = {
   @react.component
-  let make = (~proposalID, ~proposalName, ~address) => {
+  let make = (~accountOpt: option<AccountContext.t>, ~proposalID, ~proposalName) => {
     let (_, dispatchModal) = React.useContext(ModalContext.context)
     let vote = () => Vote(proposalID, proposalName)->SubmitTx->OpenModal->dispatchModal
-    let accountQuery = AccountQuery.get(address)
 
-    // TODO: (proposal) uncomment before launch
-    // switch accountQuery {
-    // | Data({councilOpt}) =>
-    //   switch councilOpt {
-    //   | Some(council) =>
-    //     <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
-    //       {"Vote"->React.string}
-    //     </Button>
-    //   | None => React.null
-    //   }
-    // | _ => React.null
-    // }
-
-    <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
-      {"Vote"->React.string}
-    </Button>
+    switch accountOpt {
+    | Some({address}) =>
+      let accountQuery = AccountQuery.get(address)
+      switch accountQuery {
+      | Data({councilMembers}) =>
+        switch councilMembers->Belt.Array.length > 0 {
+        | true =>
+          <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => vote()}>
+            {"Vote"->React.string}
+          </Button>
+        | false => React.null
+        }
+      | _ => React.null
+      }
+    | None => React.null
+    }
   }
 }
 
 module OpenVetoButton = {
   @react.component
-  let make = (~proposalID, ~address, ~proposalName, ~totalDeposit) => {
+  let make = (~accountOpt: option<AccountContext.t>, ~proposalID, ~proposalName) => {
     let (_, dispatchModal) = React.useContext(ModalContext.context)
-    let openVeto = () =>
-      OpenVeto(proposalID, proposalName, totalDeposit)->SubmitTx->OpenModal->dispatchModal
-    let accountQuery = AccountQuery.get(address)
+    let openVeto = () => OpenVeto(proposalID, proposalName)->SubmitTx->OpenModal->dispatchModal
 
-    <Button
-      variant={Outline} px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => openVeto()}>
-      {"Open Veto"->React.string}
-    </Button>
+    switch accountOpt {
+    | Some({address}) =>
+      <Button
+        variant={Outline}
+        px=40
+        py=10
+        fsize=14
+        style={CssHelper.flexBox()}
+        onClick={_ => openVeto()}>
+        {"Open Veto"->React.string}
+      </Button>
+    | None => React.null
+    }
   }
 }
 
 module RenderData = {
   @react.component
-  let make = (~proposal: CouncilProposalSub.t, ~votes: array<CouncilVoteSub.t>) => {
+  let make = (
+    ~proposal: CouncilProposalSub.t,
+    ~votes: array<CouncilVoteSub.t>,
+    ~bondedToken: float,
+  ) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
@@ -186,27 +196,19 @@ module RenderData = {
             </Row>
           </Col>
           <Hidden variant={Mobile}>
-            {switch accountOpt {
-            | Some({address}) =>
-              <Col col=Col.Two>
-                {switch proposal.vetoProposalOpt {
-                | Some({totalDeposit}) =>
-                  <OpenVetoButton
-                    proposalID=proposal.id proposalName=proposal.title address totalDeposit
-                  />
-                | None => React.null
-                }}
-                // TODO: uncomment before launch
-                // {switch proposal.status {
-                // | VotingPeriod => <VoteButton proposalID=proposal.id proposalName=proposal.title address />
-                // | _ => <OpenVetoButton
-                //   proposalID=proposal.id proposalName=proposal.title address totalDeposit
-                // />
-                // | _ => React.null
-                // }}
-              </Col>
-            | None => React.null
-            }}
+            <Col col=Col.Two>
+              {switch proposal.status {
+              | VotingPeriod =>
+                <VoteButton proposalID=proposal.id proposalName=proposal.title accountOpt />
+              | WaitingVeto =>
+                switch proposal.vetoProposalOpt {
+                | Some(_) => React.null
+                | None =>
+                  <OpenVetoButton accountOpt proposalID=proposal.id proposalName=proposal.title />
+                }
+              | _ => React.null
+              }}
+            </Col>
           </Hidden>
         </Row>
         <SeperatedLine mt=32 mb=24 mtSm=24 mbSm=24 color=theme.neutral_200 />
@@ -238,21 +240,22 @@ module RenderData = {
             switch proposal.status {
             | WaitingVeto =>
               <Col col=Col.Five>
-                {switch proposal.vetoId {
-                | Some(vetoId) => {
-                    let totalDepositSub = ProposalSub.totalDeposit(vetoId)
-                    switch totalDepositSub {
-                    | Data(totalDepositOpt) => <RejectDetailsCard.Wait vetoId totalDepositOpt />
-                    | _ => <LoadingCensorBar width=153 height=30 />
-                    }
-                  }
+                {switch proposal.vetoProposalOpt {
+                | Some({id, totalDeposit}) =>
+                  <RejectDetailsCard.Wait
+                    proposal
+                    totalDeposit={totalDeposit
+                    ->Belt.List.reduce(0., (acc, deposit) => acc +. deposit.amount)
+                    ->Coin.newUBANDFromAmount}
+                    vetoProposal
+                  />
 
                 | None => React.null
                 }}
               </Col>
             | _ =>
               <Col col=Col.Six>
-                <RejectDetailsCard.Vote vetoProposal status=proposal.status />
+                <RejectDetailsCard.Vote vetoProposal status=proposal.status bondedToken />
               </Col>
             }
 
@@ -298,7 +301,7 @@ module RenderData = {
                 <Col col=Col.Ten colSm=Col.Eight>
                   <div className={CssHelper.clickable} onClick={_ => openMembers()}>
                     <Text
-                      value={proposal.council.name->CouncilSub.getCouncilNameString}
+                      value={proposal.council.name->Council.getCouncilNameString}
                       size=Text.Body1
                       weight=Text.Thin
                       color=theme.primary_600
@@ -361,10 +364,12 @@ module RenderData = {
 let make = (~proposalID) => {
   let proposalSub = CouncilProposalSub.get(proposalID)
   let councilVoteSub = CouncilVoteSub.get(proposalID)
+  let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
 
-  let allSub = Sub.all2(proposalSub, councilVoteSub)
+  let allSub = Sub.all3(proposalSub, councilVoteSub, bondedTokenCountSub)
   switch allSub {
-  | Data(proposal, votes) => <RenderData proposal votes />
+  | Data(proposal, votes, bondedToken) =>
+    <RenderData proposal votes bondedToken={bondedToken->Coin.getUBandAmountFromCoin /. 1e6} />
   | Error(err) => <Heading value={err.message} />
   | Loading =>
     <div className=Styles.loadingContainer>

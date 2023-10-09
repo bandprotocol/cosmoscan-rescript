@@ -1,19 +1,4 @@
-type account_t = {address: Address.t}
-
-type council_member_t = {
-  account: account_t,
-  weight: int,
-  metadata: string,
-  since: MomentRe.Moment.t,
-}
-
-type council_t = {
-  id: int,
-  name: CouncilSub.council_name_t,
-  account: account_t,
-  councilMembers: array<council_member_t>,
-}
-
+open Council
 module Status = {
   type t =
     | VotingPeriod
@@ -97,7 +82,6 @@ module VetoProposal = {
   type t = {
     id: ID.LegacyProposal.t,
     status: CurrentStatus.t,
-    turnOut: float,
     yesVote: float,
     noVote: float,
     noWithVetoVote: float,
@@ -115,20 +99,20 @@ module VetoProposal = {
   }
 
   // percent of yes vote to win
-  let yesTheshold = 50.
-  let turnoutTheshold = 40.
+  let yesThreshold = 50.
+  let turnoutThreshold = 40.
 
   let fromProposal = (proposal: proposal_t) => {
-    let yesVote = proposal.yesVote->Belt.Option.getWithDefault(0.)
-    let noVote = proposal.noVote->Belt.Option.getWithDefault(0.)
-    let noWithVetoVote = proposal.noWithVetoVote->Belt.Option.getWithDefault(0.)
-    let abstainVote = proposal.abstainVote->Belt.Option.getWithDefault(0.)
+    let yesVote = proposal.yesVote->Belt.Option.getWithDefault(0.) /. 1e6
+    let noVote = proposal.noVote->Belt.Option.getWithDefault(0.) /. 1e6
+    let noWithVetoVote = proposal.noWithVetoVote->Belt.Option.getWithDefault(0.) /. 1e6
+    let abstainVote = proposal.abstainVote->Belt.Option.getWithDefault(0.) /. 1e6
     let totalVote = yesVote +. noVote +. noWithVetoVote +. abstainVote
     let yesVotePercent = totalVote == 0. ? 0. : yesVote /. totalVote *. 100.
-    let totalBondedTokens = proposal.totalBondedTokens->Belt.Option.getWithDefault(0.)
+    let totalBondedTokens = proposal.totalBondedTokens->Belt.Option.getWithDefault(0.) /. 1e6
     let turnout = totalVote /. totalBondedTokens *. 100.
-    let isYesPassed = yesVotePercent >= yesTheshold
-    let isTurnoutPassed = turnout >= turnoutTheshold
+    let isYesPassed = yesVotePercent >= yesThreshold
+    let isTurnoutPassed = turnout >= turnoutThreshold
 
     {
       id: proposal.id,
@@ -136,7 +120,6 @@ module VetoProposal = {
       | true => CurrentStatus.Pass
       | false => Reject
       },
-      turnOut: totalVote,
       yesVote,
       noVote,
       noWithVetoVote,
@@ -208,7 +191,7 @@ module SingleConfig = %graphql(`
       title
       council @ppxAs(type: "council_t") {
         id
-        name @ppxCustom(module: "CouncilSub.CouncilName")
+        name @ppxCustom(module: "CouncilNameParser")
         account @ppxAs(type: "account_t") {
           address @ppxCustom(module:"GraphQLParserModule.Address")
         }
@@ -255,7 +238,7 @@ module MultiConfig = %graphql(`
       title
       council @ppxAs(type: "council_t") {
         id
-        name @ppxCustom(module: "CouncilSub.CouncilName")
+        name @ppxCustom(module: "CouncilNameParser")
         account @ppxAs(type: "account_t") {
           address @ppxCustom(module:"GraphQLParserModule.Address")
         }
@@ -296,8 +279,8 @@ module MultiConfig = %graphql(`
 `)
 
 module CountConfig = %graphql(`
-    subscription CouncilProposalCount {
-      council_proposals_aggregate {
+    subscription CouncilProposalCount($filter: String!) {
+      council_proposals_aggregate(where: {council: { name: { _ilike: $filter}}}) {
         aggregate {
           count
         }
@@ -317,14 +300,14 @@ let getFilter = str =>
 
 let parseProposalType = councilName =>
   switch councilName {
-  | CouncilSub.BandDaoCouncil => BandDAO
+  | BandDaoCouncil => BandDAO
   | GrantCouncil => Grant
   | TechCouncil => Tech
-  | Unknown => Unknown
+  | Unspecified => Unknown
   }
 
 // percent of yes vote required for proposal to win
-let passedTheshold = 50.
+let passedThreshold = 50.
 
 let toExternal = (
   {
@@ -378,11 +361,11 @@ let toExternal = (
     submitTime,
     totalWeight,
     proposalType: council.name->parseProposalType,
-    councilVoteStatus: switch yesVotePercent >= passedTheshold {
+    councilVoteStatus: switch yesVotePercent >= passedThreshold {
     | true => Pass
     | false => Reject
     },
-    currentStatus: switch yesVotePercent >= passedTheshold {
+    currentStatus: switch yesVotePercent >= passedThreshold {
     | true =>
       switch vetoProposalOpt {
       | Some(vetoProposal) =>
@@ -394,7 +377,7 @@ let toExternal = (
       }
     | false => Reject
     },
-    isCurrentRejectByVeto: switch yesVotePercent >= passedTheshold {
+    isCurrentRejectByVeto: switch yesVotePercent >= passedThreshold {
     | true =>
       switch vetoProposalOpt {
       | Some(vetoProposal) =>
@@ -429,8 +412,8 @@ let getList = (~filter, ~page, ~pageSize, ()) => {
   result->Sub.fromData->Sub.map(internal => internal.council_proposals->Belt.Array.map(toExternal))
 }
 
-let count = () => {
-  let result = CountConfig.use()
+let count = (~filter) => {
+  let result = CountConfig.use({filter: filter->getFilter})
 
   result
   ->Sub.fromData

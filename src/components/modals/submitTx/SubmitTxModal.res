@@ -84,8 +84,12 @@ module SubmitTxStep = {
         <VoteMsg address={account.address} proposalID proposalName setMsgsOpt />
       | VetoVote(proposalID, proposalName) =>
         <VetoVoteMsg address={account.address} proposalID proposalName setMsgsOpt />
-      | OpenVeto(proposalID, proposalName, totalDeposit) =>
-        <OpenVetoMsg address={account.address} proposalID proposalName totalDeposit setMsgsOpt />
+      | OpenVeto(proposalID, proposalName) =>
+        <OpenVetoMsg address={account.address} proposalID proposalName setMsgsOpt />
+      | Deposit(proposalID, proposalName, vetoProposalID, totalDeposit) =>
+        <DepositMsg
+          address={account.address} proposalID proposalName vetoProposalID totalDeposit setMsgsOpt
+        />
       }}
       <EnhanceTxInput
         width=300

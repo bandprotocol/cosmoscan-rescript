@@ -22,7 +22,7 @@ module SendMsg = {
   let make = (~toAddress, ~amount) =>
     <BadgeWrapper>
       <AmountRender coins=amount size={Body2} />
-      <Text value={j` to `} size=Text.Body2 nowrap=true block=true />
+      <Text value="to" size=Text.Body2 nowrap=true block=true marginLeft=4 marginRight=4 />
       <AddressRender address=toAddress />
     </BadgeWrapper>
 }
