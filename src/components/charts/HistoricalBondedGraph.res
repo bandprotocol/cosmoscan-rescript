@@ -30,7 +30,7 @@ function(data, isDarkMode) {
               type: 'line',
               pointRadius: 0,
               fill: false,
-              borderColor: isDarkMode ? '#ffffff' : '#303030',
+              borderColor: isDarkMode ? '#ffffff' : '#4520E6',
               data: data,
               borderWidth: 2,
           }]
@@ -57,14 +57,18 @@ function(data, isDarkMode) {
                 fontSize: 10,
                 autoSkip: true,
                 maxTicksLimit: 5,
-              }
-            },
+                maxRotation: 0,
+                minRotation: 0,
+                callback: value => value.split(" ")
+              },
+            }
           ],
           yAxes: [
             {
               gridLines: {
                 display: true,
                 color: isDarkMode ? '#353535' : '#EDEDED',
+                borderDash: [4, 4],
                 drawBorder: false,
                 zeroLineColor: isDarkMode ? '#353535' : '#EDEDED',
               },
@@ -118,9 +122,9 @@ function(data, isDarkMode) {
             label: function(tooltipItem, data) {
               let date = new Date(tooltipItem.label);
               let dateTimeFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'short', day: '2-digit' });
-              let [{ value: month },,{ value: day },,{ value: year }] = dateTimeFormat .formatToParts(date );
+              let [{ value: month },,{ value: day },,{ value: year }] = dateTimeFormat .formatToParts(date);
 
-              return month + " " + month + "," + year;
+              return month + " " + day + "," + year;
             },
           }
 				},

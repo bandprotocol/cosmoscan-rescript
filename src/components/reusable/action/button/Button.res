@@ -2,7 +2,7 @@ type btn_style_t =
   | Primary
   | Secondary
   | Outline
-  | Text
+  | Text({underline: bool})
 
 module Styles = {
   open CssJs
@@ -89,13 +89,15 @@ module Styles = {
           opacity(0.5),
         ]),
       ])
-    | Text =>
+    | Text({underline}) =>
       style(. [
         padding(#zero),
         backgroundColor(#transparent),
+        fontWeight(#normal),
         color(theme.neutral_900),
         border(#px(1), #solid, #transparent),
         selector("i", [color(theme.neutral_900)]),
+        textDecoration(underline ? #underline : #none),
         hover([
           backgroundColor(#transparent),
           color(theme.primary_600),

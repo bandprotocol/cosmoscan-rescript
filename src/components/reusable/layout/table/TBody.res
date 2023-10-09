@@ -7,6 +7,7 @@ module Styles = {
       borderTop(#px(1), #solid, isDarkMode ? theme.neutral_300 : theme.neutral_100),
       padding2(~v=pv, ~h=ph),
       overflow(#hidden),
+      selector("&:last-child", [paddingBottom(zero)]),
     ])
 }
 

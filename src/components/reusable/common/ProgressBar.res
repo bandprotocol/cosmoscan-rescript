@@ -50,10 +50,19 @@ module Styles = {
   ])
 
   // uptimeBar
-
-  let progressUptimeInner = (p, color) =>
+  let progressUptimeOuter = (theme: Theme.t) =>
     style(. [
-      width(#percent(p)),
+      position(relative),
+      width(#percent(100.)),
+      height(px(10)),
+      borderRadius(px(7)),
+      border(px(1), solid, theme.neutral_100),
+      overflow(hidden),
+      backgroundColor(theme.neutral_300),
+    ])
+  let progressUptimeInner = (value, color) =>
+    style(. [
+      width(#percent(value)),
       height(#percent(100.)),
       borderRadius(px(7)),
       background(color),
@@ -98,15 +107,13 @@ module Uptime = {
   @react.component
   let make = (~percent) => {
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    let color = if percent == 100. {
-      theme.primary_600
-    } else if percent < 100. && percent >= 79. {
+    let color = if percent >= 80. {
       theme.primary_600
     } else {
-      theme.error_600
+      theme.warning_600
     }
 
-    <div className={Styles.progressOuter(theme)}>
+    <div className={Styles.progressUptimeOuter(theme)}>
       <div className={Styles.progressUptimeInner(percent, color)} />
     </div>
   }

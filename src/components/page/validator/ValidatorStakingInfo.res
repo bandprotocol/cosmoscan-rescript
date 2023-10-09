@@ -1,8 +1,6 @@
 module Styles = {
   open CssJs
 
-  let connectContainer = (theme: Theme.t) =>
-    style(. [height(#px(145)), backgroundColor(theme.neutral_100)])
   let rewardContainer = (theme: Theme.t) =>
     style(. [
       backgroundColor(theme.neutral_100),
@@ -14,8 +12,6 @@ module Styles = {
     selector("> button + button", [marginLeft(#px(15))]),
     selector("> div + div", [marginLeft(#px(15))]),
   ])
-
-  let linkStyle = style(. [color(#currentColor), transition(~duration=0, "all")])
 }
 
 module ButtonSection = {
@@ -44,7 +40,7 @@ module ButtonSection = {
           px=20
           py=8
           disabled=disableNoBalance
-          variant=Button.Outline
+          variant=Button.Text({underline: true})
           onClick={_ => {
             open Webapi.Dom
             validatorInfo.commission == 100.
@@ -54,19 +50,27 @@ module ButtonSection = {
           {"Delegate"->React.string}
         </Button>
         <Button
-          px=20 py=8 variant=Button.Outline disabled=disableNoStake onClick={_ => undelegate()}>
+          px=20
+          py=8
+          variant=Button.Text({underline: true})
+          disabled=disableNoStake
+          onClick={_ => undelegate()}>
           {"Undelegate"->React.string}
         </Button>
         <Button
-          px=20 py=8 variant=Button.Outline disabled=disableNoStake onClick={_ => redelegate()}>
+          px=20
+          py=8
+          variant=Button.Text({underline: true})
+          disabled=disableNoStake
+          onClick={_ => redelegate()}>
           {"Redelegate"->React.string}
         </Button>
       </div>
     | _ =>
       <div className={Css.merge(list{CssHelper.flexBox(), Styles.buttonContainer})}>
-        <LoadingCensorBar width=100 height=33 />
-        <LoadingCensorBar width=100 height=33 />
-        <LoadingCensorBar width=100 height=33 />
+        <LoadingCensorBar width=75 height=20 />
+        <LoadingCensorBar width=75 height=20 />
+        <LoadingCensorBar width=75 height=20 />
       </div>
     }
   }
@@ -78,7 +82,7 @@ module DisplayBalance = {
     let make = () => {
       <>
         <LoadingCensorBar width=120 height=15 />
-        <VSpacing size=Spacing.xs />
+        <VSpacing size=Spacing.sm />
         <LoadingCensorBar width=80 height=15 />
       </>
     }
@@ -93,26 +97,29 @@ module DisplayBalance = {
         {isCountup
           ? <NumberCountUp
               value={amount->Coin.getBandAmountFromCoin}
-              size=Text.Body1
-              weight=Text.Regular
+              size=Text.Xl
+              weight=Text.Bold
+              color={theme.neutral_900}
               spacing={Text.Em(0.)}
-              color={theme.neutral_600}
               code=false
             />
           : <Text
               value={amount->Coin.getBandAmountFromCoin->Format.fPretty(~digits=6)}
-              size=Text.Body1
-              color={theme.neutral_600}
+              size=Text.Xl
+              weight=Text.Bold
+              color={theme.neutral_900}
               block=true
             />}
         <HSpacing size=Spacing.sm />
-        <Text value="BAND" size=Text.Body1 color={theme.neutral_600} block=true />
+        <Text value="BAND" size=Text.Xl color={theme.neutral_900} weight=Text.Bold block=true />
       </div>
+      <VSpacing size={Spacing.sm} />
       <div className={CssHelper.flexBox()}>
+        <Text value="$" size=Text.Body2 color={theme.neutral_600} block=true />
         {isCountup
           ? <NumberCountUp
               value={amount->Coin.getBandAmountFromCoin *. usdPrice}
-              size=Text.Body2
+              size=Text.Body1
               weight=Text.Regular
               color={theme.neutral_600}
               code=false
@@ -120,12 +127,10 @@ module DisplayBalance = {
             />
           : <Text
               value={(amount->Coin.getBandAmountFromCoin *. usdPrice)->Format.fPretty(~digits=6)}
-              size=Text.Body2
+              size=Text.Body1
               color={theme.neutral_600}
               block=true
             />}
-        <HSpacing size=Spacing.sm />
-        <Text value="USD" size=Text.Body2 color={theme.neutral_600} block=true />
       </div>
     </>
   }
@@ -156,59 +161,57 @@ module StakingInfo = {
     let reinvest = reward =>
       (validatorAddress, reward)->SubmitMsg.Reinvest->SubmitTx->OpenModal->dispatchModal
     <>
-      <Row marginBottom=24>
-        <Col>
-          <Text
-            value="Note: You have a non-zero pending reward on this validator. Any additional staking actions will automatically withdraw that reward balance."
-            color={theme.neutral_600}
-            weight=Text.Thin
-          />
-        </Col>
-      </Row>
       <Row>
         <Col col=Col.Six>
-          <div className={CssHelper.mb(~size=16, ())}>
-            <Heading
-              value="Balance at Stake" size=Heading.H5 color={theme.neutral_600} marginBottom=8
-            />
-            {switch allSub {
-            | Data(({financial: {usdPrice}}, balanceAtStake, _)) =>
-              <DisplayBalance amount={balanceAtStake.amount} usdPrice />
-            | _ => <DisplayBalance.Loading />
-            }}
+          <div className={CssHelper.flexBox()}>
+            <Heading value="Delegated Amount (BAND)" size=Heading.H5 color={theme.neutral_600} />
+            <HSpacing size=Spacing.xs />
+            <CTooltip tooltipText="Delegated Amount.">
+              <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
+            </CTooltip>
           </div>
+          <VSpacing size={Spacing.md} />
+          {switch allSub {
+          | Data(({financial: {usdPrice}}, balanceAtStake, _)) =>
+            <DisplayBalance amount={balanceAtStake.amount} usdPrice />
+          | _ => <DisplayBalance.Loading />
+          }}
+          <VSpacing size=Spacing.sm />
           <ButtonSection validatorAddress delegatorAddress />
         </Col>
         <Col col=Col.Three>
-          <div className={CssHelper.mb(~size=16, ())}>
-            <div className={CssHelper.flexBox()}>
-              <Heading
-                value="Unbonding Amount" size=Heading.H5 marginBottom=8 color={theme.neutral_600}
-              />
-            </div>
-            {switch allSub {
-            | Data(({financial: {usdPrice}}, _, unbonding)) =>
-              <DisplayBalance amount=unbonding usdPrice />
-            | _ => <DisplayBalance.Loading />
-            }}
+          <div className={CssHelper.flexBox()}>
+            <Heading value="Unbonding Amount (BAND)" size=Heading.H5 color={theme.neutral_600} />
+            <HSpacing size=Spacing.xs />
+            <CTooltip tooltipText="Unbonding Amount.">
+              <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
+            </CTooltip>
           </div>
-          <Button px=20 py=8 variant=Button.Outline onClick={_ => ()}>
-            <Link
-              className=Styles.linkStyle
-              route={Route.AccountIndexPage(delegatorAddress, Route.AccountUnbonding)}>
-              {"View Entries"->React.string}
-            </Link>
-          </Button>
+          <VSpacing size={Spacing.md} />
+          {switch allSub {
+          | Data(({financial: {usdPrice}}, _, unbonding)) =>
+            <DisplayBalance amount=unbonding usdPrice />
+          | _ => <DisplayBalance.Loading />
+          }}
+          <VSpacing size=Spacing.sm />
+          // TODO: wire up
+          <Text value="4d 18h:29m:17s" size=Text.Body1 weight=Text.Thin color={theme.neutral_900} />
         </Col>
         <Col col=Col.Three>
-          <div className={CssHelper.mb(~size=16, ())}>
-            <Heading value="Reward" size=Heading.H5 color={theme.neutral_600} marginBottom=8 />
-            {switch allSub {
-            | Data(({financial: {usdPrice}}, balanceAtStake, _)) =>
-              <DisplayBalance amount={balanceAtStake.reward} usdPrice isCountup=true />
-            | _ => <DisplayBalance.Loading />
-            }}
+          <div className={CssHelper.flexBox()}>
+            <Heading value="Reward (BAND)" size=Heading.H5 color={theme.neutral_600} />
+            <HSpacing size=Spacing.xs />
+            <CTooltip tooltipText="Reward.">
+              <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
+            </CTooltip>
           </div>
+          <VSpacing size=Spacing.md />
+          {switch allSub {
+          | Data(({financial: {usdPrice}}, balanceAtStake, _)) =>
+            <DisplayBalance amount={balanceAtStake.reward} usdPrice isCountup=true />
+          | _ => <DisplayBalance.Loading />
+          }}
+          <VSpacing size=Spacing.sm />
           <div
             className={Css.merge(list{CssHelper.flexBox(), Styles.buttonContainer})}
             id="withdrawRewardContainer">
@@ -225,7 +228,7 @@ module StakingInfo = {
                 <Button
                   px=20
                   py=8
-                  variant=Button.Outline
+                  variant=Button.Text({underline: true})
                   onClick={_ => withdrawReward()}
                   disabled=disable>
                   {"Claim"->React.string}
@@ -233,7 +236,7 @@ module StakingInfo = {
                 <Button
                   px=20
                   py=8
-                  variant=Button.Outline
+                  variant=Button.Text({underline: true})
                   onClick={_ => reinvest(reward)}
                   disabled=disable>
                   {"Reinvest"->React.string}
@@ -256,32 +259,23 @@ let make = (~validatorAddress) => {
 
   let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
 
-  <InfoContainer>
-    <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
-      <div className={CssHelper.flexBox()}>
-        <Heading value="Your Delegation Info" size=Heading.H4 />
-        <HSpacing size=Spacing.xs />
-        <CTooltip tooltipText="Your delegation stats on this validators">
-          <Icon name="fal fa-info-circle" size=10 />
-        </CTooltip>
-      </div>
-    </div>
-    <SeperatedLine mt=32 mb=24 />
+  <InfoContainer py=24>
+    <Heading value="My Delegation" size=Heading.H4 />
+    <SeperatedLine mt=16 mb=16 />
     {switch accountOpt {
     | Some({address: delegatorAddress}) => <StakingInfo validatorAddress delegatorAddress />
     | None =>
       switch trackingSub {
       | Data({chainID}) =>
         <div
-          className={Css.merge(list{
-            CssHelper.flexBox(~direction=#column, ~justify=#center, ()),
-            Styles.connectContainer(theme),
-          })}>
+          className={Css.merge(list{CssHelper.flexBox(~direction=#column, ~justify=#center, ())})}>
           <Icon name="fal fa-link" size=32 color={isDarkMode ? theme.white : theme.black} />
-          <VSpacing size={#px(16)} />
-          <Text value="Please connect to make request" size=Text.Body1 nowrap=true />
-          <VSpacing size={#px(16)} />
-          <Button px=20 py=5 onClick={_ => connect(chainID)}> {"Connect"->React.string} </Button>
+          <VSpacing size=Spacing.sm />
+          <Text value="Connect Wallet to see Delegation Info" size=Text.Body1 nowrap=true />
+          <VSpacing size=Spacing.sm />
+          <Button px=24 py=7 variant=Outline onClick={_ => connect(chainID)}>
+            {"Connect Wallet"->React.string}
+          </Button>
         </div>
       | Error(err) =>
         // log for err details

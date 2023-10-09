@@ -21,7 +21,7 @@ module Styles = {
       cursor(pointer),
       padding4(~top=#zero, ~right=#zero, ~bottom=#px(16), ~left=#zero),
       borderBottom(#px(4), solid, active ? theme.primary_600 : transparent),
-      Media.mobile([whiteSpace(nowrap), padding2(~v=#px(24), ~h=zero)]),
+      Media.mobile([whiteSpace(nowrap), paddingBottom(#px(16))]),
     ])
 
   let childrenContainer = style(. [Media.mobile([padding2(~h=px(16), ~v=zero)])])

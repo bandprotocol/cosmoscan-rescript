@@ -3,194 +3,45 @@ module Styles = {
 
   let tableWrapper = style(. [Media.mobile([padding2(~v=#px(16), ~h=#zero)])])
   let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
-
-  // DataSource Table
-  let dataSourceTable = (show, theme: Theme.t) => {
-    style(. [
-      padding2(~v=show ? #px(16) : #zero, ~h=#px(24)),
-      marginTop(show ? #px(24) : #zero),
-      backgroundColor(theme.neutral_100),
-      transition(~duration=200, "all"),
-      height(show ? #auto : #zero),
-      opacity(show ? 1. : 0.),
-      selector("> div + div", [paddingTop(#px(16))]),
-    ])
-  }
-  let toggle = style(. [cursor(#pointer)])
 }
-
-module DataSourceItem = {
-  @react.component
-  let make = (~dataSource: ReportSub.ValidatorReport.report_details_t) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-
-    <Row>
-      <Col col=Col.Two>
-        <Text block=true value={dataSource.externalID} color={theme.neutral_900} />
-      </Col>
-      <Col col=Col.Three>
-        <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
-          <TypeID.DataSource
-            id={
-              let rawRequest = dataSource.rawRequest->Belt.Option.getExn
-              rawRequest.dataSource.dataSourceID
-            }
-          />
-          <HSpacing size=Spacing.sm />
-          <Text
-            value={
-              let rawRequest = dataSource.rawRequest->Belt.Option.getExn
-              rawRequest.dataSource.dataSourceName
-            }
-            ellipsis=true
-          />
-        </div>
-      </Col>
-      <Col col=Col.Two>
-        <Text
-          block=true
-          value={
-            let rawRequest = dataSource.rawRequest->Belt.Option.getExn
-            rawRequest.calldata->JsBuffer.toUTF8
-          }
-          color={theme.neutral_900}
-        />
-      </Col>
-      <Col col=Col.Two>
-        <Text block=true value={dataSource.exitCode} color={theme.neutral_900} />
-      </Col>
-      <Col col=Col.Three>
-        <Text
-          block=true
-          value={dataSource.data->JsBuffer.toUTF8}
-          align=Text.Right
-          color={theme.neutral_900}
-          ellipsis=true
-        />
-      </Col>
-    </Row>
-  }
-}
-
 module RenderBody = {
   @react.component
-  let make = (~reportsSub: Sub.variant<ReportSub.ValidatorReport.t>) => {
+  let make = (~reportsSub: Sub.variant<ReportSub.ValidatorReport.t>, ~templateColumns) => {
     let (show, setShow) = React.useState(_ => false)
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
     <TBody>
-      <Row alignItems=Row.Center minHeight={#px(30)}>
-        <Col col=Col.Three>
-          {switch reportsSub {
-          | Data({request: {id}}) => <TypeID.Request id />
-          | _ => <LoadingCensorBar width=135 height=15 />
-          }}
-        </Col>
-        <Col col=Col.Four>
-          {switch reportsSub {
-          | Data({request: {oracleScript: {oracleScriptID, name}}}) =>
-            <div className={CssHelper.flexBox()}>
-              <TypeID.OracleScript id=oracleScriptID />
-              <HSpacing size=Spacing.sm />
-              <Text value=name ellipsis=true />
-            </div>
-          | _ => <LoadingCensorBar width=270 height=15 />
-          }}
-        </Col>
-        <Col col=Col.Three>
-          {switch reportsSub {
-          | Data({txHash}) =>
-            switch txHash {
-            | Some(txHash') => <TxLink txHash=txHash' width=140 />
-            | None => <Text value="Syncing" />
-            }
-          | _ => <LoadingCensorBar width=170 height=15 />
-          }}
-        </Col>
-        <Col col=Col.Two>
-          <div
-            onClick={_ => setShow(prev => !prev)}
-            className={Css.merge(list{CssHelper.flexBox(~justify=#flexEnd, ()), Styles.toggle})}>
-            {switch reportsSub {
-            | Data(_) =>
-              <>
-                <Text
-                  block=true
-                  value={show ? "Hide Report" : "Show Report"}
-                  weight=Text.Semibold
-                  color={theme.neutral_900}
-                />
-                <HSpacing size=Spacing.xs />
-                <Icon
-                  name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.neutral_600}
-                />
-              </>
-            | _ => <LoadingCensorBar width=100 height=15 />
-            }}
-          </div>
-        </Col>
-      </Row>
-      <div className={Styles.dataSourceTable(show, theme)}>
-        <Row>
-          <Col col=Col.Two>
-            <Text
-              block=true
-              value="External ID"
-              weight=Text.Semibold
-              transform=Text.Uppercase
-              size=Text.Caption
-            />
-          </Col>
-          <Col col=Col.Three>
-            <Text
-              block=true
-              value="Data Source"
-              weight=Text.Semibold
-              transform=Text.Uppercase
-              size=Text.Caption
-            />
-          </Col>
-          <Col col=Col.Two>
-            <Text
-              block=true
-              value="Param"
-              weight=Text.Semibold
-              transform=Text.Uppercase
-              size=Text.Caption
-            />
-          </Col>
-          <Col col=Col.Two>
-            <Text
-              block=true
-              value="Exit Code"
-              weight=Text.Semibold
-              transform=Text.Uppercase
-              size=Text.Caption
-            />
-          </Col>
-          <Col col=Col.Three>
-            <Text
-              block=true
-              value="Value"
-              weight=Text.Semibold
-              align=Text.Right
-              transform=Text.Uppercase
-              size=Text.Caption
-            />
-          </Col>
-        </Row>
+      <TableGrid templateColumns>
         {switch reportsSub {
-        | Data({reportDetails}) =>
-          reportDetails
-          ->Belt.Array.mapWithIndex((i, reportDetail) =>
-            <DataSourceItem
-              key={i->Belt.Int.toString ++ reportDetail.externalID} dataSource=reportDetail
-            />
-          )
-          ->React.array
-        | _ => <LoadingCensorBar width=170 height=50 />
+        | Data({txHash}) =>
+          switch txHash {
+          | Some(txHash') => <TxLink txHash=txHash' width=140 />
+          | None => <Text value="Syncing" />
+          }
+        | _ => <LoadingCensorBar width=170 height=15 />
         }}
-      </div>
+        {switch reportsSub {
+        | Data({request: {id}}) => <TypeID.Request id />
+        | _ => <LoadingCensorBar width=135 height=15 />
+        }}
+        {switch reportsSub {
+        | Data({request: {oracleScript: {oracleScriptID, name}}}) =>
+          <div className={CssHelper.flexBox(~wrap=#nowrap, ())}>
+            <TypeID.OracleScript id=oracleScriptID />
+            <HSpacing size=Spacing.sm />
+            <Text value=name ellipsis=true />
+          </div>
+        | _ => <LoadingCensorBar width=270 height=15 />
+        }}
+        // TODO: wire up
+        <div className={CssHelper.flexBox(~justify=#center, ())}>
+          <img alt="Status Icon" src={Images.success} />
+        </div>
+        <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+          // TODO: wire up
+          <Timestamp time={MomentRe.momentNow()} size=Text.Body1 textAlign=Text.Right />
+        </div>
+      </TableGrid>
     </TBody>
   }
 }
@@ -205,8 +56,6 @@ module RenderBodyMobile = {
         values={
           open InfoMobileCard
           [
-            ("Request ID", RequestID(id)),
-            ("Oracle Script", OracleScript(oracleScriptID, name)),
             (
               "TX Hash",
               switch txHash {
@@ -214,36 +63,26 @@ module RenderBodyMobile = {
               | None => Text("Syncing")
               },
             ),
+            ("Request ID", RequestID(id)),
+            ("Oracle Script", OracleScript(oracleScriptID, name)),
+            // TODO: wire up
+            ("Status", Status({status: true})),
+            ("Time", Timestamp(MomentRe.momentNow())),
           ]
         }
         key={id->ID.Request.toString}
         idx={id->ID.Request.toString}
-        panels={reportDetails->Belt.Array.map(({
-          externalID,
-          exitCode,
-          data,
-          rawRequest: rawRequestOpt,
-        }) => {
-          let {dataSource: {dataSourceID, dataSourceName}, calldata} =
-            rawRequestOpt->Belt.Option.getExn
-          open InfoMobileCard
-          [
-            ("External ID", Text(externalID)),
-            ("Data Source", DataSource(dataSourceID, dataSourceName)),
-            ("Param", Text(calldata->JsBuffer.toUTF8)),
-            ("Exit Code", Text(exitCode)),
-            ("Value", Text(data->JsBuffer.toUTF8)),
-          ]
-        })}
       />
     | _ =>
       <MobileCard
         values={
           open InfoMobileCard
           [
+            ("TX Hash", Loading(isSmallMobile ? 170 : 200)),
             ("Request ID", Loading(70)),
             ("Oracle Script", Loading(136)),
-            ("TX Hash", Loading(isSmallMobile ? 170 : 200)),
+            ("Status", Loading(60)),
+            ("Time", Loading(100)),
           ]
         }
         key={reserveIndex->Belt.Int.toString}
@@ -269,79 +108,21 @@ let make = (~address) => {
   let allSub = Sub.all2(reportsSub, reportsCountSub)
 
   let isMobile = Media.isMobile()
-  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = ThemeContext.use()
+
+  let templateColumns = [#fr(1.), #fr(1.), #minmax((#px(200), #fr(1.5))), #fr(0.5), #fr(1.)]
 
   <div className=Styles.tableWrapper>
     {isMobile
-      ? <Row marginBottom=16>
-          <Col>
-            {switch reportsCountSub {
-            | Data(reportsCount) =>
-              <div className={CssHelper.flexBox()}>
-                <Text
-                  block=true
-                  value={reportsCount->Format.iPretty}
-                  weight=Text.Semibold
-                  transform=Text.Uppercase
-                  size=Text.Caption
-                />
-                <HSpacing size=Spacing.xs />
-                <Text
-                  block=true
-                  value="Requests"
-                  weight=Text.Semibold
-                  transform=Text.Uppercase
-                  size=Text.Caption
-                />
-              </div>
-            | _ => <LoadingCensorBar width=100 height=15 />
-            }}
-          </Col>
-        </Row>
-      : <THead>
-          <Row alignItems=Row.Center>
-            <Col col=Col.Three>
-              {switch reportsCountSub {
-              | Data(reportsCount) =>
-                <div className={CssHelper.flexBox()}>
-                  <Text
-                    block=true
-                    value={reportsCount->Format.iPretty}
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                    size=Text.Caption
-                  />
-                  <HSpacing size=Spacing.xs />
-                  <Text
-                    block=true
-                    value="Oracle Reports"
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                    size=Text.Caption
-                  />
-                </div>
-              | _ => <LoadingCensorBar width=100 height=15 />
-              }}
-            </Col>
-            <Col col=Col.Four>
-              <Text
-                block=true
-                value="Oracle Script"
-                weight=Text.Semibold
-                transform=Text.Uppercase
-                size=Text.Caption
-              />
-            </Col>
-            <Col col=Col.Five>
-              <Text
-                block=true
-                value="TX Hash"
-                weight=Text.Semibold
-                transform=Text.Uppercase
-                size=Text.Caption
-              />
-            </Col>
-          </Row>
+      ? React.null
+      : <THead height=36>
+          <TableGrid templateColumns={templateColumns}>
+            <Text block=true value="TX Hash" weight=Semibold />
+            <Text block=true value="Request ID" weight=Semibold />
+            <Text block=true value="Oracle Script" weight=Semibold />
+            <Text block=true value="Status" weight=Semibold align=Center />
+            <Text block=true value="Time" weight=Semibold align=Right />
+          </TableGrid>
         </THead>}
     {switch allSub {
     | Data((reports, reportsCount)) =>
@@ -358,6 +139,7 @@ let make = (~address) => {
                 : <RenderBody
                     key={i->Belt.Int.toString ++ e.request.id->ID.Request.toString}
                     reportsSub={Sub.resolve(e)}
+                    templateColumns
                   />
             )
             ->React.array
@@ -390,7 +172,7 @@ let make = (~address) => {
       ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i reportsSub=noData />
-          : <RenderBody key={i->Belt.Int.toString} reportsSub=noData />
+          : <RenderBody key={i->Belt.Int.toString} reportsSub=noData templateColumns />
       )
       ->React.array
     }}
