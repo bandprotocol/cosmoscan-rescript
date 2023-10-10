@@ -44,7 +44,7 @@ module Loading = {
       </div>
       <div className={Css.merge(list{CssHelper.flexBox(), Styles.resultBox})}>
         <div className=Styles.labelWrapper>
-          <Text value="Proof of Validaty" color={theme.neutral_600} weight=Text.Regular />
+          <Text value="Proof of validity" color={theme.neutral_600} weight=Text.Regular />
         </div>
         <LoadingCensorBar width=103 height=20 />
       </div>
@@ -180,7 +180,7 @@ let make = (~txResponse: TxCreator.tx_response_t, ~schema: string) =>
             </div>
             <div className={Css.merge(list{CssHelper.flexBox(), Styles.resultBox})}>
               <div className=Styles.labelWrapper>
-                <Text value="Proof of Validaty" color={theme.neutral_600} weight=Text.Regular />
+                <Text value="Proof of validity" color={theme.neutral_600} weight=Text.Regular />
               </div>
               {txResponse.code != 0
                 ? <Text value="n/a" color={theme.neutral_400} />
