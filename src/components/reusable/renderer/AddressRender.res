@@ -83,7 +83,7 @@ let make = (
       ])}
       route={isValidator
         ? Route.ValidatorDetailsPage(address, Route.Reports)
-        : Route.AccountIndexPage(address, Route.AccountDelegations)}>
+        : Route.AccountIndexPage(address, Route.AccountPortfolio)}>
       <span
         className={CssJs.merge(. [
           Styles.base,

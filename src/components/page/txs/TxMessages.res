@@ -24,7 +24,7 @@ module Styles = {
 }
 
 @react.component
-let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string) => {
+let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string, ~showSender=true) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let (overflowed, setOverflowed) = React.useState(_ => false)
   let (expanded, setExpanded) = React.useState(_ => false)
@@ -46,7 +46,7 @@ let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string) => {
       ->Belt.List.toArray
       ->Belt.Array.mapWithIndex((i, msg) =>
         <React.Fragment key={txHash->Hash.toHex ++ i->Belt.Int.toString}>
-          {<SubMsg msg />}
+          {<SubMsg msg showSender />}
         </React.Fragment>
       )
       ->React.array}

@@ -10,9 +10,8 @@ type oracle_script_tab_t =
   | OracleScriptRequests
 
 type account_tab_t =
-  | AccountDelegations
-  | AccountUnbonding
-  | AccountRedelegate
+  | AccountPortfolio
+  | AccountTransaction
 
 type validator_tab_t =
   | ProposedBlocks
@@ -94,9 +93,8 @@ let fromUrl = (url: RescriptReactRouter.url) =>
   | (list{"account", address}, hash) =>
     let urlHash = hash =>
       switch hash {
-      | "unbonding" => AccountUnbonding
-      | "redelegate" => AccountRedelegate
-      | _ => AccountDelegations
+      | "txs" => AccountTransaction
+      | _ => AccountPortfolio
       }
     switch address->Address.fromBech32Opt {
     | Some(address) => AccountIndexPage(address, urlHash(hash))
@@ -161,19 +159,14 @@ let toString = route =>
   | BlockDetailsPage(height) => `/block/${height->Belt.Int.toString}`
   | RequestHomePage => "/requests"
   | RequestDetailsPage(reqID) => `/request/${reqID->Belt.Int.toString}`
-  | AccountIndexPage(address, AccountDelegations) => {
+  | AccountIndexPage(address, AccountPortfolio) => {
       let addressBech32 = address->Address.toBech32
-      `/account/${addressBech32}#delegations`
+      `/account/${addressBech32}#portfolio`
     }
 
-  | AccountIndexPage(address, AccountUnbonding) => {
+  | AccountIndexPage(address, AccountTransaction) => {
       let addressBech32 = address->Address.toBech32
-      `/account/${addressBech32}#unbonding`
-    }
-
-  | AccountIndexPage(address, AccountRedelegate) => {
-      let addressBech32 = address->Address.toBech32
-      `/account/${addressBech32}#redelegate`
+      `/account/${addressBech32}#txs`
     }
 
   | ValidatorDetailsPage(validatorAddress, Delegators) => {
@@ -217,7 +210,7 @@ let search = (str: string) => {
   } else if str->Js.String2.startsWith("band") {
     str
     ->Address.fromBech32Opt
-    ->Belt.Option.map(address => AccountIndexPage(address, AccountDelegations))
+    ->Belt.Option.map(address => AccountIndexPage(address, AccountPortfolio))
   } else if len == 64 || (str->Js.String2.startsWith("0x") && len == 66) {
     Some(TxIndexPage(str->Hash.fromHex))
   } else if capStr->Js.String2.startsWith("B") {

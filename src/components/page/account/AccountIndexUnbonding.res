@@ -7,45 +7,40 @@ module Styles = {
 
 module RenderBody = {
   @react.component
-  let make = (~unbondingListSub: Sub.variant<UnbondingSub.unbonding_list_t>) =>
+  let make = (~unbondingListSub: Sub.variant<UnbondingSub.unbonding_list_t>, ~templateColumns) =>
     <TBody>
-      <Row alignItems=Row.Center>
-        <Col col=Col.Six>
+      <TableGrid templateColumns>
+        {switch unbondingListSub {
+        | Data({validator: {operatorAddress, moniker, identity}}) =>
+          <div className={CssHelper.flexBox()}>
+            <ValidatorMonikerLink
+              validatorAddress=operatorAddress
+              moniker
+              identity
+              width=#px(300)
+              avatarWidth=30
+              size=Text.Body1
+            />
+          </div>
+        | _ => <LoadingCensorBar width=200 height=20 />
+        }}
+        <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
           {switch unbondingListSub {
-          | Data({validator: {operatorAddress, moniker, identity}}) =>
-            <div className={CssHelper.flexBox()}>
-              <ValidatorMonikerLink
-                validatorAddress=operatorAddress
-                moniker
-                identity
-                width=#px(300)
-                avatarWidth=30
-                size=Text.Body1
-              />
-            </div>
+          | Data({amount}) =>
+            <Text value={amount->Coin.getBandAmountFromCoin->Format.fPretty} size=Body1 />
           | _ => <LoadingCensorBar width=200 height=20 />
           }}
-        </Col>
-        <Col col=Col.Three>
-          <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-            {switch unbondingListSub {
-            | Data({amount}) => <Text value={amount->Coin.getBandAmountFromCoin->Format.fPretty} />
-            | _ => <LoadingCensorBar width=200 height=20 />
-            }}
-          </div>
-        </Col>
-        <Col col=Col.Three>
-          <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-            {switch unbondingListSub {
-            | Data({completionTime}) =>
-              <Timestamp
-                time=completionTime size=Text.Body2 weight=Text.Regular textAlign=Text.Right
-              />
-            | _ => <LoadingCensorBar width=200 height=20 />
-            }}
-          </div>
-        </Col>
-      </Row>
+        </div>
+        <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+          {switch unbondingListSub {
+          | Data({completionTime}) =>
+            <Timestamp
+              time=completionTime size=Text.Body1 weight=Text.Regular textAlign=Text.Right
+            />
+          | _ => <LoadingCensorBar width=200 height=20 />
+          }}
+        </div>
+      </TableGrid>
     </TBody>
 }
 
@@ -62,8 +57,8 @@ module RenderBodyMobile = {
         values={
           open InfoMobileCard
           [
-            ("Validator", Validator({address: operatorAddress, moniker, identity})),
-            ("Amount\n(BAND)", Coin({value: list{amount}, hasDenom: false})),
+            ("Validator Name", Validator({address: operatorAddress, moniker, identity})),
+            ("Amount", Coin({value: list{amount}, hasDenom: false})),
             ("Unbonded At", Timestamp(completionTime)),
           ]
         }
@@ -75,9 +70,9 @@ module RenderBodyMobile = {
         values={
           open InfoMobileCard
           [
-            ("Validator", Loading(230)),
-            ("Amount\n(BAND)", Loading(230)),
-            ("Unbonded At", Loading(230)),
+            ("Validator Name", Loading(200)),
+            ("Amount", Loading(200)),
+            ("Unbonded At", Loading(200)),
           ]
         }
         key={reserveIndex->Belt.Int.toString}
@@ -104,81 +99,19 @@ let make = (~address) => {
   )
   let unbondingCountSub = UnbondingSub.getUnbondingCountByDelegator(address, currentTime)
 
-  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = ThemeContext.use()
+
+  let templateColumns = [#fr(1.4), #repeat(#num(2), #fr(0.8))]
 
   <div className=Styles.tableWrapper>
     {isMobile
-      ? <Row marginBottom=16>
-          <Col>
-            {switch unbondingCountSub {
-            | Data(unbondingCount) =>
-              <div className={CssHelper.flexBox()}>
-                <Text
-                  block=true
-                  value={unbondingCount->Belt.Int.toString}
-                  weight=Text.Semibold
-                  size=Text.Caption
-                  transform=Text.Uppercase
-                />
-                <HSpacing size=Spacing.xs />
-                <Text
-                  block=true
-                  value="Unbonding Entries"
-                  weight=Text.Semibold
-                  size=Text.Caption
-                  transform=Text.Uppercase
-                />
-              </div>
-            | _ => <LoadingCensorBar width=100 height=15 />
-            }}
-          </Col>
-        </Row>
+      ? React.null
       : <THead>
-          <Row alignItems=Row.Center>
-            <Col col=Col.Six>
-              {switch unbondingCountSub {
-              | Data(unbondingCount) =>
-                <div className={CssHelper.flexBox()}>
-                  <Text
-                    block=true
-                    value={unbondingCount->Belt.Int.toString}
-                    weight=Text.Semibold
-                    size=Text.Caption
-                    transform=Text.Uppercase
-                  />
-                  <HSpacing size=Spacing.xs />
-                  <Text
-                    block=true
-                    value="Unbonding Entries"
-                    weight=Text.Semibold
-                    size=Text.Caption
-                    transform=Text.Uppercase
-                  />
-                </div>
-              | _ => <LoadingCensorBar width=100 height=15 />
-              }}
-            </Col>
-            <Col col=Col.Three>
-              <Text
-                block=true
-                value="Amount (BAND)"
-                weight=Text.Semibold
-                size=Text.Caption
-                transform=Text.Uppercase
-                align=Text.Right
-              />
-            </Col>
-            <Col col=Col.Three>
-              <Text
-                block=true
-                value="Unbonded At"
-                weight=Text.Semibold
-                size=Text.Caption
-                transform=Text.Uppercase
-                align=Text.Right
-              />
-            </Col>
-          </Row>
+          <TableGrid templateColumns>
+            <Text block=true value="Unbonding Entries" weight=Semibold />
+            <Text block=true value="Amount(BAND)" weight=Semibold align=Right />
+            <Text block=true value="Unbonded At" weight=Semibold align=Right />
+          </TableGrid>
         </THead>}
     {switch unbondingListSub {
     | Data(unbondingList) =>
@@ -198,6 +131,7 @@ let make = (~address) => {
                     (e.completionTime->MomentRe.Moment.toISOString ++
                     i->Belt.Int.toString)}
                   unbondingListSub={Sub.resolve(e)}
+                  templateColumns
                 />
           )
           ->React.array
@@ -214,13 +148,14 @@ let make = (~address) => {
               weight=Heading.Regular
               color=theme.neutral_600
             />
+            <Text value="The unbonding process is a 21 day waiting period." />
           </EmptyContainer>
     | _ =>
       Belt.Array.make(pageSize, Sub.NoData)
       ->Belt.Array.mapWithIndex((i, noData) =>
         isMobile
           ? <RenderBodyMobile key={i->Belt.Int.toString} reserveIndex=i unbondingListSub=noData />
-          : <RenderBody key={i->Belt.Int.toString} unbondingListSub=noData />
+          : <RenderBody key={i->Belt.Int.toString} unbondingListSub=noData templateColumns />
       )
       ->React.array
     }}
