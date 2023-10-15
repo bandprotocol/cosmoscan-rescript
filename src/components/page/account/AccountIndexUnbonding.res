@@ -22,13 +22,15 @@ module RenderBody = {
               size=Text.Body1
             />
           </div>
-        | _ => <LoadingCensorBar width=200 height=20 />
+        | _ => <LoadingCensorBar width=150 height=20 />
         }}
         <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
           {switch unbondingListSub {
           | Data({amount}) =>
-            <Text value={amount->Coin.getBandAmountFromCoin->Format.fPretty} size=Body1 />
-          | _ => <LoadingCensorBar width=200 height=20 />
+            <Text
+              value={amount->Coin.getBandAmountFromCoin->Format.fPretty} size=Body1 weight=Bold
+            />
+          | _ => <LoadingCensorBar width=150 height=20 />
           }}
         </div>
         <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
@@ -37,7 +39,7 @@ module RenderBody = {
             <Timestamp
               time=completionTime size=Text.Body1 weight=Text.Regular textAlign=Text.Right
             />
-          | _ => <LoadingCensorBar width=200 height=20 />
+          | _ => <LoadingCensorBar width=150 height=20 />
           }}
         </div>
       </TableGrid>
