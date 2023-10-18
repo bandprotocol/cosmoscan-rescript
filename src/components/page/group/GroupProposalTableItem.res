@@ -84,8 +84,8 @@ module TableItemMobile = {
           </Col>
           <Col colSm=Col.Eight>
             <GroupProposalStatus
-              value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
-              color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+              value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.toString}
+              status={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
             />
           </Col>
         </Row>
@@ -148,8 +148,8 @@ let make = (~item) => {
           </div>
           <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
             <GroupProposalStatus
-              value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
-              color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+              value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.toString}
+              status={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
             />
           </div>
         </div>}
