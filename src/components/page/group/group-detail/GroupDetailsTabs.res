@@ -81,6 +81,12 @@ module Styles = {
   let informationContainer = style(. [padding2(~v=#px(24), ~h=#px(0))])
   let link = (theme: Theme.t) =>
     style(. [color(theme.primary_600), fontSize(#px(14)), textDecoration(#underline)])
+  let noDataContainer = style(. [
+    display(#flex),
+    justifyContent(#center),
+    marginTop(#px(16)),
+    padding2(~v=#px(8), ~h=#px(0)),
+  ])
 }
 
 module SortableTHead = {
@@ -149,9 +155,11 @@ module SortableTHead = {
 // TODO: params in mocked
 module Proposal = {
   @react.component
-  let make = (~proposals: array<MockGroup.group_proposal>) => {
+  let make = (~groupID: ID.Group.t) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+    // TODO: add pagination
+    let proposalSub = GroupSub.getProposals(~groupID, ~page=1, ~pageSize=10, ())
 
     // TODO: wire up this when graphql is ready
     let (sortedBy, setSortedBy) = React.useState(_ => SortGroupProposalTable.ID)
@@ -168,181 +176,201 @@ module Proposal = {
     }
 
     {
-      isMobile
-        ? {
-            proposals
-            ->Belt.Array.mapWithIndex((index, proposal) =>
-              <div>
-                <Row marginTop={16}>
-                  <Col col=Col.Twelve>
-                    <TypeID.GroupProposalLink id={proposal.id}>
-                      <div className={Css.merge(list{CssHelper.flexBox()})}>
-                        <TypeID.GroupProposal
-                          id={proposal.id} position=TypeID.Subtitle isNotLink=true weight={Semibold}
-                        />
-                        <HSpacing size=Spacing.sm />
-                        <Heading
-                          size=Heading.H4
-                          value={proposal.name}
-                          weight=Heading.Semibold
-                          color={theme.primary_600}
-                        />
-                      </div>
-                    </TypeID.GroupProposalLink>
-                  </Col>
-                </Row>
-                <Row marginTop={16}>
-                  <Col colSm=Col.Four>
-                    <Text value="Message" size={Body1} weight={Semibold} />
-                  </Col>
-                  <Col colSm=Col.Eight>
-                    <MsgBadge name="Message" />
-                  </Col>
-                </Row>
-                <Row marginTop={16}>
-                  <Col colSm=Col.Four>
-                    <Text value="Policy Type" size={Body1} weight={Semibold} />
-                  </Col>
-                  <Col colSm=Col.Eight>
-                    <Text
-                      value={proposal._policy_type->MockGroup.policy_type_to_string}
-                      ellipsis=true
-                      color={theme.neutral_900}
-                      size={Body1}
-                    />
-                  </Col>
-                </Row>
-                <Row marginTop={16}>
-                  <Col colSm=Col.Four>
-                    <Text value="Status" size={Body1} weight={Semibold} />
-                  </Col>
-                  <Col colSm=Col.Eight>
-                    <GroupProposalStatus
-                      value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.toString}
-                      status={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
-                    />
-                  </Col>
-                </Row>
-                {index < proposals->Belt.Array.length - 1
-                  ? <SeperatedLine color=theme.neutral_200 />
-                  : React.null}
-              </div>
-            )
-            ->React.array
-          }
-        : <div>
-            {isMobile
-              ? React.null
-              : <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
-                  <div className={Css.merge(list{Styles.tablehead, Styles.proposalGrid})}>
-                    <div>
-                      <SortableTHead
-                        title="ID" direction toggle value=SortGroupProposalTable.ID sortedBy
-                      />
-                    </div>
-                    <div>
-                      <SortableTHead
-                        title="Proposal Name"
-                        direction
-                        toggle
-                        sortedBy
-                        value=SortGroupProposalTable.Name
-                      />
-                    </div>
-                    <div>
-                      <SortableTHead
-                        title="Message"
-                        toggle
-                        sortedBy
-                        direction
-                        value=SortGroupProposalTable.Message
-                      />
-                    </div>
-                    <div>
-                      <SortableTHead
-                        title="Policy Type"
-                        toggle
-                        sortedBy
-                        direction
-                        value=SortGroupProposalTable.GroupID
-                      />
-                    </div>
-                    <div>
-                      <SortableTHead
-                        title="Result"
-                        toggle
-                        sortedBy
-                        direction
-                        value=SortGroupProposalTable.GroupID
-                      />
-                    </div>
-                    <div>
-                      <SortableTHead
-                        title="Status"
-                        toggle
-                        sortedBy
-                        direction
-                        value=SortGroupProposalTable.ProposalStatus
-                      />
-                    </div>
-                  </div>
-                </div>}
-            {proposals
-            ->Belt.Array.mapWithIndex((index, proposal) =>
-              <div>
-                <div
-                  className={Css.merge(list{
-                    "table_item",
-                    CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
-                    Styles.tableItem(theme),
-                    Styles.proposalGrid,
-                  })}>
-                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-                    <TypeID.GroupProposal id={proposal.id} size={Body1} weight={Bold} />
-                  </div>
-                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-                    <Link
-                      className={Css.merge(list{Styles.tableLink(theme)})}
-                      route={OracleScriptDetailsPage(1, OracleScriptRequests)}>
+      switch proposalSub {
+      | Data(proposals) =>
+        isMobile
+          ? {
+              proposals
+              ->Belt.Array.mapWithIndex((index, proposal) =>
+                <div key={proposal.id->ID.GroupProposal.toString}>
+                  <Row marginTop={16}>
+                    <Col col=Col.Twelve>
+                      <TypeID.GroupProposalLink id={proposal.id}>
+                        <div className={Css.merge(list{CssHelper.flexBox()})}>
+                          <TypeID.GroupProposal
+                            id={proposal.id}
+                            position=TypeID.Subtitle
+                            isNotLink=true
+                            weight={Semibold}
+                          />
+                          <HSpacing size=Spacing.sm />
+                          <Heading
+                            size=Heading.H4
+                            value={proposal.title}
+                            weight=Heading.Semibold
+                            color={theme.primary_600}
+                          />
+                        </div>
+                      </TypeID.GroupProposalLink>
+                    </Col>
+                  </Row>
+                  <Row marginTop={16}>
+                    <Col colSm=Col.Four>
+                      <Text value="Message" size={Body1} weight={Semibold} />
+                    </Col>
+                    <Col colSm=Col.Eight>
+                      <MsgBadge name="Message" />
+                    </Col>
+                  </Row>
+                  <Row marginTop={16}>
+                    <Col colSm=Col.Four>
+                      <Text value="Policy Type" size={Body1} weight={Semibold} />
+                    </Col>
+                    <Col colSm=Col.Eight>
                       <Text
-                        value={proposal.name}
+                        value={proposal.policyType->Group.PolicyType.toString}
                         ellipsis=true
-                        color={theme.primary_600}
-                        weight=Semibold
+                        color={theme.neutral_900}
                         size={Body1}
                       />
-                    </Link>
-                  </div>
-                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-                    {proposal.message->Belt.Array.map(msg => <MsgBadge name={msg} />)->React.array}
-                  </div>
-                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-                    <Text
-                      value={proposal._policy_type->MockGroup.policy_type_to_string}
-                      ellipsis=true
-                      color={theme.neutral_600}
-                      size={Body1}
-                    />
-                  </div>
-                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-                    <Text
-                      value={proposal.result} ellipsis=true color={theme.neutral_600} size={Body1}
-                    />
-                  </div>
-                  <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-                    <GroupProposalStatus
-                      value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.toString}
-                      status={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
-                    />
-                  </div>
+                    </Col>
+                  </Row>
+                  <Row marginTop={16}>
+                    <Col colSm=Col.Four>
+                      <Text value="Status" size={Body1} weight={Semibold} />
+                    </Col>
+                    <Col colSm=Col.Eight>
+                      <GroupProposalStatus
+                        value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.toString}
+                        status={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+                      />
+                    </Col>
+                  </Row>
+                  {index < proposals->Belt.Array.length - 1
+                    ? <SeperatedLine color=theme.neutral_200 />
+                    : React.null}
                 </div>
-                {index < proposals->Belt.Array.length - 1
-                  ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
-                  : React.null}
-              </div>
-            )
-            ->React.array}
-          </div>
+              )
+              ->React.array
+            }
+          : <div>
+              {isMobile
+                ? React.null
+                : <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
+                    <div className={Css.merge(list{Styles.tablehead, Styles.proposalGrid})}>
+                      <div>
+                        <SortableTHead
+                          title="ID" direction toggle value=SortGroupProposalTable.ID sortedBy
+                        />
+                      </div>
+                      <div>
+                        <SortableTHead
+                          title="Proposal Name"
+                          direction
+                          toggle
+                          sortedBy
+                          value=SortGroupProposalTable.Name
+                        />
+                      </div>
+                      <div>
+                        <SortableTHead
+                          title="Message"
+                          toggle
+                          sortedBy
+                          direction
+                          value=SortGroupProposalTable.Message
+                        />
+                      </div>
+                      <div>
+                        <SortableTHead
+                          title="Policy Type"
+                          toggle
+                          sortedBy
+                          direction
+                          value=SortGroupProposalTable.GroupID
+                        />
+                      </div>
+                      <div>
+                        <SortableTHead
+                          title="Result"
+                          toggle
+                          sortedBy
+                          direction
+                          value=SortGroupProposalTable.GroupID
+                        />
+                      </div>
+                      <div>
+                        <SortableTHead
+                          title="Status"
+                          toggle
+                          sortedBy
+                          direction
+                          value=SortGroupProposalTable.ProposalStatus
+                        />
+                      </div>
+                    </div>
+                  </div>}
+              {proposals
+              ->Belt.Array.mapWithIndex((index, proposal) =>
+                <div key={proposal.id->ID.GroupProposal.toString}>
+                  <div
+                    className={Css.merge(list{
+                      "table_item",
+                      CssHelper.flexBox(~align=#center, ~justify=#spaceBetween, ()),
+                      Styles.tableItem(theme),
+                      Styles.proposalGrid,
+                    })}>
+                    <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                      <TypeID.GroupProposal id={proposal.id} size={Body1} weight={Bold} />
+                    </div>
+                    <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                      <Link
+                        className={Css.merge(list{Styles.tableLink(theme)})}
+                        route={OracleScriptDetailsPage(1, OracleScriptRequests)}>
+                        <Text
+                          value={proposal.title}
+                          ellipsis=true
+                          color={theme.primary_600}
+                          weight=Semibold
+                          size={Body1}
+                        />
+                      </Link>
+                    </div>
+                    <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                      {proposal.messages
+                      ->Belt.List.map(msg => <MsgBadge name={(msg.decoded->Msg.getBadge).name} />)
+                      ->Array.of_list
+                      ->React.array}
+                    </div>
+                    <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                      <Text
+                        value={proposal.policyType->Group.PolicyType.toString}
+                        ellipsis=true
+                        color={theme.neutral_600}
+                        size={Body1}
+                      />
+                    </div>
+                    <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                      <Text
+                        value={proposal.yesVote->Belt.Float.toString}
+                        ellipsis=true
+                        color={theme.neutral_600}
+                        size={Body1}
+                      />
+                    </div>
+                    <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
+                      <GroupProposalStatus
+                        value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.toString}
+                        status={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+                      />
+                    </div>
+                  </div>
+                  {index < proposals->Belt.Array.length - 1
+                    ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
+                    : React.null}
+                </div>
+              )
+              ->React.array}
+            </div>
+      | NoData | Loading =>
+        <div className=Styles.noDataContainer>
+          <Text value="No proposal created" color={theme.neutral_600} size={Body1} />
+        </div>
+      | Error(err) =>
+        <div className=Styles.noDataContainer>
+          <Text value=err.message color={theme.neutral_600} size={Body1} />
+        </div>
+      }
     }
   }
 }
@@ -409,7 +437,7 @@ module Policy = {
           </div>}
       {polices
       ->Belt.Array.mapWithIndex((index, policy) =>
-        <div>
+        <div key={policy.address->Address.toBech32}>
           {isMobile
             ? <div>
                 <Row marginTop={16}>
@@ -590,7 +618,7 @@ module Members = {
       {members
       ->Belt.Array.mapWithIndex((index, member) => {
         isMobile
-          ? <div>
+          ? <div key={member.address->Address.toBech32}>
               <Row marginTop={16}>
                 <Col
                   col=Col.Twelve
@@ -612,7 +640,7 @@ module Members = {
                 ? <SeperatedLine color=theme.neutral_200 mt=0 mb=0 />
                 : React.null}
             </div>
-          : <div>
+          : <div key={member.address->Address.toBech32}>
               <div
                 className={Css.merge(list{
                   "table_item",

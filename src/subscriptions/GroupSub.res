@@ -13,6 +13,9 @@ module ProposalConfig = %graphql(`
       noWithVetoVote: no_with_veto_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
       abstainVote: abstain_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
       status @ppxCustom(module:"GraphQLParserModule.GroupProposalStatus")
+      summary
+      submitTime: submit_time @ppxCustom(module: "GraphQLParserModule.Date")
+      votingPeriodEnd: voting_period_end @ppxCustom(module: "GraphQLParserModule.Date")
     }
   }
 `)
@@ -97,8 +100,8 @@ module MultiConfig = %graphql(`
   }
 `)
 
-let get = id => {
-  let result = SingleConfig.use({id: id})
+let get = groupID => {
+  let result = SingleConfig.use({id: groupID->ID.Group.toInt})
 
   result
   ->Sub.fromData
@@ -119,7 +122,7 @@ let getList = (~page, ~pageSize, ()) => {
 
 let getProposals = (~groupID, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
-  let result = ProposalConfig.use({groupID, limit: pageSize, offset})
+  let result = ProposalConfig.use({groupID: groupID->ID.Group.toInt, limit: pageSize, offset})
 
   result
   ->Sub.fromData

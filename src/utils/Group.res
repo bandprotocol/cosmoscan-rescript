@@ -168,6 +168,10 @@ module Proposal = {
     yesVote: float,
     totalVote: float,
     status: GroupProposalStatus.t,
+    summary: string,
+    submitTime: MomentRe.Moment.t,
+    votingPeriodEnd: MomentRe.Moment.t,
+    result: string,
   }
 
   type group_policy_internal_t = {
@@ -185,6 +189,9 @@ module Proposal = {
     noVote: option<float>,
     noWithVetoVote: option<float>,
     abstainVote: option<float>,
+    summary: string,
+    submitTime: MomentRe.Moment.t,
+    votingPeriodEnd: MomentRe.Moment.t,
   }
 
   let toExternal = ({
@@ -197,22 +204,38 @@ module Proposal = {
     noVote,
     noWithVetoVote,
     abstainVote,
+    summary,
+    submitTime,
+    votingPeriodEnd,
   }) => {
-    id,
-    title,
-    messages: {
-      let msg = messages->Js.Json.decodeArray
-      switch msg {
-      | Some(msg) => msg->Belt.List.fromArray
-      | None => []->Belt.List.fromArray
-      }->Belt.List.map(each => Msg.decodeMsg(each, false))
-    },
-    policyType: group_policy._type->PolicyType.parse,
-    yesVote: yesVote->Belt.Option.getExn,
-    totalVote: yesVote->Belt.Option.getExn +.
-    noVote->Belt.Option.getExn +.
-    noWithVetoVote->Belt.Option.getExn +.
-    abstainVote->Belt.Option.getExn,
-    status,
+    let totalVote =
+      yesVote->Belt.Option.getExn +.
+      noVote->Belt.Option.getExn +.
+      noWithVetoVote->Belt.Option.getExn +.
+      abstainVote->Belt.Option.getExn
+
+    {
+      id,
+      title,
+      messages: {
+        let msg = messages->Js.Json.decodeArray
+        switch msg {
+        | Some(msg) => msg->Belt.List.fromArray
+        | None => []->Belt.List.fromArray
+        }->Belt.List.map(each => Msg.decodeMsg(each, false))
+      },
+      policyType: group_policy._type->PolicyType.parse,
+      yesVote: yesVote->Belt.Option.getExn,
+      totalVote,
+      status,
+      summary,
+      submitTime,
+      votingPeriodEnd,
+      result: switch group_policy._type->PolicyType.parse {
+      | Threshold => yesVote->Belt.Option.getExn->Belt.Float.toString
+      | Percentage => (yesVote->Belt.Option.getExn /. totalVote)->Belt.Float.toString
+      | Unspecified => "Unspecified"
+      },
+    }
   }
 }

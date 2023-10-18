@@ -6,7 +6,8 @@ module Styles = {
   let noPadding = style(. [padding(#zero)])
   let groupID = style(. [
     fontFamilies([#custom("Roboto Mono"), #monospace]),
-    Media.mobile([display(#block), marginRight(#px(8))]),
+    marginRight(#px(8)),
+    Media.mobile([display(#block)]),
   ])
 
   let buttonStyled = style(. [
@@ -26,7 +27,7 @@ module Styles = {
 
 module Content = {
   @react.component
-  let make = (~groupID, ~hashtag) => {
+  let make = (~group: Group.t, ~hashtag) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -48,6 +49,7 @@ module Content = {
               <span className=Styles.groupID>
                 {`#G${mock.id->ID.Group.toInt->Belt.Int.toString} `->React.string}
               </span>
+              // TODO: extract group name from meta data
               <span> {"Group Name"->React.string} </span>
             </Heading>
           </div>
@@ -57,25 +59,25 @@ module Content = {
             <Tab.Route
               tabs=[
                 {
-                  name: `Proposal (${mock.proposals->Belt.Array.length->Belt.Int.toString})`,
-                  route: groupID->ID.Group.getRouteWithTab(Route.GroupProposal),
+                  name: `Proposal (${group.proposalsCount->Belt.Int.toString})`,
+                  route: group.id->ID.Group.getRouteWithTab(Route.GroupProposal),
                 },
                 {
-                  name: `Policy (${mock.policies->Belt.Array.length->Belt.Int.toString})`,
-                  route: groupID->ID.Group.getRouteWithTab(Route.GroupPolicy),
+                  name: `Policy (${group.policiesCount->Belt.Int.toString})`,
+                  route: group.id->ID.Group.getRouteWithTab(Route.GroupPolicy),
                 },
                 {
-                  name: `Members (${mock.members->Belt.Array.length->Belt.Int.toString})`,
-                  route: groupID->ID.Group.getRouteWithTab(Route.GroupMember),
+                  name: `Members (${group.memberCount->Belt.Int.toString})`,
+                  route: group.id->ID.Group.getRouteWithTab(Route.GroupMember),
                 },
                 {
                   name: "Information",
-                  route: groupID->ID.Group.getRouteWithTab(Route.GroupInformation),
+                  route: group.id->ID.Group.getRouteWithTab(Route.GroupInformation),
                 },
               ]
-              currentRoute={groupID->ID.Group.getRouteWithTab(hashtag)}>
+              currentRoute={group.id->ID.Group.getRouteWithTab(hashtag)}>
               {switch hashtag {
-              | GroupProposal => <GroupDetailsTabs.Proposal proposals={mock.proposals} />
+              | GroupProposal => <GroupDetailsTabs.Proposal groupID=group.id />
               | GroupPolicy => <GroupDetailsTabs.Policy polices={mock.policies} />
               | GroupMember => <GroupDetailsTabs.Members members={mock.members} />
               | GroupInformation => <GroupDetailsTabs.Information information={mock.information} />
@@ -90,11 +92,12 @@ module Content = {
 
 @react.component
 let make = (~groupID, ~hashtag) => {
-  // TODO: not have a subscription yet
-  // switch oracleScriptSub {
-  // | NoData => <NotFound />
-  // | Data(_) | Error(_) | Loading => <Content groupID hashtag />
-  // }
+  let groupSub = GroupSub.get(groupID)
 
-  <Content groupID hashtag />
+  switch groupSub {
+  | Data(group) => <Content group hashtag />
+  | NoData => <Text value="NoData" />
+  | Error(_) => <Text value="Error" />
+  | Loading => <Text value="Loading" />
+  }
 }
