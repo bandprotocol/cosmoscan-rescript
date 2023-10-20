@@ -50,7 +50,7 @@ module Content = {
                 {`#G${mock.id->ID.Group.toInt->Belt.Int.toString} `->React.string}
               </span>
               // TODO: extract group name from meta data
-              <span> {"Group Name"->React.string} </span>
+              <span> {group.name->React.string} </span>
             </Heading>
           </div>
         </Row>
@@ -78,9 +78,9 @@ module Content = {
               currentRoute={group.id->ID.Group.getRouteWithTab(hashtag)}>
               {switch hashtag {
               | GroupProposal => <GroupDetailsTabs.Proposal groupID=group.id />
-              | GroupPolicy => <GroupDetailsTabs.Policy polices={mock.policies} />
-              | GroupMember => <GroupDetailsTabs.Members members={mock.members} />
-              | GroupInformation => <GroupDetailsTabs.Information information={mock.information} />
+              | GroupPolicy => <GroupDetailsTabs.Policy groupID=group.id />
+              | GroupMember => <GroupDetailsTabs.Members groupID=group.id />
+              | GroupInformation => <GroupDetailsTabs.Information group />
               }}
             </Tab.Route>
           </Table>

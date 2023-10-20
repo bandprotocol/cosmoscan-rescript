@@ -17,6 +17,7 @@ type group_policy_t = {
 
 type t = {
   id: ID.Group.t,
+  name: string,
   admin: Address.t,
   totalWeight: int,
   createdAt: MomentRe.Moment.t,
@@ -24,6 +25,9 @@ type t = {
   memberCount: int,
   policiesCount: int,
   proposalsCount: int,
+  description: string,
+  website: string,
+  forum: string,
 }
 
 type group_members_aggregate_t = {aggregate: option<aggregate_t>}
@@ -41,6 +45,21 @@ type internal_t = {
   group_proposals_aggregate: group_proposals_aggregate_t,
 }
 
+type metadata_t = {
+  name: string,
+  description: string,
+  website: string,
+  forum: string,
+}
+
+// TODO: extractMetadata
+let extractMetadata = metadata => {
+  name: "Example Group Name",
+  description: "description",
+  website: "website",
+  forum: "forum",
+}
+
 let toExternal = ({
   id,
   admin,
@@ -51,14 +70,22 @@ let toExternal = ({
   group_policies_aggregate,
   group_proposals_aggregate,
 }) => {
-  id,
-  admin,
-  totalWeight,
-  createdAt,
-  metadata,
-  memberCount: (group_members_aggregate.aggregate->Belt.Option.getExn).count,
-  policiesCount: (group_policies_aggregate.aggregate->Belt.Option.getExn).count,
-  proposalsCount: (group_proposals_aggregate.aggregate->Belt.Option.getExn).count,
+  let metdataExtracted = metadata->extractMetadata
+
+  {
+    id,
+    name: metdataExtracted.name,
+    admin,
+    totalWeight,
+    createdAt,
+    metadata,
+    memberCount: (group_members_aggregate.aggregate->Belt.Option.getExn).count,
+    policiesCount: (group_policies_aggregate.aggregate->Belt.Option.getExn).count,
+    proposalsCount: (group_proposals_aggregate.aggregate->Belt.Option.getExn).count,
+    description: metdataExtracted.description,
+    website: metdataExtracted.website,
+    forum: metdataExtracted.forum,
+  }
 }
 
 module PolicyType = {

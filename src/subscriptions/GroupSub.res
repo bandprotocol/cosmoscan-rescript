@@ -131,7 +131,7 @@ let getProposals = (~groupID, ~page, ~pageSize, ()) => {
 
 let getPolicies = (~groupID, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
-  let result = PolicyConfig.use({groupID, limit: pageSize, offset})
+  let result = PolicyConfig.use({groupID: groupID->ID.Group.toInt, limit: pageSize, offset})
 
   result
   ->Sub.fromData
@@ -140,7 +140,7 @@ let getPolicies = (~groupID, ~page, ~pageSize, ()) => {
 
 let getMembers = (~groupID, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
-  let result = MemberConfig.use({groupID, limit: pageSize, offset})
+  let result = MemberConfig.use({groupID: groupID->ID.Group.toInt, limit: pageSize, offset})
 
   result->Sub.fromData->Sub.map(internal => internal.group_members)
 }
