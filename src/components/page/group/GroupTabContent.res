@@ -33,6 +33,13 @@ module Styles = {
   let tableContentWrapper = style(. [
     selector("> div:last-child", [borderBottom(#px(0), #solid, #transparent)]),
   ])
+
+  let noDataContainer = style(. [
+    display(#flex),
+    justifyContent(#center),
+    marginTop(#px(16)),
+    padding2(~v=#px(8), ~h=#px(0)),
+  ])
 }
 
 module SortableTHead = {
@@ -98,65 +105,184 @@ module SortableTHead = {
   }
 }
 
-module MyGroupTabContent = {
+module NoAccountContent = {
   @react.component
-  let make = (~sortedBy, ~toggle, ~direction) => {
+  let make = () => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <div className={Styles.tabContentWrapper}>
       <Heading size=H3 value="My Group" />
-      {<>
-        <InfoContainer style=Styles.infoContainer>
-          <Table>
-            <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
-              <div className={Css.merge(list{Styles.tablehead})}>
-                <div>
-                  <SortableTHead
-                    title="Group ID" direction toggle value=SortGroupTable.ID sortedBy
-                  />
-                </div>
-                {isMobile
-                  ? React.null
-                  : <div>
+      <InfoContainer style=Styles.infoContainer>
+        <Table>
+          <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
+            <div className={Css.merge(list{Styles.tablehead})}>
+              <div>
+                <Text
+                  block=true
+                  value="Group ID"
+                  size=Text.Caption
+                  weight=Text.Semibold
+                  transform=Text.Uppercase
+                  color=theme.neutral_900
+                />
+              </div>
+              {isMobile
+                ? React.null
+                : <div>
+                    <Text
+                      block=true
+                      value="Group Name"
+                      size=Text.Caption
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                      color=theme.neutral_900
+                    />
+                  </div>}
+              <div>
+                <Text
+                  block=true
+                  value="Members"
+                  size=Text.Caption
+                  weight=Text.Semibold
+                  transform=Text.Uppercase
+                  color=theme.neutral_900
+                />
+              </div>
+              <div>
+                <Text
+                  block=true
+                  value="Proposals"
+                  size=Text.Caption
+                  weight=Text.Semibold
+                  transform=Text.Uppercase
+                  color=theme.neutral_900
+                />
+              </div>
+              {isMobile
+                ? React.null
+                : <div>
+                    <Text
+                      block=true
+                      value="Proposals On Voting"
+                      size=Text.Caption
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                      color=theme.neutral_900
+                    />
+                  </div>}
+            </div>
+          </div>
+          <div className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
+            <div className=Styles.noDataContainer>
+              <Text
+                value="Connect Wallet to see your group" color={theme.neutral_600} size={Body1}
+              />
+            </div>
+          </div>
+        </Table>
+      </InfoContainer>
+    </div>
+  }
+}
+
+module MyGroupTabContent = {
+  @react.component
+  let make = (~sortedBy, ~toggle, ~direction, ~account: AccountContext.t) => {
+    let isMobile = Media.isMobile()
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    let pageSize = 10
+    let (page, setPage) = React.useState(_ => 1)
+
+    let myGroupSub = GroupSub.getListByAccount(
+      ~address=account.address->Address.toBech32,
+      ~page,
+      ~pageSize,
+      (),
+    )
+
+    {
+      switch myGroupSub {
+      | Data(groups) =>
+        let pageCount = Page.getPageCount(groups->Belt.Array.length, pageSize)
+
+        <div className={Styles.tabContentWrapper}>
+          <Heading size=H3 value="My Group" />
+          {<>
+            <InfoContainer style=Styles.infoContainer>
+              <Table>
+                <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
+                  <div className={Css.merge(list{Styles.tablehead})}>
+                    <div>
                       <SortableTHead
-                        title="Group Name" direction toggle sortedBy value=SortGroupTable.Name
+                        title="Group ID" direction toggle value=SortGroupTable.ID sortedBy
                       />
-                    </div>}
-                <div>
-                  <SortableTHead
-                    title="Members" toggle sortedBy direction value=SortGroupTable.MembersCount
-                  />
-                </div>
-                <div>
-                  <SortableTHead
-                    title="Proposals" toggle sortedBy direction value=SortGroupTable.ProposalsCount
-                  />
-                </div>
-                {isMobile
-                  ? React.null
-                  : <div>
+                    </div>
+                    {isMobile
+                      ? React.null
+                      : <div>
+                          <SortableTHead
+                            title="Group Name" direction toggle sortedBy value=SortGroupTable.Name
+                          />
+                        </div>}
+                    <div>
                       <SortableTHead
-                        title="Proposals On Voting"
+                        title="Members" toggle sortedBy direction value=SortGroupTable.MembersCount
+                      />
+                    </div>
+                    <div>
+                      <SortableTHead
+                        title="Proposals"
                         toggle
                         sortedBy
                         direction
-                        value=SortGroupTable.ProposalsOnVotingCount
+                        value=SortGroupTable.ProposalsCount
                       />
-                    </div>}
-              </div>
+                    </div>
+                    {isMobile
+                      ? React.null
+                      : <div>
+                          <SortableTHead
+                            title="Proposals On Voting"
+                            toggle
+                            sortedBy
+                            direction
+                            value=SortGroupTable.ProposalsOnVotingCount
+                          />
+                        </div>}
+                  </div>
+                </div>
+                <div
+                  className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
+                  {switch groups->Belt.Array.length > 0 {
+                  | true =>
+                    groups
+                    ->Belt.Array.mapWithIndex((index, group) => {
+                      <GroupTableItem group key={index->Belt.Int.toString} />
+                    })
+                    ->React.array
+                  | false =>
+                    <div className=Styles.noDataContainer>
+                      <Text value="No group created" color={theme.neutral_600} size={Body1} />
+                    </div>
+                  }}
+                </div>
+              </Table>
+            </InfoContainer>
+            <div className={Css.merge(list{"table_content--footer"})}>
+              <Pagination2
+                currentPage=page
+                pageCount
+                onPageChange={newPage => setPage(_ => newPage)}
+                onChangeCurrentPage={newPage => setPage(_ => newPage)}
+              />
             </div>
-            <div className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
-              {[1, 2]
-              ->Belt.Array.mapWithIndex((item, ind) => {
-                <GroupTableItem key={ind->Belt.Int.toString} />
-              })
-              ->React.array}
-            </div>
-          </Table>
-        </InfoContainer>
-      </>}
-    </div>
+          </>}
+        </div>
+      | _ => <Text value="No Data" />
+      }
+    }
   }
 }
 
@@ -169,68 +295,82 @@ module AllGroupTabContent = {
     let (page, setPage) = React.useState(_ => 1)
     let pageSize = 10
 
-    <div className={Styles.tabContentWrapper}>
-      <Heading size=H3 value="All Groups" />
-      {<>
-        <InfoContainer style=Styles.infoContainer>
-          <Table>
-            <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
-              <div className={Css.merge(list{Styles.tablehead})}>
-                <div>
-                  <SortableTHead
-                    title="Group ID" direction toggle value=SortGroupTable.ID sortedBy
-                  />
-                </div>
-                {isMobile
-                  ? React.null
-                  : <div>
+    let groupSub = GroupSub.getList(~page, ~pageSize, ())
+
+    {
+      switch groupSub {
+      | Data(groups) =>
+        let pageCount = Page.getPageCount(groups->Belt.Array.length, pageSize)
+
+        <div className={Styles.tabContentWrapper}>
+          <Heading size=H3 value="All Groups" />
+          {<>
+            <InfoContainer style=Styles.infoContainer>
+              <Table>
+                <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
+                  <div className={Css.merge(list{Styles.tablehead})}>
+                    <div>
                       <SortableTHead
-                        title="Group Name" direction toggle sortedBy value=SortGroupTable.Name
+                        title="Group ID" direction toggle value=SortGroupTable.ID sortedBy
                       />
-                    </div>}
-                <div>
-                  <SortableTHead
-                    title="Members" toggle sortedBy direction value=SortGroupTable.MembersCount
-                  />
-                </div>
-                <div>
-                  <SortableTHead
-                    title="Proposals" toggle sortedBy direction value=SortGroupTable.ProposalsCount
-                  />
-                </div>
-                {isMobile
-                  ? React.null
-                  : <div>
+                    </div>
+                    {isMobile
+                      ? React.null
+                      : <div>
+                          <SortableTHead
+                            title="Group Name" direction toggle sortedBy value=SortGroupTable.Name
+                          />
+                        </div>}
+                    <div>
                       <SortableTHead
-                        title="Proposals On Voting"
+                        title="Members" toggle sortedBy direction value=SortGroupTable.MembersCount
+                      />
+                    </div>
+                    <div>
+                      <SortableTHead
+                        title="Proposals"
                         toggle
                         sortedBy
                         direction
-                        value=SortGroupTable.ProposalsOnVotingCount
+                        value=SortGroupTable.ProposalsCount
                       />
-                    </div>}
-              </div>
+                    </div>
+                    {isMobile
+                      ? React.null
+                      : <div>
+                          <SortableTHead
+                            title="Proposals On Voting"
+                            toggle
+                            sortedBy
+                            direction
+                            value=SortGroupTable.ProposalsOnVotingCount
+                          />
+                        </div>}
+                  </div>
+                </div>
+                <div
+                  className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
+                  {groups
+                  ->Belt.Array.mapWithIndex((index, group) => {
+                    <GroupTableItem group key={index->Belt.Int.toString} />
+                  })
+                  ->React.array}
+                </div>
+              </Table>
+            </InfoContainer>
+            <div className={Css.merge(list{"table_content--footer"})}>
+              <Pagination2
+                currentPage=page
+                pageCount
+                onPageChange={newPage => setPage(_ => newPage)}
+                onChangeCurrentPage={newPage => setPage(_ => newPage)}
+              />
             </div>
-            <div className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
-              {[1, 2]
-              ->Belt.Array.mapWithIndex((item, ind) => {
-                <GroupTableItem key={ind->Belt.Int.toString} />
-              })
-              ->React.array}
-            </div>
-          </Table>
-        </InfoContainer>
-        <div className={Css.merge(list{"table_content--footer"})}>
-          //TODO: hardcode pageCount
-          <Pagination2
-            currentPage=page
-            pageCount=10
-            onPageChange={newPage => setPage(_ => newPage)}
-            onChangeCurrentPage={newPage => setPage(_ => newPage)}
-          />
+          </>}
         </div>
-      </>}
-    </div>
+      | _ => React.null
+      }
+    }
   }
 }
 
@@ -238,6 +378,7 @@ module AllGroupTabContent = {
 let make = () => {
   let isMobile = Media.isMobile()
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let (accountOpt, _) = React.useContext(AccountContext.context)
 
   let (sortedBy, setSortedBy) = React.useState(_ => SortGroupTable.ID)
   let (direction, setDirection) = React.useState(_ => SortGroupTable.DESC)
@@ -264,7 +405,10 @@ let make = () => {
           <SortGroupTableDropdown sortedBy setSortedBy direction setDirection />
         </div>
       : React.null}
-    <MyGroupTabContent sortedBy toggle direction />
+    {switch accountOpt {
+    | Some(account) => <MyGroupTabContent sortedBy toggle direction account />
+    | None => <NoAccountContent />
+    }}
     <AllGroupTabContent sortedBy toggle direction />
   </>
 }

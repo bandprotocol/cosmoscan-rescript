@@ -69,6 +69,9 @@ module SingleConfig = %graphql(`
           count
         }
       }
+      proposalOnVoting: group_proposals(where: {status: {_eq: "PROPOSAL_STATUS_VOTING_PERIOD"}}) @ppxAs(type: "Group.group_proposal_t") {
+        id @ppxCustom(module:"GraphQLParserModule.GroupProposalID")
+      }
     }
   }
 `)
@@ -96,6 +99,39 @@ module MultiConfig = %graphql(`
               count
             }
           }
+          proposalOnVoting: group_proposals(where: {status: {_eq: "PROPOSAL_STATUS_VOTING_PERIOD"}}) @ppxAs(type: "Group.group_proposal_t") {
+            id @ppxCustom(module:"GraphQLParserModule.GroupProposalID")
+          }
+      }
+  }
+`)
+
+module GroupByAccountConfig = %graphql(`
+  subscription Groups($address: String!, $limit: Int!, $offset: Int!)  {
+      groups(where: {group_members: {account: {address: {_eq: $address}}} }, limit: $limit, offset: $offset) @ppxAs(type: "Group.internal_t"){
+          id @ppxCustom(module: "GraphQLParserModule.GroupID")
+          admin @ppxCustom(module:"GraphQLParserModule.Address")
+          totalWeight: total_weight @ppxCustom(module:"GraphQLParserModule.IntString")
+          createdAt: created_at @ppxCustom(module: "GraphQLParserModule.Date")
+          metadata
+          group_members_aggregate @ppxAs(type: "Group.group_members_aggregate_t") {
+            aggregate @ppxAs(type: "Group.aggregate_t") {
+              count
+            }
+          }
+          group_policies_aggregate @ppxAs(type: "Group.group_policies_aggregate_t") {
+            aggregate @ppxAs(type: "Group.aggregate_t") {
+              count
+            }
+          }
+          group_proposals_aggregate @ppxAs(type: "Group.group_proposals_aggregate_t") {
+            aggregate @ppxAs(type: "Group.aggregate_t") {
+              count
+            }
+          }
+          proposalOnVoting: group_proposals(where: {status: {_eq: "PROPOSAL_STATUS_VOTING_PERIOD"}}) @ppxAs(type: "Group.group_proposal_t") {
+            id @ppxCustom(module:"GraphQLParserModule.GroupProposalID")
+          }
       }
   }
 `)
@@ -116,6 +152,13 @@ let get = groupID => {
 let getList = (~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
   let result = MultiConfig.use({limit: pageSize, offset})
+
+  result->Sub.fromData->Sub.map(internal => internal.groups->Belt.Array.map(Group.toExternal))
+}
+
+let getListByAccount = (~address, ~page, ~pageSize, ()) => {
+  let offset = (page - 1) * pageSize
+  let result = GroupByAccountConfig.use({address, limit: pageSize, offset})
 
   result->Sub.fromData->Sub.map(internal => internal.groups->Belt.Array.map(Group.toExternal))
 }

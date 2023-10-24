@@ -15,6 +15,8 @@ type group_policy_t = {
   metadata: string,
 }
 
+type group_proposal_t = {id: ID.GroupProposal.t}
+
 type t = {
   id: ID.Group.t,
   name: string,
@@ -25,6 +27,7 @@ type t = {
   memberCount: int,
   policiesCount: int,
   proposalsCount: int,
+  proposalOnVoting: array<group_proposal_t>,
   description: string,
   website: string,
   forum: string,
@@ -43,6 +46,7 @@ type internal_t = {
   group_members_aggregate: group_members_aggregate_t,
   group_policies_aggregate: group_policies_aggregate_t,
   group_proposals_aggregate: group_proposals_aggregate_t,
+  proposalOnVoting: array<group_proposal_t>,
 }
 
 type metadata_t = {
@@ -69,6 +73,7 @@ let toExternal = ({
   group_members_aggregate,
   group_policies_aggregate,
   group_proposals_aggregate,
+  proposalOnVoting,
 }) => {
   let metdataExtracted = metadata->extractMetadata
 
@@ -82,6 +87,7 @@ let toExternal = ({
     memberCount: (group_members_aggregate.aggregate->Belt.Option.getExn).count,
     policiesCount: (group_policies_aggregate.aggregate->Belt.Option.getExn).count,
     proposalsCount: (group_proposals_aggregate.aggregate->Belt.Option.getExn).count,
+    proposalOnVoting,
     description: metdataExtracted.description,
     website: metdataExtracted.website,
     forum: metdataExtracted.forum,

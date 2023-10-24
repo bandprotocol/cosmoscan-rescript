@@ -31,8 +31,6 @@ module Content = {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-    let mock = MockGroup.mock
-
     <Section>
       <div className=CssHelper.container>
         <button
@@ -47,7 +45,7 @@ module Content = {
           <div className={Css.merge(list{CssHelper.flexBox(), Styles.idCointainer})}>
             <Heading size=Heading.H1 weight=Heading.Bold style={CssHelper.flexBox()}>
               <span className=Styles.groupID>
-                {`#G${mock.id->ID.Group.toInt->Belt.Int.toString} `->React.string}
+                {`#G${group.id->ID.Group.toInt->Belt.Int.toString} `->React.string}
               </span>
               // TODO: extract group name from meta data
               <span> {group.name->React.string} </span>

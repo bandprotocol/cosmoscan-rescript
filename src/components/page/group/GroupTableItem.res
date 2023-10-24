@@ -22,7 +22,7 @@ module Styles = {
     ])
 }
 @react.component
-let make = () => {
+let make = (~group: Group.t) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let isMobile = Media.isMobile()
   <>
@@ -33,33 +33,42 @@ let make = () => {
         Styles.tableItem(theme),
       })}>
       <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-        // TODO: hardcode
-        <TypeID.Group id={1->ID.Group.fromInt} size={Body1} weight={Bold} />
+        <TypeID.Group id=group.id size={Body1} weight={Bold} />
       </div>
       <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
         <Link
           className={Css.merge(list{Styles.tableLink(theme)})}
           route={OracleScriptDetailsPage(1, OracleScriptRequests)}>
           <Text
-            // TODO: hardcode
-            value="Group Example"
-            ellipsis=true
-            color={theme.primary_600}
-            weight=Semibold
-            size={Body1}
+            value=group.name ellipsis=true color={theme.primary_600} weight=Semibold size={Body1}
           />
         </Link>
       </div>
       <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-        <Text value={"00"} color={theme.neutral_900} size={Body1} code=true />
+        <Text
+          value={group.memberCount->Belt.Int.toString}
+          color={theme.neutral_900}
+          size={Body1}
+          code=true
+        />
       </div>
       <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-        <Text value={"00"} color={theme.neutral_900} size={Body1} code=true />
+        <Text
+          value={group.proposalsCount->Belt.Int.toString}
+          color={theme.neutral_900}
+          size={Body1}
+          code=true
+        />
       </div>
       {isMobile
         ? React.null
         : <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <Text value={"00"} color={theme.neutral_900} size={Body1} code=true />
+            <Text
+              value={group.proposalOnVoting->Belt.Array.length->Belt.Int.toString}
+              color={theme.neutral_900}
+              size={Body1}
+              code=true
+            />
           </div>}
     </div>
   </>
