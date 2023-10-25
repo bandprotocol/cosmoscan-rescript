@@ -159,7 +159,7 @@ module Proposal = {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
     // TODO: add pagination
-    let proposalSub = GroupSub.getProposals(~groupID, ~page=1, ~pageSize=10, ())
+    let proposalSub = GroupSub.getProposalsByGroup(~groupID, ~page=1, ~pageSize=10, ())
 
     // TODO: wire up this when graphql is ready
     let (sortedBy, setSortedBy) = React.useState(_ => SortGroupProposalTable.ID)

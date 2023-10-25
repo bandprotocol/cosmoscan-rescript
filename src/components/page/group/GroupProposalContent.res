@@ -106,7 +106,8 @@ module MyGroupProposalTabContent = {
                 className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
                 {[1, 2]
                 ->Belt.Array.mapWithIndex((ind, item) => {
-                  <GroupProposalTableItem key={ind->Belt.Int.toString} item />
+                  <Text value={ind->Belt.Int.toString} />
+                  // <GroupProposalTableItem key={ind->Belt.Int.toString}  />
                 })
                 ->React.array}
               </div>
@@ -172,7 +173,8 @@ module MyGroupProposalTabContent = {
                     })}>
                     {[1, 2]
                     ->Belt.Array.mapWithIndex((ind, item) => {
-                      <GroupProposalTableItem key={ind->Belt.Int.toString} item />
+                      <Text value={ind->Belt.Int.toString} />
+                      // <GroupProposalTableItem key={ind->Belt.Int.toString} item />
                     })
                     ->React.array}
                   </div>
@@ -189,111 +191,127 @@ module AllGroupProposalTabContent = {
   let make = (~sortedBy, ~toggle, ~direction) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-    let (page, setPage) = React.useState(_ => 1)
-    let pageSize = 10
 
-    <div className={Styles.tabContentWrapper}>
-      <Heading size=H3 value="All Proposals" />
-      {<>
-        {isMobile
-          ? <>
-              <div
-                className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
-                {[1, 2, 3, 4, 5, 6, 7, 8]
-                ->Belt.Array.mapWithIndex((ind, item) => {
-                  <GroupProposalTableItem key={ind->Belt.Int.toString} item />
-                })
-                ->React.array}
-              </div>
-              <div className={Css.merge(list{"table_content--footer"})}>
-                //TODO: hardcode pageCount
-                <Pagination2
-                  currentPage=page
-                  pageCount=10
-                  onPageChange={newPage => setPage(_ => newPage)}
-                  onChangeCurrentPage={newPage => setPage(_ => newPage)}
-                />
-              </div>
-            </>
-          : <>
-              <InfoContainer style=Styles.infoContainer>
-                <Table>
-                  <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
-                    {isMobile
-                      ? React.null
-                      : <div className={Css.merge(list{Styles.tablehead})}>
-                          <div>
-                            <SortableTHead
-                              title="Proposal ID"
-                              direction
-                              toggle
-                              value=SortGroupProposalTable.ID
-                              sortedBy
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Proposal Name"
-                              direction
-                              toggle
-                              sortedBy
-                              value=SortGroupProposalTable.Name
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Message"
-                              toggle
-                              sortedBy
-                              direction
-                              value=SortGroupProposalTable.Message
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Group"
-                              toggle
-                              sortedBy
-                              direction
-                              value=SortGroupProposalTable.GroupID
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Status"
-                              toggle
-                              sortedBy
-                              direction
-                              value=SortGroupProposalTable.ProposalStatus
-                            />
-                          </div>
-                        </div>}
-                  </div>
+    let pageSize = 10
+    let (page, setPage) = React.useState(_ => 1)
+
+    let proposalsSub = GroupSub.getProposals(~page, ~pageSize, ())
+
+    {
+      switch proposalsSub {
+      | Data(proposals) =>
+        let pageCount = Page.getPageCount(proposals->Belt.Array.length, pageSize)
+
+        <div className={Styles.tabContentWrapper}>
+          <Heading size=H3 value="All Proposals" />
+          {<>
+            {isMobile
+              ? <>
                   <div
                     className={Css.merge(list{
                       "table_content--wrapper",
                       Styles.tableContentWrapper,
                     })}>
-                    {[1, 2, 3, 4, 5, 6, 7, 8]
-                    ->Belt.Array.mapWithIndex((ind, item) => {
-                      <GroupProposalTableItem key={ind->Belt.Int.toString} item />
+                    {proposals
+                    ->Belt.Array.mapWithIndex((ind, proposal) => {
+                      <GroupProposalTableItem key={ind->Belt.Int.toString} proposal />
                     })
                     ->React.array}
                   </div>
-                </Table>
-              </InfoContainer>
-              <div className={Css.merge(list{"table_content--footer"})}>
-                //TODO: hardcode pageCount
-                <Pagination2
-                  currentPage=page
-                  pageCount=10
-                  onPageChange={newPage => setPage(_ => newPage)}
-                  onChangeCurrentPage={newPage => setPage(_ => newPage)}
-                />
-              </div>
-            </>}
-      </>}
-    </div>
+                  <div className={Css.merge(list{"table_content--footer"})}>
+                    <Pagination2
+                      currentPage=page
+                      pageCount
+                      onPageChange={newPage => setPage(_ => newPage)}
+                      onChangeCurrentPage={newPage => setPage(_ => newPage)}
+                    />
+                  </div>
+                </>
+              : <>
+                  <InfoContainer style=Styles.infoContainer>
+                    <Table>
+                      <div
+                        className={Css.merge(list{
+                          "table-wrapper",
+                          Styles.tableHeadWrapper(theme),
+                        })}>
+                        {isMobile
+                          ? React.null
+                          : <div className={Css.merge(list{Styles.tablehead})}>
+                              <div>
+                                <SortableTHead
+                                  title="Proposal ID"
+                                  direction
+                                  toggle
+                                  value=SortGroupProposalTable.ID
+                                  sortedBy
+                                />
+                              </div>
+                              <div>
+                                <SortableTHead
+                                  title="Proposal Name"
+                                  direction
+                                  toggle
+                                  sortedBy
+                                  value=SortGroupProposalTable.Name
+                                />
+                              </div>
+                              <div>
+                                <SortableTHead
+                                  title="Message"
+                                  toggle
+                                  sortedBy
+                                  direction
+                                  value=SortGroupProposalTable.Message
+                                />
+                              </div>
+                              <div>
+                                <SortableTHead
+                                  title="Group"
+                                  toggle
+                                  sortedBy
+                                  direction
+                                  value=SortGroupProposalTable.GroupID
+                                />
+                              </div>
+                              <div>
+                                <SortableTHead
+                                  title="Status"
+                                  toggle
+                                  sortedBy
+                                  direction
+                                  value=SortGroupProposalTable.ProposalStatus
+                                />
+                              </div>
+                            </div>}
+                      </div>
+                      <div
+                        className={Css.merge(list{
+                          "table_content--wrapper",
+                          Styles.tableContentWrapper,
+                        })}>
+                        {proposals
+                        ->Belt.Array.mapWithIndex((ind, proposal) => {
+                          <GroupProposalTableItem key={ind->Belt.Int.toString} proposal />
+                        })
+                        ->React.array}
+                      </div>
+                    </Table>
+                  </InfoContainer>
+                  <div className={Css.merge(list{"table_content--footer"})}>
+                    <Pagination2
+                      currentPage=page
+                      pageCount
+                      onPageChange={newPage => setPage(_ => newPage)}
+                      onChangeCurrentPage={newPage => setPage(_ => newPage)}
+                    />
+                  </div>
+                </>}
+          </>}
+        </div>
+      | _ => <Text value="None" />
+      }
+    }
   }
 }
 

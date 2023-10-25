@@ -58,7 +58,7 @@ type metadata_t = {
 
 // TODO: extractMetadata
 let extractMetadata = metadata => {
-  name: "Example Group Name",
+  name: "Group Name",
   description: "description",
   website: "website",
   forum: "forum",
@@ -75,11 +75,11 @@ let toExternal = ({
   group_proposals_aggregate,
   proposalOnVoting,
 }) => {
-  let metdataExtracted = metadata->extractMetadata
+  let metadataExtracted = metadata->extractMetadata
 
   {
     id,
-    name: metdataExtracted.name,
+    name: metadataExtracted.name,
     admin,
     totalWeight,
     createdAt,
@@ -88,9 +88,9 @@ let toExternal = ({
     policiesCount: (group_policies_aggregate.aggregate->Belt.Option.getExn).count,
     proposalsCount: (group_proposals_aggregate.aggregate->Belt.Option.getExn).count,
     proposalOnVoting,
-    description: metdataExtracted.description,
-    website: metdataExtracted.website,
-    forum: metdataExtracted.forum,
+    description: metadataExtracted.description,
+    website: metadataExtracted.website,
+    forum: metadataExtracted.forum,
   }
 }
 
@@ -196,6 +196,8 @@ module Proposal = {
   type t = {
     id: ID.GroupProposal.t,
     title: string,
+    groupID: ID.Group.t,
+    groupName: string,
     messages: list<Msg.result_t>,
     policyType: PolicyType.t,
     yesVote: float,
@@ -211,10 +213,13 @@ module Proposal = {
     _type: string,
     decisionPolicy: Js.Json.t,
   }
+  type group_internal_t = {metadata: string}
 
   type internal_t = {
     id: ID.GroupProposal.t,
     title: string,
+    groupID: ID.Group.t,
+    group: group_internal_t,
     messages: Js.Json.t,
     group_policy: group_policy_internal_t,
     status: GroupProposalStatus.t,
@@ -230,6 +235,8 @@ module Proposal = {
   let toExternal = ({
     id,
     title,
+    groupID,
+    group,
     messages,
     group_policy,
     status,
@@ -247,9 +254,13 @@ module Proposal = {
       noWithVetoVote->Belt.Option.getExn +.
       abstainVote->Belt.Option.getExn
 
+    let groupMetadataExtracted = group.metadata->extractMetadata
+
     {
       id,
       title,
+      groupID,
+      groupName: groupMetadataExtracted.name,
       messages: {
         let msg = messages->Js.Json.decodeArray
         switch msg {

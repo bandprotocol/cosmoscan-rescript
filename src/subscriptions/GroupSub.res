@@ -1,8 +1,64 @@
-module ProposalConfig = %graphql(`
+module ProposalSingleConfig = %graphql(`
   subscription GroupProposal($groupID: Int!, $limit: Int!, $offset: Int!) {
     group_proposals(where: {group_id: { _eq: $groupID }}, limit: $limit, offset: $offset) @ppxAs(type: "Group.Proposal.internal_t") {
       id @ppxCustom(module:"GraphQLParserModule.GroupProposalID")
       title
+      groupID: group_id @ppxCustom(module: "GraphQLParserModule.GroupID")
+      group @ppxAs(type: "Group.Proposal.group_internal_t") {
+        metadata
+      }
+      messages
+      group_policy @ppxAs(type: "Group.Proposal.group_policy_internal_t") {
+        _type: type
+        decisionPolicy: decision_policy
+      }
+      yesVote :yes_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
+      noVote: no_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
+      noWithVetoVote: no_with_veto_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
+      abstainVote: abstain_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
+      status @ppxCustom(module:"GraphQLParserModule.GroupProposalStatus")
+      summary
+      submitTime: submit_time @ppxCustom(module: "GraphQLParserModule.Date")
+      votingPeriodEnd: voting_period_end @ppxCustom(module: "GraphQLParserModule.Date")
+    }
+  }
+`)
+
+module ProposalMultiConfig = %graphql(`
+  subscription GroupProposal($limit: Int!, $offset: Int!) {
+    group_proposals(limit: $limit, offset: $offset) @ppxAs(type: "Group.Proposal.internal_t") {
+      id @ppxCustom(module:"GraphQLParserModule.GroupProposalID")
+      title
+      groupID: group_id @ppxCustom(module: "GraphQLParserModule.GroupID")
+      group @ppxAs(type: "Group.Proposal.group_internal_t") {
+        metadata
+      }
+      messages
+      group_policy @ppxAs(type: "Group.Proposal.group_policy_internal_t") {
+        _type: type
+        decisionPolicy: decision_policy
+      }
+      yesVote :yes_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
+      noVote: no_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
+      noWithVetoVote: no_with_veto_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
+      abstainVote: abstain_vote @ppxCustom(module: "GraphQLParserModule.FloatString")
+      status @ppxCustom(module:"GraphQLParserModule.GroupProposalStatus")
+      summary
+      submitTime: submit_time @ppxCustom(module: "GraphQLParserModule.Date")
+      votingPeriodEnd: voting_period_end @ppxCustom(module: "GraphQLParserModule.Date")
+    }
+  }
+`)
+
+module ProposalByAccountConfig = %graphql(`
+  subscription GroupProposal($proposers: String!, $limit: Int!, $offset: Int!) {
+    group_proposals(where: {proposers: { _eq: $proposers }}, limit: $limit, offset: $offset) @ppxAs(type: "Group.Proposal.internal_t") {
+      id @ppxCustom(module:"GraphQLParserModule.GroupProposalID")
+      title
+      groupID: group_id @ppxCustom(module: "GraphQLParserModule.GroupID")
+      group @ppxAs(type: "Group.Proposal.group_internal_t") {
+        metadata
+      }
       messages
       group_policy @ppxAs(type: "Group.Proposal.group_policy_internal_t") {
         _type: type
@@ -163,9 +219,27 @@ let getListByAccount = (~address, ~page, ~pageSize, ()) => {
   result->Sub.fromData->Sub.map(internal => internal.groups->Belt.Array.map(Group.toExternal))
 }
 
-let getProposals = (~groupID, ~page, ~pageSize, ()) => {
+let getProposalsByGroup = (~groupID, ~page, ~pageSize, ()) => {
   let offset = (page - 1) * pageSize
-  let result = ProposalConfig.use({groupID: groupID->ID.Group.toInt, limit: pageSize, offset})
+  let result = ProposalSingleConfig.use({groupID: groupID->ID.Group.toInt, limit: pageSize, offset})
+
+  result
+  ->Sub.fromData
+  ->Sub.map(internal => internal.group_proposals->Belt.Array.map(Group.Proposal.toExternal))
+}
+
+let getProposals = (~page, ~pageSize, ()) => {
+  let offset = (page - 1) * pageSize
+  let result = ProposalMultiConfig.use({limit: pageSize, offset})
+
+  result
+  ->Sub.fromData
+  ->Sub.map(internal => internal.group_proposals->Belt.Array.map(Group.Proposal.toExternal))
+}
+
+let getProposalsByAccount = (~address, ~page, ~pageSize, ()) => {
+  let offset = (page - 1) * pageSize
+  let result = ProposalByAccountConfig.use({proposers: address, limit: pageSize, offset})
 
   result
   ->Sub.fromData
