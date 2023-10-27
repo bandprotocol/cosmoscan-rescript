@@ -258,6 +258,7 @@ module MyGroupTabContent = {
                   {switch groups->Belt.Array.length > 0 {
                   | true =>
                     groups
+                    ->SortGroupTable.sorting(~sortedBy, ~direction)
                     ->Belt.Array.mapWithIndex((index, group) => {
                       <GroupTableItem group key={index->Belt.Int.toString} />
                     })
@@ -351,6 +352,7 @@ module AllGroupTabContent = {
                 <div
                   className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
                   {groups
+                  ->SortGroupTable.sorting(~sortedBy, ~direction)
                   ->Belt.Array.mapWithIndex((index, group) => {
                     <GroupTableItem group key={index->Belt.Int.toString} />
                   })

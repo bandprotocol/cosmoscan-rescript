@@ -51,11 +51,11 @@ let compareVersion = (a: OracleScriptSub.version_t, b: OracleScriptSub.version_t
   compareString(a->parseVersion, b->parseVersion)
 }
 
-let defaultCompare = (a: OracleScriptSub.t_with_stats, b: OracleScriptSub.t_with_stats) =>
-  if a.name != b.name {
+let defaultCompare = (a: Group.Proposal.t, b: Group.Proposal.t) =>
+  if a.title != b.title {
     compare(b.id, a.id)
   } else {
-    compareString(b.name, a.name)
+    compareString(b.title, a.title)
   }
 
 let sorting = (proposals: array<Group.Proposal.t>, ~sortedBy, ~direction) => {
@@ -74,12 +74,11 @@ let sorting = (proposals: array<Group.Proposal.t>, ~sortedBy, ~direction) => {
       | (ProposalStatus, DESC) => compare(b.status, a.status)
       }
     }
-    result
-    // if result != 0 {
-    //   result
-    // } else {
-    //   defaultCompare(a, b)
-    // }
+    if result != 0 {
+      result
+    } else {
+      defaultCompare(a, b)
+    }
   })
   ->Belt.List.toArray
 }
