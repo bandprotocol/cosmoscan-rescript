@@ -91,8 +91,8 @@ let sorting = (validators: array<ValidatorSub.t>, sortedBy) => {
       result
     } else {
       switch sortedBy {
-       | VotingPowerAsc => defaultCompare(b,a)
-       | _ => defaultCompare(a, b)
+      | VotingPowerAsc => defaultCompare(b, a)
+      | _ => defaultCompare(a, b)
       }
     }
   })

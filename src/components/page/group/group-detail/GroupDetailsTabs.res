@@ -263,12 +263,13 @@ module Proposal = {
                         />
                       </div>
                       <div>
-                        <SortableTHead
-                          title="Message"
-                          toggle
-                          sortedBy
-                          direction
-                          value=SortGroupProposalTable.Message
+                        <Text
+                          block=true
+                          value="Message"
+                          size=Text.Caption
+                          weight=Text.Semibold
+                          transform=Text.Uppercase
+                          color=theme.neutral_900
                         />
                       </div>
                       <div>
@@ -421,7 +422,7 @@ module Policy = {
                   </div>
                   <div>
                     <SortableTHead
-                      title="Value" toggle sortedBy direction value=SortGroupProposalTable.Message
+                      title="Value" toggle sortedBy direction value=SortGroupProposalTable.GroupID
                     />
                   </div>
                   <div>
@@ -639,7 +640,7 @@ module Members = {
                       toggle
                       sortedBy
                       direction
-                      value=SortGroupProposalTable.Message
+                      value=SortGroupProposalTable.GroupID
                     />
                   </div>
                 </div>

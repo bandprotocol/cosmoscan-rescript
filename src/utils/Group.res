@@ -209,6 +209,16 @@ module Proposal = {
     result: string,
   }
 
+  type sort_by_t =
+    | IDASC
+    | IDDESC
+    | TitleAsc
+    | TitleDesc
+    | GroupIDASC
+    | GroupIDDESC
+    | StatusASC
+    | StatusDESC
+
   type group_policy_internal_t = {
     _type: string,
     decisionPolicy: Js.Json.t,
