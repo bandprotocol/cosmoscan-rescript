@@ -91,11 +91,22 @@ module Content = {
 @react.component
 let make = (~groupID, ~hashtag) => {
   let groupSub = GroupSub.get(groupID)
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   switch groupSub {
   | Data(group) => <Content group hashtag />
-  | NoData => <Text value="NoData" />
-  | Error(_) => <Text value="Error" />
-  | Loading => <Text value="Loading" />
+  | NoData => <NotFound />
+  | Error(_) =>
+    <Section>
+      <div className=CssHelper.container>
+        <Text value="an Error Occured" color={theme.neutral_600} size={Body1} />
+      </div>
+    </Section>
+  | Loading =>
+    <Section>
+      <div className=CssHelper.container>
+        <LoadingCensorBar.CircleSpin height=180 />
+      </div>
+    </Section>
   }
 }
