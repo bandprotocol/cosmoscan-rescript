@@ -429,7 +429,9 @@ module Grant = {
     },
     {
       title: "Authorization URL",
-      content: PlainText(msg.url),
+      content: PlainText( 
+        msg.url->Belt.Option.getWithDefault("-")
+      ),
       order: 4,
     },
     {
