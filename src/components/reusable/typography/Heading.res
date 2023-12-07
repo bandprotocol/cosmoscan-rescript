@@ -21,11 +21,11 @@ module Styles = {
   open CssJs
   let lineHeight = x =>
     switch x {
-    | H1 => style(. [lineHeight(#px(40)), Media.mobile([lineHeight(#px(32))])])
-    | H2 => style(. [lineHeight(#px(32)), Media.mobile([lineHeight(#px(28))])])
-    | H3 => style(. [lineHeight(#px(28)), Media.mobile([lineHeight(#px(26))])])
-    | H4 => style(. [lineHeight(#px(22)), Media.mobile([lineHeight(#px(20))])])
-    | H5 => style(. [lineHeight(#px(20)), Media.mobile([lineHeight(#px(20))])])
+    | H1 => style(. [lineHeight(#em(1.67)), Media.mobile([lineHeight(#em(1.6))])])
+    | H2 => style(. [lineHeight(#em(1.6)), Media.mobile([lineHeight(#em(1.4))])])
+    | H3 => style(. [lineHeight(#em(1.56)), Media.mobile([lineHeight(#em(1.625))])])
+    | H4 => style(. [lineHeight(#em(1.57)), Media.mobile([lineHeight(#em(1.67))])])
+    | H5 => style(. [lineHeight(#em(1.67)), Media.mobile([lineHeight(#em(1.81))])])
     }
   let fontSize = x =>
     switch x {

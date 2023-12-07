@@ -65,19 +65,6 @@ let make = (~consensusAddress) => {
       </div>
     </div>
     <VSpacing size=#px(24) />
-    <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
-      <div className={CssHelper.flexBox()}>
-        <div className={Styles.block(theme, Validator.Proposed)} />
-        <HSpacing size=Spacing.sm />
-        <Text block=true value="Proposed" weight=Text.Semibold />
-      </div>
-      {switch getUptimeSub {
-      | Data({proposedCount}) =>
-        <Text block=true value={proposedCount->Belt.Int.toString} weight=Bold size=Body1 />
-      | _ => <LoadingCensorBar width=20 height=14 />
-      }}
-    </div>
-    <VSpacing size={#px(10)} />
     <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
       <div className={CssHelper.flexBox()}>
         <div className={Styles.block(theme, Validator.Signed)} />
@@ -87,6 +74,19 @@ let make = (~consensusAddress) => {
       {switch getUptimeSub {
       | Data({signedCount}) =>
         <Text block=true value={signedCount->Belt.Int.toString} weight=Bold size=Body1 />
+      | _ => <LoadingCensorBar width=20 height=14 />
+      }}
+    </div>
+    <VSpacing size={#px(10)} />
+    <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
+      <div className={CssHelper.flexBox()}>
+        <div className={Styles.block(theme, Validator.Proposed)} />
+        <HSpacing size=Spacing.sm />
+        <Text block=true value="Proposed" weight=Text.Semibold />
+      </div>
+      {switch getUptimeSub {
+      | Data({proposedCount}) =>
+        <Text block=true value={proposedCount->Belt.Int.toString} weight=Bold size=Body1 />
       | _ => <LoadingCensorBar width=20 height=14 />
       }}
     </div>

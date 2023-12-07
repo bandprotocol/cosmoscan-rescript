@@ -134,7 +134,7 @@ let make = (~oracleStatus, ~operatorAddress) => {
             <Item
               key={i->Belt.Int.toString ++ timestamp->Belt.Int.toString}
               // TODO: To be implemented
-              statuses={OracleStatus.allOf3}
+              statuses={OracleStatus.someInactive}
               timestamp
             />
           )

@@ -259,7 +259,7 @@ let make = (~validatorAddress) => {
 
   let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
 
-  <InfoContainer py=24>
+  <InfoContainer py=40>
     <Heading value="My Delegation" size=Heading.H4 />
     <SeperatedLine mt=16 mb=16 />
     {switch accountOpt {

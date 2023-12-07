@@ -164,6 +164,7 @@ module RenderBody = {
               size=Text.Body1
               weight=Text.Bold
               color={theme.neutral_900}
+              code=true
             />
             <VSpacing size=Spacing.sm />
             <Text
@@ -210,7 +211,7 @@ module RenderBody = {
               <VSpacing size=Spacing.xs />
               <ProgressBar.Uptime percent=uptime' />
             </div>
-          | None => <Text value="N/A" block=true />
+          | None => <Text value="N/A" block=true align=Right />
           }
         | _ =>
           <div>

@@ -151,7 +151,7 @@ module DstValidatorSelection = {
 @react.component
 let make = (~address, ~validator, ~setMsgsOpt) => {
   let validatorInfoSub = ValidatorSub.get(validator)
-  let validatorsSub = ValidatorSub.getList(~isActive=true, ())
+  let validatorsSub = ValidatorSub.getList(~filter=Active, ())
   let delegationSub = DelegationSub.getStakeByValidator(address, validator)
 
   let allSub = Sub.all3(validatorInfoSub, validatorsSub, delegationSub)

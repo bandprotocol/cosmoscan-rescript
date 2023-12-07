@@ -44,8 +44,8 @@ module SingleConfig = %graphql(`
 `)
 
 module MultiConfig = %graphql(`
-  subscription Validators($jailed: Boolean!) {
-    validators(where: {jailed: {_eq: $jailed}}, order_by: [{tokens: desc, moniker: asc}]) @ppxAs(type: "Validator.raw_t") {
+  subscription Validators {
+    validators(order_by: [{tokens: desc, moniker: asc}]) @ppxAs(type: "Validator.raw_t") {
       operatorAddress: operator_address @ppxCustom(module: "GraphQLParserModule.Address")
       consensusAddress: consensus_address
       moniker
@@ -149,24 +149,37 @@ let get = operator_address => {
   })
 }
 
-let getList = (~isActive, ()) => {
-  let result = MultiConfig.use({jailed: !isActive})
+type validators_bool_exp = {jailed: bool}
+
+let getList = (~filter, ()) => {
+  let result = MultiConfig.use()
 
   result
   ->Sub.fromData
   ->Sub.map(({validators}) =>
-    validators->Belt.Array.mapWithIndex((idx, each) => Validator.toExternal(each, idx + 1))
+    validators
+    ->Belt.Array.keep(({jailed}) =>
+      switch filter {
+      | ValidatorsFilter.All => true
+      | Active if !jailed => true
+      | Inactive if jailed => true
+      | _ => false
+      }
+    )
+    ->Belt.Array.mapWithIndex((idx, each) => Validator.toExternal(each, idx + 1))
   )
 }
 
 let avgCommission = (~isActive, ()) => {
-  let result = MultiConfig.use({jailed: !isActive})
+  let result = MultiConfig.use()
 
   result
   ->Sub.fromData
   ->Sub.map(x => {
     let exclude100percent =
-      x.validators->Belt_Array.keep(({commissionRate}) => commissionRate != 1.)
+      x.validators->Belt_Array.keep(({commissionRate, jailed}) =>
+        jailed == !isActive && commissionRate != 1.
+      )
     let length = Belt_Array.length(exclude100percent) |> Belt.Int.toFloat
 
     exclude100percent

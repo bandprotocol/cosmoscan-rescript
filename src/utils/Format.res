@@ -33,15 +33,15 @@ let fPretty = (~digits=?, value) => {
   }
 }
 
-let fCurrency = value =>
+let fCurrency = (~digits=2, value) =>
   if value >= 1e9 {
-    (value /. 1e9)->fPretty(~digits=2) ++ "B"
+    (value /. 1e9)->fPretty(~digits) ++ "B"
   } else if value >= 1e6 {
-    (value /. 1e6)->fPretty(~digits=2) ++ "M"
+    (value /. 1e6)->fPretty(~digits) ++ "M"
   } else if value >= 1e3 {
-    (value /. 1e3)->fPretty(~digits=2) ++ "K"
+    (value /. 1e3)->fPretty(~digits) ++ "K"
   } else {
-    value->fPretty(~digits=2)
+    value->fPretty(~digits)
   }
 
 let fPercentChange = value =>
@@ -58,7 +58,7 @@ let fPercent = (~digits=?, value) => {
         value->Js.Float.toFixedWithPrecision(~digits=6)
       },
     )
-  } ++ " %"
+  } ++ "%"
 }
 
 let iPretty = value => withCommas(value->Belt.Int.toString)

@@ -88,7 +88,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
   let oracleReportsCountSub = ReportSub.ValidatorReport.count(address)
 
   // for finding validator rank
-  let validatorsSub = ValidatorSub.getList(~isActive=true, ())
+  let validatorsSub = ValidatorSub.getList(~filter=Active, ())
 
   let isMobile = Media.isMobile()
 
@@ -204,13 +204,13 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
             </Col>
           </Row>}
       // Validator Information
-      <Row marginBottom=24>
+      <Row marginBottom=40 marginBottomSm=24>
         <Col>
           <InfoContainer py=24>
             <Heading value="Validator Information" size=Heading.H4 />
             <SeperatedLine mt=8 mb=16 />
             <Row marginBottom=24 alignItems=Row.Center>
-              <Col col=Col.Four mbSm=8>
+              <Col col=Col.Three mbSm=8>
                 <div className={CssHelper.flexBox()}>
                   <Heading
                     value="Commission" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
@@ -222,7 +222,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
                   </CTooltip>
                 </div>
               </Col>
-              <Col col=Col.Eight>
+              <Col col=Col.Nine>
                 {switch allSub {
                 | Data(({commission}, _, _)) =>
                   <div className={CssHelper.flexBox()}>
@@ -240,30 +240,30 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               </Col>
             </Row>
             <Row marginBottom=24 alignItems=Row.Center>
-              <Col col=Col.Four mbSm=8>
+              <Col col=Col.Three mbSm=8>
                 <div className={CssHelper.flexBox()}>
                   <Heading
                     value="Est. APR" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                   <HSpacing size=Spacing.xs />
-                  // TODO: remove mock wording
-                  <CTooltip tooltipText="Lorem Ipsum">
+                  <CTooltip
+                    tooltipText="Estimated Annual Percentage Rate of staking rewards exclude validator's commission">
                     <Icon name="fal fa-info-circle" size=10 color={theme.neutral_600} />
                   </CTooltip>
                 </div>
               </Col>
-              <Col col=Col.Eight>
+              <Col col=Col.Nine>
                 /* TODO: implement APR */
                 <Text value={Format.fPercent(~digits=2, 0.)} size=Text.Body1 />
               </Col>
             </Row>
             <Row marginBottom=24 alignItems=Row.Center>
-              <Col col=Col.Four mbSm=8>
+              <Col col=Col.Three mbSm=8>
                 <Heading
                   value="Website" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                 />
               </Col>
-              <Col col=Col.Eight>
+              <Col col=Col.Nine>
                 {switch allSub {
                 | Data(({website}, _, _)) =>
                   <AbsoluteLink href=website className=Styles.link>
@@ -274,23 +274,23 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               </Col>
             </Row>
             <Row marginBottom=24 alignItems=Row.Center>
-              <Col col=Col.Four mbSm=8>
+              <Col col=Col.Three mbSm=8>
                 <Heading
                   value="Since" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                 />
               </Col>
-              <Col col=Col.Eight>
+              <Col col=Col.Nine>
                 /* TODO: implement since date time */
                 <Text value="2023-04-25 06:29:18" size=Text.Body1 />
               </Col>
             </Row>
             <Row>
-              <Col col=Col.Four mbSm=8>
+              <Col col=Col.Three mbSm=8>
                 <Heading
                   value="Description" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                 />
               </Col>
-              <Col col=Col.Eight>
+              <Col col=Col.Nine>
                 {switch allSub {
                 | Data(({details}, _, _)) => <Text value=details size=Text.Body1 />
                 | _ => <LoadingCensorBar width=260 height=15 />

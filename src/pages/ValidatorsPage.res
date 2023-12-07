@@ -23,8 +23,6 @@ let make = () => {
 
   let (prevDayTime, setPrevDayTime) = React.useState(getPrevDay)
   let (searchTerm, setSearchTerm) = React.useState(_ => "")
-  // TODO: wire up
-  let (isActive, setIsActive) = React.useState(_ => true)
   let (filterType, setFilterType) = React.useState(_ => ValidatorsFilter.Active)
   let (sortedBy, setSortedBy) = React.useState(_ => ValidatorsTable.VotingPower)
   let (direction, setDirection) = React.useState(_ => Sort.DESC)
@@ -36,7 +34,7 @@ let make = () => {
 
   let infoSub = React.useContext(GlobalContext.context)
 
-  let validatorsSub = ValidatorSub.getList(~isActive, ())
+  let validatorsSub = ValidatorSub.getList(~filter=filterType, ())
   let validatorsCountSub = ValidatorSub.count()
   let activeValidatorCountSub = ValidatorSub.countByActive(true)
   let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
@@ -74,7 +72,7 @@ let make = () => {
         </Col>
       </Row>
       // Infomation Cards
-      <Row marginBottom=40>
+      <Row marginBottom=40 marginBottomSm=24>
         <Col col=Col.Three colSm=Col.Six mbSm=24>
           <InfoContainer style=Styles.infoContainer px=24 py=16 pxSm=16 pySm=16 radius=8>
             <Heading
@@ -92,6 +90,7 @@ let make = () => {
                 block=true
                 weight=Text.Bold
                 color={theme.neutral_900}
+                code=true
               />
             | _ => <LoadingCensorBar width=100 height=24 />
             }}
@@ -108,22 +107,21 @@ let make = () => {
             />
             {switch infoBondSub {
             | Data({financial}, bondedTokenCount) =>
-              <div className={CssHelper.flexBox()}>
-                // TODO: update formatter
+              <div className={CssHelper.flexBox(~align=#baseline, ())}>
                 <Text
-                  value={bondedTokenCount->Coin.getBandAmountFromCoin->Format.fCurrency}
+                  value={bondedTokenCount->Coin.getBandAmountFromCoin->Format.fCurrency(~digits=0)}
                   size=Text.Xxxl
                   block=true
                   weight=Text.Bold
                   color={theme.neutral_900}
                 />
-                // TODO: update formatter
                 <Text
-                  value={"/" ++ financial.totalSupply->Format.fCurrency}
+                  value={"/" ++ financial.totalSupply->Format.fCurrency(~digits=0)}
                   size=Text.Xl
                   block=true
                   code=true
                 />
+                <HSpacing size=Spacing.sm />
                 {isMobile
                   ? React.null
                   : <Text
@@ -191,7 +189,7 @@ let make = () => {
       <Row marginTop=40 marginBottom=16 marginTopSm=24 marginBottomSm=24 alignItems=Center>
         {isMobile
           ? <Col>
-              <Heading value="All Validators" size=H3 weight=Semibold color=theme.neutral_900 />
+              <Heading value="All Validators" size=H2 weight=Semibold color=theme.neutral_900 />
               <ValidatorsFilter setFilterType filterType />
             </Col>
           : React.null}

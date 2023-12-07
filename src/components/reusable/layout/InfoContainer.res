@@ -5,7 +5,15 @@ module Styles = {
     style(. [
       backgroundColor(isDarkMode ? theme.neutral_100 : theme.neutral_000),
       borderRadius(#px(radius)),
-      boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.2)))),
+      boxShadow(
+        Shadow.box(
+          ~x=#zero,
+          ~y=#px(2),
+          ~blur=#px(4),
+          ~spread=#px(1),
+          Css.rgba(16, 18, 20, #num(0.15)),
+        ),
+      ),
       padding2(~v=#px(py), ~h=#px(px)),
       position(#relative),
       Media.mobile([padding2(~v=#px(pySm), ~h=#px(pxSm))]),
