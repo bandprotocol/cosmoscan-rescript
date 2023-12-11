@@ -27,8 +27,15 @@ function(data, colors) {
             data: data,
             backgroundColor: colors,
             borderColor: colors,
-            borderWidth: 1
+            borderWidth: 0
           },
+        ],
+        labels: [
+          "Available",
+          "Commission",
+          "Delegated",
+          "Reward",
+          "Unbonding",
         ],
       },
 
@@ -39,7 +46,7 @@ function(data, colors) {
           display: false
         },
         tooltip: {
-          enabled: false
+          enabled: true
         },
         cutoutPercentage: 65,
       },

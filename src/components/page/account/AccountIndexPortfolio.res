@@ -57,7 +57,9 @@ module BalanceDetails = {
           </CTooltip>
         </div>
         <div className={CssHelper.ml(~size=24, ())}>
-          <Text value={percent != 0. ? percent->Format.fPercent : "-"} code=true />
+          <Text
+            value={percent != 0. ? percent->Format.fPercent : "-"} color=theme.neutral_600 code=true
+          />
         </div>
       </Col>
       <Col col=Col.Six colSm=Col.Seven>
@@ -105,7 +107,7 @@ module BalanceDetails = {
                           color=theme.neutral_600
                         />
                       : <Text
-                          value={amountInUsdPrice->Format.fPretty}
+                          value={amountInUsdPrice->Format.fPretty(~digits=2)}
                           size=Text.Body2
                           spacing=Text.Em(0.02)
                           weight=Text.Thin
@@ -204,12 +206,14 @@ let make = (~address) => {
   ]
 
   <>
-    <Row marginTop=40 marginTopSm=24 marginBottom=24 marginBottomSm=24>
+    <Row marginTop=40 marginTopSm=24 marginBottom=40 marginBottomSm=24>
       <Col>
         <InfoContainer>
           <Row>
             <Col col=Col.Six>
-              <Heading value="Total Balance" size=Heading.H4 marginBottom=8 />
+              <Heading
+                value="Total Balance" size=Heading.H4 color=theme.neutral_600 marginBottom=8
+              />
               {switch topPartAllSub {
               | Data(({financial}, {balance, commission}, {amount, reward}, unbonding, _)) => {
                   let (allPercents, totalBalanceBAND) = calculateRatioAndTotal(
@@ -221,7 +225,7 @@ let make = (~address) => {
                   )
                   let totalBalanceUSD = totalBalanceBAND *. financial.usdPrice
                   let adjustedText =
-                    totalBalanceBAND->Format.fPretty(~digits=6)->Js.String2.split(".")
+                    totalBalanceBAND->Format.fPretty(~digits=2)->Js.String2.split(".")
 
                   <>
                     <div className={CssHelper.flexBox(~align=#flexEnd, ())}>
@@ -276,7 +280,7 @@ let make = (~address) => {
               }}
             </Col>
             <Col col=Col.Six mtSm=24>
-              <Heading value="BAND Distribution" size=Heading.H4 />
+              <Heading value="BAND Distribution" color=theme.neutral_600 size=Heading.H4 />
               <div className={Styles.allBalancesContainer(~theme, ())}>
                 <div>
                   {switch topPartAllSub {
@@ -304,14 +308,14 @@ let make = (~address) => {
                           percent={allPercents[0]}
                           showZero=true
                         />
-                        {isMobile
+                        {isMobile || accountOpt->Belt.Option.isNone
                           ? React.null
                           : <div
                               className={Css.merge(list{
                                 CssHelper.flexBox(~cGap=#px(16), ~justify=#flexEnd, ()),
                                 CssHelper.mt(~size=8, ()),
                               })}>
-                              <Button variant=Button.Outline onClick={_ => send(chainID)}>
+                              <Button variant=Button.Outline onClick={_ => send(chainID)} fsize=14>
                                 {"Send"->React.string}
                               </Button>
                               // TODO: wire up

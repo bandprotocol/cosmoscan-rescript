@@ -22,6 +22,7 @@ module RenderBody = {
   ) => {
     let (_, dispatchModal) = React.useContext(ModalContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
+    let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
 
     <TBody overflow=#visible paddingV=#px(16)>
       <TableGrid templateColumns>
@@ -48,7 +49,10 @@ module RenderBody = {
           {switch delegationsSub {
           | Data({amount}) =>
             <Text
-              value={amount->Coin.getBandAmountFromCoin->Format.fPretty} size=Body1 weight=Bold
+              value={amount->Coin.getBandAmountFromCoin->Format.fPretty}
+              size=Body1
+              weight=Bold
+              color=theme.neutral_900
             />
           | _ => <LoadingCensorBar width=140 height=20 />
           }}
@@ -62,6 +66,7 @@ module RenderBody = {
               code=true
               weight=Bold
               size=Body1
+              color=theme.neutral_900
             />
           | _ => <LoadingCensorBar width=100 height=20 />
           }}
@@ -202,8 +207,8 @@ let make = (~address) => {
       )
       ->React.array
     }}
-    {switch delegationsSub {
-    | Data(_) if !isMobile =>
+    {switch (delegationsSub, accountOpt) {
+    | (Data(_), Some({address: loginAddress})) if !isMobile && loginAddress == address =>
       <div className={Styles.actionContainer(theme)}>
         <Button
           px=24

@@ -2,7 +2,7 @@ module Styles = {
   open CssJs
 
   let menuContainer = style(. [position(relative), display(#flex), justifyContent(#flexEnd)])
-  let menuPanel = show =>
+  let menuPanel = (show, theme: Theme.t) =>
     style(. [
       zIndex(2),
       display(show ? #block : #none),
@@ -13,6 +13,8 @@ module Styles = {
       top(#percent(100.)),
       width(#px(154)),
       padding2(~h=#zero, ~v=#px(8)),
+      border(#px(1), #solid, theme.neutral_100),
+      borderRadius(#px(8)),
     ])
   let menuItem = (theme: Theme.t) => {
     style(. [
@@ -60,7 +62,7 @@ let make = (~operatorAddress, ~rewardAmount) => {
     <Button variant=Text({underline: false}) onClick={_ => toggle()}>
       <Icon name="fas fa-ellipsis-v" size=16 color=theme.neutral_600 />
     </Button>
-    <div className={Styles.menuPanel(show)}>
+    <div className={Styles.menuPanel(show, theme)}>
       {[
         SubmitMsg.Delegate(operatorAddress),
         Undelegate(operatorAddress),

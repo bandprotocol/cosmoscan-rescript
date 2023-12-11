@@ -28,9 +28,7 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
           </div>
         </Col>
         <Col col=Col.Nine>
-          <AddressRender
-            address position=AddressRender.Subtitle copy=true clickable=false accountType=#validator
-          />
+          <AddressRender address position=AddressRender.Subtitle copy=true accountType=#validator />
         </Col>
       </Row>
       // TODO: wire up

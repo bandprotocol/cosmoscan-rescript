@@ -39,7 +39,7 @@ module RenderBody = {
           />
         | _ =>
           <>
-            <LoadingCensorBar width=400 height=15 />
+            <LoadingCensorBar width=300 height=15 />
           </>
         }}
         {switch txSub {
@@ -51,7 +51,7 @@ module RenderBody = {
             code=true
             size=Body1
           />
-        | _ => <LoadingCensorBar width=65 height=15 />
+        | _ => <LoadingCensorBar width=65 height=15 isRight=true />
         }}
         // TODO: wire up
         <Text value="2023-04-25 06:29:18" size=Body1 align=Right />
