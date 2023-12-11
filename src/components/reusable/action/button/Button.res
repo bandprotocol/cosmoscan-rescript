@@ -2,7 +2,7 @@ type btn_style_t =
   | Primary
   | Secondary
   | Outline
-  | Text({underline: bool})
+  | Text({underline: bool, color?: Css.Types.Color.t})
 
 module Styles = {
   open CssJs

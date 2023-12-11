@@ -180,7 +180,7 @@ let make = (~info) => {
     | Some(uptime) =>
       <div className={Css.merge(list{Styles.vFlex, Styles.uptimeContainer})}>
         <Text
-          value={uptime->Format.fPercent(~digits=2)}
+          value={uptime->Format.fPercent(~digits=uptime == 100. ? 0 : 2)}
           spacing={Text.Em(0.02)}
           nowrap=true
           code=true

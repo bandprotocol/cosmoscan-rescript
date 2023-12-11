@@ -97,10 +97,8 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
   <Section ptSm=24>
     <div className=CssHelper.container>
       <Button variant=Button.Text({underline: false}) onClick={_ => Route.redirect(ValidatorsPage)}>
-        <Icon name="fa fa-angle-left" mr=8 size=16 />
-        <Text
-          value="Back to all Validators" size=Text.Xl weight=Text.Medium color=theme.neutral_600
-        />
+        <Icon name="fal fa-angle-left" mr=8 size=20 color=theme.neutral_600 />
+        <Text value="Back to all Validators" size=Text.Xl weight=Text.Medium />
       </Button>
       <Row marginTop=40 marginBottom=40 marginBottomSm=24>
         <Col col=Col.One>
@@ -168,6 +166,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
                   accountType=#validator
                   clickable=false
                   wordBreak=true
+                  copy=true
                 />
               | _ => <LoadingCensorBar width=260 height=15 />
               }}
@@ -183,7 +182,11 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               {switch allSub {
               | Data(({operatorAddress}, _, _)) =>
                 <AddressRender
-                  address=operatorAddress position=AddressRender.Subtitle wordBreak=true
+                  address=operatorAddress
+                  position=AddressRender.Subtitle
+                  wordBreak=true
+                  copy=true
+                  qrCode=true
                 />
               | _ => <LoadingCensorBar width=260 height=15 />
               }}

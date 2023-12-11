@@ -207,7 +207,12 @@ module RenderBody = {
           switch uptime {
           | Some(uptime') =>
             <div className={Styles.uptimeContainer(~isLogin, ())}>
-              <Text value={uptime'->Format.fPercent(~digits=2)} code=true align=Right size=Body1 />
+              <Text
+                value={uptime'->Format.fPercent(~digits=uptime' == 100. ? 0 : 2)}
+                code=true
+                align=Right
+                size=Body1
+              />
               <VSpacing size=Spacing.xs />
               <ProgressBar.Uptime percent=uptime' />
             </div>

@@ -52,6 +52,8 @@ module Styles = {
     | Title => style(. [Media.mobile([width(#percent(90.))])])
     | _ => ""
     }
+
+  let qrCode = style(. [cursor(#pointer), position(#relative), zIndex(2)])
 }
 
 @react.component
@@ -60,6 +62,7 @@ let make = (
   ~position=Text,
   ~accountType=#account,
   ~copy=false,
+  ~qrCode=false,
   ~clickable=true,
   ~wordBreak=false,
   ~ellipsis=false,
@@ -71,7 +74,10 @@ let make = (
     ? address->Address.toOperatorBech32->Js.String2.sliceToEnd(~from=11)
     : address->Address.toBech32->Js.String2.sliceToEnd(~from=4)
 
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
+  let (_, dispatchModal) = ModalContext.use()
+
+  let openQrCode = () => address->QRCode->OpenModal->dispatchModal
 
   <div className={Styles.container}>
     <Link
@@ -109,6 +115,14 @@ let make = (
             }}
             message={isValidator ? address->Address.toOperatorBech32 : address->Address.toBech32}
           />
+        </>
+      : React.null}
+    {qrCode
+      ? <>
+          <HSpacing size=Spacing.sm />
+          <div className=Styles.qrCode onClick={_ => openQrCode()}>
+            <Icon size=16 name="far fa-qrcode" color=theme.neutral_600 />
+          </div>
         </>
       : React.null}
   </div>

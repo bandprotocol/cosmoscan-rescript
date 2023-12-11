@@ -42,6 +42,7 @@ let reducer = (state, x) =>
 
 type props = {value: (option<t>, a => unit), children: React.element}
 let context = React.createContext((None, _ => ()))
+let use = () => React.useContext(context)
 
 module Provider = {
   @react.component
