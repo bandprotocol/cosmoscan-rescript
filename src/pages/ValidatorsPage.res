@@ -103,7 +103,7 @@ let make = () => {
               size=Heading.H4
               marginBottom=8
               weight=Regular
-              color={theme.neutral_600}
+              color=theme.neutral_600
             />
             {switch infoBondSub {
             | Data({financial}, bondedTokenCount) =>
@@ -113,7 +113,8 @@ let make = () => {
                   size=Text.Xxxl
                   block=true
                   weight=Text.Bold
-                  color={theme.neutral_900}
+                  color=theme.neutral_900
+                  code=true
                 />
                 <Text
                   value={"/" ++ financial.totalSupply->Format.fCurrency(~digits=0)}

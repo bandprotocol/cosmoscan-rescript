@@ -229,7 +229,12 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
                 {switch allSub {
                 | Data(({commission}, _, _)) =>
                   <div className={CssHelper.flexBox()}>
-                    <Text value={Format.fPercent(~digits=2, commission)} size=Body1 code=true />
+                    <Text
+                      value={Format.fPercent(~digits=2, commission)}
+                      size=Body1
+                      color={theme.neutral_900}
+                      code=true
+                    />
                     <HSpacing size=Spacing.lg />
                     // TODO: wire up
                     <Text value="(possible range is 2-20%)" size=Body1 />
@@ -257,7 +262,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               </Col>
               <Col col=Col.Nine>
                 /* TODO: implement APR */
-                <Text value={Format.fPercent(~digits=2, 0.)} size=Text.Body1 />
+                <Text value={Format.fPercent(~digits=2, 0.)} size=Text.Body1 code=true />
               </Col>
             </Row>
             <Row marginBottom=24 alignItems=Row.Center>
@@ -284,7 +289,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               </Col>
               <Col col=Col.Nine>
                 /* TODO: implement since date time */
-                <Text value="2023-04-25 06:29:18" size=Text.Body1 />
+                <Text value="2023-04-25 06:29:18" size=Text.Body1 code=true />
               </Col>
             </Row>
             <Row>
@@ -295,7 +300,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
               </Col>
               <Col col=Col.Nine>
                 {switch allSub {
-                | Data(({details}, _, _)) => <Text value=details size=Text.Body1 />
+                | Data(({details}, _, _)) => <Text value=details size=Text.Body1 code=true />
                 | _ => <LoadingCensorBar width=260 height=15 />
                 }}
               </Col>
@@ -383,6 +388,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
           <Tab.Route
             tabs=[
               {
+                // TODO: to wire up
                 name: "Oracle Reports (12,345,678)",
                 route: Route.ValidatorDetailsPage(address, Route.Reports),
               },
