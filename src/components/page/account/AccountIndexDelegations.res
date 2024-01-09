@@ -53,6 +53,7 @@ module RenderBody = {
               size=Body1
               weight=Bold
               color=theme.neutral_900
+              code=true
             />
           | _ => <LoadingCensorBar width=140 height=20 />
           }}
