@@ -38,7 +38,7 @@ module ResolveStatus = {
     switch statusOpt {
     | Some("Success") => Success
     | Some("Failure") => Failure
-    | _ => raise(NotFound("The resolve status is not existing"))
+    | _ => Unknown
     }
   }
   let serialize = status => {
