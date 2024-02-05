@@ -236,6 +236,8 @@ let toString = route =>
   | GroupDetailsPage(groupID, GroupMember) => `/group/${groupID->Belt.Int.toString}#members`
   | GroupDetailsPage(groupID, GroupInformation) =>
     `/group/${groupID->Belt.Int.toString}#information`
+  | GroupPage(Group) => `/group/#group`
+  | GroupPage(Proposal) => `/group/#proposal`
   | HomePage => "/"
   | NotFound => "/notfound"
   }
