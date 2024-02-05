@@ -5,7 +5,6 @@ type sort_direction_t =
 type sort_t =
   | ID
   | Name
-  | Message
   | GroupID
   | ProposalStatus
 
@@ -14,8 +13,6 @@ type sort_by_t =
   | IDDesc
   | NameAsc
   | NameDesc
-  | MessageAsc
-  | MessageDesc
   | GroupIDAsc
   | GroupIDDesc
   | ProposalStatusAsc
@@ -25,13 +22,11 @@ let getDirection = x =>
   switch x {
   | IDAsc
   | NameAsc
-  | MessageAsc
   | GroupIDAsc
   | ProposalStatusAsc =>
     ASC
   | IDDesc
   | NameDesc
-  | MessageDesc
   | GroupIDDesc
   | ProposalStatusDesc =>
     DESC
@@ -56,29 +51,27 @@ let compareVersion = (a: OracleScriptSub.version_t, b: OracleScriptSub.version_t
   compareString(a->parseVersion, b->parseVersion)
 }
 
-let defaultCompare = (a: OracleScriptSub.t_with_stats, b: OracleScriptSub.t_with_stats) =>
-  if a.name != b.name {
+let defaultCompare = (a: Group.Proposal.t, b: Group.Proposal.t) =>
+  if a.title != b.title {
     compare(b.id, a.id)
   } else {
-    compareString(b.name, a.name)
+    compareString(b.title, a.title)
   }
 
-let sorting = (oraclescripts: array<OracleScriptSub.t_with_stats>, ~sortedBy, ~direction) => {
-  oraclescripts
+let sorting = (proposals: array<Group.Proposal.t>, ~sortedBy, ~direction) => {
+  proposals
   ->Belt.List.fromArray
   ->Belt.List.sort((a, b) => {
     let result = {
       switch (sortedBy, direction) {
       | (ID, ASC) => compare(a.id, b.id)
       | (ID, DESC) => compare(b.id, a.id)
-      | (Name, ASC) => compareString(b.name, a.name)
-      | (Name, DESC) => compareString(a.name, b.name)
-      | (Message, ASC) => compareVersion(a.version, b.version)
-      | (Message, DESC) => compareVersion(b.version, a.version)
-      | (GroupID, ASC) => compare(a.stat.count, b.stat.count)
-      | (GroupID, DESC) => compare(b.stat.count, a.stat.count)
-      | (ProposalStatus, ASC) => compare(a.stat.responseTime, b.stat.responseTime)
-      | (ProposalStatus, DESC) => compare(b.stat.responseTime, a.stat.responseTime)
+      | (Name, ASC) => Js.String2.localeCompare(b.title, a.title)->Belt.Float.toInt
+      | (Name, DESC) => Js.String2.localeCompare(a.title, b.title)->Belt.Float.toInt
+      | (GroupID, ASC) => compare(a.groupID, b.groupID)
+      | (GroupID, DESC) => compare(b.groupID, a.groupID)
+      | (ProposalStatus, ASC) => compare(a.status, b.status)
+      | (ProposalStatus, DESC) => compare(b.status, a.status)
       }
     }
     if result != 0 {
@@ -94,7 +87,6 @@ let parseSortString = sortOption => {
   switch sortOption {
   | ID => "Proposal ID"
   | Name => "Proposal Name"
-  | Message => "Message"
   | GroupID => "Group"
   | ProposalStatus => "Status"
   }
@@ -115,9 +107,6 @@ let parseSortby = s => {
   | NameAsc
   | NameDesc =>
     Name
-  | MessageAsc
-  | MessageDesc =>
-    Message
   | GroupIDAsc
   | GroupIDDesc =>
     GroupID

@@ -1,4 +1,4 @@
-type group_proposal_status_t =
+type t =
   | PROPOSAL_STATUS_UNSPECIFIED
   | PROPOSAL_STATUS_SUBMITTED
   | PROPOSAL_STATUS_ACCEPTED
@@ -6,7 +6,7 @@ type group_proposal_status_t =
   | PROPOSAL_STATUS_ABORTED
   | PROPOSAL_STATUS_WITHDRAWN
 
-let parseGroupProposalStatus = status => {
+let toString = status => {
   switch status {
   | PROPOSAL_STATUS_UNSPECIFIED => "Unspecified"
   | PROPOSAL_STATUS_SUBMITTED => "Submitted"
@@ -17,12 +17,24 @@ let parseGroupProposalStatus = status => {
   }
 }
 
+let parse = str => {
+  switch str {
+  | "PROPOSAL_STATUS_UNSPECIFIED" => PROPOSAL_STATUS_UNSPECIFIED
+  | "PROPOSAL_STATUS_SUBMITTED" => PROPOSAL_STATUS_SUBMITTED
+  | "PROPOSAL_STATUS_ACCEPTED" => PROPOSAL_STATUS_ACCEPTED
+  | "PROPOSAL_STATUS_REJECTED" => PROPOSAL_STATUS_REJECTED
+  | "PROPOSAL_STATUS_ABORTED" => PROPOSAL_STATUS_ABORTED
+  | "PROPOSAL_STATUS_WITHDRAWN" => PROPOSAL_STATUS_WITHDRAWN
+  | _ => PROPOSAL_STATUS_UNSPECIFIED
+  }
+}
+
 module Styles = {
   open CssJs
-  let chipStyles = (~bgColor: group_proposal_status_t, theme: Theme.t) =>
+  let chipStyles = (~status: t, theme: Theme.t) =>
     style(. [
       backgroundColor({
-        switch bgColor {
+        switch status {
         | PROPOSAL_STATUS_ACCEPTED
         | PROPOSAL_STATUS_SUBMITTED =>
           theme.success_600
@@ -41,12 +53,12 @@ module Styles = {
 }
 
 @react.component
-let make = (~value, ~color=PROPOSAL_STATUS_UNSPECIFIED) => {
+let make = (~value, ~status=PROPOSAL_STATUS_UNSPECIFIED) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   <div
     className={Css.merge(list{
       CssHelper.flexBox(~wrap=#nowrap, ~justify=#center, ()),
-      Styles.chipStyles(~bgColor=color, theme),
+      Styles.chipStyles(~status, theme),
     })}>
     <Text
       value

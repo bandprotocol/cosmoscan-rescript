@@ -84,8 +84,8 @@ module TableItemMobile = {
           </Col>
           <Col colSm=Col.Eight>
             <GroupProposalStatus
-              value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
-              color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+              value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.toString}
+              status={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
             />
           </Col>
         </Row>
@@ -95,7 +95,7 @@ module TableItemMobile = {
 }
 
 @react.component
-let make = (~item) => {
+let make = (~proposal: Group.Proposal.t) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let isMobile = Media.isMobile()
 
@@ -109,16 +109,14 @@ let make = (~item) => {
             Styles.tableItem(theme),
           })}>
           <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            // TODO: hardcode
-            <TypeID.GroupProposal id={item->ID.GroupProposal.fromInt} size={Body1} weight={Bold} />
+            <TypeID.GroupProposal id={proposal.id} size={Body1} weight={Bold} />
           </div>
           <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
             <Link
               className={Css.merge(list{Styles.tableLink(theme)})}
               route={OracleScriptDetailsPage(1, OracleScriptRequests)}>
               <Text
-                // TODO: hardcode
-                value="Group Proposal Example"
+                value=proposal.title
                 ellipsis=true
                 color={theme.primary_600}
                 weight=Semibold
@@ -127,19 +125,18 @@ let make = (~item) => {
             </Link>
           </div>
           <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            //TODO: hardcode
-            <MsgBadge name="Message" />
+            <MsgBadgeGroup messages={proposal.messages} />
           </div>
           <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
-            <TypeID.GroupLink id={1->ID.Group.fromInt}>
+            <TypeID.GroupLink id={proposal.groupID}>
               <div className={Css.merge(list{CssHelper.flexBox()})}>
                 <TypeID.Group
-                  id={1->ID.Group.fromInt} position=TypeID.Subtitle isNotLink=true weight={Semibold}
+                  id={proposal.groupID} position=TypeID.Subtitle isNotLink=true weight={Semibold}
                 />
                 <HSpacing size=Spacing.sm />
                 <Heading
                   size=Heading.H4
-                  value="Group Example"
+                  value=proposal.groupName
                   weight=Heading.Semibold
                   color={theme.primary_600}
                 />
@@ -148,8 +145,8 @@ let make = (~item) => {
           </div>
           <div className={Css.merge(list{"table_item--cell", CssHelper.flexBox()})}>
             <GroupProposalStatus
-              value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.parseGroupProposalStatus}
-              color={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
+              value={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED->GroupProposalStatus.toString}
+              status={GroupProposalStatus.PROPOSAL_STATUS_ACCEPTED}
             />
           </div>
         </div>}

@@ -26,7 +26,7 @@ module RenderBody = {
         </Col>
         <Col col=Col.Three>
           {switch txSub {
-          | Data({messages, txHash, success, errMsg}) => <MsgBadgeGroup txHash messages />
+          | Data({messages}) => <MsgBadgeGroup messages />
           | _ => <LoadingCensorBar width=50 height=15 />
           }}
         </Col>
@@ -61,7 +61,7 @@ module RenderBodyMobile = {
           [
             ("Tx Hash", TxHash(txHash, isSmallMobile ? 170 : 200)),
             ("Block", Height(blockHeight)),
-            ("Actions", MsgBadgeGroup(txHash, messages)),
+            ("Actions", MsgBadgeGroup(messages)),
             ("Status", Status(success)),
           ]
         }

@@ -32,6 +32,12 @@ module Styles = {
     Media.mobile([marginTop(#px(16))]),
     selector("> div:last-child", [borderBottom(#px(0), #solid, #transparent)]),
   ])
+
+  let noDataContainer = style(. [
+    display(#flex),
+    justifyContent(#center),
+    padding2(~v=#px(8), ~h=#px(0)),
+  ])
 }
 
 module SortableTHead = {
@@ -91,95 +97,175 @@ module SortableTHead = {
   }
 }
 
-module MyGroupProposalTabContent = {
+module NoAccountContent = {
   @react.component
-  let make = (~sortedBy, ~toggle, ~direction) => {
+  let make = () => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <div className={Styles.tabContentWrapper}>
+      <Heading size=H3 value="My Group" />
+      <InfoContainer style=Styles.infoContainer>
+        <div className=Styles.noDataContainer>
+          <Text value="Connect Wallet to see your group" color={theme.neutral_600} size={Body1} />
+        </div>
+      </InfoContainer>
+    </div>
+  }
+}
+
+module MyGroupProposalTabContent = {
+  @react.component
+  let make = (~address: Address.t, ~sortedBy, ~toggle, ~direction) => {
+    let isMobile = Media.isMobile()
+    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+    let pageSize = 10
+    let (page, setPage) = React.useState(_ => 1)
+
+    let proposalsSub = GroupSub.getProposalsByAccount(
+      ~address=address->Address.toBech32,
+      ~page,
+      ~pageSize,
+      (),
+    )
+
+    <div className={Styles.tabContentWrapper}>
       <Heading size=H3 value="My Proposals" />
-      {<>
-        {isMobile
-          ? <>
-              <div
-                className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
-                {[1, 2]
-                ->Belt.Array.mapWithIndex((ind, item) => {
-                  <GroupProposalTableItem key={ind->Belt.Int.toString} item />
-                })
-                ->React.array}
-              </div>
-            </>
-          : <>
-              <InfoContainer style=Styles.infoContainer>
-                <Table>
-                  <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
-                    {isMobile
-                      ? React.null
-                      : <div className={Css.merge(list{Styles.tablehead})}>
-                          <div>
-                            <SortableTHead
-                              title="Proposal ID"
-                              direction
-                              toggle
-                              value=SortGroupProposalTable.ID
-                              sortedBy
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Proposal Name"
-                              direction
-                              toggle
-                              sortedBy
-                              value=SortGroupProposalTable.Name
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Message"
-                              toggle
-                              sortedBy
-                              direction
-                              value=SortGroupProposalTable.Message
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Group"
-                              toggle
-                              sortedBy
-                              direction
-                              value=SortGroupProposalTable.GroupID
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Status"
-                              toggle
-                              sortedBy
-                              direction
-                              value=SortGroupProposalTable.ProposalStatus
-                            />
-                          </div>
-                        </div>}
-                  </div>
-                  <div
-                    className={Css.merge(list{
-                      "table_content--wrapper",
-                      Styles.tableContentWrapper,
-                    })}>
-                    {[1, 2]
-                    ->Belt.Array.mapWithIndex((ind, item) => {
-                      <GroupProposalTableItem key={ind->Belt.Int.toString} item />
-                    })
-                    ->React.array}
-                  </div>
-                </Table>
-              </InfoContainer>
-            </>}
-      </>}
+      {switch proposalsSub {
+      | Data(proposals) =>
+        let pageCount = Page.getPageCount(proposals->Belt.Array.length, pageSize)
+
+        <>
+          {isMobile
+            ? <>
+                <div
+                  className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
+                  {proposals
+                  ->SortGroupProposalTable.sorting(~sortedBy, ~direction)
+                  ->Belt.Array.mapWithIndex((ind, proposal) => {
+                    <GroupProposalTableItem key={ind->Belt.Int.toString} proposal />
+                  })
+                  ->React.array}
+                </div>
+                <div className={Css.merge(list{"table_content--footer"})}>
+                  <Pagination2
+                    currentPage=page
+                    pageCount
+                    onPageChange={newPage => setPage(_ => newPage)}
+                    onChangeCurrentPage={newPage => setPage(_ => newPage)}
+                  />
+                </div>
+              </>
+            : <>
+                <InfoContainer style=Styles.infoContainer>
+                  <Table>
+                    <div
+                      className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
+                      {isMobile
+                        ? React.null
+                        : <div className={Css.merge(list{Styles.tablehead})}>
+                            <div>
+                              <SortableTHead
+                                title="Proposal ID"
+                                direction
+                                toggle
+                                value=SortGroupProposalTable.ID
+                                sortedBy
+                              />
+                            </div>
+                            <div>
+                              <SortableTHead
+                                title="Proposal Name"
+                                direction
+                                toggle
+                                sortedBy
+                                value=SortGroupProposalTable.Name
+                              />
+                            </div>
+                            <div>
+                              <Text
+                                block=true
+                                value="Message"
+                                size=Text.Caption
+                                weight=Text.Semibold
+                                transform=Text.Uppercase
+                                color=theme.neutral_900
+                              />
+                            </div>
+                            <div>
+                              <SortableTHead
+                                title="Group"
+                                toggle
+                                sortedBy
+                                direction
+                                value=SortGroupProposalTable.GroupID
+                              />
+                            </div>
+                            <div>
+                              <SortableTHead
+                                title="Status"
+                                toggle
+                                sortedBy
+                                direction
+                                value=SortGroupProposalTable.ProposalStatus
+                              />
+                            </div>
+                          </div>}
+                    </div>
+                    <div
+                      className={Css.merge(list{
+                        "table_content--wrapper",
+                        Styles.tableContentWrapper,
+                      })}>
+                      {switch proposals->Belt.Array.length > 0 {
+                      | true =>
+                        proposals
+                        ->SortGroupProposalTable.sorting(~sortedBy, ~direction)
+                        ->Belt.Array.mapWithIndex((ind, proposal) => {
+                          <GroupProposalTableItem key={ind->Belt.Int.toString} proposal />
+                        })
+                        ->React.array
+                      | false =>
+                        <div className=Styles.noDataContainer>
+                          <Text
+                            value="No proposal created" color={theme.neutral_600} size={Body1}
+                          />
+                        </div>
+                      }}
+                    </div>
+                  </Table>
+                </InfoContainer>
+                <div className={Css.merge(list{"table_content--footer"})}>
+                  <Pagination2
+                    currentPage=page
+                    pageCount
+                    onPageChange={newPage => setPage(_ => newPage)}
+                    onChangeCurrentPage={newPage => setPage(_ => newPage)}
+                  />
+                </div>
+              </>}
+        </>
+      | Loading =>
+        <InfoContainer style=Styles.infoContainer>
+          <div className=Styles.noDataContainer>
+            <LoadingCensorBar.CircleSpin height=80 />
+          </div>
+        </InfoContainer>
+      | NoData =>
+        <InfoContainer style=Styles.infoContainer>
+          <div className=Styles.noDataContainer>
+            <Text value="No group created" color={theme.neutral_600} size={Body1} />
+          </div>
+        </InfoContainer>
+
+      | Error(_) =>
+        <InfoContainer style=Styles.infoContainer>
+          <div className=Styles.noDataContainer>
+            <Text value="an Error Occured" color={theme.neutral_600} size={Body1} />
+          </div>
+        </InfoContainer>
+      }}
     </div>
   }
 }
@@ -189,110 +275,137 @@ module AllGroupProposalTabContent = {
   let make = (~sortedBy, ~toggle, ~direction) => {
     let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-    let (page, setPage) = React.useState(_ => 1)
+
     let pageSize = 10
+    let (page, setPage) = React.useState(_ => 1)
+
+    let proposalsSub = GroupSub.getProposals(~page, ~pageSize, ())
 
     <div className={Styles.tabContentWrapper}>
       <Heading size=H3 value="All Proposals" />
-      {<>
-        {isMobile
-          ? <>
-              <div
-                className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
-                {[1, 2, 3, 4, 5, 6, 7, 8]
-                ->Belt.Array.mapWithIndex((ind, item) => {
-                  <GroupProposalTableItem key={ind->Belt.Int.toString} item />
-                })
-                ->React.array}
-              </div>
-              <div className={Css.merge(list{"table_content--footer"})}>
-                //TODO: hardcode pageCount
-                <Pagination2
-                  currentPage=page
-                  pageCount=10
-                  onPageChange={newPage => setPage(_ => newPage)}
-                  onChangeCurrentPage={newPage => setPage(_ => newPage)}
-                />
-              </div>
-            </>
-          : <>
-              <InfoContainer style=Styles.infoContainer>
-                <Table>
-                  <div className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
-                    {isMobile
-                      ? React.null
-                      : <div className={Css.merge(list{Styles.tablehead})}>
-                          <div>
-                            <SortableTHead
-                              title="Proposal ID"
-                              direction
-                              toggle
-                              value=SortGroupProposalTable.ID
-                              sortedBy
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Proposal Name"
-                              direction
-                              toggle
-                              sortedBy
-                              value=SortGroupProposalTable.Name
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Message"
-                              toggle
-                              sortedBy
-                              direction
-                              value=SortGroupProposalTable.Message
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Group"
-                              toggle
-                              sortedBy
-                              direction
-                              value=SortGroupProposalTable.GroupID
-                            />
-                          </div>
-                          <div>
-                            <SortableTHead
-                              title="Status"
-                              toggle
-                              sortedBy
-                              direction
-                              value=SortGroupProposalTable.ProposalStatus
-                            />
-                          </div>
-                        </div>}
-                  </div>
-                  <div
-                    className={Css.merge(list{
-                      "table_content--wrapper",
-                      Styles.tableContentWrapper,
-                    })}>
-                    {[1, 2, 3, 4, 5, 6, 7, 8]
-                    ->Belt.Array.mapWithIndex((ind, item) => {
-                      <GroupProposalTableItem key={ind->Belt.Int.toString} item />
-                    })
-                    ->React.array}
-                  </div>
-                </Table>
-              </InfoContainer>
-              <div className={Css.merge(list{"table_content--footer"})}>
-                //TODO: hardcode pageCount
-                <Pagination2
-                  currentPage=page
-                  pageCount=10
-                  onPageChange={newPage => setPage(_ => newPage)}
-                  onChangeCurrentPage={newPage => setPage(_ => newPage)}
-                />
-              </div>
-            </>}
-      </>}
+      {switch proposalsSub {
+      | Data(proposals) =>
+        let pageCount = Page.getPageCount(proposals->Belt.Array.length, pageSize)
+        <>
+          {isMobile
+            ? <>
+                <div
+                  className={Css.merge(list{"table_content--wrapper", Styles.tableContentWrapper})}>
+                  {proposals
+                  ->SortGroupProposalTable.sorting(~sortedBy, ~direction)
+                  ->Belt.Array.mapWithIndex((ind, proposal) => {
+                    <GroupProposalTableItem key={ind->Belt.Int.toString} proposal />
+                  })
+                  ->React.array}
+                </div>
+                <div className={Css.merge(list{"table_content--footer"})}>
+                  <Pagination2
+                    currentPage=page
+                    pageCount
+                    onPageChange={newPage => setPage(_ => newPage)}
+                    onChangeCurrentPage={newPage => setPage(_ => newPage)}
+                  />
+                </div>
+              </>
+            : <>
+                <InfoContainer style=Styles.infoContainer>
+                  <Table>
+                    <div
+                      className={Css.merge(list{"table-wrapper", Styles.tableHeadWrapper(theme)})}>
+                      {isMobile
+                        ? React.null
+                        : <div className={Css.merge(list{Styles.tablehead})}>
+                            <div>
+                              <SortableTHead
+                                title="Proposal ID"
+                                direction
+                                toggle
+                                value=SortGroupProposalTable.ID
+                                sortedBy
+                              />
+                            </div>
+                            <div>
+                              <SortableTHead
+                                title="Proposal Name"
+                                direction
+                                toggle
+                                sortedBy
+                                value=SortGroupProposalTable.Name
+                              />
+                            </div>
+                            <div>
+                              <Text
+                                block=true
+                                value="Message"
+                                size=Text.Caption
+                                weight=Text.Semibold
+                                transform=Text.Uppercase
+                                color=theme.neutral_900
+                              />
+                            </div>
+                            <div>
+                              <SortableTHead
+                                title="Group"
+                                toggle
+                                sortedBy
+                                direction
+                                value=SortGroupProposalTable.GroupID
+                              />
+                            </div>
+                            <div>
+                              <SortableTHead
+                                title="Status"
+                                toggle
+                                sortedBy
+                                direction
+                                value=SortGroupProposalTable.ProposalStatus
+                              />
+                            </div>
+                          </div>}
+                    </div>
+                    <div
+                      className={Css.merge(list{
+                        "table_content--wrapper",
+                        Styles.tableContentWrapper,
+                      })}>
+                      {proposals
+                      ->SortGroupProposalTable.sorting(~sortedBy, ~direction)
+                      ->Belt.Array.mapWithIndex((ind, proposal) => {
+                        <GroupProposalTableItem key={ind->Belt.Int.toString} proposal />
+                      })
+                      ->React.array}
+                    </div>
+                  </Table>
+                </InfoContainer>
+                <div className={Css.merge(list{"table_content--footer"})}>
+                  <Pagination2
+                    currentPage=page
+                    pageCount
+                    onPageChange={newPage => setPage(_ => newPage)}
+                    onChangeCurrentPage={newPage => setPage(_ => newPage)}
+                  />
+                </div>
+              </>}
+        </>
+      | Loading =>
+        <InfoContainer style=Styles.infoContainer>
+          <div className=Styles.noDataContainer>
+            <LoadingCensorBar.CircleSpin height=80 />
+          </div>
+        </InfoContainer>
+      | NoData =>
+        <InfoContainer style=Styles.infoContainer>
+          <div className=Styles.noDataContainer>
+            <Text value="No group created" color={theme.neutral_600} size={Body1} />
+          </div>
+        </InfoContainer>
+      | Error(_) =>
+        <InfoContainer style=Styles.infoContainer>
+          <div className=Styles.noDataContainer>
+            <Text value="an Error Occured" color={theme.neutral_600} size={Body1} />
+          </div>
+        </InfoContainer>
+      }}
     </div>
   }
 }
@@ -301,6 +414,7 @@ module AllGroupProposalTabContent = {
 let make = () => {
   let isMobile = Media.isMobile()
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let (accountOpt, _) = React.useContext(AccountContext.context)
 
   let (sortedBy, setSortedBy) = React.useState(_ => SortGroupProposalTable.ID)
   let (direction, setDirection) = React.useState(_ => SortGroupProposalTable.DESC)
@@ -327,7 +441,11 @@ let make = () => {
           <SortGroupProposalTableDropdown sortedBy setSortedBy direction setDirection />
         </div>
       : React.null}
-    <MyGroupProposalTabContent sortedBy toggle direction />
+    {switch accountOpt {
+    | Some(account) =>
+      <MyGroupProposalTabContent address=account.address sortedBy toggle direction />
+    | None => <NoAccountContent />
+    }}
     <AllGroupProposalTabContent sortedBy toggle direction />
   </>
 }

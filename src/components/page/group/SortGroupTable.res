@@ -44,26 +44,14 @@ let compareString = (a, b) => {
   Js.String2.localeCompare(a_, b_)->Belt.Float.toInt
 }
 
-let compareVersion = (a: OracleScriptSub.version_t, b: OracleScriptSub.version_t) => {
-  let parseVersion = v => {
-    switch v {
-    | OracleScriptSub.Ok => "upgraded"
-    | Redeploy => "redeploy"
-    | Nothing => "xxx"
-    }
-  }
-
-  compareString(a->parseVersion, b->parseVersion)
-}
-
-let defaultCompare = (a: OracleScriptSub.t_with_stats, b: OracleScriptSub.t_with_stats) =>
+let defaultCompare = (a: Group.t, b: Group.t) =>
   if a.name != b.name {
     compare(b.id, a.id)
   } else {
     compareString(b.name, a.name)
   }
 
-let sorting = (oraclescripts: array<OracleScriptSub.t_with_stats>, ~sortedBy, ~direction) => {
+let sorting = (oraclescripts: array<Group.t>, ~sortedBy, ~direction) => {
   oraclescripts
   ->Belt.List.fromArray
   ->Belt.List.sort((a, b) => {
@@ -73,12 +61,12 @@ let sorting = (oraclescripts: array<OracleScriptSub.t_with_stats>, ~sortedBy, ~d
       | (ID, DESC) => compare(b.id, a.id)
       | (Name, ASC) => compareString(b.name, a.name)
       | (Name, DESC) => compareString(a.name, b.name)
-      | (MembersCount, ASC) => compareVersion(a.version, b.version)
-      | (MembersCount, DESC) => compareVersion(b.version, a.version)
-      | (ProposalsCount, ASC) => compare(a.stat.count, b.stat.count)
-      | (ProposalsCount, DESC) => compare(b.stat.count, a.stat.count)
-      | (ProposalsOnVotingCount, ASC) => compare(a.stat.responseTime, b.stat.responseTime)
-      | (ProposalsOnVotingCount, DESC) => compare(b.stat.responseTime, a.stat.responseTime)
+      | (MembersCount, ASC) => compare(a.memberCount, b.memberCount)
+      | (MembersCount, DESC) => compare(b.memberCount, a.memberCount)
+      | (ProposalsCount, ASC) => compare(a.proposalsCount, b.proposalsCount)
+      | (ProposalsCount, DESC) => compare(b.proposalsCount, a.proposalsCount)
+      | (ProposalsOnVotingCount, ASC) => compare(a.proposalOnVotingCount, b.proposalOnVotingCount)
+      | (ProposalsOnVotingCount, DESC) => compare(b.proposalOnVotingCount, a.proposalOnVotingCount)
       }
     }
     if result != 0 {

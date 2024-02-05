@@ -35,7 +35,7 @@ type t =
   | BlockHash(Hash.t)
   | Validator(Address.t, string, string)
   | Messages(Hash.t, list<Msg.result_t>, bool, string)
-  | MsgBadgeGroup(Hash.t, list<Msg.result_t>)
+  | MsgBadgeGroup(list<Msg.result_t>)
   | PubKey(PubKey.t)
   | Badge(Msg.badge_theme_t)
   | VotingPower(Coin.t, float)
@@ -150,7 +150,7 @@ let make = (~info) => {
       color={theme.neutral_900}
     />
   | Messages(txHash, messages, success, errMsg) => <TxMessages txHash messages success errMsg />
-  | MsgBadgeGroup(txHash, messages) => <MsgBadgeGroup txHash messages />
+  | MsgBadgeGroup(messages) => <MsgBadgeGroup messages />
   | Badge(_) => React.null
   | VotingPower(tokens, votingPercent) =>
     <div className=Styles.vFlex>

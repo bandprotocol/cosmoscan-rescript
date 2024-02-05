@@ -120,6 +120,12 @@ module BlockID = {
   let serialize = blockID => blockID->ID.Block.toInt
 }
 
+module GroupProposalStatus = {
+  type t = GroupProposalStatus.t
+  let parse = str => str->GroupProposalStatus.parse
+  let serialize = status => status->GroupProposalStatus.toString
+}
+
 module ProposalID = {
   type t = ID.Proposal.t
   let parse = proposalID => proposalID->ID.Proposal.fromInt
@@ -148,4 +154,22 @@ module RequestID = {
   type t = ID.Request.t
   let parse = datasourceID => datasourceID->ID.Request.fromInt
   let serialize = datasourceID => datasourceID->ID.Request.toInt
+}
+
+module GroupID = {
+  type t = ID.Group.t
+  let parse = groupID => groupID->ID.Group.fromInt
+  let serialize = groupID => groupID->ID.Group.toInt
+}
+
+module GroupProposalID = {
+  type t = ID.Group.t
+  let parse = groupID => groupID->ID.GroupProposal.fromInt
+  let serialize = groupID => groupID->ID.GroupProposal.toInt
+}
+
+module GroupPolicyType = {
+  type t = Group.PolicyType.t
+  let parse = str => str->Group.PolicyType.parse
+  let serialize = policyType => policyType->Group.PolicyType.toString
 }

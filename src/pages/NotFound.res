@@ -27,6 +27,7 @@ module Styles = {
 @react.component
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
   <Section>
     <div className=CssHelper.container>
       <VSpacing size=Spacing.xxxl />
