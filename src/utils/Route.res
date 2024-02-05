@@ -229,8 +229,6 @@ let toString = route =>
   | LegacyProposalDetailsPage(proposalID) => `/legacy/proposal/${proposalID->Belt.Int.toString}`
   | RelayersHomepage => "/relayers"
   | ChannelDetailsPage(chainID, port, channel) => `/relayers/${chainID}/${port}/${channel}`
-  | GroupPage(Group) => `/group#group`
-  | GroupPage(Proposal) => `/group#proposal`
   | GroupDetailsPage(groupID, GroupProposal) => `/group/${groupID->Belt.Int.toString}#proposal`
   | GroupDetailsPage(groupID, GroupPolicy) => `/group/${groupID->Belt.Int.toString}#policy`
   | GroupDetailsPage(groupID, GroupMember) => `/group/${groupID->Belt.Int.toString}#members`
