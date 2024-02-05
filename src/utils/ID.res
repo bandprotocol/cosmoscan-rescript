@@ -80,9 +80,27 @@ module IDCreator = (RawID: RawIDSig) => {
   let toJson = (ID(id)) => id->Belt.Int.toFloat->Js.Json.number
 }
 
+module RawGroupID = {
+  type tab_t = unit
+  let prefix = "#G"
+  // TODO: change to group page
+  let route = (id, _) => Route.RequestDetailsPage(id)
+  let defaultTab = ()
+}
+
+module RawGroupProposalID = {
+  type tab_t = unit
+  let prefix = "#P"
+  // TODO: change to group proposal page
+  let route = (id, _) => Route.RequestDetailsPage(id)
+  let defaultTab = ()
+}
+
 module DataSource = IDCreator(RawDataSourceID)
 module OracleScript = IDCreator(RawOracleScriptID)
 module Request = IDCreator(RawRequestID)
 module Proposal = IDCreator(RawProposalID)
 module LegacyProposal = IDCreator(RawLegacyProposalID)
 module Block = IDCreator(RawBlock)
+module Group = IDCreator(RawGroupID)
+module GroupProposal = IDCreator(RawGroupProposalID)

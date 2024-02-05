@@ -51,7 +51,7 @@ module Styles = {
       fontSize(#px(14)),
       fontWeight(#light),
       border(#px(1), #solid, theme.neutral_200),
-      backgroundColor(theme.neutral_200),
+      backgroundColor(theme.neutral_000),
       outlineStyle(#none),
       color(theme.neutral_900),
       fontFamilies([#custom("Montserrat"), #custom("sans-serif")]),
@@ -100,35 +100,37 @@ let make = (
             setInputPage(_ => (currentPage - 1)->Format.iPretty)
           }}
         />
-        <input
-          className={Styles.inputPage(theme)}
-          type_="number"
-          defaultValue={currentPage->Belt.Int.toString}
-          value={inputPage}
-          onChange={event => {
-            let newVal = ReactEvent.Form.target(event)["value"]
-            setInputPage(_ => newVal)
-          }}
-          onKeyDown={event => {
-            let nextIndexCount = 0
-            switch ReactEvent.Keyboard.key(event) {
-            | "Enter" => onChangeCurrentPage(inputPage->Belt.Int.fromString->Belt.Option.getExn)
-            | _ => ()
-            }
-          }}
-        />
-        <div
-          className={Css.merge(list{
-            CssHelper.flexBox(~justify=#center, ()),
-            Styles.paginationBox,
-          })}>
-          <Text value="of" size=Text.Body1 />
-          <Text
-            value={pageCount->Format.iPretty}
-            weight=Text.Semibold
-            size=Text.Body1
-            color=theme.neutral_900
+        <div className={CssHelper.flexBox(~justify=#center, ~align=#center, ~direction=#row, ())}>
+          <input
+            className={Styles.inputPage(theme)}
+            type_="number"
+            defaultValue={currentPage->Belt.Int.toString}
+            value={inputPage}
+            onChange={event => {
+              let newVal = ReactEvent.Form.target(event)["value"]
+              setInputPage(_ => newVal)
+            }}
+            onKeyDown={event => {
+              let nextIndexCount = 0
+              switch ReactEvent.Keyboard.key(event) {
+              | "Enter" => onChangeCurrentPage(inputPage->Belt.Int.fromString->Belt.Option.getExn)
+              | _ => ()
+              }
+            }}
           />
+          <div
+            className={Css.merge(list{
+              CssHelper.flexBox(~justify=#center, ()),
+              Styles.paginationBox,
+            })}>
+            <Text value="of" size=Text.Body1 />
+            <Text
+              value={pageCount->Format.iPretty}
+              weight=Text.Semibold
+              size=Text.Body1
+              color=theme.neutral_900
+            />
+          </div>
         </div>
         <ClickableSymbol
           isPrevious=false
