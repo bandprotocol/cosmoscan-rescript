@@ -4,6 +4,7 @@ module Styles = {
   let emptyContainer = style(. [
     justifyContent(#center),
     alignItems(#center),
+    rowGap(#px(8)),
     flexDirection(#column),
     width(#percent(100.)),
     Media.mobile([minHeight(#px(200))]),
@@ -15,10 +16,18 @@ module Styles = {
   let boxShadow = style(. [
     boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.08)))),
   ])
+  let borderTop = (theme: Theme.t) => style(. [borderTop(#px(1), #solid, theme.neutral_200)])
 }
 
 @react.component
-let make = (~height=#px(300), ~display=true, ~backgroundColor=?, ~boxShadow=false, ~children) => {
+let make = (
+  ~height=#px(300),
+  ~display=true,
+  ~backgroundColor=?,
+  ~boxShadow=false,
+  ~borderTop=false,
+  ~children,
+) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   <div
     className={CssJs.merge(. [
@@ -31,6 +40,7 @@ let make = (~height=#px(300), ~display=true, ~backgroundColor=?, ~boxShadow=fals
         ),
       ),
       boxShadow ? Styles.boxShadow : "",
+      borderTop ? Styles.borderTop(theme) : "",
     ])}>
     children
   </div>

@@ -48,7 +48,7 @@ describe("Expect Search Functionality to work correctly", () => {
     expect("band1p40yh3zkmhcv0ecqp3mcazy83sa57rgjp07dun"->search)->toEqual(
       AccountIndexPage(
         "band1p40yh3zkmhcv0ecqp3mcazy83sa57rgjp07dun"->Address.fromBech32,
-        AccountDelegations,
+        AccountPortfolio,
       ),
     )
   )
@@ -107,31 +107,22 @@ describe("Expect toString function to work correctly", () => {
     expect(RequestDetailsPage(123)->toString)->toEqual("/request/123")
   )
 
-  test("AccountIndexPage delegations", () =>
+  test("AccountIndexPage portfolio", () =>
     expect(
       AccountIndexPage(
         Address.fromBech32("band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"),
-        AccountDelegations,
+        AccountPortfolio,
       )->toString,
-    )->toEqual("/account/band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph#delegations")
+    )->toEqual("/account/band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph#portfolio")
   )
 
-  test("AccountIndexPage unbonding", () =>
+  test("AccountIndexPage transaction", () =>
     expect(
       AccountIndexPage(
         Address.fromBech32("band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"),
-        AccountUnbonding,
+        AccountTransaction,
       )->toString,
-    )->toEqual("/account/band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph#unbonding")
-  )
-
-  test("AccountIndexPage redelegate", () =>
-    expect(
-      AccountIndexPage(
-        Address.fromBech32("band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"),
-        AccountRedelegate,
-      )->toString,
-    )->toEqual("/account/band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph#redelegate")
+    )->toEqual("/account/band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph#txs")
   )
 
   test("ValidatorDetailsPage reports", () =>
@@ -410,39 +401,23 @@ describe("Expect toAbsoluteString function to work correctly", () => {
     })->toEqual(
       AccountIndexPage(
         Address.fromBech32("band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"),
-        AccountDelegations,
+        AccountPortfolio,
       ),
     )
   )
 
-  test("AccountIndexPage unbonding", () =>
+  test("AccountIndexPage transaction", () =>
     expect({
       let url: RescriptReactRouter.url = {
         path: list{"account", "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"},
-        hash: "unbonding",
+        hash: "txs",
         search: "",
       }
       url->fromUrl
     })->toEqual(
       AccountIndexPage(
         Address.fromBech32("band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"),
-        AccountUnbonding,
-      ),
-    )
-  )
-
-  test("AccountIndexPage redelegate", () =>
-    expect({
-      let url: RescriptReactRouter.url = {
-        path: list{"account", "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"},
-        hash: "redelegate",
-        search: "",
-      }
-      url->fromUrl
-    })->toEqual(
-      AccountIndexPage(
-        Address.fromBech32("band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph"),
-        AccountRedelegate,
+        AccountTransaction,
       ),
     )
   )

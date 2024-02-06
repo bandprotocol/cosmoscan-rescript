@@ -48,7 +48,7 @@ let makeBadge = (name, length, color1, color2) =>
   </div>
 
 @react.component
-let make = (~msg: Msg.result_t) => {
+let make = (~msg: Msg.result_t, ~showSender) => {
   let badge = msg.decoded->Msg.getBadge
   <div
     className={CssJs.merge(. [
@@ -57,7 +57,7 @@ let make = (~msg: Msg.result_t) => {
       CssHelper.overflowHidden,
       Styles.msgContainer,
     ])}>
-    <MsgFront name=badge.name fromAddress={msg.sender} />
+    <MsgFront name=badge.name fromAddress={msg.sender} showSender />
     {switch msg.decoded {
     | SendMsg({toAddress, amount}) => <TokenMsg.SendMsg toAddress amount />
     | MultiSendMsg(msg) => <TokenMsg.MultisendMsg inputs={msg.inputs} outputs={msg.outputs} />

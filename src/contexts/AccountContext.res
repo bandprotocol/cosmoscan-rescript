@@ -23,6 +23,7 @@ let reducer = (state, action) => {
 }
 
 let context = React.createContext((None, _ => ()))
+let use = () => React.useContext(context)
 
 module Provider = {
   @react.component

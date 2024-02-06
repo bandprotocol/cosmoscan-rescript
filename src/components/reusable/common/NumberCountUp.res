@@ -6,7 +6,7 @@ let make = (~value, ~size, ~weight, ~spacing=?, ~color=?, ~code=true, ~smallNumb
       ~start=value,
       ~end=value,
       ~delay=0,
-      ~decimals=6,
+      ~decimals=2,
       ~duration=4,
       ~useEasing=false,
       ~separator=",",

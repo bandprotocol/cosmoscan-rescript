@@ -4,10 +4,12 @@ module Styles = {
 }
 
 @react.component
-let make = (~name, ~fromAddress) =>
+let make = (~name, ~fromAddress, ~showSender) =>
   <div className={Css.merge(list{CssHelper.flexBox(~wrap=#nowrap, ())})}>
-    <div className=Styles.addressWrapper>
-      <AddressRender address=fromAddress />
-    </div>
+    {showSender
+      ? <div className=Styles.addressWrapper>
+          <AddressRender address=fromAddress />
+        </div>
+      : React.null}
     <MsgBadge name />
   </div>
