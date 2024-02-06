@@ -259,7 +259,7 @@ module Authz = {
     type t = {
       granter: Address.t,
       grantee: Address.t,
-      url: string,
+      url: option<string>,
       expiration: MomentRe.Moment.t,
       msgTypeUrl: string,
     }
@@ -269,7 +269,7 @@ module Authz = {
       buildObject(json => {
         granter: json.required(list{"msg", "granter"}, address),
         grantee: json.required(list{"msg", "grantee"}, address),
-        url: json.required(list{"msg", "url"}, string),
+        url: json.optional(list{"msg", "url"}, string),
         expiration: json.required(list{"msg", "grant", "expiration"}, timeString),
         msgTypeUrl: json.required(list{"msg", "grant", "authorization", "msg"}, string),
       })
