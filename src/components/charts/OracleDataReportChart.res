@@ -150,9 +150,14 @@ let make = (~oracleStatus, ~operatorAddress) => {
         <HSpacing size=Spacing.sm />
         <Text block=true value="Uptime" weight=Text.Semibold />
       </div>
-      // TODO: wire up
       {switch historicalOracleStatusSub {
-      | Data({uptimeCount}) => <Text block=true value="99.23%" weight=Bold size=Body1 />
+      | Data({uptimeCount}) =>
+        <Text
+          block=true
+          value={(uptimeCount->Belt.Int.toFloat /. 90. *. 100.)->Format.fPercent(~digits=0)}
+          weight=Bold
+          size=Body1
+        />
       | _ => <LoadingCensorBar width=20 height=14 />
       }}
     </div>
@@ -168,20 +173,25 @@ let make = (~oracleStatus, ~operatorAddress) => {
           <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
         </CTooltip>
       </div>
-      // TODO: wire up
       {switch historicalOracleStatusSub {
-      | Data({downtimeCount}) => <Text block=true value="0.77%" weight=Bold size=Body1 />
+      | Data({downtimeCount}) =>
+        <Text
+          block=true
+          value={(downtimeCount->Belt.Int.toFloat /. 90. *. 100.)->Format.fPercent(~digits=0)}
+          weight=Bold
+          size=Body1
+        />
       | _ => <LoadingCensorBar width=20 height=14 />
       }}
     </div>
-    <VSpacing size={#px(10)} />
-    <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
-      <div className={CssHelper.flexBox()}>
-        <div className={Styles.labelStatus(~theme, ~status=OracleStatus.NoData, ())} />
-        <HSpacing size=Spacing.sm />
-        <Text block=true value="No Data" weight=Text.Semibold />
-      </div>
-      // To be implemented NoData case
-    </div>
+    // TODO: NoData
+    // <VSpacing size={#px(10)} />
+    // <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
+    //   <div className={CssHelper.flexBox()}>
+    //     <div className={Styles.labelStatus(~theme, ~status=OracleStatus.NoData, ())} />
+    //     <HSpacing size=Spacing.sm />
+    //     <Text block=true value="No Data" weight=Text.Semibold />
+    //   </div>
+    // </div>
   </>
 }

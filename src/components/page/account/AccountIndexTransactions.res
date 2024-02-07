@@ -53,8 +53,16 @@ module RenderBody = {
           />
         | _ => <LoadingCensorBar width=65 height=15 isRight=true />
         }}
-        // TODO: wire up
-        <Text value="2023-04-25 06:29:18" size=Body1 align=Right />
+        {switch txSub {
+        | Data({timestamp}) =>
+          <div className={CssHelper.fullWidth}>
+            <div
+              className={CssHelper.flexBox(~justify=#flexEnd, ~align=#center, ~direction=#row, ())}>
+              <Timestamp time=timestamp size=Text.Body1 weight=Text.Regular textAlign=Text.Right />
+            </div>
+          </div>
+        | _ => <LoadingCensorBar width=65 height=15 isRight=true />
+        }}
       </TableGrid>
     </TBody>
   }

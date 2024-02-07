@@ -78,6 +78,68 @@ module ValidatorStatus = {
   }
 }
 
+module OracleUptimePercent = {
+  @react.component
+  let make = (~oracleStatus, ~operatorAddress) => {
+    let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
+    let (prevDate, setPrevDate) = React.useState(_ => OracleDataReportChart.getDayAgo(90))
+    React.useEffect0(() => {
+      let timeOutID = Js.Global.setInterval(
+        () => {setPrevDate(_ => OracleDataReportChart.getDayAgo(90))},
+        60_000,
+      )
+      Some(() => {Js.Global.clearInterval(timeOutID)})
+    })
+    let historicalOracleStatusSub = ValidatorSub.getHistoricalOracleStatus(
+      operatorAddress,
+      prevDate,
+      oracleStatus,
+    )
+
+    <>
+      {switch historicalOracleStatusSub {
+      | Data({uptimeCount}) =>
+        <Text
+          value={(uptimeCount->Belt.Int.toFloat /. 90. *. 100.)->Format.fPercent(~digits=0)}
+          code=true
+          size=Xl
+          weight=Bold
+          color=theme.neutral_900
+        />
+      | _ => <LoadingCensorBar width=20 height=14 />
+      }}
+    </>
+  }
+}
+
+module UptimePercent = {
+  @react.component
+  let make = (~consensusAddress) => {
+    let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
+    let getUptimeSub = ValidatorSub.getBlockUptimeByValidator(consensusAddress)
+
+    let uptime = switch getUptimeSub {
+    | Data({signedCount, missedCount}) =>
+      signedCount == 0 && missedCount == 0
+        ? None
+        : Some(
+            signedCount->Belt.Int.toFloat /.
+            (signedCount->Belt.Int.toFloat +. missedCount->Belt.Int.toFloat) *. 100.,
+          )
+    | _ => None
+    }
+
+    switch uptime {
+    | Some(x) =>
+      <Text
+        value={x->Format.fPercent(~digits=0)} code=true size=Xl weight=Bold color=theme.neutral_900
+      />
+
+    | None => <Text value={"N/A"} code=true size=Xl weight=Bold color=theme.neutral_900 />
+    }
+  }
+}
+
 @react.component
 let make = (~address, ~hashtag: Route.validator_tab_t) => {
   let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
@@ -86,6 +148,8 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
   let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
 
   let oracleReportsCountSub = ReportSub.ValidatorReport.count(address)
+  let reporterCountSub = ReporterSub.count(address)
+  let delegatorCountSub = DelegationSub.getDelegatorCountByValidator(address)
 
   // for finding validator rank
   let validatorsSub = ValidatorSub.getList(~filter=Active, ())
@@ -281,17 +345,6 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
                 }}
               </Col>
             </Row>
-            <Row marginBottom=24 alignItems=Row.Center>
-              <Col col=Col.Three mbSm=8>
-                <Heading
-                  value="Since" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
-                />
-              </Col>
-              <Col col=Col.Nine>
-                /* TODO: implement since date time */
-                <Text value="2023-04-25 06:29:18" size=Text.Body1 code=true />
-              </Col>
-            </Row>
             <Row>
               <Col col=Col.Three mbSm=8>
                 <Heading
@@ -312,13 +365,42 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
       <Row marginBottom=24>
         <Col col=Col.Four mbSm=24>
           <InfoContainer style=Styles.bondedTokenContainer py=24>
-            // TODO: wire up
             <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
               <Heading value="Voting Power" size=Heading.H4 />
               <div className={CssHelper.flexBox()}>
-                <Text value="3,334,812" code=true size=Xl weight=Bold color=theme.neutral_900 />
-                <HSpacing size=Spacing.sm />
-                <Text value="(10.12%)" size=Body1 code=true />
+                // voting power
+                {switch allSub {
+                | Data({tokens, votingPower}, _, bondedTokenCount) =>
+                  <div className={CssHelper.flexBox()}>
+                    <Text
+                      value={tokens->Coin.getBandAmountFromCoin->Format.fPretty(~digits=0)}
+                      code=true
+                      size=Xl
+                      weight=Bold
+                      color=theme.neutral_900
+                    />
+                    <HSpacing size=Spacing.sm />
+                    <Text
+                      value={"(" ++
+                      (votingPower /. bondedTokenCount.amount *. 100.)
+                        ->Format.fPercent(~digits=2) ++ ")"}
+                      size=Body1
+                      code=true
+                    />
+                  </div>
+                | _ =>
+                  <div
+                    className={CssHelper.flexBox(
+                      ~justify=#center,
+                      ~direction=#column,
+                      ~align=#flexEnd,
+                      (),
+                    )}>
+                    <LoadingCensorBar width=40 height=25 />
+                    <HSpacing size=Spacing.sm />
+                    <LoadingCensorBar width=80 height=15 />
+                  </div>
+                }}
               </div>
             </div>
             <VSpacing size=#px(48) />
@@ -336,13 +418,15 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
         </Col>
         <Col col=Col.Four mbSm=24>
           <InfoContainer style=Styles.customContainer py=24>
-            // TODO: wire up
             <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
               <div className={CssHelper.flexBox(~direction=#column, ~align=#flexStart, ())}>
                 <Heading value="Node Uptime" size=Heading.H4 />
                 <Text value="(last 100 Blocks)" size=Body1 />
               </div>
-              <Text value="98%" code=true size=Xl weight=Bold color=theme.neutral_900 />
+              {switch allSub {
+              | Data(({consensusAddress}, _, _)) => <UptimePercent consensusAddress />
+              | _ => <LoadingCensorBar width=90 height=15 />
+              }}
             </div>
             <VSpacing size=Spacing.lg />
             <div
@@ -359,13 +443,17 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
         </Col>
         <Col col=Col.Four>
           <InfoContainer style=Styles.customContainer py=24>
-            // TODO: wire up
             <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
               <div className={CssHelper.flexBox(~direction=#column, ~align=#flexStart, ())}>
                 <Heading value="Oracle Data Report Uptime" size=Heading.H4 />
                 <Text value="(last 90 Days)" size=Body1 />
               </div>
-              <Text value="99.23%" code=true size=Xl weight=Bold color=theme.neutral_900 />
+              {switch allSub {
+              | Data(({oracleStatus}, _, _)) =>
+                // TODO: change hard-coded data
+                <OracleUptimePercent oracleStatus operatorAddress=address />
+              | _ => <LoadingCensorBar.CircleSpin height=90 />
+              }}
             </div>
             <VSpacing size=Spacing.lg />
             <div
@@ -383,22 +471,38 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
         </Col>
       </Row>
       <InfoContainer pySm=24>
-        // TODO: wire up
         <Table>
           <Tab.Route
             tabs=[
               {
-                // TODO: to wire up
-                name: "Oracle Reports (12,345,678)",
+                name: {
+                  switch oracleReportsCountSub {
+                  | Data(count) => "Oracle Reports (" ++ count->Format.iPretty ++ ")"
+                  | _ => "Oracle Reports"
+                  }
+                },
                 route: Route.ValidatorDetailsPage(address, Route.Reports),
               },
-              {name: "Reporters (5)", route: Route.ValidatorDetailsPage(address, Route.Reporters)},
               {
-                name: "Proposed Blocks (12,345,678)",
+                name: {
+                  switch reporterCountSub {
+                  | Data(count) => "Reporters (" ++ count->Format.iPretty ++ ")"
+                  | _ => "Reporters"
+                  }
+                },
+                route: Route.ValidatorDetailsPage(address, Route.Reporters),
+              },
+              {
+                name: "Proposed Blocks",
                 route: Route.ValidatorDetailsPage(address, Route.ProposedBlocks),
               },
               {
-                name: "Delegators (123)",
+                name: {
+                  switch delegatorCountSub {
+                  | Data(count) => "Delegators (" ++ count->Format.iPretty ++ ")"
+                  | _ => "Delegators"
+                  }
+                },
                 route: Route.ValidatorDetailsPage(address, Route.Delegators),
               },
             ]
