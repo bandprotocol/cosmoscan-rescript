@@ -41,17 +41,19 @@ module Styles = {
 
   let statusColor = (~theme: Theme.t, ~status, ()) =>
     switch status {
-    | OracleStatus.Active => style(. [backgroundColor(theme.success_600)])
-    | Inactive => style(. [backgroundColor(theme.error_600)])
-    | NoData => style(. [backgroundColor(theme.neutral_300)])
+    | true => style(. [backgroundColor(theme.success_600)])
+    | false => style(. [backgroundColor(theme.error_600)])
+    | _ => style(. [backgroundColor(theme.neutral_300)])
     }
 
-  let statusBar = style(. [
-    width(#percent(100.)),
-    height(#percent(100.)),
-    borderRadius(#px(2)),
-    overflow(#hidden),
-  ])
+  let statusBar = (~theme: Theme.t) =>
+    style(. [
+      width(#percent(100.)),
+      height(#percent(100.)),
+      borderRadius(#px(2)),
+      overflow(#hidden),
+      backgroundColor(theme.success_600),
+    ])
   // use inside each status bar
   let partitionArea = (~h, ~theme: Theme.t, ~status, ()) => {
     let base = style(. [width(#percent(100.)), height(h)])
@@ -79,31 +81,30 @@ let getDayAgo = days => {
 
 module Item = {
   @react.component
-  let make = (~statuses, ~timestamp) => {
+  let make = (~status, ~timestamp, ~failDuration, ~failPercentage) => {
     let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
 
     <CTooltip
-      width=100
+      width=180
       tooltipPlacement=CTooltip.Top
       tooltipPlacementSm=CTooltip.BottomLeft
       mobile=false
       align=#center
-      pd=10
-      tooltipText={MomentRe.Moment.format("YYYY-MM-DD", MomentRe.momentWithUnix(timestamp))}
-      styles=Styles.blockContainer>
+      fsize=10
+      pd=4
+      tooltipText={MomentRe.Moment.format("YYYY-MM-DD", MomentRe.momentWithUnix(timestamp)) ++ (
+        failDuration === 0.
+          ? ""
+          : " (Downtime: " ++
+            failDuration->MomentRe.duration(#seconds)->MomentRe.Duration.humanize ++ ")"
+      )}
+      styles={Styles.blockContainer}>
       <div
         className={Css.merge(list{
-          Styles.statusBar,
+          Styles.statusBar(~theme),
           CssHelper.flexBox(~direction=#columnReverse, ()),
         })}>
-        {statuses
-        ->Belt.Array.mapWithIndex((i, {OracleStatus.status: status, size}) =>
-          <div
-            key={i->Belt.Int.toString ++ timestamp->Belt.Int.toString ++ size->Belt.Float.toString}
-            className={Styles.partitionArea(~h=#percent(size), ~theme, ~status, ())}
-          />
-        )
-        ->React.array}
+        <div className={Styles.partitionArea(~h=#percent(failPercentage), ~theme, ~status, ())} />
       </div>
     </CTooltip>
   }
@@ -130,11 +131,16 @@ let make = (~oracleStatus, ~operatorAddress) => {
         {switch historicalOracleStatusSub {
         | Data({oracleStatusReports}) =>
           oracleStatusReports
-          ->Belt.Array.mapWithIndex((i, {timestamp, status}) =>
+          ->Belt.Array.mapWithIndex((
+            i,
+            {timestamp, status, failDurationInSecond, failPercentage},
+          ) =>
             <Item
               key={i->Belt.Int.toString ++ timestamp->Belt.Int.toString}
               // TODO: To be implemented
-              statuses={OracleStatus.someInactive}
+              status={status}
+              failDuration={failDurationInSecond}
+              failPercentage={failPercentage}
               timestamp
             />
           )
@@ -146,7 +152,7 @@ let make = (~oracleStatus, ~operatorAddress) => {
     <VSpacing size=#px(24) />
     <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
       <div className={CssHelper.flexBox()}>
-        <div className={Styles.labelStatus(~theme, ~status=OracleStatus.Active, ())} />
+        <div className={Styles.labelStatus(~theme, ~status=true, ())} />
         <HSpacing size=Spacing.sm />
         <Text block=true value="Uptime" weight=Text.Semibold />
       </div>
@@ -164,7 +170,7 @@ let make = (~oracleStatus, ~operatorAddress) => {
     <VSpacing size={#px(10)} />
     <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
       <div className={CssHelper.flexBox()}>
-        <div className={Styles.labelStatus(~theme, ~status=OracleStatus.Inactive, ())} />
+        <div className={Styles.labelStatus(~theme, ~status=false, ())} />
         <HSpacing size=Spacing.sm />
         <Text block=true value="Downtime" weight=Text.Semibold />
         <HSpacing size=Spacing.sm />

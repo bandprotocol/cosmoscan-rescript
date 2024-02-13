@@ -180,7 +180,7 @@ let avgCommission = (~isActive, ()) => {
       x.validators->Belt_Array.keep(({commissionRate, jailed}) =>
         jailed == !isActive && commissionRate != 1.
       )
-    let length = Belt_Array.length(exclude100percent) |> Belt.Int.toFloat
+    let length = Belt_Array.length(exclude100percent)->Belt.Int.toFloat
 
     exclude100percent
     ->Belt_Array.reduce(0., (acc, {commissionRate}) => acc +. commissionRate)
@@ -299,54 +299,6 @@ let getBlockUptimeByValidator = consensusAddress => {
   })
 }
 
-let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
-  let result = HistoricalOracleStatusesConfig.use({
-    operatorAddress: operatorAddress->Address.toOperatorBech32,
-    greater: greater->MomentRe.Moment.format(Config.timestampUseFormat, _)->Js.Json.string,
-  })
-
-  let startDate = greater->MomentRe.Moment.startOf(#day, _)->MomentRe.Moment.toUnix
-
-  result
-  ->Sub.fromData
-  ->Sub.flatMap(({historical_oracle_statuses}) => {
-    let oracleStatusReports =
-      historical_oracle_statuses->Belt.Array.length > 0
-        ? historical_oracle_statuses
-          ->Belt.Array.map(each => {
-            HistoryOracleParser.status: each.status,
-            timestamp: each.timestamp->GraphQLParser.timestamp->MomentRe.Moment.toUnix,
-          })
-          ->Belt.List.fromArray
-        : list{
-            {
-              timestamp: startDate,
-              status: oracleStatus,
-            },
-          }
-    let rawParsedReports = HistoryOracleParser.parse(~oracleStatusReports, ~startDate, ())
-
-    let parsedReports = if !oracleStatus && historical_oracle_statuses->Belt.Array.length == 0 {
-      rawParsedReports->Belt.Array.map(({timestamp}) => {
-        HistoryOracleParser.timestamp,
-        status: false,
-      })
-    } else {
-      rawParsedReports
-    }
-
-    Sub.resolve(
-      (
-        {
-          oracleStatusReports: parsedReports,
-          uptimeCount: parsedReports->Belt.Array.keep(({status}) => status)->Belt.Array.length,
-          downtimeCount: parsedReports->Belt.Array.keep(({status}) => !status)->Belt.Array.length,
-        }: Validator.historical_oracle_statuses_count_t
-      ),
-    )
-  })
-}
-
 let getBlockUptimeByValidator = consensusAddress => {
   let result = SingleLast100ListConfig.use({
     consensusAddress: consensusAddress->Address.toHex,
@@ -395,20 +347,31 @@ let getHistoricalOracleStatus = (operatorAddress, greater, oracleStatus) => {
           ->Belt.Array.map(each => {
             HistoryOracleParser.status: each.status,
             timestamp: each.timestamp->GraphQLParser.timestamp->MomentRe.Moment.toUnix,
+            failDurationInSecond: each.status ? 0. : 100.,
+            failPercentage: each.status ? 0. : 100.,
           })
           ->Belt.List.fromArray
         : list{
             {
               timestamp: startDate,
               status: oracleStatus,
+              failDurationInSecond: oracleStatus ? 0. : 100.,
+              failPercentage: oracleStatus ? 0. : 100.,
             },
           }
-    let rawParsedReports = HistoryOracleParser.parse(~oracleStatusReports, ~startDate, ())
+    // let rawParsedReports = HistoryOracleParser.parse(~oracleStatusReports, ~startDate, ())
+    let rawParsedReports = HistoryOracleParser.parseToDurationFormat(
+      ~oracleStatusReports,
+      ~startDate,
+      (),
+    )
 
     let parsedReports = if !oracleStatus && historical_oracle_statuses->Belt.Array.length == 0 {
-      rawParsedReports->Belt.Array.map(({timestamp}) => {
+      rawParsedReports->Belt.Array.map(({timestamp, failDurationInSecond, failPercentage}) => {
         HistoryOracleParser.timestamp,
         status: false,
+        failDurationInSecond,
+        failPercentage,
       })
     } else {
       rawParsedReports

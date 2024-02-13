@@ -15,45 +15,51 @@ describe("Expect HistoryOracleParser works correctly", () => {
   test("should be parse from event(true) at start date", () =>
     expect(
       parse(
-        ~oracleStatusReports=list{{timestamp: dates[0] + 5000, status: true}},
+        ~oracleStatusReports=list{
+          {timestamp: dates[0] + 5000, status: true, failDurationInSecond: 0., failPercentage: 0.},
+        },
         ~startDate=dates[0],
         (),
       ),
     )->toEqual([
-      {timestamp: dates[1], status: true},
-      {timestamp: dates[2], status: true},
-      {timestamp: dates[3], status: true},
-      {timestamp: dates[4], status: true},
+      {timestamp: dates[1], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[2], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[3], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[4], status: true, failDurationInSecond: 0., failPercentage: 0.},
     ])
   )
 
   test("should be parse from 1 events (true)", () =>
     expect(
       parse(
-        ~oracleStatusReports=list{{timestamp: dates[1] + 5000, status: true}},
+        ~oracleStatusReports=list{
+          {timestamp: dates[1] + 5000, status: true, failDurationInSecond: 0., failPercentage: 0.},
+        },
         ~startDate=dates[0],
         (),
       ),
     )->toEqual([
-      {timestamp: dates[1], status: false},
-      {timestamp: dates[2], status: true},
-      {timestamp: dates[3], status: true},
-      {timestamp: dates[4], status: true},
+      {timestamp: dates[1], status: false, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[2], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[3], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[4], status: true, failDurationInSecond: 0., failPercentage: 0.},
     ])
   )
 
   test("should be parse from 1 events (false)", () =>
     expect(
       parse(
-        ~oracleStatusReports=list{{timestamp: dates[2] + 5000, status: false}},
+        ~oracleStatusReports=list{
+          {timestamp: dates[2] + 5000, status: false, failDurationInSecond: 0., failPercentage: 0.},
+        },
         ~startDate=dates[0],
         (),
       ),
     )->toEqual([
-      {timestamp: dates[1], status: true},
-      {timestamp: dates[2], status: false},
-      {timestamp: dates[3], status: false},
-      {timestamp: dates[4], status: false},
+      {timestamp: dates[1], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[2], status: false, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[3], status: false, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[4], status: false, failDurationInSecond: 0., failPercentage: 0.},
     ])
   )
 
@@ -61,19 +67,19 @@ describe("Expect HistoryOracleParser works correctly", () => {
     expect(
       parse(
         ~oracleStatusReports=list{
-          {timestamp: dates[2] + 1000, status: false},
-          {timestamp: dates[2] + 4200, status: true},
-          {timestamp: dates[2] + 5000, status: false},
-          {timestamp: dates[2] + 12000, status: true},
+          {timestamp: dates[2] + 1000, status: false, failDurationInSecond: 0., failPercentage: 0.},
+          {timestamp: dates[2] + 4200, status: true, failDurationInSecond: 0., failPercentage: 0.},
+          {timestamp: dates[2] + 5000, status: false, failDurationInSecond: 0., failPercentage: 0.},
+          {timestamp: dates[2] + 12000, status: true, failDurationInSecond: 0., failPercentage: 0.},
         },
         ~startDate=dates[0],
         (),
       ),
     )->toEqual([
-      {timestamp: dates[1], status: true},
-      {timestamp: dates[2], status: false},
-      {timestamp: dates[3], status: true},
-      {timestamp: dates[4], status: true},
+      {timestamp: dates[1], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[2], status: false, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[3], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[4], status: true, failDurationInSecond: 0., failPercentage: 0.},
     ])
   )
 
@@ -81,20 +87,25 @@ describe("Expect HistoryOracleParser works correctly", () => {
     expect(
       parse(
         ~oracleStatusReports=list{
-          {timestamp: dates[2] + 1000, status: false},
-          {timestamp: dates[2] + 4200, status: true},
-          {timestamp: dates[2] + 5000, status: false},
-          {timestamp: dates[2] + 12000, status: true},
-          {timestamp: dates[4] + 12000, status: false},
+          {timestamp: dates[2] + 1000, status: false, failDurationInSecond: 0., failPercentage: 0.},
+          {timestamp: dates[2] + 4200, status: true, failDurationInSecond: 0., failPercentage: 0.},
+          {timestamp: dates[2] + 5000, status: false, failDurationInSecond: 0., failPercentage: 0.},
+          {timestamp: dates[2] + 12000, status: true, failDurationInSecond: 0., failPercentage: 0.},
+          {
+            timestamp: dates[4] + 12000,
+            status: false,
+            failDurationInSecond: 0.,
+            failPercentage: 0.,
+          },
         },
         ~startDate=dates[0],
         (),
       ),
     )->toEqual([
-      {timestamp: dates[1], status: true},
-      {timestamp: dates[2], status: false},
-      {timestamp: dates[3], status: true},
-      {timestamp: dates[4], status: false},
+      {timestamp: dates[1], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[2], status: false, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[3], status: true, failDurationInSecond: 0., failPercentage: 0.},
+      {timestamp: dates[4], status: false, failDurationInSecond: 0., failPercentage: 0.},
     ])
   )
 })
