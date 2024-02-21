@@ -1148,10 +1148,10 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
-"@reasonml-community/graphql-ppx@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.2.2.tgz#c8e07f8d826782219da1ddb7b2c01202bb343690"
-  integrity sha512-mgkETKdZ2QM1Xqlsg7nb30KaM7ojDpxy1rWdiZE5XLaA+oJgClMxA6ghF2b3TZL5f/XdQJ1rnd0p4LmXKnmpqQ==
+"@reasonml-community/graphql-ppx@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.2.3.tgz#2a9df118560fdfc8121ed471a2ef8038a363bd60"
+  integrity sha512-4XQpzfeLAhaDFX4d/z9AQs9nV0f0y01TRAM/lqRtDcgu+0W9F64FmuWk/4kQ6G1Rvo75pYKrLPlOf53vfHb+Qw==
 
 "@rescript/react@^0.11.0":
   version "0.11.0"
