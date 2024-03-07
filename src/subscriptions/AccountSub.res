@@ -1,9 +1,6 @@
-type council_t = {name: Council.council_name_t}
-
 type t = {
   balance: list<Coin.t>,
   commission: list<Coin.t>,
-  councilOpt: option<council_t>,
 }
 
 type validator_t = {commission: list<Coin.t>}
@@ -11,16 +8,14 @@ type validator_t = {commission: list<Coin.t>}
 type internal_t = {
   balance: list<Coin.t>,
   validator: option<validator_t>,
-  councilOpt: option<council_t>,
 }
 
-let toExternal = ({balance, validator, councilOpt}) => {
+let toExternal = ({balance, validator}) => {
   balance,
   commission: switch validator {
   | Some(validator') => validator'.commission
   | None => list{}
   },
-  councilOpt,
 }
 
 module SingleConfig = %graphql(`
@@ -30,9 +25,7 @@ module SingleConfig = %graphql(`
       validator @ppxAs(type: "validator_t"){
         commission: accumulated_commission @ppxCustom(module: "GraphQLParserModule.Coins")
       }
-      councilOpt: council @ppxAs(type: "council_t") {
-        name @ppxCustom(module: "Council.CouncilNameParser")
-      }
+    
     }
   }
   `)
@@ -45,7 +38,7 @@ let get = address => {
   ->Sub.flatMap(({accounts_by_pk}) => {
     switch accounts_by_pk {
     | Some(data) => Sub.resolve(data->toExternal)
-    | None => Sub.resolve({balance: list{}, commission: list{}, councilOpt: None})
+    | None => Sub.resolve({balance: list{}, commission: list{}})
     }
   })
 }

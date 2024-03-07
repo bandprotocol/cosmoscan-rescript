@@ -36,35 +36,35 @@ module SubmitProposal = {
   }
 }
 
-module SubmitCouncilProposal = {
-  module Success = {
-    @react.component
-    let make = (~proposalID, ~council) =>
-      <BadgeWrapper>
-        <TypeID.Proposal id=proposalID />
-        <Text
-          value={council->Council.CouncilNameParser.parse->Council.getCouncilNameString}
-          size=Text.Body2
-          marginLeft=8
-          nowrap=true
-          block=true
-        />
-      </BadgeWrapper>
-  }
+// module SubmitCouncilProposal = {
+//   module Success = {
+//     @react.component
+//     let make = (~proposalID, ~council) =>
+//       <BadgeWrapper>
+//         <TypeID.Proposal id=proposalID />
+//         <Text
+//           value={council->Council.CouncilNameParser.parse->Council.getCouncilNameString}
+//           size=Text.Body2
+//           marginLeft=8
+//           nowrap=true
+//           block=true
+//         />
+//       </BadgeWrapper>
+//   }
 
-  module Fail = {
-    @react.component
-    let make = (~council) =>
-      <BadgeWrapper>
-        <Text
-          value={council->Council.CouncilNameParser.parse->Council.getCouncilNameString}
-          size=Text.Body2
-          nowrap=true
-          block=true
-        />
-      </BadgeWrapper>
-  }
-}
+//   module Fail = {
+//     @react.component
+//     let make = (~council) =>
+//       <BadgeWrapper>
+//         <Text
+//           value={council->Council.CouncilNameParser.parse->Council.getCouncilNameString}
+//           size=Text.Body2
+//           nowrap=true
+//           block=true
+//         />
+//       </BadgeWrapper>
+//   }
+// }
 
 module Deposit = {
   module Success = {

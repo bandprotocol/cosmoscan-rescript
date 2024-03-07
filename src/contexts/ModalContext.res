@@ -5,7 +5,6 @@ type modal_t =
   | QRCode(Address.t)
   | IBCPacketError(string)
   | Syncing
-  | CouncilMembers(Council.council_t)
   | Depositors(int)
   | VetoVote(ID.LegacyProposal.t)
 

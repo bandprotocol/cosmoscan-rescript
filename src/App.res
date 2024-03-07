@@ -41,18 +41,13 @@ let make = () => {
       | RequestHomePage => <RequestHomePage />
       | RequestDetailsPage(reqID) => <RequestDetailsPage reqID=ID.Request.ID(reqID) />
       | AccountIndexPage(address, hashtag) => <AccountIndexPage address hashtag />
-      | ProposalPage => <ProposalPage />
-      | ProposalDetailsPage(proposalID) =>
-        <ProposalDetailsPage proposalID=ID.Proposal.ID(proposalID) />
-      | LegacyProposalPage => <LegacyProposalPage />
-      | LegacyProposalDetailsPage(proposalID) =>
-        <LegacyProposalDetailsPage proposalID=ID.LegacyProposal.ID(proposalID) />
       | RelayersHomepage => <RelayersHomepage />
       | ChannelDetailsPage(chainID, port, channel) => <ChannelPage chainID channel port />
       | NotFound => <NotFound />
       | GroupPage(hashtag) => <GroupPage hashtag />
       | GroupDetailsPage(groupID, hashtag) =>
         <GroupDetailsPage groupID={ID.Group.fromInt(groupID)} hashtag />
+      | _ => <NotFound />
       }}
     </div>
     <Footer />

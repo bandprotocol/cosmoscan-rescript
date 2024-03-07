@@ -154,6 +154,8 @@ let getList = (~page, ~pageSize, ~searchTerm, ~sortDirection, ~sortBy, ()) => {
     transaction: None,
     transaction_id: None,
     treasury: None,
+    data_source_requests_per_days_aggregate: None,
+    last_request: None,
   }
 
   let requestStatSortBy: MultiConfig.MultiConfig_inner.t_variables_data_source_requests_order_by = {

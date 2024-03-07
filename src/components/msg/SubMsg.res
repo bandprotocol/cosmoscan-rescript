@@ -147,13 +147,13 @@ let make = (~msg: Msg.result_t) => {
       | Msg.Gov.VoteWeighted.Failure(f) => <ProposalMsg.LegacyVote.Fail proposalID={f.proposalID} />
       }
     | VoteMsg(msg) => <ProposalMsg.Vote.Fail proposalID={msg.proposalID} />
-    | SubmitCouncilProposalMsg(msg) =>
-      switch msg {
-      | Msg.Council.SubmitProposal.Success({proposalID, council}) =>
-        <ProposalMsg.SubmitCouncilProposal.Success proposalID council />
-      | Msg.Council.SubmitProposal.Failure({council}) =>
-        <ProposalMsg.SubmitCouncilProposal.Fail council />
-      }
+    // | SubmitCouncilProposalMsg(msg) =>
+    //   switch msg {
+    //   | Msg.Council.SubmitProposal.Success({proposalID, council}) =>
+    //     <ProposalMsg.SubmitCouncilProposal.Success proposalID council />
+    //   | Msg.Council.SubmitProposal.Failure({council}) =>
+    //     <ProposalMsg.SubmitCouncilProposal.Fail council />
+    //   }
     | CreateClientMsg(_) => React.null
     | UpgradeClientMsg({clientID})
     | UpdateClientMsg({clientID})
@@ -196,7 +196,7 @@ let make = (~msg: Msg.result_t) => {
       }
     | ExecMsg(msg) => <ValidatorMsg.Exec messages={msg.msgs} />
     // | ExecMsg(msg) => React.null
-    | UnknownMsg => React.null
+    | UnknownMsg | _ => React.null
     }}
   </div>
 }
