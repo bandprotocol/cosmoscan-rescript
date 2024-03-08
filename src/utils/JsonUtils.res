@@ -27,6 +27,19 @@ module Decode = {
 
   let mustDecode = (json, decoder) => json->decode(decoder)->Belt.Result.getExn
 
+  // for debug decode msg
+  // let mustDecode = (json, decoder) =>
+  //   json->(
+  //     x => {
+  //       Js.log(x)
+  //       switch x->decode(decoder) {
+  //       | Ok(decoded) => Js.log("Ok")
+  //       | Error(err) => Js.log(err)
+  //       }
+  //       x->decode(decoder)->Belt.Result.getExn
+  //     }
+  //   )
+
   type fd_type = {
     required: 'a. (list<string>, t<'a>) => 'a,
     optional: 'a. (list<string>, t<'a>) => option<'a>,
