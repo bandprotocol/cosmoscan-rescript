@@ -5,7 +5,6 @@ module Styles = {
 }
 
 let transform = (account, msg: Msg.result_t) => {
-  Js.log(msg)
   let transformDecoded = switch msg.decoded {
   | SendMsg({toAddress, fromAddress, amount}) if Address.isEqual(toAddress, account) =>
     Msg.ReceiveMsg({toAddress, fromAddress, amount})
