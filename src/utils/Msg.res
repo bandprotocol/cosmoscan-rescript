@@ -368,12 +368,13 @@ module FeeGrant = {
     }
   }
 
+  // TODO: remove decode allowance missing in transaction
   module GrantAllowance = {
     type t = {
       grantee: Address.t,
       granter: Address.t,
-      allowance: Allowance.t,
-      allowedMessages: list<string>,
+      // allowance: Allowance.t,
+      // allowedMessages: list<string>,
     }
 
     let decode = {
@@ -381,8 +382,8 @@ module FeeGrant = {
       buildObject(json => {
         granter: json.required(list{"msg", "granter"}, address),
         grantee: json.required(list{"msg", "grantee"}, address),
-        allowance: json.required(list{"msg", "allowance"}, Allowance.decoder),
-        allowedMessages: json.required(list{"msg", "allowance", "allowed_messages"}, list(string)),
+        // allowance: json.required(list{"msg", "allowance"}, Allowance.decoder),
+        // allowedMessages: json.required(list{"msg", "allowance", "allowed_messages"}, list(string)),
       })
     }
   }
