@@ -154,7 +154,7 @@ let parseToDurationFormat = (~oracleStatusReports, ~startDate, ()) => {
           ->GraphQLParser.fromUnixSecond
           ->MomentRe.diff(downtimeStart->GraphQLParser.fromUnixSecond, #seconds)
 
-        downtimeInSeconds.contents = downtimeInSeconds.contents +. downtimeDuration
+        downtimeInSeconds := downtimeDuration
       }
     })
 

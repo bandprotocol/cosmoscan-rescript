@@ -43,7 +43,6 @@ module Styles = {
     switch status {
     | true => style(. [backgroundColor(theme.success_600)])
     | false => style(. [backgroundColor(theme.error_600)])
-    | _ => style(. [backgroundColor(theme.neutral_300)])
     }
 
   let statusBar = (~theme: Theme.t) =>
