@@ -79,7 +79,7 @@ let parseChainID = x =>
   | "band-laozi-testnet4"
   | "band-laozi-testnet5"
   | "band-laozi-testnet6"
-  | "band-v3-devnet" =>
+  | "band-laozi-v3-devnet" =>
     LaoziTestnet
   | "laozi-mainnet" => LaoziMainnet
   | "band-laozi-poa" => LaoziPOA
