@@ -74,9 +74,14 @@ module DisconnectBtn = {
 module FaucetBtn = {
   @react.component
   let make = (~address) => {
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
     let (isRequest, setIsRequest) = React.useState(_ => false)
+    let (isFailed, setIsFailed) = React.useState(_ => false)
+
     isRequest
       ? <LoadingCensorBar.CircleSpin size=30 height=30 />
+      : isFailed
+      ? <Text size=Text.Caption color={theme.error_600} value="Too many Request. try again later" />
       : <div id="getFreeButton">
           <Button
             px=20
@@ -84,12 +89,19 @@ module FaucetBtn = {
             variant=Button.Outline
             onClick={_ => {
               setIsRequest(_ => true)
+              setIsFailed(_ => false)
               AxiosFaucet.request({
                 address: address->Address.toBech32,
                 amount: 10_000_000,
               })
-              ->Promise.then(_ => {
+              ->Promise.then(response => {
                 setIsRequest(_ => false)
+                Js.log(response)
+                Promise.resolve()
+              })
+              ->Promise.catch(err => {
+                setIsRequest(_ => false)
+                setIsFailed(_ => true)
                 Promise.resolve()
               })
               ->ignore
