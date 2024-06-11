@@ -17,7 +17,7 @@ module Styles = {
   let rightArrow = style(. [width(#px(20)), filter([#saturate(50.0), #brightness(70.0)])])
 }
 
-let isIBCTx = (tx: TxSub.t) => {
+let isIBCTx = (tx: Transaction.t) => {
   tx.messages->Belt.List.reduce(false, (acc, message) => acc || message.isIBC)
 }
 
@@ -38,7 +38,7 @@ let make = (~height) => {
   | (NoData, Data(latestBlock)) =>
     <Section>
       <div className=CssHelper.container>
-        <VSpacing size=Spacing.xxl />
+        <VSpacing size=Spacing.xxxl />
         <div
           className={Css.merge(list{
             Styles.pageContainer(theme),
@@ -47,7 +47,7 @@ let make = (~height) => {
           <div className={CssHelper.flexBox()}>
             <img alt="Not Found" src=Images.notFoundBg className=Styles.logo />
           </div>
-          <VSpacing size=Spacing.xxl />
+          <VSpacing size=Spacing.xxxl />
           {height > latestBlock.height
             ? <Text
                 value={j`This block(${height->ID.Block.toString}) hasn't mined yet.`}
@@ -77,7 +77,7 @@ let make = (~height) => {
             <HSpacing size=Spacing.md />
             <img alt="Right Arrow Icon" src=Images.rightArrow className=Styles.rightArrow />
           </Link>
-          <VSpacing size=Spacing.xxl />
+          <VSpacing size=Spacing.xxxl />
         </div>
       </div>
     </Section>
@@ -191,24 +191,26 @@ let make = (~height) => {
           ibcTxs->Belt.Array.length > 0
             ? <Row marginBottom=24>
                 <Col>
-                  <Table>
-                    <Heading
-                      value="IBC Transactions" size=Heading.H4 marginBottom=16 marginTop=32
-                    />
-                    <Text value="This section contains only IBC-related transactions." />
-                    <SeperatedLine mt=32 mb=0 />
-                    <BlockIndexTxsTable txsSub=ibcTxsSub />
-                  </Table>
+                  <InfoContainer>
+                    <Table>
+                      <Heading value="IBC Transactions" size=Heading.H4 marginBottom=16 />
+                      <Text value="This section contains only IBC-related transactions." />
+                      <SeperatedLine mt=32 mb=0 />
+                      <BlockIndexTxsTable txsSub=ibcTxsSub />
+                    </Table>
+                  </InfoContainer>
                 </Col>
               </Row>
             : React.null
         | Error(_) | Loading | NoData => React.null
         }}
-        <Table>
-          <Heading value="Transactions" size=Heading.H4 marginBottom=32 marginTop=32 />
-          <SeperatedLine mt=32 mb=0 />
-          <BlockIndexTxsTable txsSub=commonTxsSub />
-        </Table>
+        <InfoContainer>
+          <Table>
+            <Heading value="Transactions" size=Heading.H4 marginBottom=32 />
+            <SeperatedLine mt=32 mb=0 />
+            <BlockIndexTxsTable txsSub=commonTxsSub />
+          </Table>
+        </InfoContainer>
       </div>
     </Section>
   }

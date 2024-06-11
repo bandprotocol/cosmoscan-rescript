@@ -56,10 +56,31 @@ let all5 = (s1, s2, s3, s4, s5) =>
     )
   )
 
-let sumResults5 = (results: variant<(array<'a>, array<'b>, array<'c>, array<'d>, array<'e>)>) => {
+let all6 = (s1, s2, s3, s4, s5, s6) =>
+  flatMap(s1, s1' =>
+    flatMap(s2, s2' =>
+      flatMap(
+        s3,
+        s3' =>
+          flatMap(
+            s4,
+            s4' => flatMap(s5, s5' => flatMap(s6, s6' => Data((s1', s2', s3', s4', s5', s6')))),
+          ),
+      )
+    )
+  )
+
+let sumResults6 = (
+  results: variant<(array<'a>, array<'b>, array<'c>, array<'d>, array<'e>, array<'f>)>,
+) => {
   let len = switch results {
-  | Data((a, b, c, d, e)) =>
-    Array.length(a) + Array.length(b) + Array.length(c) + Array.length(d) + Array.length(e)
+  | Data((a, b, c, d, e, f)) =>
+    Array.length(a) +
+    Array.length(b) +
+    Array.length(c) +
+    Array.length(d) +
+    Array.length(e) +
+    Array.length(f)
   | _ => 0
   }
   len

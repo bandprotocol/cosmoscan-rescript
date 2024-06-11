@@ -373,7 +373,7 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
       </Row>
       <Row marginBottom=24 marginBottomSm=16>
         <Col>
-          <Table>
+          <InfoContainer>
             <Tab.Route
               tabs=[
                 {
@@ -396,7 +396,7 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
               | AccountRedelegate => <AccountIndexRedelegate address />
               }}
             </Tab.Route>
-          </Table>
+          </InfoContainer>
         </Col>
       </Row>
       <Row>

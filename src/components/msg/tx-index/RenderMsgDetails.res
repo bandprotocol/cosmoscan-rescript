@@ -429,7 +429,7 @@ module Grant = {
     },
     {
       title: "Authorization URL",
-      content: PlainText(msg.url),
+      content: PlainText(msg.url->Belt.Option.getWithDefault("-")),
       order: 4,
     },
     {
@@ -460,6 +460,7 @@ module Revoke = {
   ]
 }
 
+// TODO: add more details eg. spend_limit, expiration
 module GrantAllowance = {
   let factory = (msg: Msg.FeeGrant.GrantAllowance.t) => [
     {
@@ -818,7 +819,7 @@ module SubmitProposal = {
       {title: "Proposer", content: Address(msg.proposer), order: 1},
       {
         title: "Title",
-        content: PlainText(msg.title),
+        content: PlainText(msg.title->Belt.Option.getWithDefault("")),
         order: 3,
       },
       {

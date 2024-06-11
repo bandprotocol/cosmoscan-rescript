@@ -7,6 +7,7 @@ type base_account = {
 type tx_response = {
   txhash: string,
   code: int,
+  rawLog: string,
 }
 
 // import { SignDoc } from '@bandprotocol/bandchain.js/proto/cosmos/tx/v1beta1/tx_pb'

@@ -259,7 +259,7 @@ module Authz = {
     type t = {
       granter: Address.t,
       grantee: Address.t,
-      url: string,
+      url: option<string>,
       expiration: MomentRe.Moment.t,
       msgTypeUrl: string,
     }
@@ -269,9 +269,12 @@ module Authz = {
       buildObject(json => {
         granter: json.required(list{"msg", "granter"}, address),
         grantee: json.required(list{"msg", "grantee"}, address),
-        url: json.required(list{"msg", "url"}, string),
+        url: json.optional(list{"msg", "url"}, string),
         expiration: json.required(list{"msg", "grant", "expiration"}, timeString),
-        msgTypeUrl: json.required(list{"msg", "grant", "authorization", "msg"}, string),
+        // TODO: on mainnet tx Hash 2ad08bcb4d4298faea49c0dcf9195a71db0731872e602dd3e777b16d56558afe
+        // render validator details on StakeAuthorization
+        // msgTypeUrl: json.required(list{"msg", "grant", "authorization", "msg"}, string),
+        msgTypeUrl: "",
       })
     }
   }
@@ -365,12 +368,13 @@ module FeeGrant = {
     }
   }
 
+  // TODO: remove decode allowance missing in transaction
   module GrantAllowance = {
     type t = {
       grantee: Address.t,
       granter: Address.t,
-      allowance: Allowance.t,
-      allowedMessages: list<string>,
+      // allowance: Allowance.t,
+      // allowedMessages: list<string>,
     }
 
     let decode = {
@@ -378,8 +382,8 @@ module FeeGrant = {
       buildObject(json => {
         granter: json.required(list{"msg", "granter"}, address),
         grantee: json.required(list{"msg", "grantee"}, address),
-        allowance: json.required(list{"msg", "allowance"}, Allowance.decoder),
-        allowedMessages: json.required(list{"msg", "allowance", "allowed_messages"}, list(string)),
+        // allowance: json.required(list{"msg", "allowance"}, Allowance.decoder),
+        // allowedMessages: json.required(list{"msg", "allowance", "allowed_messages"}, list(string)),
       })
     }
   }
@@ -687,7 +691,7 @@ module Gov = {
   module SubmitProposal = {
     type t<'a> = {
       proposer: Address.t,
-      title: string,
+      title: option<string>,
       description: string,
       initialDeposit: list<Coin.t>,
       proposalID: 'a,
@@ -704,7 +708,7 @@ module Gov = {
       open JsonUtils.Decode
       buildObject(json => {
         proposer: json.required(list{"msg", "proposer"}, address),
-        title: json.required(list{"msg", "content", "title"}, string),
+        title: json.optional(list{"msg", "content", "title"}, string),
         description: json.required(list{"msg", "content", "description"}, string),
         initialDeposit: json.required(list{"msg", "initial_deposit"}, list(Coin.decodeCoin)),
         proposalID: json->proposalIDD,
@@ -1008,7 +1012,13 @@ module Channel = {
 
     let decodeSuccess: JsonUtils.Decode.t<success_t> = {
       open JsonUtils.Decode
-      decodeFactory(json => json.optional(list{}, PacketDecoder.decodeAction))
+      decodeFactory(json => {
+        let packetTypeOpt = json.optional(list{"msg", "packet_type"}, string)
+        switch packetTypeOpt {
+        | None => None // Fail IBC will have no packet_type
+        | Some(_) => json.optional(list{}, PacketDecoder.decodeAction)
+        }
+      })
     }
 
     let decodeFail: JsonUtils.Decode.t<fail_t> = {

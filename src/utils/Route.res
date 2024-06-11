@@ -20,6 +20,10 @@ type validator_tab_t =
   | Reports
   | Reporters
 
+type group_tab_t =
+  | Group
+  | Proposal
+
 type t =
   | NotFound
   | HomePage
@@ -41,6 +45,7 @@ type t =
   | RelayersHomepage
   | ChannelDetailsPage(string, string, string)
   | Example
+  | GroupPage(group_tab_t)
 
 let fromUrl = (url: RescriptReactRouter.url) =>
   switch (url.path, url.hash) {
@@ -120,6 +125,14 @@ let fromUrl = (url: RescriptReactRouter.url) =>
   | (list{"relayers"}, _) => RelayersHomepage
   | (list{"relayers", counterparty, port, channelID}, _) =>
     ChannelDetailsPage(counterparty, port, channelID)
+  | (list{"group"}, hash) =>
+    let urlHash = hash =>
+      switch hash {
+      | "group" => Group
+      | "proposal" => Proposal
+      | _ => Group
+      }
+    GroupPage(urlHash(hash))
   | (list{}, _) => HomePage
   | (list{"example"}, _) => Example
   | (_, _) => NotFound
@@ -189,6 +202,8 @@ let toString = route =>
   | ProposalDetailsPage(proposalID) => `/proposal/${proposalID->Belt.Int.toString}`
   | RelayersHomepage => "/relayers"
   | ChannelDetailsPage(chainID, port, channel) => `/relayers/${chainID}/${port}/${channel}`
+  | GroupPage(Group) => `/group/#group`
+  | GroupPage(Proposal) => `/group/#proposal`
   | HomePage => "/"
   | NotFound => "/notfound"
   | Example => "/example"
@@ -201,9 +216,11 @@ let search = (str: string) => {
   let capStr = str->String.capitalize_ascii
 
   if str->Js.String2.startsWith("bandvaloper") {
-    Some(ValidatorDetailsPage(str->Address.fromBech32, Reports))
+    str->Address.fromBech32Opt->Belt.Option.map(address => ValidatorDetailsPage(address, Reports))
   } else if str->Js.String2.startsWith("band") {
-    Some(AccountIndexPage(str->Address.fromBech32, AccountDelegations))
+    str
+    ->Address.fromBech32Opt
+    ->Belt.Option.map(address => AccountIndexPage(address, AccountDelegations))
   } else if len == 64 || (str->Js.String2.startsWith("0x") && len == 66) {
     Some(TxIndexPage(str->Hash.fromHex))
   } else if capStr->Js.String2.startsWith("B") {

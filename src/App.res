@@ -13,11 +13,43 @@ module Styles = {
     minHeight(#calc(#sub, #vh(100.), #px(193))),
     Media.mobile([paddingBottom(#zero)]),
   ])
+
+  let mainContent = style(. [
+    width(#percent(100.)),
+    position(#relative),
+    overflow(#auto),
+    paddingBottom(#px(70)),
+    paddingTop(#px(70)),
+    Media.mobile([
+      paddingTop(#px(100)),
+      paddingBottom(#px(0)),
+      minHeight(#calc(#sub, #vh(100.), #px(193))),
+    ]),
+  ])
+
+  let backdropContainer = show =>
+    style(. [
+      display(#none),
+      Media.mobile([
+        display(#block),
+        width(#percent(100.)),
+        height(#percent(100.)),
+        backgroundColor(#rgba((0, 0, 0, #num(0.5)))),
+        position(#fixed),
+        opacity(show ? 1. : 0.),
+        pointerEvents(show ? #auto : #none),
+        left(#zero),
+        top(#px(0)),
+        transition(~duration=400, "all"),
+        zIndex(900),
+      ]),
+    ])
+
+  let pageWrapper = style(. [display(#flex), height(#vh(100.)), overflow(#hidden)])
 }
 
 @react.component
 let make = () => {
-  let currentRoute = RescriptReactRouter.useUrl()->Route.fromUrl
   let isMobile = Media.isMobile()
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -48,10 +80,11 @@ let make = () => {
       | ChannelDetailsPage(chainID, port, channel) => <ChannelPage chainID channel port />
       | NotFound => <NotFound />
       | Example => <Example />
+      | GroupPage(hashtag) => <GroupPage hashtag />
       }}
     </div>
-    <Footer />
     <Modal />
     <CookieBar />
+    <div onClick={_ => setShow(_ => false)} className={Styles.backdropContainer(show)} />
   </div>
 }

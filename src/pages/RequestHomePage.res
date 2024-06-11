@@ -165,98 +165,106 @@ let make = () => {
           }}
         </Col>
       </Row>
-      <Table>
-        {isMobile
-          ? React.null
-          : <THead>
-              <Row alignItems=Row.Center>
-                <Col col=Col.Two>
-                  <Text
-                    block=true
-                    value="Request ID"
-                    size=Text.Caption
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                  />
-                </Col>
-                <Col col=Col.Four>
-                  <Text
-                    block=true
-                    value="Oracle Script"
-                    size=Text.Caption
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                  />
-                </Col>
-                <Col col=Col.Four>
-                  <Text
-                    block=true
-                    value="Report Status"
-                    size=Text.Caption
-                    weight=Text.Semibold
-                    transform=Text.Uppercase
-                  />
-                </Col>
-                <Col col=Col.Two>
-                  <Text
-                    block=true
-                    value="Timestamp"
-                    size=Text.Caption
-                    weight=Text.Semibold
-                    align=Text.Right
-                    transform=Text.Uppercase
-                  />
-                </Col>
-              </Row>
-            </THead>}
-        {switch allSub {
-        | Data((requests, latestRequest)) =>
-          let requestsCount =
-            latestRequest
-            ->Belt.Array.get(0)
-            ->Belt.Option.mapWithDefault(0, ({id}) => id->ID.Request.toInt)
-          let pageCount = Page.getPageCount(requestsCount, pageSize)
-          <>
-            {requestsCount > 0
-              ? requests
-                ->Belt.Array.mapWithIndex((i, e) =>
-                  isMobile
-                    ? <RenderBodyMobile
-                        reserveIndex=i key={e.id->ID.Request.toString} requestsSub={Sub.resolve(e)}
-                      />
-                    : <RenderBody key={e.id->ID.Request.toString} requestsSub={Sub.resolve(e)} />
-                )
-                ->React.array
-              : <EmptyContainer>
-                  <img
-                    alt="No Request"
-                    src={isDarkMode ? Images.noDataDark : Images.noDataLight}
-                    className=Styles.noDataImage
-                  />
-                  <Heading
-                    size=Heading.H4
-                    value="No Request"
-                    align=Heading.Center
-                    weight=Heading.Regular
-                    color={theme.neutral_600}
-                  />
-                </EmptyContainer>}
-            {isMobile
-              ? React.null
-              : <Pagination
-                  currentPage=page pageCount onPageChange={newPage => setPage(_ => newPage)}
-                />}
-          </>
-        | _ =>
-          Belt.Array.make(pageSize, Sub.NoData)
-          ->Belt.Array.mapWithIndex((i, noData) =>
-            isMobile
-              ? <RenderBodyMobile reserveIndex=i key={i->Belt.Int.toString} requestsSub=noData />
-              : <RenderBody key={i->Belt.Int.toString} requestsSub=noData />
-          )
-          ->React.array
-        }}
-      </Table>
+      <InfoContainer>
+        <Table>
+          {isMobile
+            ? React.null
+            : <THead>
+                <Row alignItems=Row.Center>
+                  <Col col=Col.Two>
+                    <Text
+                      block=true
+                      value="Request ID"
+                      size=Text.Caption
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                    />
+                  </Col>
+                  <Col col=Col.Four>
+                    <Text
+                      block=true
+                      value="Oracle Script"
+                      size=Text.Caption
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                    />
+                  </Col>
+                  <Col col=Col.Four>
+                    <Text
+                      block=true
+                      value="Report Status"
+                      size=Text.Caption
+                      weight=Text.Semibold
+                      transform=Text.Uppercase
+                    />
+                  </Col>
+                  <Col col=Col.Two>
+                    <Text
+                      block=true
+                      value="Timestamp"
+                      size=Text.Caption
+                      weight=Text.Semibold
+                      align=Text.Right
+                      transform=Text.Uppercase
+                    />
+                  </Col>
+                </Row>
+              </THead>}
+          {switch allSub {
+          | Data((requests, latestRequest)) =>
+            let requestsCount =
+              latestRequest
+              ->Belt.Array.get(0)
+              ->Belt.Option.mapWithDefault(0, ({id}) => id->ID.Request.toInt)
+            let pageCount = Page.getPageCount(requestsCount, pageSize)
+            <>
+              {requestsCount > 0
+                ? requests
+                  ->Belt.Array.mapWithIndex((i, e) =>
+                    isMobile
+                      ? <RenderBodyMobile
+                          reserveIndex=i
+                          key={e.id->ID.Request.toString}
+                          requestsSub={Sub.resolve(e)}
+                        />
+                      : <RenderBody key={e.id->ID.Request.toString} requestsSub={Sub.resolve(e)} />
+                  )
+                  ->React.array
+                : <EmptyContainer>
+                    <img
+                      alt="No Request"
+                      src={isDarkMode ? Images.noDataDark : Images.noDataLight}
+                      className=Styles.noDataImage
+                    />
+                    <Heading
+                      size=Heading.H4
+                      value="No Request"
+                      align=Heading.Center
+                      weight=Heading.Regular
+                      color={theme.neutral_600}
+                    />
+                  </EmptyContainer>}
+              {isMobile
+                ? React.null
+                : <Pagination
+                    currentPage=page
+                    totalElement=requestsCount
+                    pageSize
+                    onPageChange={newPage => setPage(_ => newPage)}
+                    onChangeCurrentPage={newPage => setPage(_ => newPage)}
+                  />}
+            </>
+          | _ =>
+            Belt.Array.make(pageSize, Sub.NoData)
+            ->Belt.Array.mapWithIndex((i, noData) =>
+              isMobile
+                ? <RenderBodyMobile reserveIndex=i key={i->Belt.Int.toString} requestsSub=noData />
+                : <RenderBody key={i->Belt.Int.toString} requestsSub=noData />
+            )
+            ->React.array
+          }}
+        </Table>
+      </InfoContainer>
     </div>
   </Section>
 }
