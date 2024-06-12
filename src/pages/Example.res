@@ -40,40 +40,26 @@ let createSendTx = async (client, sender, reciever, pubKey) => {
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let client = React.useContext(ClientContext.context)
+  let (address, setAddress) = React.useState(_ => "")
+  let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-  let handleClickCosmostation = async () => {
-    open Cosmostation.Cosmos
-
-    let provider = await Cosmostation.cosmos()
-    let account = await provider.getAccount("bandtestnet")
-
-    let (rawTx, signDoc) =
-      await client->createSendTx(
-        account.address,
-        account.address,
-        account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
-      )
-
-    open BandChainJS.SignDoc
-    let cosmosStationSignDoc = {
-      chain_id: signDoc->getChainId,
-      account_number: signDoc->getAccountNumber->Belt.Int.toString,
-      auth_info_bytes: signDoc->getAuthInfoBytes_asU8,
-      body_bytes: signDoc->getBodyBytes_asU8,
-    }
-
-    let signResponse = await provider.signDirect("bandtestnet", cosmosStationSignDoc, None)
-
-    let txRawBytes =
-      rawTx->BandChainJS.Transaction.getTxData(
-        signResponse.signature->JsBuffer.fromBase64,
-        account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
-        1,
-      )
-
-    let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
-    Js.log(broadcastResponse)
+  let connectWalletKeplr = async () => {
+    let chainID = await client->BandChainJS.Client.getChainId
+    await Keplr.enable(chainID)
+    let account = await Keplr.getKey(chainID)
+    setAddress(_ => account.bech32Address)
   }
+
+  let selectWallet = async () => {
+    let chainID = await client->BandChainJS.Client.getChainId
+    dispatchModal(OpenModal(SelectWallet(chainID)))
+  }
+
+  React.useEffect0(() => {
+    connectWalletKeplr()->ignore
+
+    None
+  })
 
   let handleClickKeplr = async () => {
     let chainID = await client->BandChainJS.Client.getChainId
@@ -114,44 +100,6 @@ let make = () => {
         signResponse.signature.signature->JsBuffer.fromBase64,
         account.pubKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
         1,
-      )
-
-    let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
-    Js.log(broadcastResponse)
-  }
-
-  let handleClickCosmostationAmino = async () => {
-    open Cosmostation.Cosmos
-
-    let provider = await Cosmostation.cosmos()
-    let account = await provider.getAccount("bandtestnet")
-
-    let (rawTx, signDoc) =
-      await client->createSendTx(
-        account.address,
-        account.address,
-        account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
-      )
-
-    open BandChainJS.SignDoc
-    let cosmosStationSignDoc = {
-      chain_id: signDoc->getChainId,
-      account_number: signDoc->getAccountNumber->Belt.Int.toString,
-      auth_info_bytes: signDoc->getAuthInfoBytes_asU8,
-      body_bytes: signDoc->getBodyBytes_asU8,
-    }
-
-    let signResponse = await provider.signAmino(
-      "bandtestnet",
-      Cosmostation.Cosmos.getAminoSignDocFromTx(rawTx),
-      None,
-    )
-
-    let txRawBytes =
-      rawTx->BandChainJS.Transaction.getTxData(
-        signResponse.signature->JsBuffer.fromBase64,
-        account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
-        127,
       )
 
     let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
@@ -200,19 +148,7 @@ let make = () => {
   }
 
   <Section pt=80 pb=80 bg={theme.neutral_000} style=Styles.root>
-    <div>
-      <button onClick={_ => handleClickCosmostation()->ignore}>
-        {"connect cosmostation"->React.string}
-      </button>
-      <button onClick={_ => handleClickKeplr()->ignore}> {"connect keplr"->React.string} </button>
-    </div>
-    <div>
-      <button onClick={_ => handleClickCosmostationAmino()->ignore}>
-        {"sign cosmostation amino"->React.string}
-      </button>
-      <button onClick={_ => handleClickKeplrAmino()->ignore}>
-        {"sign keplr amino"->React.string}
-      </button>
-    </div>
+    <h3> {address->React.string} </h3>
+    <Button onClick={_ => selectWallet()->ignore}> {"select wallet"->React.string} </Button>
   </Section>
 }

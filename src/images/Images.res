@@ -92,3 +92,9 @@
 @module("./icon-group.svg") external groupIconSidebar: string = "default"
 @module("./icon-TSS.svg") external tssIconSidebar: string = "default"
 @module("./icon-proposal.svg") external proposalIconSidebar: string = "default"
+
+// Wallet
+@module("./keplr.png") external keplr: string = "default"
+@module("./cosmostation.png") external cosmostation: string = "default"
+@module("./ledger.png") external ledger: string = "default"
+@module("./mnemonic.png") external mnemonic: string = "default"
