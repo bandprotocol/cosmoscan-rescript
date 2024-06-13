@@ -103,8 +103,7 @@ let createRawTx = async (client, sender, msgs, chainID, feeAmount, gas, memo) =>
 
 let signTx = async (account: AccountContext.t, rawTx) => {
   try {
-    let jsonTxStr = rawTx->BandChainJS.Transaction.getSignMessage->JsBuffer.toUTF8
-    let signature = await Wallet.sign(jsonTxStr, account.wallet)
+    let signature = await Wallet.sign(rawTx, account.wallet)
     Belt.Result.Ok(
       rawTx->BandChainJS.Transaction.getTxData(
         signature,

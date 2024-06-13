@@ -153,7 +153,8 @@ let make = () => {
 
   let clickOutside = ClickOutside.useClickOutside(_ => setShow(_ => false))
 
-  let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
+  let connect = chainID => dispatchModal(OpenModal(SelectWallet(chainID)))
+
   let disconnect = () => {
     dispatchAccount(Disconnect)
     setShow(_ => false)

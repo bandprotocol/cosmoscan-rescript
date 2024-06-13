@@ -18,8 +18,9 @@ let getAddressAndPubKey = x => (
   Secp256k1.publicKeyCreate(x.privKey, true)->JsBuffer.arrayToBase64->PubKey.fromBase64,
 )
 
-let sign = (x, message) => {
-  let hash = Crypto.createHash("sha256")->Crypto.update(_, message)->Crypto.digest(_, "hex")
+let sign = (x, rawTx) => {
+  let jsonTxStr = rawTx->BandChainJS.Transaction.getSignMessage->JsBuffer.toUTF8
+  let hash = Crypto.createHash("sha256")->Crypto.update(_, jsonTxStr)->Crypto.digest(_, "hex")
   let signInfo = Secp256k1.ecdsaSign(hash->JsBuffer.fromHex, x.privKey)
   signInfo.signature->JsBuffer.from
 }

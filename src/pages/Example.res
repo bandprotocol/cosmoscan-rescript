@@ -40,26 +40,12 @@ let createSendTx = async (client, sender, reciever, pubKey) => {
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let client = React.useContext(ClientContext.context)
-  let (address, setAddress) = React.useState(_ => "")
   let (_, dispatchModal) = React.useContext(ModalContext.context)
-
-  let connectWalletKeplr = async () => {
-    let chainID = await client->BandChainJS.Client.getChainId
-    await Keplr.enable(chainID)
-    let account = await Keplr.getKey(chainID)
-    setAddress(_ => account.bech32Address)
-  }
 
   let selectWallet = async () => {
     let chainID = await client->BandChainJS.Client.getChainId
     dispatchModal(OpenModal(SelectWallet(chainID)))
   }
-
-  React.useEffect0(() => {
-    connectWalletKeplr()->ignore
-
-    None
-  })
 
   let handleClickKeplr = async () => {
     let chainID = await client->BandChainJS.Client.getChainId
@@ -116,7 +102,7 @@ let make = () => {
     let (rawTx, signDoc) =
       await client->createSendTx(
         account.bech32Address,
-        account.bech32Address,
+        "band18p27yl962l8283ct7srr5l3g7ydazj07dqrwph",
         account.pubKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
       )
 
@@ -134,7 +120,10 @@ let make = () => {
       },
     )
 
-    Js.log(signResponse)
+    // Js.log(signResponse)
+
+    Js.log2("getAminoSignDocFromTx", Keplr.getAminoSignDocFromTx(rawTx))
+    Js.log2("BandChainJS.Transaction.getSignMessage", BandChainJS.Transaction.getSignMessage(rawTx))
 
     let txRawBytes =
       rawTx->BandChainJS.Transaction.getTxData(
@@ -148,7 +137,7 @@ let make = () => {
   }
 
   <Section pt=80 pb=80 bg={theme.neutral_000} style=Styles.root>
-    <h3> {address->React.string} </h3>
     <Button onClick={_ => selectWallet()->ignore}> {"select wallet"->React.string} </Button>
+    <Button onClick={_ => handleClickKeplrAmino()->ignore}> {"send BAND"->React.string} </Button>
   </Section>
 }
