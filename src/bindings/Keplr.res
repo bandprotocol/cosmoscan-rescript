@@ -1,3 +1,4 @@
+type t = {}
 module Long = {
   type t = {
     high: int,
@@ -89,6 +90,9 @@ external signAmino: (
   signAminoDoc<'a>,
   keplrSignOptions,
 ) => Js.Promise.t<directSignResponse> = "signAmino"
+
+@val @scope("window")
+external keplr: option<t> = "keplr"
 
 let getAminoSignDocFromTx = (tx: BandChainJS.Transaction.transaction_t) => {
   account_number: tx.accountNum->Belt.Option.getExn->Belt.Int.toString,

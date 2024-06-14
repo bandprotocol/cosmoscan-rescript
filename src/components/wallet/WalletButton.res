@@ -11,7 +11,11 @@ module Styles = {
     style(. [
       display(#flex),
       justifyContent(#spaceBetween),
+      alignItems(#center),
       width(#percent(100.)),
+      fontSize(#px(14)),
+      fontWeight(#semiBold),
+      color(theme.neutral_900),
       padding2(~v=#px(10), ~h=#px(24)),
       transition(~duration=200, "all"),
       borderRadius(#px(8)),
@@ -28,6 +32,8 @@ module Styles = {
         hover([backgroundColor(#transparent)]),
         opacity(0.5),
       ]),
+      hover([backgroundColor(theme.neutral_100)]),
+      active([backgroundColor(theme.primary_800), color(theme.white)]),
     ])
 
   let icon = {
@@ -40,9 +46,9 @@ let make = (~onClick=_ => (), ~disabled=false, ~wallet) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <button className={Styles.btn(theme, isDarkMode)} onClick disabled>
-    <Text size=Text.Body1 weight=Text.Semibold color={theme.neutral_900} value={wallet} />
+    <p> {wallet->React.string} </p>
     <img
-      alt="Fail Icon"
+      alt={`$wallet icon`}
       src={switch wallet {
       | "Keplr" => Images.keplr
       | "Cosmostation" => Images.cosmostation

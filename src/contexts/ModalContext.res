@@ -1,5 +1,4 @@
 type modal_t =
-  | SelectWallet(string)
   | Connect(string)
   | SubmitTx(SubmitMsg.t)
   | ChainSelector(IBCConnectionQuery.target_chain_t)

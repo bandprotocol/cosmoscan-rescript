@@ -42,9 +42,11 @@ let make = () => {
   let client = React.useContext(ClientContext.context)
   let (_, dispatchModal) = React.useContext(ModalContext.context)
 
-  let selectWallet = async () => {
-    let chainID = await client->BandChainJS.Client.getChainId
-    dispatchModal(OpenModal(SelectWallet(chainID)))
+  let checkKeplr = () => {
+    switch Keplr.keplr {
+    | Some(x) => Js.log(x)
+    | None => Js.log("no keplr")
+    }
   }
 
   let handleClickKeplr = async () => {
@@ -137,7 +139,7 @@ let make = () => {
   }
 
   <Section pt=80 pb=80 bg={theme.neutral_000} style=Styles.root>
-    <Button onClick={_ => selectWallet()->ignore}> {"select wallet"->React.string} </Button>
+    <Button onClick={_ => checkKeplr()}> {"check Keplr"->React.string} </Button>
     <Button onClick={_ => handleClickKeplrAmino()->ignore}> {"send BAND"->React.string} </Button>
   </Section>
 }

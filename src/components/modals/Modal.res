@@ -110,7 +110,6 @@ let make = () => {
           <Icon name="fal fa-times" color=theme.neutral_900 size=18 />
         </div>
         {switch modal {
-        | SelectWallet(chainID) => <SelectWalletModal chainID />
         | Connect(chainID) => <ConnectModal chainID />
         | SubmitTx(msg) => <SubmitTxModal msg />
         | ChainSelector(targetChain) => <ChainSelectorModal targetChain />

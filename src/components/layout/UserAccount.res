@@ -18,19 +18,21 @@ module Styles = {
   let logo = style(. [width(#px(12))])
   let fullWidth = style(. [width(#percent(100.))])
 
-  let profileCard = (show, theme: Theme.t) =>
+  let profileCard = (show, theme: Theme.t, isDarkMode) =>
     style(. [
       position(#absolute),
-      backgroundColor(theme.neutral_000),
-      top(#px(30)),
-      right(#px(-10)),
-      borderRadius(#px(4)),
-      padding(#px(16)),
-      boxShadow(Shadow.box(~x=#zero, ~y=#zero, ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.08)))),
+      top(#px(42)),
+      right(#px(0)),
       transition(~duration=200, "all"),
       opacity(show ? 1. : 0.),
       pointerEvents(show ? #auto : #none),
       zIndex(5),
+      width(#px(400)),
+      padding2(~v=#px(24), ~h=#px(24)),
+      background(isDarkMode ? theme.neutral_100 : theme.neutral_000),
+      borderRadius(#px(16)),
+      border(#px(1), #solid, theme.neutral_200),
+      boxShadows([Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(16, 18, 20, #num(0.15)))]),
     ])
 
   let innerProfileCard = (theme: Theme.t) =>
@@ -38,6 +40,15 @@ module Styles = {
       padding(#px(16)),
       backgroundColor(theme.neutral_100),
       boxShadow(Shadow.box(~x=#zero, ~y=#zero, ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.08)))),
+    ])
+
+  let userInfoButton = (theme: Theme.t) =>
+    style(. [
+      width(#px(160)),
+      padding2(~v=#px(10), ~h=#px(16)),
+      borderRadius(#px(8)),
+      border(#px(1), #solid, theme.neutral_600),
+      backgroundColor(theme.neutral_000),
     ])
 
   let connect = style(. [padding2(~v=#px(10), ~h=#zero)])
@@ -144,44 +155,30 @@ module Balance = {
   }
 }
 
-@react.component
-let make = () => {
-  let trackingSub = TrackingSub.use()
-  let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
-  let (_, dispatchModal) = React.useContext(ModalContext.context)
-  let (show, setShow) = React.useState(_ => false)
+module AccountBox = {
+  @react.component
+  let make = (~setAccountBoxState) => {
+    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+    let (_, dispatchModal) = React.useContext(ModalContext.context)
+    let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
+    let trackingSub = TrackingSub.use()
+    let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
 
-  let clickOutside = ClickOutside.useClickOutside(_ => setShow(_ => false))
+    let send = () => {
+      SubmitMsg.Send(None, IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
+      setAccountBoxState(_ => "noShow")
+    }
 
-  let connect = chainID => dispatchModal(OpenModal(SelectWallet(chainID)))
+    let disconnect = () => {
+      dispatchAccount(Disconnect)
+      setAccountBoxState(_ => "noShow")
+    }
 
-  let disconnect = () => {
-    dispatchAccount(Disconnect)
-    setShow(_ => false)
-  }
-  let send = () => {
-    SubmitMsg.Send(None, IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
-    setShow(_ => false)
-  }
-
-  let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-
-  switch accountOpt {
-  | Some({address}) =>
-    <div className={Css.merge(list{CssHelper.flexBox(~justify=#flexEnd, ()), Styles.container})}>
-      <div ref={ReactDOM.Ref.domRef(clickOutside)}>
-        <div
-          id="userInfoButton"
-          className={Css.merge(list{CssHelper.flexBox(), CssHelper.clickable})}
-          onClick={_ => setShow(prev => !prev)}>
-          <div className={Styles.oval(theme)}>
-            <Icon name="fal fa-user" color=Theme.white />
-          </div>
-          <HSpacing size=Spacing.sm />
-          <Icon name="fas fa-caret-down" color=theme.primary_600 />
-        </div>
-        <div className={Styles.profileCard(show, theme)} id="addressWrapper">
-          <div onClick={_ => setShow(_ => false)}>
+    {
+      switch accountOpt {
+      | Some({address}) =>
+        <div>
+          <div onClick={_ => setAccountBoxState(_ => "account")}>
             <AddressRender address position=AddressRender.Text />
           </div>
           <VSpacing size=#px(16) />
@@ -202,18 +199,66 @@ let make = () => {
           </div>
           <DisconnectBtn disconnect />
         </div>
+      | None => React.null
+      }
+    }
+  }
+}
+
+@react.component
+let make = () => {
+  let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
+  let (accountBoxState, setAccountBoxState) = React.useState(_ => "noShow")
+  let trackingSub = TrackingSub.use()
+  let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+
+  let clickOutside = ClickOutside.useClickOutside(_ => setAccountBoxState(_ => "noShow"))
+
+  let connect = () =>
+    accountBoxState == "noShow"
+      ? setAccountBoxState(_ => "connect")
+      : setAccountBoxState(_ => "noShow")
+
+  <div className={Css.merge(list{CssHelper.flexBox(~justify=#flexEnd, ()), Styles.container})}>
+    <div ref={ReactDOM.Ref.domRef(clickOutside)}>
+      {switch accountOpt {
+      | Some({address}) =>
+        <div
+          id="userInfoButton"
+          className={Css.merge(list{
+            CssHelper.flexBox(),
+            CssHelper.clickable,
+            Styles.userInfoButton(theme),
+          })}
+          onClick={_ => setAccountBoxState(_ => "account")}>
+          <Text
+            value={address->Address.toBech32}
+            color=theme.neutral_900
+            ellipsis=true
+            weight={Semibold}
+          />
+        </div>
+      | None =>
+        <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+          {switch trackingSub {
+          | Data(_) => <ConnectBtn connect={_ => connect()} />
+          | Error(err) =>
+            // log for err details
+            Js.Console.log(err)
+            <Text value="Invalid Chain ID" />
+          | _ => <LoadingCensorBar width=150 height=30 />
+          }}
+        </div>
+      }}
+      <div className={Styles.profileCard(accountBoxState != "noShow", theme, isDarkMode)}>
+        {switch accountBoxState {
+        | "account" => <AccountBox setAccountBoxState />
+        | "connect" => <SelectWallet setAccountBoxState />
+        | "keplrNotfound" => <KeplrNotfound />
+        | "keplrBandNotfound" => <KeplrBandNotfound />
+        | _ => React.null
+        }}
       </div>
     </div>
-  | None =>
-    <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-      {switch trackingSub {
-      | Data({chainID}) => <ConnectBtn connect={_ => connect(chainID)} />
-      | Error(err) =>
-        // log for err details
-        Js.Console.log(err)
-        <Text value="Invalid Chain ID" />
-      | _ => <LoadingCensorBar width=150 height=30 />
-      }}
-    </div>
-  }
+  </div>
 }

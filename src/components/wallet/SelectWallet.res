@@ -8,9 +8,6 @@ module Styles = {
       justifyContent(#center),
       alignItems(#center),
       position(#relative),
-      width(#px(400)),
-      padding2(~v=#px(24), ~h=#px(24)),
-      background(isDarkMode ? theme.neutral_100 : theme.neutral_000),
     ])
 
   let modalTitle = (theme: Theme.t) =>
@@ -20,18 +17,29 @@ module Styles = {
 }
 
 @react.component
-let make = (~chainID) => {
+let make = (~setAccountBoxState) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let client = React.useContext(ClientContext.context)
-  let (_, dispatchModal) = React.useContext(ModalContext.context)
   let (_, dispatchAccount) = React.useContext(AccountContext.context)
 
   let connectWalletKeplr = async () => {
-    let chainID = await client->BandChainJS.Client.getChainId
-    let wallet = await Wallet.createFromKeplr(chainID)
-    let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
-    dispatchAccount(Connect(wallet, address, pubKey, chainID))
-    ModalContext.CloseModal->dispatchModal
+    if Keplr.keplr->Belt.Option.isNone {
+      setAccountBoxState(_ => "keplrNotfound")
+    } else {
+      let chainID = await client->BandChainJS.Client.getChainId
+
+      try {
+        let wallet = await Wallet.createFromKeplr(chainID)
+        let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
+        dispatchAccount(Connect(wallet, address, pubKey, chainID))
+
+        setAccountBoxState(_ => "noShow")
+      } catch {
+      | Js.Exn.Error(e) =>
+        Js.Console.log(e)
+        setAccountBoxState(_ => "keplrBandNotfound")
+      }
+    }
   }
 
   <div className={Styles.container(theme, isDarkMode)}>
@@ -39,8 +47,6 @@ let make = (~chainID) => {
       <Heading value="Select Wallet" size=Heading.H3 />
       <VSpacing size=Spacing.lg />
     </div>
-    <WalletButton onClick={_ => connectWalletKeplr()->ignore} wallet="Cosmostation" />
-    <VSpacing size=Spacing.md />
     <WalletButton onClick={_ => connectWalletKeplr()->ignore} wallet="Keplr" />
     <VSpacing size=Spacing.md />
     <WalletButton onClick={_ => connectWalletKeplr()->ignore} wallet="Ledger" />
