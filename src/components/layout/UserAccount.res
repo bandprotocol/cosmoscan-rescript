@@ -256,6 +256,7 @@ let make = () => {
         | "connect" => <SelectWallet setAccountBoxState />
         | "keplrNotfound" => <KeplrNotfound />
         | "keplrBandNotfound" => <KeplrBandNotfound />
+        | "connectMnemonic" => <ConnectMnemonic setAccountBoxState />
         | _ => React.null
         }}
       </div>

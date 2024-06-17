@@ -8,12 +8,6 @@ module Styles = {
       justifyContent(#center),
       alignItems(#center),
       position(#relative),
-      width(#px(400)),
-      padding2(~v=#px(24), ~h=#px(24)),
-      background(isDarkMode ? theme.neutral_100 : theme.neutral_000),
-      borderRadius(#px(16)),
-      border(#px(1), #solid, theme.neutral_200),
-      boxShadows([Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(16, 18, 20, #num(0.15)))]),
     ])
 
   let icon = {

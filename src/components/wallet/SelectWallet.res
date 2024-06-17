@@ -19,15 +19,13 @@ module Styles = {
 @react.component
 let make = (~setAccountBoxState) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-  let client = React.useContext(ClientContext.context)
   let (_, dispatchAccount) = React.useContext(AccountContext.context)
+  let trackingSub = TrackingSub.use()
 
-  let connectWalletKeplr = async () => {
+  let connectWalletKeplr = async chainID => {
     if Keplr.keplr->Belt.Option.isNone {
       setAccountBoxState(_ => "keplrNotfound")
     } else {
-      let chainID = await client->BandChainJS.Client.getChainId
-
       try {
         let wallet = await Wallet.createFromKeplr(chainID)
         let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
@@ -42,16 +40,25 @@ let make = (~setAccountBoxState) => {
     }
   }
 
-  <div className={Styles.container(theme, isDarkMode)}>
-    <div className={Styles.modalTitle(theme)}>
-      <Heading value="Select Wallet" size=Heading.H3 />
-      <VSpacing size=Spacing.lg />
-    </div>
-    <WalletButton onClick={_ => connectWalletKeplr()->ignore} wallet="Keplr" />
-    <VSpacing size=Spacing.md />
-    <WalletButton onClick={_ => connectWalletKeplr()->ignore} wallet="Ledger" />
-    <VSpacing size=Spacing.md />
-    <WalletButton onClick={_ => connectWalletKeplr()->ignore} wallet="Mnemonic" />
-    <VSpacing size=Spacing.md />
-  </div>
+  let connectMnemonic = () => setAccountBoxState(_ => "connectMnemonic")
+
+  {
+    switch trackingSub {
+    | Data({chainID}) =>
+      <div className={Styles.container(theme, isDarkMode)}>
+        <div className={Styles.modalTitle(theme)}>
+          <Heading value="Select Wallet" size=Heading.H3 />
+          <VSpacing size=Spacing.lg />
+        </div>
+        <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet="Keplr" />
+        <VSpacing size=Spacing.md />
+        <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet="Ledger" />
+        <VSpacing size=Spacing.md />
+        <WalletButton onClick={_ => connectMnemonic()} wallet="Mnemonic" />
+        <VSpacing size=Spacing.md />
+      </div>
+    | Error(_) => React.null
+    | _ => <LoadingCensorBar.CircleSpin height=200 />
+    }
+  }
 }
