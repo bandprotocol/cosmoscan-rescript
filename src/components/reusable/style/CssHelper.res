@@ -8,6 +8,7 @@ let flexBox = (~align=#center, ~justify=#flexStart, ~wrap=#wrap, ~direction=#row
     flexDirection(direction),
     flexWrap(wrap),
   ])
+
 let flexBoxSm = (~align=#center, ~justify=#flexStart, ~wrap=#wrap, ~direction=#row, ()) =>
   style(. [
     Media.mobile([

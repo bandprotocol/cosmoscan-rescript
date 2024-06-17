@@ -2,19 +2,6 @@ module Styles = {
   open CssJs
 
   let container = style(. [position(#relative)])
-
-  let oval = (theme: Theme.t) =>
-    style(. [
-      display(#flex),
-      width(#px(24)),
-      height(#px(24)),
-      justifyContent(#center),
-      alignItems(#center),
-      padding(#px(5)),
-      backgroundColor(theme.primary_600),
-      borderRadius(#percent(50.)),
-    ])
-
   let logo = style(. [width(#px(12))])
   let fullWidth = style(. [width(#percent(100.))])
 
@@ -35,13 +22,6 @@ module Styles = {
       boxShadows([Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(16, 18, 20, #num(0.15)))]),
     ])
 
-  let innerProfileCard = (theme: Theme.t) =>
-    style(. [
-      padding(#px(16)),
-      backgroundColor(theme.neutral_100),
-      boxShadow(Shadow.box(~x=#zero, ~y=#zero, ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.08)))),
-    ])
-
   let userInfoButton = (theme: Theme.t) =>
     style(. [
       width(#px(160)),
@@ -52,7 +32,6 @@ module Styles = {
     ])
 
   let connect = style(. [padding2(~v=#px(10), ~h=#zero)])
-  let disconnect = style(. [paddingTop(#px(16))])
 }
 
 module ConnectBtn = {
@@ -63,146 +42,6 @@ module ConnectBtn = {
         {"Connect Wallet"->React.string}
       </Button>
     </div>
-}
-
-module DisconnectBtn = {
-  @react.component
-  let make = (~disconnect) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-
-    <div
-      className={Css.merge(list{
-        CssHelper.flexBox(~justify=#center, ~align=#center, ()),
-        CssHelper.clickable,
-        Styles.disconnect,
-      })}
-      onClick={_ => disconnect()}>
-      <Text value="Disconnect" weight=Text.Medium color=theme.primary_600 nowrap=true block=true />
-    </div>
-  }
-}
-
-module FaucetBtn = {
-  @react.component
-  let make = (~address) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    let (isRequest, setIsRequest) = React.useState(_ => false)
-    let (isFailed, setIsFailed) = React.useState(_ => false)
-
-    isRequest
-      ? <LoadingCensorBar.CircleSpin size=30 height=30 />
-      : isFailed
-      ? <Text size=Text.Caption color={theme.error_600} value="Too many Request. try again later" />
-      : <div id="getFreeButton">
-          <Button
-            px=20
-            py=5
-            variant=Button.Outline
-            onClick={_ => {
-              setIsRequest(_ => true)
-              setIsFailed(_ => false)
-              AxiosFaucet.request({
-                address: address->Address.toBech32,
-                amount: 10_000_000,
-              })
-              ->Promise.then(response => {
-                setIsRequest(_ => false)
-                Js.log(response)
-                Promise.resolve()
-              })
-              ->Promise.catch(err => {
-                setIsRequest(_ => false)
-                setIsFailed(_ => true)
-                Promise.resolve()
-              })
-              ->ignore
-            }}>
-            {"Get 10 Testnet BAND"->React.string}
-          </Button>
-        </div>
-  }
-}
-
-module SendBtn = {
-  @react.component
-  let make = (~send) =>
-    <div id="sendToken">
-      <Button px=20 py=5 onClick={_ => send()}> {"Send"->React.string} </Button>
-    </div>
-}
-
-module Balance = {
-  @react.component
-  let make = (~address) => {
-    let accountSub = AccountSub.get(address)
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-
-    <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
-      <Text value="Balance" weight=Text.Medium color=theme.neutral_900 />
-      <div className={CssHelper.flexBox()} id="bandBalance">
-        <Text
-          value={switch accountSub {
-          | Data(account) => account.balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)
-          | _ => "0"
-          }}
-          code=true
-          color=theme.neutral_900
-        />
-        <HSpacing size=Spacing.sm />
-        <Text value="BAND" weight=Text.Thin color=theme.neutral_900 />
-      </div>
-    </div>
-  }
-}
-
-module AccountBox = {
-  @react.component
-  let make = (~setAccountBoxState) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    let (_, dispatchModal) = React.useContext(ModalContext.context)
-    let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
-    let trackingSub = TrackingSub.use()
-    let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
-
-    let send = () => {
-      SubmitMsg.Send(None, IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
-      setAccountBoxState(_ => "noShow")
-    }
-
-    let disconnect = () => {
-      dispatchAccount(Disconnect)
-      setAccountBoxState(_ => "noShow")
-    }
-
-    {
-      switch accountOpt {
-      | Some({address}) =>
-        <div>
-          <div onClick={_ => setAccountBoxState(_ => "account")}>
-            <AddressRender address position=AddressRender.Text />
-          </div>
-          <VSpacing size=#px(16) />
-          <div className={Styles.innerProfileCard(theme)}>
-            <Balance address />
-            <VSpacing size=#px(16) />
-            <div className={CssHelper.flexBox(~direction=#row, ~justify=#spaceBetween, ())}>
-              {switch trackingSub {
-              | Data({chainID}) => {
-                  let currentChainID = chainID->ChainIDBadge.parseChainID
-                  currentChainID == LaoziTestnet ? <FaucetBtn address /> : React.null
-                }
-
-              | _ => React.null
-              }}
-              <SendBtn send />
-            </div>
-          </div>
-          <DisconnectBtn disconnect />
-        </div>
-      | None => React.null
-      }
-    }
-  }
 }
 
 @react.component

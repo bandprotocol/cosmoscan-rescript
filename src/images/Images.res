@@ -66,6 +66,10 @@
 @module("./right-arrow.svg") external rightArrow: string = "default"
 @module("./long-arrow-dark.svg") external longArrowDark: string = "default"
 @module("./long-arrow-light.svg") external longArrowLight: string = "default"
+@module("./log-out.svg") external logOut: string = "default"
+@module("./circle-arrow-upright.svg") external arrowUpright: string = "default"
+@module("./circle-arrow-bottomleft.svg") external arrowBottomleft: string = "default"
+@module("./circle-user.svg") external circleUser: string = "default"
 
 // BG
 @module("./not-found-bg.svg") external notFoundBg: string = "default"
