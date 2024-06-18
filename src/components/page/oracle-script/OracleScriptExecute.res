@@ -331,8 +331,10 @@ module ExecutionPart = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     let (accountOpt, dispatch) = React.useContext(AccountContext.context)
-    let (_, dispatchModal) = React.useContext(ModalContext.context)
     let trackingSub = TrackingSub.use()
+    let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
+
+    let connect = () => setAccountBoxState(_ => "noShow")
     let numParams = paramsInput->Belt.Array.length
 
     let validatorCount = ValidatorSub.countByActive(true)
@@ -518,7 +520,7 @@ module ExecutionPart = {
                 </>
               | None =>
                 switch trackingSub {
-                | Data({chainID}) => <ConnectPanel connect={_ => connect(chainID)} />
+                | Data(_) => <ConnectPanel connect={_ => connect()} />
                 | Error(err) =>
                   // log for err details
                   Js.Console.log(err)

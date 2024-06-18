@@ -251,10 +251,10 @@ module StakingInfo = {
 let make = (~validatorAddress) => {
   let trackingSub = TrackingSub.use()
   let (accountOpt, _) = React.useContext(AccountContext.context)
-  let (_, dispatchModal) = React.useContext(ModalContext.context)
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
 
-  let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
+  let connect = () => setAccountBoxState(_ => "noShow")
 
   <InfoContainer>
     <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
@@ -271,7 +271,7 @@ let make = (~validatorAddress) => {
     | Some({address: delegatorAddress}) => <StakingInfo validatorAddress delegatorAddress />
     | None =>
       switch trackingSub {
-      | Data({chainID}) =>
+      | Data(_) =>
         <div
           className={Css.merge(list{
             CssHelper.flexBox(~direction=#column, ~justify=#center, ()),
@@ -281,7 +281,7 @@ let make = (~validatorAddress) => {
           <VSpacing size={#px(16)} />
           <Text value="Please connect to make request" size=Text.Body1 nowrap=true />
           <VSpacing size={#px(16)} />
-          <Button px=20 py=5 onClick={_ => connect(chainID)}> {"Connect"->React.string} </Button>
+          <Button px=20 py=5 onClick={_ => connect()}> {"Connect"->React.string} </Button>
         </div>
       | Error(err) =>
         // log for err details
