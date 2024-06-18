@@ -19,11 +19,10 @@ module Styles = {
 }
 
 @react.component
-let make = (~setAccountBoxState) => {
+let make = (~setAccountBoxState, ~chainID) => {
   let (_, dispatchAccount) = React.useContext(AccountContext.context)
   let (mnemonic, setMnemonic) = React.useState(_ => "")
   let (errMsg, setErrMsg) = React.useState(_ => "")
-  let client = React.useContext(ClientContext.context)
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -32,7 +31,6 @@ let make = (~setAccountBoxState) => {
       setErrMsg(_ => "Invalid mnemonic")
     } else {
       let wallet = Wallet.createFromMnemonic(mnemonic)
-      let chainID = await client->BandChainJS.Client.getChainId
 
       wallet
       ->Wallet.getAddressAndPubKey

@@ -67,17 +67,38 @@ module Styles = {
     display(#flex),
     justifyContent(#spaceBetween),
   ])
-}
 
-module InstructionCard = {
-  @react.component
-  let make = (~title, ~url) => {
-    let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
-    <div className=Styles.instructionCard>
-      <Text value=title color={theme.neutral_900} weight=Text.Semibold />
-      <img alt="Ledger Device" src=url className=Styles.ledgerGuide />
-    </div>
-  }
+  let inputBar = (theme: Theme.t, isDarkMode) =>
+    style(. [
+      width(#percent(100.)),
+      height(#px(37)),
+      paddingLeft(#px(9)),
+      borderRadius(#px(6)),
+      border(#px(1), #solid, isDarkMode ? theme.neutral_400 : theme.neutral_200),
+      backgroundColor(isDarkMode ? theme.neutral_300 : theme.neutral_000),
+      outlineStyle(#none),
+      color(theme.neutral_900),
+    ])
+
+  let connectBtn = style(. [width(#percent(100.)), height(#px(37))])
+
+  let derivationPath = (theme: Theme.t) =>
+    style(. [
+      display(#flex),
+      flexDirection(#column),
+      justifyContent(#center),
+      padding(#px(16)),
+      marginTop(#px(16)),
+      backgroundColor(theme.neutral_100),
+      borderRadius(#px(8)),
+    ])
+
+  let derivationInput = style(. [
+    display(#flex),
+    marginTop(#px(8)),
+    marginBottom(#px(4)),
+    alignItems(#baseline),
+  ])
 }
 
 type result_t =
@@ -86,107 +107,79 @@ type result_t =
   | Error(string)
 
 @react.component
-let make = (~chainID, ~ledgerApp) => {
+let make = (~setAccountBoxState, ~chainID) => {
   let (_, dispatchAccount) = React.useContext(AccountContext.context)
-  let (_, dispatchModal) = React.useContext(ModalContext.context)
   let (result, setResult) = React.useState(_ => Nothing)
-  let (accountIndex, setAccountIndex) = React.useState(_ => 0)
+  let (accountIndex, setAccountIndex) = React.useState(_ => "0")
+  let (errMsg, setErrMsg) = React.useState(_ => "")
+  let (showAdvance, setShowAdvance) = React.useState(_ => false)
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   let createLedger = async (accountIndex: int): unit => {
-    dispatchModal(DisableExit)
     setResult(_ => Loading)
     try {
-      let wallet = await Wallet.createFromLedger(ledgerApp, accountIndex)
+      let wallet = await Wallet.createFromLedger(Ledger.Cosmos, accountIndex)
       let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
       dispatchAccount(Connect(wallet, address, pubKey, chainID))
-      dispatchModal(CloseModal)
+      setAccountBoxState(_ => "noShow")
     } catch {
     | Js.Exn.Error(e) =>
       Js.Console.log(e)
       setResult(_ => Error("An error occured"))
-      dispatchModal(EnableExit)
     }
   }
 
   <div className=Styles.container>
-    <VSpacing size=Spacing.xxl />
-    <Text value="1. Select HD Derivation Path" weight=Text.Semibold color={theme.neutral_900} />
+    <Heading value="Open Cosmos app on your ledger" size=Heading.H5 />
     <VSpacing size=Spacing.md />
-    <div className={Styles.selectWrapper(theme, isDarkMode)}>
-      <div
-        className={CssHelper.selectWrapper(
-          ~pRight=8,
-          ~mW=100,
-          ~size=10,
-          ~fontColor=theme.neutral_900,
-          (),
-        )}>
-        <select
-          className={Styles.selectContent(theme)}
-          onChange={event => {
-            let newAccountIndex =
-              ReactEvent.Form.target(event)["value"]->Belt.Int.fromString->Belt.Option.getExn
-            setAccountIndex(_ => newAccountIndex)
-          }}>
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-          ->Belt.Array.map(index =>
-            <option key={index->Belt.Int.toString} value={index->Belt.Int.toString}>
-              {
-                let prefixPath = switch ledgerApp {
-                | Ledger.Cosmos => "44/118/0/0/"
-                }
-                (prefixPath ++ index->Belt.Int.toString)->React.string
-              }
-            </option>
-          )
-          ->React.array}
-        </select>
-      </div>
+    <img alt="Ledger Device" src=Images.ledgerStep2Cosmos className=Styles.ledgerGuide />
+    <VSpacing size=Spacing.md />
+    <div className={CssHelper.flexBox()}>
+      <SwitchV2 checked=showAdvance onClick={_ => setShowAdvance(_ => !showAdvance)} />
+      <Text value="Advanced settings" size=Text.Body1 color=theme.neutral_900 />
     </div>
-    <VSpacing size=Spacing.xxl />
-    <Text value="2. On Your Ledger" weight=Text.Semibold color={theme.neutral_900} />
-    <VSpacing size=Spacing.xxl />
-    <InstructionCard title="1. Enter Pin Code" url=Images.ledgerStep1 />
-    <VSpacing size=Spacing.lg />
-    {switch ledgerApp {
-    | Ledger.Cosmos => <InstructionCard title="2. Open Cosmos" url=Images.ledgerStep2Cosmos />
-    }}
-    <div className=Styles.resultContainer>
-      {switch result {
-      | Loading => <Text value="Please accept with ledger" weight=Text.Medium />
-      | Error(err) => <Text value=err color=theme.error_600 weight=Text.Medium size=Text.Body1 />
-      | Nothing => React.null
-      }}
-    </div>
-    {result == Loading
-      ? <div className={Styles.connectBtn(~isLoading=true, ())}>
-          <div className=Styles.connectingBtnContainer>
-            <Icon name="fad fa-spinner-third fa-spin" size=16 />
-            <Text value="Connecting..." weight=Text.Bold size=Text.Body2 />
+    {showAdvance
+      ? <div className={Styles.derivationPath(theme)}>
+          <Text value="HD Derivation Path" weight=Text.Semibold color=theme.neutral_900 />
+          <VSpacing size=Spacing.sm />
+          <div className=Styles.derivationInput>
+            <Text value="44/118/0/0/" code=true color=theme.neutral_900 />
+            <HSpacing size=Spacing.sm />
+            <input
+              autoFocus=true
+              type_="number"
+              value=accountIndex
+              className={Styles.inputBar(theme, isDarkMode)}
+              onChange={event => setAccountIndex(ReactEvent.Form.target(event)["value"])}
+              onKeyDown={event =>
+                switch ReactEvent.Keyboard.key(event) {
+                | "Enter" =>
+                  ReactEvent.Keyboard.preventDefault(event)
+                  createLedger(accountIndex->Belt.Int.fromString->Belt.Option.getExn)->ignore
+                | _ => ()
+                }}
+            />
           </div>
         </div>
-      : <Button
-          style={Styles.connectBtn(~isLoading=false, ())}
-          onClick={_ => {
-            switch (Os.isWindows(), Os.checkHID()) {
-            | (true, false) =>
-              open Webapi.Dom
-              let isConfirm =
-                window->Window.confirm(
-                  "To use Ledger Nano on Windows 10, please enable \"Experimental Web Platform Features\" by copy-paste \"chrome://flags/#enable-experimental-web-platform-features\". Click OK to copy.",
-                )
-              isConfirm
-                ? Copy.copy("chrome://flags/#enable-experimental-web-platform-features")
-                : ()
-            | (_, _) => {
-                let _ = createLedger(accountIndex)
-              }
-            }
-          }}>
-          {"Connect to Ledger"->React.string}
-        </Button>}
+      : React.null}
     <VSpacing size=Spacing.lg />
+    <div id="mnemonicConnectButton" className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+      <Button
+        px=20
+        py=8
+        onClick={_ => createLedger(accountIndex->Belt.Int.fromString->Belt.Option.getExn)->ignore}
+        style=Styles.connectBtn>
+        {"Connect to Ledger"->React.string}
+      </Button>
+    </div>
+    {switch errMsg->Js.String2.length {
+    | 0 => React.null
+    | _ =>
+      <>
+        <VSpacing size=Spacing.lg />
+        <Text value=errMsg color={theme.error_600} />
+      </>
+    }}
   </div>
 }

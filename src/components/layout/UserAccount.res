@@ -89,16 +89,21 @@ let make = () => {
           }}
         </div>
       }}
-      <div className={Styles.profileCard(accountBoxState != "noShow", theme, isDarkMode)}>
-        {switch accountBoxState {
-        | "account" => <AccountBox setAccountBoxState />
-        | "connect" => <SelectWallet setAccountBoxState />
-        | "keplrNotfound" => <KeplrNotfound />
-        | "keplrBandNotfound" => <KeplrBandNotfound />
-        | "connectMnemonic" => <ConnectMnemonic setAccountBoxState />
-        | _ => React.null
-        }}
-      </div>
+      {switch trackingSub {
+      | Data({chainID}) =>
+        <div className={Styles.profileCard(accountBoxState != "noShow", theme, isDarkMode)}>
+          {switch accountBoxState {
+          | "account" => <AccountBox setAccountBoxState />
+          | "connect" => <SelectWallet setAccountBoxState />
+          | "keplrNotfound" => <KeplrNotfound />
+          | "keplrBandNotfound" => <KeplrBandNotfound />
+          | "connectMnemonic" => <ConnectMnemonic setAccountBoxState chainID />
+          | "connectLedger" => <ConnectLedger setAccountBoxState chainID />
+          | _ => React.null
+          }}
+        </div>
+      | _ => React.null
+      }}
     </div>
   </div>
 }

@@ -41,6 +41,7 @@ let make = (~setAccountBoxState) => {
   }
 
   let connectMnemonic = () => setAccountBoxState(_ => "connectMnemonic")
+  let connectLedger = () => setAccountBoxState(_ => "connectLedger")
 
   {
     switch trackingSub {
@@ -52,7 +53,7 @@ let make = (~setAccountBoxState) => {
         </div>
         <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet="Keplr" />
         <VSpacing size=Spacing.md />
-        <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet="Ledger" />
+        <WalletButton onClick={_ => connectLedger()} wallet="Ledger" />
         <VSpacing size=Spacing.md />
         <WalletButton onClick={_ => connectMnemonic()} wallet="Mnemonic" />
         <VSpacing size=Spacing.md />
