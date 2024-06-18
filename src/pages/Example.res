@@ -41,65 +41,22 @@ let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let client = React.useContext(ClientContext.context)
   let (_, dispatchModal) = React.useContext(ModalContext.context)
+  let trackingSub = TrackingSub.use()
 
-  let checkKeplr = () => {
-    switch Keplr.keplr {
+  let checkLeap = () => {
+    switch Leap.leap {
     | Some(x) => Js.log(x)
-    | None => Js.log("no keplr")
+    | None => Js.log("no leap")
     }
   }
 
-  let handleClickKeplr = async () => {
-    let chainID = await client->BandChainJS.Client.getChainId
-    await Keplr.enable(chainID)
-    let account = await Keplr.getKey(chainID)
-
-    let (rawTx, signDoc) =
-      await client->createSendTx(
-        account.bech32Address,
-        account.bech32Address,
-        account.pubKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
-      )
-
-    open Keplr
-    open BandChainJS.SignDoc
-    let keplrSignDoc = {
-      chainId: signDoc->getChainId,
-      accountNumber: signDoc->getAccountNumber->Long.fromNumber,
-      authInfoBytes: signDoc->getAuthInfoBytes_asU8,
-      bodyBytes: signDoc->getBodyBytes_asU8,
-    }
-
-    let signResponse = await Keplr.signDirect(
-      chainID,
-      account.bech32Address,
-      keplrSignDoc,
-      {
-        preferNoSetFee: true,
-        preferNoSetMemo: false,
-        disableBalanceCheck: false,
-      },
-    )
-
-    Js.log(signResponse)
-
-    let txRawBytes =
-      rawTx->BandChainJS.Transaction.getTxData(
-        signResponse.signature.signature->JsBuffer.fromBase64,
-        account.pubKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
-        1,
-      )
-
-    let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
-    Js.log(broadcastResponse)
-  }
-
-  let handleClickKeplrAmino = async () => {
-    let chainID = await client->BandChainJS.Client.getChainId
-    await Keplr.enable(chainID)
-    let account = await Keplr.getKey(chainID)
+  let handleClickKeplrAmino = async chainID => {
+    await Leap.enable(chainID)
+    let account = await Leap.getKey(chainID)
     let bandChainJsAccount = await client->BandChainJS.Client.getAccount(account.bech32Address)
     let sequence = bandChainJsAccount.sequence->Belt.Int.toString
+
+    Js.log2(bandChainJsAccount, sequence)
 
     let (rawTx, signDoc) =
       await client->createSendTx(
@@ -108,13 +65,13 @@ let make = () => {
         account.pubKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
       )
 
-    open Keplr
+    open Leap
     open BandChainJS.SignDoc
 
-    let signResponse = await Keplr.signAmino(
+    let signResponse = await Leap.signAmino(
       chainID,
       account.bech32Address,
-      Keplr.getAminoSignDocFromTx(rawTx),
+      Leap.getAminoSignDocFromTx(rawTx),
       {
         preferNoSetFee: true,
         preferNoSetMemo: false,
@@ -124,7 +81,7 @@ let make = () => {
 
     // Js.log(signResponse)
 
-    Js.log2("getAminoSignDocFromTx", Keplr.getAminoSignDocFromTx(rawTx))
+    Js.log2("getAminoSignDocFromTx", Leap.getAminoSignDocFromTx(rawTx))
     Js.log2("BandChainJS.Transaction.getSignMessage", BandChainJS.Transaction.getSignMessage(rawTx))
 
     let txRawBytes =
@@ -139,7 +96,18 @@ let make = () => {
   }
 
   <Section pt=80 pb=80 bg={theme.neutral_000} style=Styles.root>
-    <Button onClick={_ => checkKeplr()}> {"check Keplr"->React.string} </Button>
-    <Button onClick={_ => handleClickKeplrAmino()->ignore}> {"send BAND"->React.string} </Button>
+    // <pre> {Js.Json.stringifyAny(Leap.leap)->Belt.Option.getExn->React.string} </pre>
+    <Button onClick={_ => checkLeap()}> {"check Leap"->React.string} </Button>
+    {switch trackingSub {
+    | Data({chainID}) =>
+      <div>
+        <Text value=chainID />
+        <Button onClick={_ => handleClickKeplrAmino(chainID)->ignore}>
+          {"send BAND"->React.string}
+        </Button>
+      </div>
+    | Error(err) => <Text value="Invalid Chain ID" />
+    | _ => <LoadingCensorBar width=150 height=30 />
+    }}
   </Section>
 }

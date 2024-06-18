@@ -102,3 +102,4 @@
 @module("./cosmostation.png") external cosmostation: string = "default"
 @module("./ledger.png") external ledger: string = "default"
 @module("./mnemonic.png") external mnemonic: string = "default"
+@module("./leap.png") external leap: string = "default"

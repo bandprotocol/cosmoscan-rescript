@@ -50,6 +50,7 @@ let make = (~onClick=_ => (), ~disabled=false, ~wallet) => {
     <img
       alt={`$wallet icon`}
       src={switch wallet {
+      | "Leap" => Images.leap
       | "Keplr" => Images.keplr
       | "Cosmostation" => Images.cosmostation
       | "Ledger" => Images.ledger

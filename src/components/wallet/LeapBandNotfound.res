@@ -16,18 +16,16 @@ module Styles = {
 }
 
 @react.component
-let make = () => {
+let make = (~chainID) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <div className={Styles.container(theme, isDarkMode)}>
-    <img alt="keplr icon" src={Images.keplr} className=Styles.icon />
+    <img alt="leap icon" src={Images.leap} className=Styles.icon />
     <VSpacing size={#px(8)} />
-    <Heading size={H2} value="BandChain is not yet add to Keplr" />
+    <Heading size={H2} value={`${chainID} is not yet add to Leap`} />
     <VSpacing size={#px(8)} />
-    <Text size={Body2} align={Center} value="please add BandChain to your Keplr wallet extension" />
-    <VSpacing size={#px(24)} />
-    <LinkButton href="https://chains.keplr.app/" fullWidth=true fsize=16>
-      {"Add BandChain to Keplr"->React.string}
-    </LinkButton>
+    <Text
+      size={Body2} align={Center} value={`please add ${chainID} to your Leap wallet extension`}
+    />
   </div>
 }
