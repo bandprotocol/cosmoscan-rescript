@@ -17,9 +17,10 @@ module Styles = {
 }
 
 @react.component
-let make = (~setAccountBoxState) => {
+let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let (_, dispatchAccount) = React.useContext(AccountContext.context)
+  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
   let trackingSub = TrackingSub.use()
 
   let connectWalletKeplr = async chainID => {

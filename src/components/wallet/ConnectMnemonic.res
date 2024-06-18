@@ -19,10 +19,11 @@ module Styles = {
 }
 
 @react.component
-let make = (~setAccountBoxState, ~chainID) => {
+let make = (~chainID) => {
   let (_, dispatchAccount) = React.useContext(AccountContext.context)
   let (mnemonic, setMnemonic) = React.useState(_ => "")
   let (errMsg, setErrMsg) = React.useState(_ => "")
+  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 

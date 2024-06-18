@@ -47,7 +47,7 @@ module ConnectBtn = {
 @react.component
 let make = () => {
   let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
-  let (accountBoxState, setAccountBoxState) = React.useState(_ => "noShow")
+  let (accountBoxState, setAccountBoxState) = React.useContext(WalletPopupContext.context)
   let trackingSub = TrackingSub.use()
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -93,12 +93,12 @@ let make = () => {
       | Data({chainID}) =>
         <div className={Styles.profileCard(accountBoxState != "noShow", theme, isDarkMode)}>
           {switch accountBoxState {
-          | "account" => <AccountBox setAccountBoxState />
-          | "connect" => <SelectWallet setAccountBoxState />
+          | "account" => <AccountBox />
+          | "connect" => <SelectWallet />
           | "keplrNotfound" => <KeplrNotfound />
           | "keplrBandNotfound" => <KeplrBandNotfound />
-          | "connectMnemonic" => <ConnectMnemonic setAccountBoxState chainID />
-          | "connectLedger" => <ConnectLedger setAccountBoxState chainID />
+          | "connectMnemonic" => <ConnectMnemonic chainID />
+          | "connectLedger" => <ConnectLedger chainID />
           | _ => React.null
           }}
         </div>

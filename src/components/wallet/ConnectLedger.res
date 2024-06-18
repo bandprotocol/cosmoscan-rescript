@@ -107,12 +107,13 @@ type result_t =
   | Error(string)
 
 @react.component
-let make = (~setAccountBoxState, ~chainID) => {
+let make = (~chainID) => {
   let (_, dispatchAccount) = React.useContext(AccountContext.context)
   let (result, setResult) = React.useState(_ => Nothing)
   let (accountIndex, setAccountIndex) = React.useState(_ => "0")
   let (errMsg, setErrMsg) = React.useState(_ => "")
   let (showAdvance, setShowAdvance) = React.useState(_ => false)
+  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 

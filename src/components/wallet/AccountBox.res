@@ -193,12 +193,13 @@ module Balance = {
 }
 
 @react.component
-let make = (~setAccountBoxState) => {
+let make = () => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let (_, dispatchModal) = React.useContext(ModalContext.context)
   let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
   let trackingSub = TrackingSub.use()
   let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
+  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
 
   let send = () => {
     SubmitMsg.Send(None, IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
