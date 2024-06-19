@@ -97,6 +97,8 @@ let make = () => {
           | "connect" => <SelectWallet />
           | "leapNotfound" => <LeapNotfound />
           | "leapBandNotfound" => <LeapBandNotfound chainID />
+          | "keplrNotfound" => <KeplrNotfound />
+          | "keplrBandNotfound" => <KeplrBandNotfound />
           | "connectMnemonic" => <ConnectMnemonic chainID />
           | "connectLedger" => <ConnectLedger chainID />
           | _ => React.null

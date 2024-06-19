@@ -41,6 +41,24 @@ let make = () => {
     }
   }
 
+  let connectWalletKeplr = async chainID => {
+    if Keplr.keplr->Belt.Option.isNone {
+      setAccountBoxState(_ => "keplrNotfound")
+    } else {
+      try {
+        let wallet = await Wallet.createFromKeplr(chainID)
+        let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
+        dispatchAccount(Connect(wallet, address, pubKey, chainID))
+
+        setAccountBoxState(_ => "noShow")
+      } catch {
+      | Js.Exn.Error(e) =>
+        Js.Console.log(e)
+        setAccountBoxState(_ => "keplrBandNotfound")
+      }
+    }
+  }
+
   let connectMnemonic = () => setAccountBoxState(_ => "connectMnemonic")
   let connectLedger = () => setAccountBoxState(_ => "connectLedger")
 
@@ -53,6 +71,8 @@ let make = () => {
           <VSpacing size=Spacing.lg />
         </div>
         <WalletButton onClick={_ => connectWalletLeap(chainID)->ignore} wallet="Leap" />
+        <VSpacing size=Spacing.md />
+        <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet="Keplr" />
         <VSpacing size=Spacing.md />
         <WalletButton onClick={_ => connectLedger()} wallet="Ledger" />
         <VSpacing size=Spacing.md />
