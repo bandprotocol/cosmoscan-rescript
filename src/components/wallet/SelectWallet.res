@@ -56,8 +56,15 @@ let make = () => {
         <VSpacing size=Spacing.md />
         <WalletButton onClick={_ => connectLedger()} wallet="Ledger" />
         <VSpacing size=Spacing.md />
-        <WalletButton onClick={_ => connectMnemonic()} wallet="Mnemonic" />
-        <VSpacing size=Spacing.md />
+        {
+          let currentChainID = chainID->ChainIDBadge.parseChainID
+          currentChainID == LaoziTestnet
+            ? <>
+                <WalletButton onClick={_ => connectMnemonic()} wallet="Mnemonic" />
+                <VSpacing size=Spacing.md />
+              </>
+            : React.null
+        }
       </div>
     | Error(_) => React.null
     | _ => <LoadingCensorBar.CircleSpin height=200 />
