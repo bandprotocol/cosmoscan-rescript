@@ -95,8 +95,6 @@ let make = () => {
           {switch accountBoxState {
           | "account" => <AccountBox />
           | "connect" => <SelectWallet />
-          | "keplrNotfound" => <KeplrNotfound />
-          | "keplrBandNotfound" => <KeplrBandNotfound />
           | "leapNotfound" => <LeapNotfound />
           | "leapBandNotfound" => <LeapBandNotfound chainID />
           | "connectMnemonic" => <ConnectMnemonic chainID />

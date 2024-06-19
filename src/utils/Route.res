@@ -44,7 +44,6 @@ type t =
   | ProposalDetailsPage(int)
   | RelayersHomepage
   | ChannelDetailsPage(string, string, string)
-  | Example
   | GroupPage(group_tab_t)
 
 let fromUrl = (url: RescriptReactRouter.url) =>
@@ -134,7 +133,6 @@ let fromUrl = (url: RescriptReactRouter.url) =>
       }
     GroupPage(urlHash(hash))
   | (list{}, _) => HomePage
-  | (list{"example"}, _) => Example
   | (_, _) => NotFound
   }
 
@@ -206,7 +204,6 @@ let toString = route =>
   | GroupPage(Proposal) => `/group/#proposal`
   | HomePage => "/"
   | NotFound => "/notfound"
-  | Example => "/example"
   }
 
 let redirect = (route: t) => RescriptReactRouter.push(route->toString)
