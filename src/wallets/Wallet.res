@@ -2,7 +2,6 @@ type t =
   | Mnemonic(Mnemonic.t)
   | Ledger(Ledger.t)
   | Keplr(KeplrWallet.t)
-  | Leap(LeapWallet.t)
 
 let createFromMnemonic = mnemonic => Mnemonic(Mnemonic.create(mnemonic))
 
@@ -11,14 +10,12 @@ let createFromLedger = (ledgerApp, accountIndex) => {
 }
 
 let createFromKeplr = async chainId => Keplr(await KeplrWallet.connect(chainId))
-let createFromLeap = async chainId => Leap(await LeapWallet.connect(chainId))
 
 let getAddressAndPubKey = x =>
   switch x {
   | Mnemonic(x) => x->Mnemonic.getAddressAndPubKey->Promise.resolve
   | Ledger(x) => x->Ledger.getAddressAndPubKey
   | Keplr(x) => x->KeplrWallet.getAddressAndPubKey
-  | Leap(x) => x->LeapWallet.getAddressAndPubKey
   }
 
 let sign = (msg, x) =>
@@ -26,7 +23,6 @@ let sign = (msg, x) =>
   | Mnemonic(x) => x->Mnemonic.sign(msg)->Promise.resolve
   | Ledger(x) => x->Ledger.sign(msg)
   | Keplr(x) => x->KeplrWallet.sign(msg)
-  | Leap(x) => x->LeapWallet.sign(msg)
   }
 
 let disconnect = x =>
@@ -34,5 +30,4 @@ let disconnect = x =>
   | Mnemonic(_) => ()
   | Ledger({transport}) => transport->LedgerJS.close
   | Keplr(_) => ()
-  | Leap(_) => ()
   }
