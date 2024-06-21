@@ -21,6 +21,7 @@ module.exports = {
   plugins: [
     new NodePolyfillPlugin(),
     new HtmlWebpackPlugin({
+      favicon: 'src/favicon.ico',
       template: 'src/index.html',
       inject: false,
     }),
@@ -45,6 +46,10 @@ module.exports = {
           name: '[name].[ext]',
           outputPath: 'src/images',
         },
+      },
+      {
+        test: /\.ico$/i,
+        type: 'asset/resource',
       },
     ],
   },

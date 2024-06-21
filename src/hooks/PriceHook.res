@@ -5,7 +5,7 @@ type t = {
   btcPrice: float,
   btcMarketCap: float,
   circulatingSupply: float,
-  totalSupply: float
+  totalSupply: float,
 }
 
 let getBandUsd24Change = () => {
@@ -45,13 +45,13 @@ let getTotalSupply = () => {
   open! JsonUtils.Decode
 
   Axios.get("https://api.bandchain.org/supply/total")
-  -> Promise.then(result => Promise.resolve(result->mustGet("data", float)))
-  -> Promise.catch(e => {
-      Js.Console.log("can't get totalsupply");
-      Js.Console.log(e);
-      Js.Promise.resolve(0.);
-     });
-};
+  ->Promise.then(result => Promise.resolve(result->mustGet("data", float)))
+  ->Promise.catch(e => {
+    Js.Console.log("can't get totalsupply")
+    Js.Console.log(e)
+    Js.Promise.resolve(0.)
+  })
+}
 
 module Price = {
   type t = {
@@ -95,15 +95,18 @@ let getPrices = () =>
     })
   )
 
-let getBandInfo = _ => {
-  //TODO: Will uncomment after, we have bandchainjs
-  // let ratesPromise = client->BandChainJS.getReferenceData([|"BAND/USD", "BAND/BTC"|]);
+let getBandInfo = client => {
   let ratesPromise = getPrices()
   let supplyPromise = getCirculatingSupply()
   let usd24HrChangePromise = getBandUsd24Change()
-  let totalPromise = getTotalSupply();
+  let totalPromise = getTotalSupply()
 
-  Promise.all4((ratesPromise, usd24HrChangePromise, supplyPromise, totalPromise))->Promise.then(result => {
+  Promise.all4((
+    ratesPromise,
+    usd24HrChangePromise,
+    supplyPromise,
+    totalPromise,
+  ))->Promise.then(result => {
     Promise.resolve({
       let (rates, usd24HrChange, supply, totalSupply) = result
       rates->Belt.Option.flatMap(prices => {
@@ -115,7 +118,7 @@ let getBandInfo = _ => {
           btcPrice: bandBtc,
           btcMarketCap: bandBtc *. supply,
           circulatingSupply: supply,
-          totalSupply
+          totalSupply,
         })
       })
     })

@@ -161,39 +161,45 @@ let make = () => {
           </Row>
         </Col>
       </Row>
-      <Table>
-        <Row marginTop=32 marginBottom=16>
-          <Col col=Col.Six colSm=Col.Eight mbSm=16>
-            <SearchInput placeholder="Search Validator" onChange=setSearchTerm />
-          </Col>
-          {isMobile
-            ? <Col col=Col.Six colSm=Col.Four mbSm=16>
-                <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-                //  <SortableDropdown
-                //    sortedBy
-                //    setSortedBy
-                //    sortList=ValidatorsTable.[
-                //      (NameAsc, getName(NameAsc)),
-                //      (NameDesc, getName(NameDesc)),
-                //      (VotingPowerAsc, getName(VotingPowerAsc)),
-                //      (VotingPowerDesc, getName(VotingPowerDesc)),
-                //      (CommissionAsc, getName(CommissionAsc)),
-                //      (CommissionDesc, getName(CommissionDesc)),
-                //      (UptimeAsc, getName(UptimeAsc)),
-                //      (UptimeDesc, getName(UptimeDesc)),
-                //    ]
-                //  />
-                </div>
-              </Col>
-            : React.null}
-          <Col col=Col.Six>
-            <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
-              <ToggleButton state=isActive setState=setIsActive nameArray=["Active", "inActive"] />
-            </div>
-          </Col>
-        </Row>
-        <ValidatorsTable allSub searchTerm sortedBy setSortedBy />
-      </Table>
+      <Row marginTop=32 marginBottom=16>
+        <Col col=Col.Six colSm=Col.Eight mbSm=16>
+          <SearchInput placeholder="Search Validator" onChange=setSearchTerm />
+        </Col>
+        {isMobile
+          ? <Col col=Col.Six colSm=Col.Four mbSm=16>
+              <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+                // // TODO: modify this in new validator page UI
+                // <SortableDropdown
+                //   sortedBy
+                //   setSortedBy
+                //   sortList={
+                //     open ValidatorsTable
+                //     list{
+                //       (NameAsc, getName(NameAsc)),
+                //       (NameDesc, getName(NameDesc)),
+                //       (VotingPowerAsc, getName(VotingPowerAsc)),
+                //       (VotingPowerDesc, getName(VotingPowerDesc)),
+                //       (CommissionAsc, getName(CommissionAsc)),
+                //       (CommissionDesc, getName(CommissionDesc)),
+                //       (UptimeAsc, getName(UptimeAsc)),
+                //       (UptimeDesc, getName(UptimeDesc)),
+                //     }
+                //   }
+                // />
+              </div>
+            </Col>
+          : React.null}
+        <Col col=Col.Six>
+          <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
+            <ToggleButton state=isActive setState=setIsActive nameArray=["Active", "Inactive"] />
+          </div>
+        </Col>
+      </Row>
+      <InfoContainer>
+        <Table>
+          <ValidatorsTable allSub searchTerm sortedBy setSortedBy />
+        </Table>
+      </InfoContainer>
     </div>
   </Section>
 }

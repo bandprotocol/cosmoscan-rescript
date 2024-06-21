@@ -165,7 +165,8 @@ module MobilePacketItem = {
         </div>
         <div>
           {switch packetSub {
-          | Data({packetType}) => <MsgBadge name={packetType->IBCQuery.getPacketTypeText} />
+          | Data({packetType}) =>
+            <MsgBadge name={packetType->IBCQuery.getPacketTypeText} mw={130} />
           | _ => <LoadingCensorBar width=110 height=20 radius=50 />
           }}
         </div>
@@ -273,7 +274,8 @@ module DesktopPacketItem = {
         <div className=Styles.packetInnerColumn>
           <div className=Styles.badgeContainer>
             {switch packetSub {
-            | Data({packetType}) => <MsgBadge name={packetType->IBCQuery.getPacketTypeText} />
+            | Data({packetType}) =>
+              <MsgBadge name={packetType->IBCQuery.getPacketTypeText} mw={130} />
             | _ => <LoadingCensorBar width=110 height=20 radius=50 />
             }}
           </div>

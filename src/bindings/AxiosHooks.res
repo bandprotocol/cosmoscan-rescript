@@ -28,9 +28,9 @@ let use = url => {
 }
 
 let useLoadable = url => {
-  let (rawdata, _) = _context(url, context_config_t(~useCache=false));
-  (Js.undefinedToOption(rawdata->dataGet), rawdata->loadingGet);
-};
+  let (rawdata, _) = _context(url, context_config_t(~useCache=false))
+  (Js.undefinedToOption(rawdata->dataGet), rawdata->loadingGet)
+}
 
 let useWithReload = url => {
   let (rawdata, reload) = _context(url, context_config_t(~useCache=false))

@@ -1,14 +1,13 @@
 module Styles = {
   open CssJs
-  let container =
-    style(. [
-      width(#percent(100.)),
-      maxWidth(#px(468)),
-      minHeight(#px(200)),
-      padding(#px(40)),
-      Media.mobile([maxWidth(#px(300))]),
-    ]);
-};
+  let container = style(. [
+    width(#percent(100.)),
+    maxWidth(#px(468)),
+    minHeight(#px(200)),
+    padding(#px(40)),
+    Media.mobile([maxWidth(#px(300))]),
+  ])
+}
 
 @react.component
 let make = () => {
@@ -24,5 +23,5 @@ let make = () => {
       value="The database has suddenly updated some changes for fixing some bugs. It means the old block and transaction information will not show on CosmoScan for now. Please wait until the state is up to date."
       size=Text.Body1
     />
-  </div>;
-};
+  </div>
+}

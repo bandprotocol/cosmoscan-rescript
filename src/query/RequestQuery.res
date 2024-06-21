@@ -11,12 +11,11 @@ module RequestCountWithOffsetConfig = %graphql(`
 `)
 
 let countOffset = (~timestamp) => {
-  let result = 
-    RequestCountWithOffsetConfig.use({
-     request_time: timestamp
-    })
+  let result = RequestCountWithOffsetConfig.use({
+    request_time: timestamp,
+  })
 
   result
-  -> Query.fromData
-  -> Query.map(x => x.requests_aggregate.aggregate->Belt.Option.mapWithDefault(0, x => x.count))
-};
+  ->Query.fromData
+  ->Query.map(x => x.requests_aggregate.aggregate->Belt.Option.mapWithDefault(0, x => x.count))
+}

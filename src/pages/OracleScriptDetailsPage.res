@@ -1,9 +1,22 @@
 module Styles = {
   open CssJs
-  let titleSpacing = style(. [marginBottom(#px(26))])
+  let titleSpacing = style(. [marginBottom(#px(4))])
   let idCointainer = style(. [marginBottom(#px(16))])
-  let containerSpacingSm = style(. [Media.mobile([marginTop(#px(16))])])
   let noDataImage = style(. [width(#auto), height(#px(70)), marginBottom(#px(16))])
+  let noPadding = style(. [padding(#zero)])
+  let oracleId = style(. [
+    fontFamilies([#custom("Roboto Mono"), #monospace]),
+    Media.mobile([display(#block), marginBottom(#px(8))]),
+  ])
+
+  let buttonStyled = style(. [
+    backgroundColor(#transparent),
+    border(#zero, #solid, #transparent),
+    outlineStyle(#none),
+    cursor(#pointer),
+    padding2(~v=#zero, ~h=#zero),
+    margin4(~top=#zero, ~right=#zero, ~bottom=#px(40), ~left=#zero),
+  ])
 
   let relatedDSContainer = style(. [
     selector("> div + div", [marginTop(#px(16))]),
@@ -16,56 +29,62 @@ module Content = {
   let make = (~oracleScriptSub: Sub.variant<OracleScriptSub.t>, ~oracleScriptID, ~hashtag) => {
     let statSub = OracleScriptSub.getResponseTime(oracleScriptID)
 
+    let isMobile = Media.isMobile()
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     <Section>
       <div className=CssHelper.container>
-        <Heading value="Oracle Script" size=Heading.H2 marginBottom=40 marginBottomSm=24 />
-        <Row marginBottom=40 marginBottomSm=24 alignItems=Row.Center>
+        <button
+          className={Css.merge(list{CssHelper.flexBox(), Styles.buttonStyled})}
+          onClick={_ => Route.redirect(OracleScriptPage)}>
+          <Icon name="fa fa-angle-left" mr=8 size=16 />
+          <Text
+            value="Back to all Oracle Scripts"
+            size=Text.Xl
+            weight=Text.Semibold
+            color=theme.neutral_600
+          />
+        </button>
+        <Row marginBottom=24 marginBottomSm=24 alignItems=Row.Center>
           <Col col=Col.Six>
             <div className={Css.merge(list{CssHelper.flexBox(), Styles.idCointainer})}>
               {switch oracleScriptSub {
               | Data({id, name}) =>
-                <>
-                  <TypeID.OracleScript id position=TypeID.Title />
-                  <HSpacing size=Spacing.sm />
-                  <Heading size=Heading.H3 value=name weight=Heading.Thin />
-                </>
+                <Heading size=Heading.H1 weight=Heading.Bold>
+                  <span className=Styles.oracleId>
+                    {`#O${id->ID.OracleScript.toInt->Belt.Int.toString} `->React.string}
+                  </span>
+                  <span> {name->React.string} </span>
+                </Heading>
               | _ => <LoadingCensorBar width=270 height=15 />
               }}
             </div>
           </Col>
           <Col col=Col.Three colSm=Col.Six>
-            <InfoContainer>
-              <Heading
-                value="Requests"
-                size=Heading.H4
-                weight=Heading.Thin
-                color={theme.neutral_600}
-                marginBottom=26
-              />
+            <InfoContainer py=16>
+              <Text value="24 hr Requests" size={Xl} />
               {switch oracleScriptSub {
               | Data({requestCount}) =>
-                <Text
-                  value={requestCount->Format.iPretty}
-                  size=Text.Xxxl
-                  block=true
-                  weight=Text.Bold
-                  color={theme.neutral_900}
-                />
+                <>
+                  <VSpacing size=Spacing.xs />
+                  <Text
+                    // TODO: change to 24 hours when graphql database is ready
+                    value={requestCount->Format.iPretty}
+                    size=Text.Xxxxl
+                    block=true
+                    weight=Text.Bold
+                    color={theme.neutral_900}
+                    code=true
+                  />
+                </>
               | _ => <LoadingCensorBar width=100 height=15 />
               }}
             </InfoContainer>
           </Col>
           <Col col=Col.Three colSm=Col.Six>
-            <InfoContainer>
+            <InfoContainer py=16>
               <div className={Css.merge(list{CssHelper.flexBox(), Styles.titleSpacing})}>
-                <Heading
-                  value="Response time"
-                  size=Heading.H4
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
-                />
+                <Text value="Response Time" size={Xl} />
                 <HSpacing size=Spacing.xs />
                 <CTooltip
                   tooltipPlacementSm=CTooltip.BottomRight
@@ -75,29 +94,31 @@ module Content = {
               </div>
               {switch statSub {
               | Data(statOpt) =>
-                <Text
-                  value={switch statOpt {
-                  | Some({responseTime}) =>
-                    responseTime->Belt.Option.getExn->Format.fPretty(~digits=2)
-                  | None => "TBD"
-                  }}
-                  size=Text.Xxxl
-                  weight=Text.Bold
-                  block=true
-                  color={theme.neutral_900}
-                />
+                <>
+                  <VSpacing size=Spacing.xs />
+                  <Text
+                    value={switch statOpt {
+                    | Some({responseTime}) =>
+                      responseTime->Belt.Option.getExn->Format.fPretty(~digits=2)
+                    | None => "TBD"
+                    }}
+                    size=Text.Xxxxl
+                    weight=Text.Bold
+                    block=true
+                    code=true
+                    color={theme.neutral_900}
+                  />
+                </>
               | Error(_) | Loading | NoData => <LoadingCensorBar width=100 height=15 />
               }}
             </InfoContainer>
           </Col>
         </Row>
-        <Row marginBottom=24>
-          <Col>
-            <InfoContainer>
-              <Heading value="Information" size=Heading.H4 />
-              <SeperatedLine mt=32 mb=24 />
-              <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
+        <Row marginBottom=24 marginLeft=0 marginRight=0>
+          <Col style=Styles.noPadding>
+            <InfoContainer py=24 pySm=24>
+              <Row marginBottom=16 alignItems=Row.Center>
+                <Col col=Col.Two colSm=Col.Four>
                   <div className={CssHelper.flexBox()}>
                     <Heading
                       value="Owner" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
@@ -108,16 +129,20 @@ module Content = {
                     </CTooltip>
                   </div>
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Ten colSm=Col.Eight>
                   {switch oracleScriptSub {
-                  | Data({owner}) => <AddressRender address=owner position=AddressRender.Subtitle />
-                  | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
+                  | Data({owner}) =>
+                    <AddressRender
+                      address=owner position=AddressRender.Subtitle copy=true ellipsis=isMobile
+                    />
+                  | Error(_) | Loading | NoData =>
+                    <LoadingCensorBar width={isMobile ? 170 : 284} height=15 />
                   }}
                 </Col>
               </Row>
-              <Row marginBottom=24>
-                <Col col=Col.Four mbSm=8>
-                  <div className={Css.merge(list{CssHelper.flexBox(), Styles.containerSpacingSm})}>
+              <Row marginBottom=16>
+                <Col col=Col.Two colSm=Col.Four>
+                  <div className={Css.merge(list{CssHelper.flexBox()})}>
                     <Heading
                       value="Data Sources"
                       size=Heading.H4
@@ -130,36 +155,93 @@ module Content = {
                     </CTooltip>
                   </div>
                 </Col>
-                <Col col=Col.Eight>
-                  <div className=Styles.relatedDSContainer>
+                <Col col=Col.Ten colSm=Col.Eight>
+                  <Row marginLeft=0 marginRight=0>
                     {switch oracleScriptSub {
                     | Data({relatedDataSources}) =>
                       relatedDataSources->Belt.List.size > 0
                         ? relatedDataSources
+                          ->Belt.List.sort((a, b) =>
+                            a.dataSourceID->ID.DataSource.toInt -
+                              b.dataSourceID->ID.DataSource.toInt
+                          )
                           ->Belt.List.map(({dataSourceName, dataSourceID}) =>
-                            <div
+                            <Col
+                              col={relatedDataSources->Belt.List.size > 10 ? Col.Six : Col.Twelve}
                               key={dataSourceID->ID.DataSource.toString}
-                              className={CssHelper.flexBox()}>
-                              <TypeID.DataSource id=dataSourceID position=TypeID.Subtitle />
-                              <Text
-                                value=dataSourceName
-                                size=Text.Body1
-                                block=true
-                                color={theme.neutral_900}
-                              />
-                            </div>
+                              style={Styles.noPadding}
+                              mb=12>
+                              <div className={CssHelper.flexBox()}>
+                                <TypeID.DataSource id=dataSourceID position=TypeID.Subtitle />
+                                <HSpacing size=Spacing.sm />
+                                <Text
+                                  value=dataSourceName
+                                  size=Text.Body1
+                                  block=true
+                                  color={theme.neutral_900}
+                                />
+                              </div>
+                            </Col>
                           )
                           ->Belt.List.toArray
                           ->React.array
-                        : <Text value="TBD" />
+                        : <Text value="TBD" size=Text.Body1 block=true />
 
                     | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
+                    }}
+                  </Row>
+                </Col>
+              </Row>
+              <Row marginBottom=16>
+                <Col col=Col.Two colSm=Col.Four>
+                  <Heading
+                    value="Created / Last Updated"
+                    size=Heading.H4
+                    weight=Heading.Thin
+                    color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Ten colSm=Col.Eight>
+                  {switch oracleScriptSub {
+                  | Data({timestamp}) =>
+                    <Text
+                      value={switch timestamp {
+                      | Some(timestamp) =>
+                        timestamp->MomentRe.Moment.format("YYYY-MM-DD HH:mm:ss", _)
+                      | None => "N/A"
+                      }}
+                      size=Text.Body1
+                      weight=Text.Thin
+                      color=theme.neutral_900
+                      block=true
+                      code=true
+                    />
+                  | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
+                  }}
+                </Col>
+              </Row>
+              <Row marginBottom=16>
+                <Col col=Col.Two colSm=Col.Four>
+                  <Heading
+                    value="Version" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Ten colSm=Col.Eight>
+                  <div className={CssHelper.flexBox()}>
+                    {switch oracleScriptSub {
+                    | Data({version}) =>
+                      switch version {
+                      | Ok => <Chip value="Upgraded" color=theme.success_600 />
+                      | Redeploy => <Chip value="Redeployment Needed" color=theme.warning_600 />
+                      | _ => <Chip value="Unknown" color=theme.neutral_600 />
+                      }
+                    | _ => <LoadingCensorBar width=284 height=15 />
                     }}
                   </div>
                 </Col>
               </Row>
               <Row>
-                <Col col=Col.Four mbSm=8>
+                <Col col=Col.Two mbSm=8>
                   <Heading
                     value="Description"
                     size=Heading.H4
@@ -167,9 +249,10 @@ module Content = {
                     color={theme.neutral_600}
                   />
                 </Col>
-                <Col col=Col.Eight>
+                <Col col=Col.Ten>
                   {switch oracleScriptSub {
-                  | Data({description}) => <Text value=description size=Text.Body1 block=true />
+                  | Data({description}) =>
+                    <Text value=description size=Text.Body1 color=theme.neutral_900 block=true />
                   | Error(_) | Loading | NoData => <LoadingCensorBar width=284 height=15 />
                   }}
                 </Col>
@@ -177,6 +260,7 @@ module Content = {
             </InfoContainer>
           </Col>
         </Row>
+        <InfoContainer>
         <Table>
           <Tab.Route
             tabs=[
@@ -236,6 +320,7 @@ module Content = {
             }}
           </Tab.Route>
         </Table>
+        </InfoContainer>
       </div>
     </Section>
   }

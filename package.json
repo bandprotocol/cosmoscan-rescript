@@ -1,8 +1,7 @@
 {
-  "name": "examples",
-  "version": "0.0.0",
-  "description": "Examples for rescript-apollo-client",
-  "private": true,
+  "name": "cosmoscan",
+  "version": "1.0.0",
+  "description": "Block Explorer for BandChain",
   "scripts": {
     "clean": "rescript clean -with-deps",
     "build": "rm -rf dist/ && rescript build -with-deps && webpack",
@@ -13,7 +12,6 @@
   },
   "devDependencies": {
     "@glennsl/rescript-jest": "^0.9.2",
-    "@reasonml-community/graphql-ppx": "^1.2.2",
     "@webpack-cli/serve": "^1.5.1",
     "css-loader": "^6.7.1",
     "eslint-plugin-prettier": "3.2.0",
@@ -34,6 +32,7 @@
     "@ledgerhq/hw-transport-webhid": "^6.4.1",
     "@ledgerhq/hw-transport-webusb": "^6.3.0",
     "@material-ui/core": "^4.12.3",
+    "@reasonml-community/graphql-ppx": "^1.2.3",
     "@rescript/react": "^0.11.0",
     "@ryyppy/rescript-promise": "^2.1.0",
     "axios": "^1.3.2",
@@ -61,6 +60,7 @@
     "react-highlight": "^0.14.0",
     "react-json-view": "^1.21.3",
     "react-select": "^4.3.1",
+    "react-svg": "^16.1.22",
     "rescript": "^10.1.2",
     "rescript-apollo-client": "^3.2.0",
     "rescript-webapi": "^0.6.1",

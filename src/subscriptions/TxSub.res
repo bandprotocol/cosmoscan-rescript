@@ -1,36 +1,4 @@
-type block_t = {timestamp: MomentRe.Moment.t}
-
-type t = {
-  id: int,
-  txHash: Hash.t,
-  blockHeight: ID.Block.t,
-  success: bool,
-  gasFee: list<Coin.t>,
-  gasLimit: int,
-  gasUsed: int,
-  sender: Address.t,
-  timestamp: MomentRe.Moment.t,
-  messages: list<Msg.result_t>,
-  memo: string,
-  errMsg: string,
-}
-
-type internal_t = {
-  id: int,
-  txHash: Hash.t,
-  blockHeight: ID.Block.t,
-  success: bool,
-  gasFee: list<Coin.t>,
-  gasLimit: int,
-  gasUsed: int,
-  sender: Address.t,
-  block: block_t,
-  messages: Js.Json.t,
-  memo: string,
-  errMsg: option<string>,
-}
-
-type account_transaction_t = {transaction: internal_t}
+type account_transaction_t = {transaction: Transaction.raw_t}
 
 module Mini = {
   type block_t = {timestamp: MomentRe.Moment.t}
@@ -42,20 +10,22 @@ module Mini = {
   }
 }
 
-let toExternal = ({
-  id,
-  txHash,
-  blockHeight,
-  success,
-  gasFee,
-  gasLimit,
-  gasUsed,
-  sender,
-  memo,
-  block,
-  messages,
-  errMsg,
-}) => {
+let toExternal = (
+  {
+    id,
+    txHash,
+    blockHeight,
+    success,
+    gasFee,
+    gasLimit,
+    gasUsed,
+    sender,
+    memo,
+    block,
+    messages,
+    errMsg,
+  }: Transaction.raw_t,
+): Transaction.t => {
   id,
   txHash,
   blockHeight,
@@ -82,7 +52,7 @@ let toExternal = ({
 
 module SingleConfig = %graphql(`
   subscription Transaction($tx_hash: bytea!) {
-    transactions_by_pk(hash: $tx_hash) @ppxAs(type: "internal_t") {
+    transactions_by_pk(hash: $tx_hash) @ppxAs(type: "Transaction.raw_t") {
       id
       txHash: hash @ppxCustom(module: "GraphQLParserModule.Hash")
       blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
@@ -94,7 +64,7 @@ module SingleConfig = %graphql(`
       sender  @ppxCustom(module: "GraphQLParserModule.Address")
       messages
       errMsg: err_msg
-      block @ppxAs(type:"block_t") {
+      block @ppxAs(type:"Transaction.block_t") {
         timestamp @ppxCustom(module: "GraphQLParserModule.Date")
       }
     }
@@ -103,7 +73,7 @@ module SingleConfig = %graphql(`
 
 module MultiConfig = %graphql(`
   subscription Transactions($limit: Int!, $offset: Int!) {
-    transactions(offset: $offset, limit: $limit, order_by: [{id: desc}]) @ppxAs(type: "internal_t") {
+    transactions(offset: $offset, limit: $limit, order_by: [{id: desc}]) @ppxAs(type: "Transaction.raw_t") {
       id
       txHash: hash @ppxCustom(module: "GraphQLParserModule.Hash")
       blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
@@ -115,7 +85,7 @@ module MultiConfig = %graphql(`
       sender  @ppxCustom(module: "GraphQLParserModule.Address")
       messages
       errMsg: err_msg
-      block @ppxAs(type:"block_t") {
+      block @ppxAs(type:"Transaction.block_t") {
         timestamp @ppxCustom(module: "GraphQLParserModule.Date")
       }
     }
@@ -124,7 +94,7 @@ module MultiConfig = %graphql(`
 
 module MultiByHeightConfig = %graphql(`
   subscription TransactionsByHeight($height: Int!) {
-    transactions(where: {block_height: {_eq: $height}}, order_by: [{id: desc}]) @ppxAs(type: "internal_t") {
+    transactions(where: {block_height: {_eq: $height}}, order_by: [{id: desc}]) @ppxAs(type: "Transaction.raw_t") {
       id
       txHash: hash @ppxCustom(module: "GraphQLParserModule.Hash")
       blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
@@ -136,7 +106,7 @@ module MultiByHeightConfig = %graphql(`
       sender  @ppxCustom(module: "GraphQLParserModule.Address")
       messages
       errMsg: err_msg
-      block @ppxAs(type: "block_t") {
+      block @ppxAs(type: "Transaction.block_t") {
         timestamp @ppxCustom(module: "GraphQLParserModule.Date")
       }
     }
@@ -147,7 +117,7 @@ module MultiBySenderConfig = %graphql(`
   subscription TransactionsBySender($sender: String!, $limit: Int!, $offset: Int!) {
     accounts_by_pk(address: $sender) {
       account_transactions(offset: $offset, limit: $limit, order_by: [{transaction_id: desc}]) @ppxAs(type: "account_transaction_t"){
-        transaction @ppxAs(type: "internal_t") {
+        transaction @ppxAs(type: "Transaction.raw_t") {
           id
           txHash: hash @ppxCustom(module: "GraphQLParserModule.Hash")
           blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
@@ -159,7 +129,7 @@ module MultiBySenderConfig = %graphql(`
           sender  @ppxCustom(module: "GraphQLParserModule.Address")
           messages
           errMsg: err_msg
-          block @ppxAs(type: "block_t") {
+          block @ppxAs(type: "Transaction.block_t") {
             timestamp  @ppxCustom(module: "GraphQLParserModule.Date")
           }
         }

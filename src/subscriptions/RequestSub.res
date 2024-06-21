@@ -10,17 +10,25 @@ type resolve_status_t =
 
 module ResolveStatus = {
   let parse = json => {
-    let status = json->Js.Json.decodeString->Belt.Option.getExn
-    switch status {
-    | "Open" => Pending
-    | "Success" => Success
-    | "Failure" => Failure
-    | "Expired" => Expired
-    | _ => Unknown
+    let statusOpt = json->Js.Json.decodeString
+    switch statusOpt {
+    | Some("Open") => Pending
+    | Some("Success") => Success
+    | Some("Failure") => Failure
+    | Some("Expired") => Expired
+    | Some(_) | None => Unknown
     }
   }
-  // TODO: Impelement serialize
-  let serialize = _ => "status"->Js.Json.string
+  let serialize = (status: resolve_status_t) => {
+    let str = switch status {
+    | Pending => "Open"
+    | Success => "Success"
+    | Failure => "Failure"
+    | Expired => "Expired"
+    | Unknown => "Unknown"
+    }
+    str->Js.Json.string
+  }
 }
 
 module Mini = {
@@ -45,13 +53,22 @@ module Mini = {
     resolveTime: option<MomentRe.Moment.t>,
     calldata: JsBuffer.t,
     oracleScript: oracle_script_internal_t,
-    transactionOpt: option<TxSub.Mini.t>,
+    transactionOpt: TxSub.Mini.t,
     reportsAggregate: aggregate_wrapper_intenal_t,
     minCount: int,
     resolveStatus: resolve_status_t,
     requestedValidatorsAggregate: aggregate_wrapper_intenal_t,
     result: option<JsBuffer.t>,
     rawDataRequests: array<raw_request_t>,
+  }
+
+  type request_os_internal_t = {
+    id: ID.Request.t,
+    minCount: int,
+    reportsAggregate: aggregate_wrapper_intenal_t,
+    requestedValidatorsAggregate: aggregate_wrapper_intenal_t,
+    resolveStatus: resolve_status_t,
+    transactionOpt: TxSub.Mini.t,
   }
 
   type raw_request_internal_t = {request: request_internal}
@@ -74,6 +91,16 @@ module Mini = {
     resolveStatus: resolve_status_t,
     result: option<JsBuffer.t>,
     feeEarned: Coin.t,
+  }
+
+  type request_os_t = {
+    id: ID.Request.t,
+    txHash: option<Hash.t>,
+    txTimestamp: option<MomentRe.Moment.t>,
+    reportsCount: int,
+    minCount: int,
+    askCount: int,
+    resolveStatus: resolve_status_t,
   }
 
   module MultiMiniByDataSourceConfig = %graphql(`
@@ -122,48 +149,29 @@ module Mini = {
 
   module MultiMiniByOracleScriptConfig = %graphql(`
       subscription RequestsMiniByOracleScript($id: Int!, $limit: Int!, $offset: Int!) {
-        requests(
-          where: {oracle_script_id: {_eq: $id}}
-          limit: $limit
-          offset: $offset
-          order_by: [{id: desc}]
-        ) @ppxAs(type: "request_internal") {
-          id @ppxCustom(module: "GraphQLParserModule.RequestID")
-          clientID: client_id
-          requestTime: request_time @ppxCustom(module: "GraphQLParserModule.FromUnixSecond")
-          resolveTime: resolve_time @ppxCustom(module: "GraphQLParserModule.FromUnixSecond")
-          sender @ppxCustom(module: "GraphQLParserModule.Address")
-          calldata @ppxCustom(module: "GraphQLParserModule.Buffer")
-          oracleScript: oracle_script @ppxAs(type: "oracle_script_internal_t") {
-            scriptID: id @ppxCustom(module: "GraphQLParserModule.OracleScriptID")
-            name
-            schema
-          }
-          transactionOpt: transaction @ppxAs(type: "transactionOpt_t") {
-            hash @ppxCustom(module: "GraphQLParserModule.Hash")
-            blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
-            block @ppxAs(type: "block_t") {
-              timestamp @ppxCustom(module: "GraphQLParserModule.Date")
+        requests( where: { oracle_script_id: { _eq: $id } } limit: $limit, offset: $offset, order_by: [{ id: desc }]) @ppxAs(type: "request_os_internal_t") {
+            id @ppxCustom(module: "GraphQLParserModule.RequestID")
+            transactionOpt: transaction @ppxAs(type: "transactionOpt_t") {
+              hash @ppxCustom(module: "GraphQLParserModule.Hash")
+              blockHeight: block_height @ppxCustom(module: "GraphQLParserModule.BlockID")
+              block @ppxAs(type: "block_t") {
+                timestamp @ppxCustom(module: "GraphQLParserModule.Date")
+              }
+              gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
             }
-            gasFee: gas_fee @ppxCustom(module: "GraphQLParserModule.Coins")
-          }
-          reportsAggregate: reports_aggregate @ppxAs(type: "aggregate_wrapper_intenal_t") {
-            aggregate @ppxAs(type: "aggregate_t") {
-              count
+            reportsAggregate: reports_aggregate @ppxAs(type: "aggregate_wrapper_intenal_t") {
+              aggregate @ppxAs(type: "aggregate_t") {
+                count
+              }
+            }
+            resolveStatus: resolve_status  @ppxCustom(module: "ResolveStatus")
+            minCount: min_count
+            requestedValidatorsAggregate: val_requests_aggregate @ppxAs(type: "aggregate_wrapper_intenal_t") {
+              aggregate @ppxAs(type: "aggregate_t") {
+                count
+              }
             }
           }
-          resolveStatus: resolve_status  @ppxCustom(module: "ResolveStatus")
-          minCount: min_count
-          requestedValidatorsAggregate: val_requests_aggregate @ppxAs(type: "aggregate_wrapper_intenal_t") {
-            aggregate @ppxAs(type: "aggregate_t") {
-              count
-            }
-          }
-          result @ppxCustom(module: "GraphQLParserModule.Buffer")
-          rawDataRequests: raw_requests(order_by: [{external_id: asc}]) @ppxAs(type: "raw_request_t") {
-            fee @ppxCustom(module: "GraphQLParserModule.Coin")
-          }
-        }
       }
 `)
 
@@ -233,9 +241,9 @@ module Mini = {
     calldata,
     oracleScriptID: oracleScript.scriptID,
     oracleScriptName: oracleScript.name,
-    txHash: transactionOpt->Belt.Option.map(({hash}) => hash),
-    txTimestamp: transactionOpt->Belt.Option.map(({block}) => block.timestamp),
-    blockHeight: transactionOpt->Belt.Option.map(({blockHeight}) => blockHeight),
+    txHash: Some(transactionOpt.hash),
+    txTimestamp: Some(transactionOpt.block.timestamp),
+    blockHeight: Some(transactionOpt.blockHeight),
     reportsCount: reportsAggregate.aggregate
     ->Belt.Option.map(({count}) => count)
     ->Belt.Option.getExn,
@@ -248,6 +256,27 @@ module Mini = {
     feeEarned: rawDataRequests
     ->Belt.Array.reduce(0., (a, {fee: {amount}}) => a +. amount)
     ->Coin.newUBANDFromAmount,
+  }
+
+  let toRequestExternal = ({
+    id,
+    transactionOpt,
+    reportsAggregate,
+    minCount,
+    resolveStatus,
+    requestedValidatorsAggregate,
+  }) => {
+    id,
+    txHash: Some(transactionOpt.hash),
+    txTimestamp: Some(transactionOpt.block.timestamp),
+    reportsCount: reportsAggregate.aggregate
+    ->Belt.Option.map(({count}) => count)
+    ->Belt.Option.getExn,
+    minCount,
+    askCount: requestedValidatorsAggregate.aggregate
+    ->Belt.Option.map(({count}) => count)
+    ->Belt.Option.getExn,
+    resolveStatus,
   }
 
   let getListByDataSource = (id, ~page, ~pageSize) => {
@@ -273,7 +302,7 @@ module Mini = {
       offset,
     })
 
-    result->Sub.fromData->Sub.map(x => x.requests->Belt.Array.map(toExternal))
+    result->Sub.fromData->Sub.map(x => x.requests->Belt.Array.map(toRequestExternal))
   }
 
   let getListByTxHash = (txHash: Hash.t) => {
@@ -306,7 +335,7 @@ type report_detail_t = {
 }
 
 type report_t = {
-  transactionOpt: option<TxSub.Mini.t>,
+  transactionOpt: TxSub.Mini.t,
   reportDetails: array<report_detail_t>,
   reportValidator: ValidatorSub.Mini.t,
 }
@@ -345,6 +374,8 @@ type internal_t = {
   reason: option<string>,
   prepareGas: int,
   executeGas: int,
+  prepareGasUsed: int,
+  executeGasUsed: int,
   feeLimit: list<Coin.t>,
   feeUsed: list<Coin.t>,
   resolveHeight: option<int>,
@@ -352,7 +383,7 @@ type internal_t = {
   minCount: int,
   resolveStatus: resolve_status_t,
   sender: option<Address.t>,
-  transactionOpt: option<TxSub.Mini.t>,
+  transactionOpt: TxSub.Mini.t,
   rawDataRequests: array<raw_data_request_t>,
   reports: array<report_t>,
   result: option<JsBuffer.t>,
@@ -369,6 +400,8 @@ type t = {
   reason: option<string>,
   prepareGas: int,
   executeGas: int,
+  prepareGasUsed: int,
+  executeGasUsed: int,
   feeLimit: list<Coin.t>,
   feeUsed: list<Coin.t>,
   resolveHeight: option<ID.Block.t>,
@@ -376,7 +409,7 @@ type t = {
   minCount: int,
   resolveStatus: resolve_status_t,
   requester: option<Address.t>,
-  transactionOpt: option<TxSub.Mini.t>,
+  transactionOpt: TxSub.Mini.t,
   rawDataRequests: array<raw_data_request_t>,
   reports: array<report_t>,
   result: option<JsBuffer.t>,
@@ -393,6 +426,8 @@ let toExternal = ({
   reason,
   prepareGas,
   executeGas,
+  prepareGasUsed,
+  executeGasUsed,
   feeLimit,
   feeUsed,
   resolveHeight,
@@ -415,6 +450,8 @@ let toExternal = ({
   reason,
   prepareGas,
   executeGas,
+  prepareGasUsed,
+  executeGasUsed,
   feeLimit,
   feeUsed,
   resolveHeight: resolveHeight->Belt.Option.map(ID.Block.fromInt),
@@ -445,6 +482,8 @@ module SingleRequestConfig = %graphql(`
       reason
       prepareGas: prepare_gas
       executeGas: execute_gas
+      prepareGasUsed: prepare_gas_used
+      executeGasUsed: execute_gas_used
       feeLimit: fee_limit @ppxCustom(module: "GraphQLParserModule.Coins")
       feeUsed: total_fees @ppxCustom(module: "GraphQLParserModule.Coins")
       resolveHeight: resolve_height
@@ -519,6 +558,8 @@ module MultiRequestConfig = %graphql(`
         reason
         prepareGas: prepare_gas
         executeGas: execute_gas
+        prepareGasUsed: prepare_gas_used
+        executeGasUsed: execute_gas_used
         feeLimit: fee_limit @ppxCustom(module: "GraphQLParserModule.Coins")
         feeUsed: total_fees @ppxCustom(module: "GraphQLParserModule.Coins")
         resolveHeight: resolve_height

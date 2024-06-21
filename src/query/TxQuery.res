@@ -10,14 +10,12 @@ module TxCountWithOffsetConfig = %graphql(`
   }
 `)
 
-
 let countOffset = (~timestamp) => {
-  let result = 
-    TxCountWithOffsetConfig.use({
-     greater: Some(timestamp -> Js.Json.string)
-    }, ~pollInterval=500)
+  let result = TxCountWithOffsetConfig.use({
+    greater: Some(timestamp->Js.Json.string),
+  })
 
   result
-  -> Query.fromData
-  -> Query.map(x => x.transactions_aggregate.aggregate->Belt.Option.mapWithDefault(0, x => x.count))
-};
+  ->Query.fromData
+  ->Query.map(x => x.transactions_aggregate.aggregate->Belt.Option.mapWithDefault(0, x => x.count))
+}

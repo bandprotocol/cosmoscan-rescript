@@ -194,7 +194,7 @@ let make = (~reqID) => {
   | Error(_) =>
     <Section>
       <div className=CssHelper.container>
-        <VSpacing size=Spacing.xxl />
+        <VSpacing size=Spacing.xxxl />
         <div
           className={Css.merge(list{
             Styles.pageContainer(theme),
@@ -207,7 +207,7 @@ let make = (~reqID) => {
               className=Styles.notFoundLogo
             />
           </div>
-          <VSpacing size=Spacing.xxl />
+          <VSpacing size=Spacing.xxxl />
           <Text value="Request ID not found." size=Text.Body1 color={theme.neutral_600} />
           <VSpacing size=Spacing.lg />
           <Link className=Styles.linkToHome route=Route.HomePage>
@@ -217,7 +217,7 @@ let make = (~reqID) => {
             <HSpacing size=Spacing.md />
             <img alt="Right Arrow Icon" src=Images.rightArrow className=Styles.rightArrow />
           </Link>
-          <VSpacing size=Spacing.xxl />
+          <VSpacing size=Spacing.xxxl />
         </div>
       </div>
     </Section>
@@ -296,10 +296,11 @@ let make = (~reqID) => {
                 <Col col=Col.Eight>
                   {switch requestSub {
                   | Data({transactionOpt}) =>
-                    switch transactionOpt {
-                    | Some({hash}) => <TxLink txHash=hash width={isMobile ? 260 : 360} />
-                    | None => <Text value="Syncing" />
-                    }
+                    // switch transactionOpt {
+                    // | Some({hash}) => <TxLink txHash=hash width={isMobile ? 260 : 360} />
+                    // | None => <Text value="Syncing" />
+                    // }
+                    <TxLink txHash={transactionOpt.hash} width={isMobile ? 260 : 360} />
                   | _ => <LoadingCensorBar width=200 height=15 />
                   }}
                 </Col>
@@ -313,21 +314,103 @@ let make = (~reqID) => {
                 <Col col=Col.Eight>
                   {switch requestSub {
                   | Data({transactionOpt}) =>
-                    switch transactionOpt {
-                    | Some({gasFee}) =>
-                      <Text
-                        block=true
-                        value={gasFee
-                        ->Coin.getBandAmountFromCoins
-                        ->Format.fPretty(~digits=6) ++ " BAND"}
-                        size=Text.Body1
-                        color={theme.neutral_600}
-                      />
-                    | None => <Text value="Syncing" />
-                    }
+                    // switch transactionOpt {
+                    // | Some({gasFee}) =>
+                    //   <Text
+                    //     block=true
+                    //     value={gasFee
+                    //     ->Coin.getBandAmountFromCoins
+                    //     ->Format.fPretty(~digits=6) ++ " BAND"}
+                    //     size=Text.Body1
+                    //     color={theme.neutral_600}
+                    //   />
+                    // | None => <Text value="Syncing" />
+                    // }
+                    <Text
+                      block=true
+                      value={transactionOpt.gasFee
+                      ->Coin.getBandAmountFromCoins
+                      ->Format.fPretty(~digits=2) ++ " BAND"}
+                      size=Text.Body1
+                      color={theme.neutral_600}
+                    />
                   | _ => <LoadingCensorBar width=200 height=15 />
                   }}
                 </Col>
+              </Row>
+              <Row marginBottom=24 alignItems=Row.Center>
+                <Col col=Col.Four mbSm=8>
+                  <Heading
+                    value="Prepare Gas Used / Prepare Gas"
+                    size=Heading.H4
+                    weight=Heading.Thin
+                    color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Eight>
+                  {switch requestSub {
+                  | Data({prepareGas, prepareGasUsed}) =>
+                    <Text
+                      block=true
+                      // value={prepareGas->Belt.Int.toString}
+                      value={(prepareGasUsed == 0 ? "-" : prepareGasUsed->Belt.Int.toString) ++
+                      " / " ++
+                      prepareGas->Belt.Int.toString}
+                      size=Text.Body1
+                      color={theme.neutral_600}
+                    />
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
+                </Col>
+              </Row>
+              <Row marginBottom=24 alignItems=Row.Center>
+                <Col col=Col.Four mbSm=8>
+                  <Heading
+                    value="Execute Gas Used / Execute Gas"
+                    size=Heading.H4
+                    weight=Heading.Thin
+                    color={theme.neutral_600}
+                  />
+                </Col>
+                <Col col=Col.Eight>
+                  {switch requestSub {
+                  | Data({executeGas, executeGasUsed}) =>
+                    <Text
+                      block=true
+                      value={(executeGasUsed == 0 ? "-" : executeGasUsed->Belt.Int.toString) ++
+                      " / " ++
+                      executeGas->Belt.Int.toString}
+                      size=Text.Body1
+                      color={theme.neutral_600}
+                    />
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
+                </Col>
+              </Row>
+              <Row marginBottom=24 alignItems=Row.Center>
+                <Col col=Col.Four mbSm=8>
+                  <Heading
+                    value="Fee Limit" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                  />
+                </Col>
+                // <Col col=Col.Eight>
+                //   {switch requestSub {
+                //   | Data({transactionOpt}) =>
+                //     switch transactionOpt {
+                //     | Some({gasFee}) =>
+                //       <Text
+                //         block=true
+                //         value={gasFee
+                //         ->Coin.getBandAmountFromCoins
+                //         ->Format.fPretty(~digits=6) ++ " BAND"}
+                //         size=Text.Body1
+                //         color={theme.neutral_600}
+                //       />
+                //     | None => <Text value="Syncing" />
+                //     }
+                //   | _ => <LoadingCensorBar width=200 height=15 />
+                //   }}
+                // </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
@@ -431,16 +514,16 @@ let make = (~reqID) => {
                     color={theme.neutral_600}
                   />
                 </Col>
-                <Col col=Col.Four>
-                  {switch requestSub {
-                  | Data({transactionOpt}) =>
-                    switch transactionOpt {
-                    | Some({blockHeight}) => <TypeID.Block id=blockHeight />
-                    | None => <Text value="Genesis" size=Text.Body1 />
-                    }
-                  | _ => <LoadingCensorBar width=200 height=15 />
-                  }}
-                </Col>
+                // <Col col=Col.Four>
+                //   {switch requestSub {
+                //   | Data({transactionOpt}) =>
+                //     switch transactionOpt {
+                //     | Some({blockHeight}) => <TypeID.Block id=blockHeight />
+                //     | None => <Text value="Genesis" size=Text.Body1 />
+                //     }
+                //   | _ => <LoadingCensorBar width=200 height=15 />
+                //   }}
+                // </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>

@@ -11,15 +11,15 @@ module Styles = {
     Media.mobile([marginRight(#zero), marginBottom(#px(16))]),
   ])
   let rankContainer = (theme: Theme.t) =>
-  style(. [
-    backgroundColor(theme.primary_600),
-    borderRadius(#percent(50.)),
-    position(#absolute),
-    right(#zero),
-    bottom(#zero),
-    width(#px(26)),
-    height(#px(26)),
-  ])
+    style(. [
+      backgroundColor(theme.primary_600),
+      borderRadius(#percent(50.)),
+      position(#absolute),
+      right(#zero),
+      bottom(#zero),
+      width(#px(26)),
+      height(#px(26)),
+    ])
 
   // Oracle Status
   let oracleStatusBox = (isActive, theme: Theme.t) => {
@@ -244,10 +244,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
           <InfoContainer style=Styles.card>
             <div className={Css.merge(list{CssHelper.flexBox(), CssHelper.mb(~size=27, ())})}>
               <Heading
-                value="Oracle Reports"
-                size=Heading.H4
-                color={theme.neutral_600}
-                weight=Heading.Thin
+                value="Oracle Reports" size=Heading.H4 color={theme.neutral_600} weight=Heading.Thin
               />
               <HSpacing size=Spacing.xs />
               <CTooltip
@@ -400,10 +397,7 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
             <Row>
               <Col col=Col.Four mbSm=8>
                 <Heading
-                  value="Description"
-                  size=Heading.H4
-                  weight=Heading.Thin
-                  color={theme.neutral_600}
+                  value="Description" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                 />
               </Col>
               <Col col=Col.Eight>
@@ -489,31 +483,33 @@ let make = (~address, ~hashtag: Route.validator_tab_t) => {
           </InfoContainer>
         </Col>
       </Row>
-      <Table>
-        <Tab.Route
-          tabs=[
-            {name: "Oracle Reports", route: Route.ValidatorDetailsPage(address, Route.Reports)},
-            {name: "Delegators", route: Route.ValidatorDetailsPage(address, Route.Delegators)},
-            {
-              name: "Proposed Blocks",
-              route: Route.ValidatorDetailsPage(address, Route.ProposedBlocks),
-            },
-            {name: "Reporters", route: Route.ValidatorDetailsPage(address, Route.Reporters)},
-          ]
-          currentRoute={Route.ValidatorDetailsPage(address, hashtag)}>
-          {switch hashtag {
-          | Reports => <ReportsTable address />
-          | Delegators => <DelegatorsTable address />
-          | ProposedBlocks =>
-            switch validatorSub {
-            | Data(validator) =>
-              <ProposedBlocksTable consensusAddress={Some(validator.consensusAddress)} />
-            | _ => <ProposedBlocksTable consensusAddress=None />
-            }
-          | Reporters => <ReportersTable address />
-          }}
-        </Tab.Route>
-      </Table>
+      <InfoContainer>
+        <Table>
+          <Tab.Route
+            tabs=[
+              {name: "Oracle Reports", route: Route.ValidatorDetailsPage(address, Route.Reports)},
+              {name: "Delegators", route: Route.ValidatorDetailsPage(address, Route.Delegators)},
+              {
+                name: "Proposed Blocks",
+                route: Route.ValidatorDetailsPage(address, Route.ProposedBlocks),
+              },
+              {name: "Reporters", route: Route.ValidatorDetailsPage(address, Route.Reporters)},
+            ]
+            currentRoute={Route.ValidatorDetailsPage(address, hashtag)}>
+            {switch hashtag {
+            | Reports => <ReportsTable address />
+            | Delegators => <DelegatorsTable address />
+            | ProposedBlocks =>
+              switch validatorSub {
+              | Data(validator) =>
+                <ProposedBlocksTable consensusAddress={Some(validator.consensusAddress)} />
+              | _ => <ProposedBlocksTable consensusAddress=None />
+              }
+            | Reporters => <ReportersTable address />
+            }}
+          </Tab.Route>
+        </Table>
+      </InfoContainer>
     </div>
   </Section>
 }

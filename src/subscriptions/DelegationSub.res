@@ -235,7 +235,7 @@ let getStakeCountByDelegator = delegatorAddress => {
 
 let getDelegatorCountByValidator = validatorAddress => {
   let result = DelegatorCountConfig.use({
-    operator_address: validatorAddress->Address.toBech32,
+    operator_address: validatorAddress->Address.toOperatorBech32,
   })
 
   result

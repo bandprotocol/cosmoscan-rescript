@@ -20,7 +20,7 @@ module Styles = {
   let blockBase = style(. [width(#percent(100.)), height(#percent(100.))])
   let status = s => {
     switch s {
-    | ValidatorSub.Missed => style(. [backgroundColor(hex("937EF1"))])
+    | Validator.Missed => style(. [backgroundColor(hex("937EF1"))])
     | Proposed => style(. [backgroundColor(hex("4520E6"))])
     | Signed => style(. [backgroundColor(hex("230E81"))])
     }
@@ -93,10 +93,7 @@ let make = (~consensusAddress) => {
           <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
             <div className={CssHelper.flexBox()}>
               <div
-                className={Css.merge(list{
-                  Styles.status(ValidatorSub.Proposed),
-                  Styles.statusLabel,
-                })}
+                className={Css.merge(list{Styles.status(Validator.Proposed), Styles.statusLabel})}
               />
               <HSpacing size=Spacing.sm />
               <Text block=true value="Proposed" weight=Text.Semibold />
@@ -109,7 +106,7 @@ let make = (~consensusAddress) => {
           <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
             <div className={CssHelper.flexBox()}>
               <div
-                className={Css.merge(list{Styles.status(ValidatorSub.Signed), Styles.statusLabel})}
+                className={Css.merge(list{Styles.status(Validator.Signed), Styles.statusLabel})}
               />
               <HSpacing size=Spacing.sm />
               <Text block=true value="Signed" weight=Text.Semibold />
@@ -122,7 +119,7 @@ let make = (~consensusAddress) => {
           <div className={CssHelper.flexBox(~justify=#spaceBetween, ())}>
             <div className={CssHelper.flexBox()}>
               <div
-                className={Css.merge(list{Styles.status(ValidatorSub.Missed), Styles.statusLabel})}
+                className={Css.merge(list{Styles.status(Validator.Missed), Styles.statusLabel})}
               />
               <HSpacing size=Spacing.sm />
               <Text block=true value="Missed" weight=Text.Semibold />
