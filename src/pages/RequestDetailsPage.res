@@ -314,18 +314,6 @@ let make = (~reqID) => {
                 <Col col=Col.Eight>
                   {switch requestSub {
                   | Data({transactionOpt}) =>
-                    // switch transactionOpt {
-                    // | Some({gasFee}) =>
-                    //   <Text
-                    //     block=true
-                    //     value={gasFee
-                    //     ->Coin.getBandAmountFromCoins
-                    //     ->Format.fPretty(~digits=6) ++ " BAND"}
-                    //     size=Text.Body1
-                    //     color={theme.neutral_600}
-                    //   />
-                    // | None => <Text value="Syncing" />
-                    // }
                     <Text
                       block=true
                       value={transactionOpt.gasFee
@@ -393,75 +381,6 @@ let make = (~reqID) => {
                     value="Fee Limit" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
                   />
                 </Col>
-                // <Col col=Col.Eight>
-                //   {switch requestSub {
-                //   | Data({transactionOpt}) =>
-                //     switch transactionOpt {
-                //     | Some({gasFee}) =>
-                //       <Text
-                //         block=true
-                //         value={gasFee
-                //         ->Coin.getBandAmountFromCoins
-                //         ->Format.fPretty(~digits=6) ++ " BAND"}
-                //         size=Text.Body1
-                //         color={theme.neutral_600}
-                //       />
-                //     | None => <Text value="Syncing" />
-                //     }
-                //   | _ => <LoadingCensorBar width=200 height=15 />
-                //   }}
-                // </Col>
-              </Row>
-              <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
-                  <Heading
-                    value="Prepare Gas"
-                    size=Heading.H4
-                    weight=Heading.Thin
-                    color={theme.neutral_600}
-                  />
-                </Col>
-                <Col col=Col.Eight>
-                  {switch requestSub {
-                  | Data({prepareGas}) =>
-                    <Text
-                      block=true
-                      value={prepareGas->Belt.Int.toString}
-                      size=Text.Body1
-                      color={theme.neutral_600}
-                    />
-                  | _ => <LoadingCensorBar width=200 height=15 />
-                  }}
-                </Col>
-              </Row>
-              <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
-                  <Heading
-                    value="Execute Gas"
-                    size=Heading.H4
-                    weight=Heading.Thin
-                    color={theme.neutral_600}
-                  />
-                </Col>
-                <Col col=Col.Eight>
-                  {switch requestSub {
-                  | Data({executeGas}) =>
-                    <Text
-                      block=true
-                      value={executeGas->Belt.Int.toString}
-                      size=Text.Body1
-                      color={theme.neutral_600}
-                    />
-                  | _ => <LoadingCensorBar width=200 height=15 />
-                  }}
-                </Col>
-              </Row>
-              <Row marginBottom=24 alignItems=Row.Center>
-                <Col col=Col.Four mbSm=8>
-                  <Heading
-                    value="Fee Limit" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
-                  />
-                </Col>
                 <Col col=Col.Eight>
                   {switch requestSub {
                   | Data({feeLimit}) =>
@@ -514,16 +433,12 @@ let make = (~reqID) => {
                     color={theme.neutral_600}
                   />
                 </Col>
-                // <Col col=Col.Four>
-                //   {switch requestSub {
-                //   | Data({transactionOpt}) =>
-                //     switch transactionOpt {
-                //     | Some({blockHeight}) => <TypeID.Block id=blockHeight />
-                //     | None => <Text value="Genesis" size=Text.Body1 />
-                //     }
-                //   | _ => <LoadingCensorBar width=200 height=15 />
-                //   }}
-                // </Col>
+                <Col col=Col.Four>
+                  {switch requestSub {
+                  | Data({transactionOpt}) => <TypeID.Block id={transactionOpt.blockHeight} />
+                  | _ => <LoadingCensorBar width=200 height=15 />
+                  }}
+                </Col>
               </Row>
               <Row marginBottom=24 alignItems=Row.Center>
                 <Col col=Col.Four mbSm=8>
