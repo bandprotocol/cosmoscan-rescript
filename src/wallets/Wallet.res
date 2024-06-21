@@ -1,3 +1,14 @@
+type wallet_option_t = Leap | Keplr | Cosmostation | Ledger | Mnemonic
+
+let wallet_option_string = (wallet: wallet_option_t) =>
+  switch wallet {
+  | Leap => "Leap"
+  | Keplr => "Keplr"
+  | Cosmostation => "Cosmostation"
+  | Ledger => "Ledger"
+  | Mnemonic => "Mnemonic"
+  }
+
 type t =
   | Mnemonic(Mnemonic.t)
   | Ledger(Ledger.t)

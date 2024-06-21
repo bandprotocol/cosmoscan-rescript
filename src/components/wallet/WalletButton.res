@@ -46,16 +46,15 @@ let make = (~onClick=_ => (), ~disabled=false, ~wallet) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <button className={Styles.btn(theme, isDarkMode)} onClick disabled>
-    <p> {wallet->React.string} </p>
+    <p> {wallet->Wallet.wallet_option_string->React.string} </p>
     <img
       alt={`$wallet icon`}
       src={switch wallet {
-      | "Leap" => Images.leap
-      | "Keplr" => Images.keplr
-      | "Cosmostation" => Images.cosmostation
-      | "Ledger" => Images.ledger
-      | "Mnemonic" => Images.mnemonic
-      | _ => Images.fail
+      | Wallet.Leap => Images.leap
+      | Wallet.Keplr => Images.keplr
+      | Wallet.Cosmostation => Images.cosmostation
+      | Wallet.Ledger => Images.ledger
+      | Wallet.Mnemonic => Images.mnemonic
       }}
       className=Styles.icon
     />

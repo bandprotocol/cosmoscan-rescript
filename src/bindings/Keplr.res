@@ -84,6 +84,9 @@ external signDirect: (
 ) => Js.Promise.t<directSignResponse> = "signDirect"
 
 @val @scope(("window", "keplr"))
+external getChainInfosWithoutEndpoints: option<unit => unit> = "getChainInfosWithoutEndpoints"
+
+@val @scope(("window", "keplr"))
 external signAmino: (
   string,
   string,

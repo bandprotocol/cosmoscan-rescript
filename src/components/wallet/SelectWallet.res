@@ -44,6 +44,9 @@ let make = () => {
   let connectWalletKeplr = async chainID => {
     if Keplr.keplr->Belt.Option.isNone {
       setAccountBoxState(_ => "keplrNotfound")
+      // check if keplr really not found
+    } else if Keplr.getChainInfosWithoutEndpoints->Belt.Option.isNone {
+      setAccountBoxState(_ => "keplrNotfound")
     } else {
       try {
         let wallet = await Wallet.createFromKeplr(chainID)
@@ -70,17 +73,17 @@ let make = () => {
           <Heading value="Select Wallet" size=Heading.H3 />
           <VSpacing size=Spacing.lg />
         </div>
-        <WalletButton onClick={_ => connectWalletLeap(chainID)->ignore} wallet="Leap" />
+        <WalletButton onClick={_ => connectWalletLeap(chainID)->ignore} wallet=Wallet.Leap />
         <VSpacing size=Spacing.md />
-        <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet="Keplr" />
+        <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet=Wallet.Keplr />
         <VSpacing size=Spacing.md />
-        <WalletButton onClick={_ => connectLedger()} wallet="Ledger" />
+        <WalletButton onClick={_ => connectLedger()} wallet=Wallet.Ledger />
         <VSpacing size=Spacing.md />
         {
           let currentChainID = chainID->ChainIDBadge.parseChainID
           currentChainID == LaoziTestnet
             ? <>
-                <WalletButton onClick={_ => connectMnemonic()} wallet="Mnemonic" />
+                <WalletButton onClick={_ => connectMnemonic()} wallet=Wallet.Mnemonic />
                 <VSpacing size=Spacing.md />
               </>
             : React.null
