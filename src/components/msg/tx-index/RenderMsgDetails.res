@@ -31,7 +31,7 @@ module Calldata = {
           data={calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
         />
       </div>
-      {Obi.decode(schema, "input", calldata)->Belt.Option.mapWithDefault(failed, calldataKVs =>
+      {Obi2.decode(schema, Obi2.Input, calldata)->Belt.Option.mapWithDefault(failed, calldataKVs =>
         <KVTable
           rows={calldataKVs->Belt.Array.map(({fieldName, fieldValue}) => [
             KVTable.Value(fieldName),
