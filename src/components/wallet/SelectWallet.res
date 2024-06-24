@@ -62,6 +62,24 @@ let make = () => {
     }
   }
 
+  let connectWalletCosmostation = async chainID => {
+    if Cosmostation.cosmostation->Belt.Option.isNone {
+      setAccountBoxState(_ => "cosmostationNotfound")
+    } else {
+      try {
+        let wallet = await Wallet.createFromCosmostation(chainID)
+        let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
+        dispatchAccount(Connect(wallet, address, pubKey, chainID))
+
+        setAccountBoxState(_ => "noShow")
+      } catch {
+      | Js.Exn.Error(e) =>
+        Js.Console.log(e)
+        setAccountBoxState(_ => "leapBandNotfound")
+      }
+    }
+  }
+
   let connectMnemonic = () => setAccountBoxState(_ => "connectMnemonic")
   let connectLedger = () => setAccountBoxState(_ => "connectLedger")
 
@@ -76,6 +94,10 @@ let make = () => {
         <WalletButton onClick={_ => connectWalletLeap(chainID)->ignore} wallet=Wallet.Leap />
         <VSpacing size=Spacing.md />
         <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet=Wallet.Keplr />
+        <VSpacing size=Spacing.md />
+        <WalletButton
+          onClick={_ => connectWalletCosmostation(chainID)->ignore} wallet=Wallet.Cosmostation
+        />
         <VSpacing size=Spacing.md />
         <WalletButton onClick={_ => connectLedger()} wallet=Wallet.Ledger />
         <VSpacing size=Spacing.md />

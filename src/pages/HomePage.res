@@ -20,30 +20,31 @@ let make = () => {
   let isMobile = Media.isMobile()
 
   <Section pt=80 pb=80 ptSm=0 pbSm=24 bg={theme.neutral_000} style=Styles.root>
-    {!isMobile
-      ? <>
-          <img
-            alt="Homepage Background"
-            src={isDarkMode ? Images.bgLeftDark : Images.bgLeftLight}
-            className={Css.merge(list{Styles.baseBg, Styles.left})}
-          />
-          <img
-            alt="Homepage Background"
-            src={isDarkMode ? Images.bgLeftDark : Images.bgLeftLight}
-            className={Css.merge(list{Styles.baseBg, Styles.right})}
-          />
-        </>
-      : React.null}
-    <div className={Css.merge(list{CssHelper.container, Styles.content})} id="homePageContainer">
-      <ChainInfoHighlights latestBlockSub />
-      <Row marginTop=40>
-        <Col col=Col.Six>
-          <LatestTxTable />
-        </Col>
-        <Col col=Col.Six>
-          <LatestRequests latestRequestsSub />
-        </Col>
-      </Row>
-    </div>
+    <Example />
+    // {!isMobile
+    //   ? <>
+    //       <img
+    //         alt="Homepage Background"
+    //         src={isDarkMode ? Images.bgLeftDark : Images.bgLeftLight}
+    //         className={Css.merge(list{Styles.baseBg, Styles.left})}
+    //       />
+    //       <img
+    //         alt="Homepage Background"
+    //         src={isDarkMode ? Images.bgLeftDark : Images.bgLeftLight}
+    //         className={Css.merge(list{Styles.baseBg, Styles.right})}
+    //       />
+    //     </>
+    //   : React.null}
+    // <div className={Css.merge(list{CssHelper.container, Styles.content})} id="homePageContainer">
+    //   <ChainInfoHighlights latestBlockSub />
+    //   <Row marginTop=40>
+    //     <Col col=Col.Six>
+    //       <LatestTxTable />
+    //     </Col>
+    //     <Col col=Col.Six>
+    //       <LatestRequests latestRequestsSub />
+    //     </Col>
+    //   </Row>
+    // </div>
   </Section>
 }

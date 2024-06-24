@@ -99,6 +99,7 @@ let make = () => {
           | "leapBandNotfound" => <LeapBandNotfound chainID />
           | "keplrNotfound" => <KeplrNotfound />
           | "keplrBandNotfound" => <KeplrBandNotfound />
+          | "cosmostationNotfound" => <KeplrNotfound />
           | "connectMnemonic" => <ConnectMnemonic chainID />
           | "connectLedger" => <ConnectLedger chainID />
           | _ => React.null
