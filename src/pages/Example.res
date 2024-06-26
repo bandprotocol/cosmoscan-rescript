@@ -122,14 +122,17 @@ let make = () => {
     Js.log(account)
   }
 
+  let {cosmosWallets, selectWallet} = CosmosProvider.useCosmosWallets()
+
   <Section pt=80 pb=80 bg={theme.neutral_000} style=Styles.root>
     {switch trackingSub {
     | Data({chainID}) =>
       <div>
-        <button onClick={_ => handleClickCosmostationAmino(chainID)->ignore}>
-          {"connect cosmostation"->React.string}
+        <button onClick={_ => selectWallet(cosmosWallets[0].id)}>
+          {"connect"->React.string}
         </button>
-        <button onClick={_ => test(chainID)->ignore}> {"test"->React.string} </button>
+        <pre> {cosmosWallets[0]->Js.Json.stringifyAny->Belt.Option.getExn->React.string} </pre>
+        <CosmosTest chainID />
       </div>
     | _ => React.null
     }}
