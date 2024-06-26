@@ -1,7 +1,10 @@
-type t = CosmostationClient.Cosmos.account
+type t = CosmosProvider.cosmos_request_account_t
 
-let getAddressAndPubKey = (x: t) => {
-  Promise.resolve((x.address->Address.fromBech32, x.publicKey->JsBuffer.arrayToHex->PubKey.fromHex))
+let getAddressAndPubKey = (account: t) => {
+  Promise.resolve((
+    account.address->Address.fromBech32,
+    account.public_key.value->PubKey.fromBase64,
+  ))
 }
 
 let sign = async (x: t, rawTx: BandChainJS.Transaction.transaction_t) => {
@@ -13,11 +16,4 @@ let sign = async (x: t, rawTx: BandChainJS.Transaction.transaction_t) => {
   )
 
   signResponse.signature->JsBuffer.fromBase64
-}
-
-let connect = async chainID => {
-  let provider = await CosmostationClient.cosmos()
-  let account = await provider.getAccount(chainID)
-
-  account
 }

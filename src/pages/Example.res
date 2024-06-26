@@ -77,8 +77,6 @@ let make = () => {
   }
 
   let handleClickCosmostationAmino = async chainID => {
-    open CosmostationClient.Cosmos
-
     let provider = await CosmostationClient.cosmos()
     let account = await provider.getAccount(chainID)
 
@@ -89,14 +87,6 @@ let make = () => {
         account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
       )
 
-    open BandChainJS.SignDoc
-    let cosmosStationSignDoc = {
-      chain_id: signDoc->getChainId,
-      account_number: signDoc->getAccountNumber->Belt.Int.toString,
-      auth_info_bytes: signDoc->getAuthInfoBytes_asU8,
-      body_bytes: signDoc->getBodyBytes_asU8,
-    }
-
     let signResponse = await provider.signAmino(
       chainID,
       CosmostationClient.Cosmos.getAminoSignDocFromTx(rawTx),
@@ -105,15 +95,15 @@ let make = () => {
 
     Js.log(signResponse)
 
-    let txRawBytes =
-      rawTx->BandChainJS.Transaction.getTxData(
-        signResponse.signature->JsBuffer.fromBase64,
-        account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
-        127,
-      )
+    // let txRawBytes =
+    //   rawTx->BandChainJS.Transaction.getTxData(
+    //     signResponse.signature->JsBuffer.fromBase64,
+    //     account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
+    //     127,
+    //   )
 
-    let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
-    Js.log(broadcastResponse)
+    // let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
+    // Js.log(broadcastResponse)
   }
 
   let test = async chainID => {
@@ -128,6 +118,9 @@ let make = () => {
     {switch trackingSub {
     | Data({chainID}) =>
       <div>
+        <button onClick={_ => handleClickCosmostationAmino(chainID)->ignore}>
+          {"cosmos amino"->React.string}
+        </button>
         <button onClick={_ => selectWallet(cosmosWallets[0].id)}>
           {"connect"->React.string}
         </button>

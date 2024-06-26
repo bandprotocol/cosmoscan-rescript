@@ -24,8 +24,8 @@ let createFromLedger = (ledgerApp, accountIndex) => {
 
 let createFromLeap = async chainId => Leap(await LeapWallet.connect(chainId))
 let createFromKeplr = async chainId => Keplr(await KeplrWallet.connect(chainId))
-let createFromCosmostation = async chainId => Cosmostation(
-  await CosmostationWallet.connect(chainId),
+let createFromCosmostation = (data: CosmosProvider.use_cosmos_account_data_t) => Cosmostation(
+  data.account,
 )
 
 let getAddressAndPubKey = x =>
