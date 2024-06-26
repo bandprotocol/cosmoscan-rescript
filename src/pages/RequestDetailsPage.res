@@ -132,7 +132,7 @@ module KVTableContainer = {
     | Some(decodes) =>
       isMobile
         ? decodes
-          ->Belt.Array.map(({Obi.fieldName: fieldName, fieldValue}) =>
+          ->Belt.Array.map(({Obi2.fieldName: fieldName, fieldValue}) =>
             <MobileCard
               values={
                 open InfoMobileCard
@@ -147,7 +147,7 @@ module KVTableContainer = {
         : <>
             <TableHeader />
             {decodes
-            ->Belt.Array.map(({Obi.fieldName: fieldName, fieldValue}) => {
+            ->Belt.Array.map(({Obi2.fieldName: fieldName, fieldValue}) => {
               <TBody key={fieldName ++ fieldValue}>
                 <Row alignItems=Row.Center minHeight={#px(30)}>
                   <Col col=Col.Three>
@@ -314,18 +314,6 @@ let make = (~reqID) => {
                 <Col col=Col.Eight>
                   {switch requestSub {
                   | Data({transactionOpt}) =>
-                    // switch transactionOpt {
-                    // | Some({gasFee}) =>
-                    //   <Text
-                    //     block=true
-                    //     value={gasFee
-                    //     ->Coin.getBandAmountFromCoins
-                    //     ->Format.fPretty(~digits=6) ++ " BAND"}
-                    //     size=Text.Body1
-                    //     color={theme.neutral_600}
-                    //   />
-                    // | None => <Text value="Syncing" />
-                    // }
                     <Text
                       block=true
                       value={transactionOpt.gasFee
@@ -447,12 +435,7 @@ let make = (~reqID) => {
                 </Col>
                 <Col col=Col.Four>
                   {switch requestSub {
-                  | Data({transactionOpt}) =>
-                    // switch transactionOpt {
-                    // | Some({blockHeight}) => <TypeID.Block id=blockHeight />
-                    // | None => <Text value="Genesis" size=Text.Body1 />
-                    // }
-                    <TypeID.Block id={transactionOpt.blockHeight} />
+                  | Data({transactionOpt}) => <TypeID.Block id={transactionOpt.blockHeight} />
                   | _ => <LoadingCensorBar width=200 height=15 />
                   }}
                 </Col>
@@ -573,7 +556,7 @@ let make = (~reqID) => {
               <div className=Styles.kvTableContainer>
                 {switch requestSub {
                 | Data({oracleScript: {schema}, calldata}) =>
-                  let decodesOpt = Obi.decode(schema, "input", calldata)
+                  let decodesOpt = Obi2.decode(schema, Obi2.Input, calldata)
                   <KVTableContainer decodesOpt />
                 | _ => <KVTableContainer.Loading />
                 }}
@@ -604,7 +587,7 @@ let make = (~reqID) => {
               | Data({oracleScript: {schema}, result: resultOpt, resolveStatus}) =>
                 switch (resolveStatus, resultOpt) {
                 | (RequestSub.Success, Some(result)) =>
-                  let decodesOpt = Obi.decode(schema, "output", result)
+                  let decodesOpt = Obi2.decode(schema, Obi2.Output, result)
                   <KVTableContainer decodesOpt />
                 | (Pending, _) =>
                   <EmptyContainer height={#px(200)}>

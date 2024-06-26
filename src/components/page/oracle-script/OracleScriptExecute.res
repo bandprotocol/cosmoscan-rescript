@@ -101,7 +101,7 @@ module ConnectPanel = {
 
 module ParameterInput = {
   @react.component
-  let make = (~params: Obi.field_key_type_t, ~index, ~setCallDataArr) => {
+  let make = (~params: Obi2.field_key_type_t, ~index, ~setCallDataArr) => {
     let fieldType = params.fieldType
     let fieldName = params.fieldName->Js.String2.replaceByRe(%re(`/[_]/g`), " ")
     let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
@@ -323,7 +323,7 @@ module ExecutionPart = {
   let make = (
     ~id: ID.OracleScript.t,
     ~schema: string,
-    ~paramsInput: array<Obi.field_key_type_t>,
+    ~paramsInput: array<Obi2.field_key_type_t>,
   ) => {
     let isMobile = Media.isMobile()
 
@@ -331,9 +331,10 @@ module ExecutionPart = {
     let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
     let (accountOpt, dispatch) = React.useContext(AccountContext.context)
-    let (_, dispatchModal) = React.useContext(ModalContext.context)
     let trackingSub = TrackingSub.use()
-    let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
+    let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
+
+    let connect = () => setAccountBoxState(_ => "noShow")
     let numParams = paramsInput->Belt.Array.length
 
     let validatorCount = ValidatorSub.countByActive(true)
@@ -453,17 +454,16 @@ module ExecutionPart = {
                     style={Styles.button(theme, result == Loading)}
                     onClick={_ =>
                       if result !== Loading {
-                        switch Obi.encode(
-                          schema,
-                          "input",
+                        let inputDataEncode =
                           paramsInput
                           ->Belt.Array.map(({fieldName}) => fieldName)
                           ->Belt.Array.zip(callDataArr)
                           ->Belt.Array.map(((fieldName, fieldValue)) => {
-                            open Obi
+                            open Obi2
                             {fieldName, fieldValue}
-                          }),
-                        ) {
+                          })
+
+                        switch Obi2.encode(schema, Obi2.Input, inputDataEncode) {
                         | Some(encoded) =>
                           setResult(_ => Loading)
                           let _ = TxCreator.sendTransaction(
@@ -519,7 +519,7 @@ module ExecutionPart = {
                 </>
               | None =>
                 switch trackingSub {
-                | Data({chainID}) => <ConnectPanel connect={_ => connect(chainID)} />
+                | Data(_) => <ConnectPanel connect={_ => connect()} />
                 | Error(err) =>
                   // log for err details
                   Js.Console.log(err)
@@ -536,7 +536,7 @@ module ExecutionPart = {
 @react.component
 let make = (~id: ID.OracleScript.t, ~schema: string) =>
   {
-    let paramsInput = schema->Obi.extractFields("input")->Belt.Option.getExn
+    let paramsInput = schema->Obi2.extractFields(Input)->Belt.Option.getExn
     Some(<ExecutionPart id schema paramsInput />)
   }->Belt.Option.getWithDefault(
     <MobileBlock>
