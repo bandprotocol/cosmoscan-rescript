@@ -6,7 +6,7 @@ type position =
 module Styles = {
   open CssJs
 
-  let container = style(. [display(#flex), cursor(#pointer), overflow(#hidden)])
+  let container = style(. [display(#flex), overflow(#hidden)])
 
   let clickable = (isActive, theme: Theme.t) =>
     isActive
@@ -16,10 +16,11 @@ module Styles = {
           color(theme.primary_600),
           hover([color(theme.primary_800)]),
           active([color(theme.primary_800)]),
+          cursor(#pointer),
         ])
       : style(. [
           pointerEvents(#none),
-          color(theme.neutral_600),
+          color(theme.neutral_900),
           hover([color(theme.neutral_600)]),
           active([color(theme.neutral_600)]),
         ])
