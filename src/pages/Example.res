@@ -114,10 +114,17 @@ let make = () => {
 
   let {cosmosWallets, selectWallet} = CosmosProvider.useCosmosWallets()
 
+  let reqacc = async chainID => {
+    let acc = await Cosmostation.requestAccount(chainID)
+
+    Js.log(acc)
+  }
+
   <Section pt=80 pb=80 bg={theme.neutral_000} style=Styles.root>
     {switch trackingSub {
     | Data({chainID}) =>
       <div>
+        <button onClick={_ => reqacc(chainID)->ignore}> {"Request Account"->React.string} </button>
         <button onClick={_ => handleClickCosmostationAmino(chainID)->ignore}>
           {"cosmos amino"->React.string}
         </button>

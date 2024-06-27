@@ -16,53 +16,6 @@ module Styles = {
   let rowContainer = style(. [padding2(~v=#zero, ~h=#px(12)), height(#percent(100.))])
 }
 
-module CosmostationButton = {
-  @react.component
-  let make = (~chainID) => {
-    let {cosmosWallets, selectWallet} = CosmosProvider.useCosmosWallets()
-    let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
-    let (_, dispatchAccount) = React.useContext(AccountContext.context)
-    let trackingSub = TrackingSub.use()
-    let {data} = CosmosProvider.useCosmosAccount(chainID)
-
-    let connectWalletCosmostation = async (
-      chainID,
-      data: option<CosmosProvider.use_cosmos_account_data_t>,
-    ) => {
-      selectWallet(cosmosWallets[0].id)
-      switch data {
-      | Some(d) =>
-        try {
-          let wallet = Wallet.createFromCosmostation(d)
-          let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
-          dispatchAccount(Connect(wallet, address, pubKey, chainID))
-
-          setAccountBoxState(_ => "noShow")
-        } catch {
-        | Js.Exn.Error(e) =>
-          Js.Console.log(e)
-          setAccountBoxState(_ => "cosmostationBandNotfound")
-        }
-      | None => setAccountBoxState(_ => "cosmostationNotfound")
-      }
-    }
-
-    {
-      switch trackingSub {
-      | Data({chainID}) =>
-        <>
-          <WalletButton
-            onClick={_ => connectWalletCosmostation(chainID, data)->ignore}
-            wallet=Wallet.Cosmostation
-          />
-          <VSpacing size=Spacing.md />
-        </>
-      | _ => React.null
-      }
-    }
-  }
-}
-
 @react.component
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
@@ -109,6 +62,25 @@ let make = () => {
     }
   }
 
+  let connectWalletCosmostation = async chainID => {
+    if Cosmostation.cosmostation->Belt.Option.isNone {
+      setAccountBoxState(_ => "cosmostationNotfound")
+      // check if cosmostation really not found
+    } else {
+      try {
+        let wallet = await Wallet.createFromCosmostation(chainID)
+        let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
+        dispatchAccount(Connect(wallet, address, pubKey, chainID))
+
+        setAccountBoxState(_ => "noShow")
+      } catch {
+      | Js.Exn.Error(e) =>
+        Js.Console.log(e)
+        setAccountBoxState(_ => "cosmostationBandNotfound")
+      }
+    }
+  }
+
   let connectMnemonic = () => setAccountBoxState(_ => "connectMnemonic")
   let connectLedger = () => setAccountBoxState(_ => "connectLedger")
 
@@ -124,7 +96,10 @@ let make = () => {
         <VSpacing size=Spacing.md />
         <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet=Wallet.Keplr />
         <VSpacing size=Spacing.md />
-        <CosmostationButton chainID />
+        <WalletButton
+          onClick={_ => connectWalletCosmostation(chainID)->ignore} wallet=Wallet.Cosmostation
+        />
+        <VSpacing size=Spacing.md />
         <WalletButton onClick={_ => connectLedger()} wallet=Wallet.Ledger />
         <VSpacing size=Spacing.md />
         {

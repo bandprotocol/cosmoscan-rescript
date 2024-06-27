@@ -67,37 +67,32 @@ let make = (~chainID) => {
     Js.log(broadcastResponse)
   }
 
-  let test2 = async (data: CosmosProvider.use_cosmos_account_data_t) => {
-    let account = data.account
+  let test2 = async chainID => {
+    let account = await Cosmostation.requestAccount(chainID)
 
     let (rawTx, signDoc) =
       await client->createSendTx(
         account.address,
         account.address,
-        account.public_key.value->PubKey.fromBase64->PubKey.toHex->BandChainJS.PubKey.fromHex,
+        account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
       )
 
-    let signResponse = await Cosmostation.request({
-      method: "cos_signAmino",
-      params: {
-        chainName: chainID,
-        doc: Cosmostation.getAminoSignDocFromTx(rawTx),
-        isEditFee: false,
-        isEditMemo: false,
-      },
-    })
+    let signResponse = await Cosmostation.signAmino(
+      chainID,
+      Cosmostation.getAminoSignDocFromTx(rawTx),
+    )
 
     Js.log(signResponse)
 
-    // let txRawBytes =
-    //   rawTx->BandChainJS.Transaction.getTxData(
-    //     signResponse.signature->JsBuffer.fromBase64,
-    //     account.public_key.value->PubKey.fromBase64->PubKey.toHex->BandChainJS.PubKey.fromHex,
-    //     127,
-    //   )
+    let txRawBytes =
+      rawTx->BandChainJS.Transaction.getTxData(
+        signResponse.signature->JsBuffer.fromBase64,
+        account.publicKey->JsBuffer.arrayToHex->BandChainJS.PubKey.fromHex,
+        127,
+      )
 
-    // let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
-    // Js.log(broadcastResponse)
+    let broadcastResponse = await client->BandChainJS.Client.sendTxBlockMode(txRawBytes)
+    Js.log(broadcastResponse)
   }
 
   <div>
@@ -112,8 +107,7 @@ let make = (~chainID) => {
           ->Address.toBech32
           ->React.string}
         </pre>
-        <button onClick={_ => test(d)->ignore}> {"test"->React.string} </button>
-        <button onClick={_ => test2(d)->ignore}> {"test 2"->React.string} </button>
+        <button onClick={_ => test2(chainID)->ignore}> {"Sign"->React.string} </button>
       </>
     | None => React.null
     }}
