@@ -20,7 +20,7 @@ module Styles = {
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let (_, dispatchAccount) = React.useContext(AccountContext.context)
-  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
+  let (_, setAccountBoxState, _, setAccountError) = React.useContext(WalletPopupContext.context)
   let trackingSub = TrackingSub.use()
 
   let connectWalletLeap = async chainID => {
@@ -36,6 +36,7 @@ let make = () => {
       } catch {
       | Js.Exn.Error(e) =>
         Js.Console.log(e)
+        setAccountError(_ => e->Js.Exn.message->Belt.Option.getWithDefault(""))
         setAccountBoxState(_ => "leapBandNotfound")
       }
     }
@@ -57,6 +58,7 @@ let make = () => {
       } catch {
       | Js.Exn.Error(e) =>
         Js.Console.log(e)
+        setAccountError(_ => e->Js.Exn.message->Belt.Option.getWithDefault(""))
         setAccountBoxState(_ => "keplrBandNotfound")
       }
     }
@@ -76,7 +78,8 @@ let make = () => {
       } catch {
       | Js.Exn.Error(e) =>
         Js.Console.log(e)
-        setAccountBoxState(_ => "cosmostationBandNotfound")
+        setAccountError(_ => e->Js.Exn.message->Belt.Option.getWithDefault(""))
+        setAccountBoxState(_ => "error")
       }
     }
   }
