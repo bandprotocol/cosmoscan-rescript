@@ -7,11 +7,9 @@ let getAddressAndPubKey = (account: t) => {
 }
 
 let sign = async (x: t, rawTx: BandChainJS.Transaction.transaction_t) => {
-  let provider = await CosmostationClient.cosmos()
-  let signResponse = await provider.signAmino(
+  let signResponse = await Cosmostation.signAmino(
     rawTx.chainId->Belt.Option.getExn,
-    CosmostationClient.Cosmos.getAminoSignDocFromTx(rawTx),
-    None,
+    Cosmostation.getAminoSignDocFromTx(rawTx),
   )
 
   signResponse.signature->JsBuffer.fromBase64

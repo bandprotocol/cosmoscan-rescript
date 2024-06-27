@@ -12,9 +12,7 @@ let make = () =>
             <ModalContext.Provider>
               <AccountContext.Provider>
                 <WalletPopupContext.Provider>
-                  <CosmosProvider>
-                    <App />
-                  </CosmosProvider>
+                  <App />
                 </WalletPopupContext.Provider>
               </AccountContext.Provider>
             </ModalContext.Provider>
