@@ -95,7 +95,7 @@ let make = (~txResponse: TxCreator.tx_response_t, ~schema: string) =>
         </div>
         {switch requestOpt {
         | Some({resolveStatus: Success, result: Some(result), id}) =>
-          let outputKVsOpt = Obi.decode(schema, "output", result)
+          let outputKVsOpt = Obi2.decode(schema, Obi2.Output, result)
           switch outputKVsOpt {
           | Some(outputKVs) =>
             <>

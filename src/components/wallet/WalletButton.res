@@ -42,7 +42,7 @@ module Styles = {
 }
 
 @react.component
-let make = (~onClick=_ => (), ~disabled=false, ~wallet) => {
+let make = (~wallet, ~disabled=false, ~onClick=_ => ()) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
   <button className={Styles.btn(theme, isDarkMode)} onClick disabled>
@@ -51,10 +51,10 @@ let make = (~onClick=_ => (), ~disabled=false, ~wallet) => {
       alt={`$wallet icon`}
       src={switch wallet {
       | Wallet.Leap => Images.leap
-      | Wallet.Keplr => Images.keplr
-      | Wallet.Cosmostation => Images.cosmostation
-      | Wallet.Ledger => Images.ledger
-      | Wallet.Mnemonic => Images.mnemonic
+      | Keplr => Images.keplr
+      | Cosmostation => Images.cosmostation
+      | Ledger => Images.ledger
+      | Mnemonic => Images.mnemonic
       }}
       className=Styles.icon
     />
