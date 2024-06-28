@@ -252,7 +252,7 @@ let make = (~validatorAddress) => {
   let trackingSub = TrackingSub.use()
   let (accountOpt, _) = React.useContext(AccountContext.context)
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
+  let (_, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
 
   let connect = () => setAccountBoxState(_ => "noShow")
 
