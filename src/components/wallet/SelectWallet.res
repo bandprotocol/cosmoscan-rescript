@@ -20,7 +20,7 @@ module Styles = {
 let make = () => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
   let (_, dispatchAccount) = React.useContext(AccountContext.context)
-  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
+  let (_, setAccountBoxState, _, setAccountError) = React.useContext(WalletPopupContext.context)
   let trackingSub = TrackingSub.use()
 
   let connectWalletLeap = async chainID => {
@@ -36,6 +36,7 @@ let make = () => {
       } catch {
       | Js.Exn.Error(e) =>
         Js.Console.log(e)
+        setAccountError(_ => e->Js.Exn.message->Belt.Option.getWithDefault(""))
         setAccountBoxState(_ => "leapBandNotfound")
       }
     }
@@ -57,7 +58,28 @@ let make = () => {
       } catch {
       | Js.Exn.Error(e) =>
         Js.Console.log(e)
+        setAccountError(_ => e->Js.Exn.message->Belt.Option.getWithDefault(""))
         setAccountBoxState(_ => "keplrBandNotfound")
+      }
+    }
+  }
+
+  let connectWalletCosmostation = async chainID => {
+    if Cosmostation.cosmostation->Belt.Option.isNone {
+      setAccountBoxState(_ => "cosmostationNotfound")
+      // check if cosmostation really not found
+    } else {
+      try {
+        let wallet = await Wallet.createFromCosmostation(chainID)
+        let (address, pubKey) = await Wallet.getAddressAndPubKey(wallet)
+        dispatchAccount(Connect(wallet, address, pubKey, chainID))
+
+        setAccountBoxState(_ => "noShow")
+      } catch {
+      | Js.Exn.Error(e) =>
+        Js.Console.log(e)
+        setAccountError(_ => e->Js.Exn.message->Belt.Option.getWithDefault(""))
+        setAccountBoxState(_ => "error")
       }
     }
   }
@@ -76,6 +98,10 @@ let make = () => {
         <WalletButton onClick={_ => connectWalletLeap(chainID)->ignore} wallet=Wallet.Leap />
         <VSpacing size=Spacing.md />
         <WalletButton onClick={_ => connectWalletKeplr(chainID)->ignore} wallet=Wallet.Keplr />
+        <VSpacing size=Spacing.md />
+        <WalletButton
+          onClick={_ => connectWalletCosmostation(chainID)->ignore} wallet=Wallet.Cosmostation
+        />
         <VSpacing size=Spacing.md />
         <WalletButton onClick={_ => connectLedger()} wallet=Wallet.Ledger />
         <VSpacing size=Spacing.md />

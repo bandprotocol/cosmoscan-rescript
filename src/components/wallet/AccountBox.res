@@ -199,7 +199,7 @@ let make = () => {
   let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
   let trackingSub = TrackingSub.use()
   let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
-  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
+  let (_, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
 
   let send = () => {
     SubmitMsg.Send(None, IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
