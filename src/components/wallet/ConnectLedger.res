@@ -113,7 +113,7 @@ let make = (~chainID) => {
   let (accountIndex, setAccountIndex) = React.useState(_ => "0")
   let (errMsg, setErrMsg) = React.useState(_ => "")
   let (showAdvance, setShowAdvance) = React.useState(_ => false)
-  let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
+  let (_, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 

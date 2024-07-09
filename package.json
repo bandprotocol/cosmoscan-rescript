@@ -30,7 +30,6 @@
     "@apollo/client": "^3.6.9",
     "@bandprotocol/bandchain.js": "^2.1.4",
     "@cosmostation/cosmosjs": "0.5.5",
-    "@cosmostation/extension-client": "^0.1.15",
     "@glennsl/rescript-json-combinators": "^1.0.0",
     "@ledgerhq/hw-transport-webhid": "^6.4.1",
     "@ledgerhq/hw-transport-webusb": "^6.3.0",

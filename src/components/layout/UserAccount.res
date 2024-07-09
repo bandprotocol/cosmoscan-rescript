@@ -47,7 +47,7 @@ module ConnectBtn = {
 @react.component
 let make = () => {
   let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
-  let (accountBoxState, setAccountBoxState) = React.useContext(WalletPopupContext.context)
+  let (accountBoxState, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
   let trackingSub = TrackingSub.use()
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
@@ -99,6 +99,8 @@ let make = () => {
           | "leapBandNotfound" => <LeapBandNotfound chainID />
           | "keplrNotfound" => <KeplrNotfound />
           | "keplrBandNotfound" => <KeplrBandNotfound />
+          | "cosmostationNotfound" => <CosmostationNotfound />
+          | "error" => <ErrorConnection />
           | "connectMnemonic" => <ConnectMnemonic chainID />
           | "connectLedger" => <ConnectLedger chainID />
           | _ => React.null

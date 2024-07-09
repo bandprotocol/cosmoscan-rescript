@@ -56,7 +56,7 @@ module VoteButton = {
 
     let (accountOpt, _) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
-    let (_, setAccountBoxState) = React.useContext(WalletPopupContext.context)
+    let (_, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
 
     let connect = () => setAccountBoxState(_ => "noShow")
     let vote = () => Vote(proposalID, proposalName)->SubmitTx->OpenModal->dispatchModal
