@@ -108,6 +108,7 @@ let getPacketStatus = packetStatus => {
   | "success" => Success
   | "pending" => Pending
   | "failure" => Fail
+  | "timeout" => Fail
   | _ => raise(Not_found)
   }
 }
