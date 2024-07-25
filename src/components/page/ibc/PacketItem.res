@@ -97,17 +97,21 @@ module ResolveStatus = {
             switch status {
             | Success => <img alt="Success Icon" src=Images.success />
             | Pending => <img alt="Pending Icon" src=Images.pending />
-            | Fail =>
-              <div
-                className={Css.merge(list{
-                  CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ()),
-                  Styles.failText,
-                })}
-                onClick={_ => errorMsg(reason->Belt.Option.getExn)}>
-                <Text value="View Error" color=theme.error_600 />
-                <HSpacing size=#px(8) />
-                <img alt="Fail Icon" src=Images.fail />
-              </div>
+            | Fail => 
+              switch reason {
+              | Some(reason) =>
+                <div
+                  className={Css.merge(list{
+                    CssHelper.flexBox(~align=#center, ~justify=#flexEnd, ()),
+                    Styles.failText,
+                  })}
+                  onClick={_ => errorMsg(reason)}>
+                  <Text value="View Error" color=theme.error_600 />
+                  <HSpacing size=#px(8) />
+                  <img alt="Fail Icon" src=Images.fail />
+                </div>
+              | _ => <img alt="Fail Icon" src=Images.fail />
+              }
             }
           | _ => React.null
           }
