@@ -95,7 +95,7 @@ module FaucetBtn = {
       switch trackingSub {
       | Data({chainID}) => {
           let currentChainID = chainID->ChainIDBadge.parseChainID
-          currentChainID == LaoziTestnet
+          currentChainID != LaoziMainnet
             ? isRequest
                 ? <LoadingCensorBar.CircleSpin size=30 height=30 />
                 : isFailed

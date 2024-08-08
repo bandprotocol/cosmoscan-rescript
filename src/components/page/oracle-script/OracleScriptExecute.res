@@ -332,9 +332,12 @@ module ExecutionPart = {
 
     let (accountOpt, dispatch) = React.useContext(AccountContext.context)
     let trackingSub = TrackingSub.use()
-    let (_, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
+    let (accountBoxState, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
 
-    let connect = () => setAccountBoxState(_ => "noShow")
+    let connect = () =>
+      accountBoxState == "noShow"
+        ? setAccountBoxState(_ => "connect")
+        : setAccountBoxState(_ => "noShow")
     let numParams = paramsInput->Belt.Array.length
 
     let validatorCount = ValidatorSub.countByActive(true)
