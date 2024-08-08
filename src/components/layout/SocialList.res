@@ -14,7 +14,7 @@ let mapImages = [
   ["https:/\/github.com/bandprotocol", Images.githubSvg, "bandprotocol on github"],
   ["https:/\/twitter.com/BandProtocol", Images.twitterSvg, "bandprotocol on twitter"],
   ["https:/\/t.me/bandprotocol", Images.telegramSvg, "bandprotocol on telegram"],
-  ["https:/\/discord.com/invite/3t4bsY7", Images.discordSvg, "bandprotocol on discord"],
+  ["https:/\/discord.bandprotocol.com", Images.discordSvg, "bandprotocol on discord"],
   [
     "https:/\/coinmarketcap.com/currencies/band-protocol/",
     Images.coinmarketcapWhiteSvg,
