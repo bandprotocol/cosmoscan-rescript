@@ -107,7 +107,7 @@ let make = () => {
         <VSpacing size=Spacing.md />
         {
           let currentChainID = chainID->ChainIDBadge.parseChainID
-          currentChainID == LaoziTestnet
+          currentChainID != LaoziMainnet
             ? <>
                 <WalletButton onClick={_ => connectMnemonic()} wallet=Wallet.Mnemonic />
                 <VSpacing size=Spacing.md />
