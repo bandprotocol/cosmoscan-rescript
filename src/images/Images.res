@@ -103,3 +103,6 @@
 @module("./ledger.png") external ledger: string = "default"
 @module("./mnemonic.png") external mnemonic: string = "default"
 @module("./leap.png") external leap: string = "default"
+
+// Feed module
+@module("./feed-msg-icon.svg") external feedIcon: string = "default"

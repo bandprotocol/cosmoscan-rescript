@@ -65,7 +65,8 @@ type content_inner_t =
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | ExecList(list<Msg.msg_t>)
-  | SignalPrices(Belt.List.t<Feeds.SignalPrice.t>)
+  | SignalList(Belt.List.t<Feeds.Signal.t>)
+  | SignalPriceList(Belt.List.t<Feeds.SignalPrice.t>)
   | None
 
 type content_t = {
@@ -193,9 +194,19 @@ let renderValue = v => {
         ),
       ])}
     />
-  | SignalPrices(prices) =>
+  | SignalList(signals) =>
     <KVTable
-      headers=["Signal", "Prices"]
+      headers=["Signal ID", "Power"]
+      rows={signals
+      ->Belt.List.toArray
+      ->Belt.Array.map(signal => [
+        KVTable.Value(signal.id),
+        KVTable.Value(signal.power->Belt.Float.toString),
+      ])}
+    />
+  | SignalPriceList(prices) =>
+    <KVTable
+      headers=["Signal", "Price"]
       rows={prices
       ->Belt.List.toArray
       ->Belt.Array.map(price => [
@@ -1771,6 +1782,23 @@ module Transfer = {
   let failed = (msg: Msg.Application.Transfer.fail_t) => msg->factory([])
 }
 
+module SubmitSignals = {
+  let factory = (msg: Msg.Feed.SubmitSignals.t) => {
+    [
+      {
+        title: "Validator",
+        content: Address(msg.delegator),
+        order: 1,
+      },
+      {
+        title: "Signals",
+        content: SignalList(msg.signals),
+        order: 2,
+      },
+    ]
+  }
+}
+
 module SubmitSignalPrices = {
   let factory = (msg: Msg.Feed.SubmitSignalPrices.t) => {
     [
@@ -1781,7 +1809,7 @@ module SubmitSignalPrices = {
       },
       {
         title: "Prices",
-        content: SignalPrices(msg.prices),
+        content: SignalPriceList(msg.prices),
         order: 2,
       },
     ]
@@ -1844,6 +1872,7 @@ let getContent = msg => {
     }
   | Msg.UnjailMsg(data) => Unjail.factory(data)
   | Msg.SetWithdrawAddressMsg(data) => SetWithdrawAddress.factory(data)
+  | Msg.SubmitSignals(data) => SubmitSignals.factory(data)
   | Msg.SubmitSignalPrices(data) => SubmitSignalPrices.factory(data)
   | Msg.SubmitProposalMsg(m) =>
     switch m {

@@ -1364,6 +1364,20 @@ module Feed = {
       })
     }
   }
+
+  module SubmitSignals = {
+    type t = {
+      delegator: Address.t,
+      signals: list<Feeds.Signal.t>,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        delegator: json.required(list{"msg", "delegator"}, string)->Address.fromBech32,
+        signals: json.required(list{"msg", "signals"}, list(Feeds.Signal.decode)),
+      })
+    }
+  }
 }
 
 type ibc_transfer_t = {
@@ -1419,6 +1433,7 @@ type rec msg_t =
   | UpgradeClientMsg(Client.t)
   | SubmitClientMisbehaviourMsg(Client.t)
   | SubmitSignalPrices(Feed.SubmitSignalPrices.t)
+  | SubmitSignals(Feed.SubmitSignals.t)
   | RecvPacketMsg(Channel.RecvPacket.decoded_t)
   | AcknowledgePacketMsg(Channel.AcknowledgePacket.t)
   | TimeoutMsg(Channel.Timeout.t)
@@ -1485,6 +1500,7 @@ let getBadge = msg => {
   | SetWithdrawAddressMsg(_) => {name: "Set Withdraw Address", category: ValidatorMsg}
   | SubmitProposalMsg(_) => {name: "Submit Proposal", category: ProposalMsg}
   | SubmitSignalPrices(_) => {name: "Submit Signal Prices", category: FeedMsg}
+  | SubmitSignals(_) => {name: "Submit Signal", category: FeedMsg}
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
   | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
@@ -1648,7 +1664,9 @@ let rec decodeMsg = (json, isSuccess) => {
     | "/cosmos.slashing.v1beta1.MsgUnjail" =>
       let msg = json->mustDecode(Slashing.Unjail.decode)
       (UnjailMsg(msg), msg.address, false)
-
+    | "/feeds.v1beta1.MsgSubmitSignals" =>
+      let msg = json->mustDecode(Feed.SubmitSignals.decode)
+      (SubmitSignals(msg), msg.delegator, false)
     | "/feeds.v1beta1.MsgSubmitSignalPrices" =>
       let msg = json->mustDecode(Feed.SubmitSignalPrices.decode)
       (SubmitSignalPrices(msg), msg.validator, false)

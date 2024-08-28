@@ -18,6 +18,14 @@ module SignalPrice = {
 module Signal = {
   type t = {
     id: string,
-    power: int,
+    power: float,
+  }
+
+  let decode = {
+    open JsonUtils.Decode
+    object(fields => {
+      id: fields.required(. "id", string),
+      power: fields.required(. "power", JsonUtils.Decode.float),
+    })
   }
 }
