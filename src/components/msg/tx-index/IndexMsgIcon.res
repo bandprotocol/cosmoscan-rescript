@@ -29,7 +29,8 @@ let make = (~category: Msg.msg_cat_t) => {
     | ValidatorMsg => <Icon name="fas fa-user" color=theme.white size=14 />
     | ProposalMsg => <Icon name="fal fa-file" color=theme.white size=14 />
     | OracleMsg => <Icon name="fal fa-globe" color=theme.white size=14 />
-    | IBCMsg => <img src=Images.ibcIcon />
+    | IBCMsg => <Icon name="fa-solid fa-arrow-right-arrow-left" color=theme.white size=14 />
+    | FeedMsg => <img src=Images.ibcIcon />
     | _ => <Icon name="fal fa-question" color=theme.white size=14 />
     }}
   </div>

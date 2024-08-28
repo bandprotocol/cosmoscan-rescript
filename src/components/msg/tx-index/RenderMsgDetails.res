@@ -65,6 +65,7 @@ type content_inner_t =
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | ExecList(list<Msg.msg_t>)
+  | SignalPrices(Belt.List.t<Feeds.SignalPrice.t>)
   | None
 
 type content_t = {
@@ -189,6 +190,22 @@ let renderValue = v => {
           output.coins
           ->Coin.getBandAmountFromCoins
           ->Belt.Float.toString,
+        ),
+      ])}
+    />
+  | SignalPrices(prices) =>
+    <KVTable
+      headers=["Signal", "Prices"]
+      rows={prices
+      ->Belt.List.toArray
+      ->Belt.Array.map(price => [
+        KVTable.Value(price.signalId),
+        KVTable.Value(
+          switch // render N/A if no price reported
+          price.price {
+          | Some(price) => price->Belt.Float.toString
+          | None => "N/A"
+          },
         ),
       ])}
     />
@@ -1754,6 +1771,23 @@ module Transfer = {
   let failed = (msg: Msg.Application.Transfer.fail_t) => msg->factory([])
 }
 
+module SubmitSignalPrices = {
+  let factory = (msg: Msg.Feed.SubmitSignalPrices.t) => {
+    [
+      {
+        title: "Validator",
+        content: Address(msg.validator),
+        order: 1,
+      },
+      {
+        title: "Prices",
+        content: SignalPrices(msg.prices),
+        order: 2,
+      },
+    ]
+  }
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1810,6 +1844,7 @@ let getContent = msg => {
     }
   | Msg.UnjailMsg(data) => Unjail.factory(data)
   | Msg.SetWithdrawAddressMsg(data) => SetWithdrawAddress.factory(data)
+  | Msg.SubmitSignalPrices(data) => SubmitSignalPrices.factory(data)
   | Msg.SubmitProposalMsg(m) =>
     switch m {
     | Msg.Gov.SubmitProposal.Success(data) => SubmitProposal.success(data)
@@ -1895,7 +1930,7 @@ module MessageItem = {
             ->Belt.List.toArray
             ->Belt.Array.mapWithIndex((i, msg) => {
               let contents = getContent(msg)
-              <div className={Styles.subMsgContainer(theme)}>
+              <div className={Styles.subMsgContainer(theme)} key={i->Belt.Int.toString}>
                 <Row marginBottom=0 marginBottomSm=24>
                   <Col col=Col.Three mb=16 mbSm=8>
                     <Heading
@@ -1919,7 +1954,7 @@ module MessageItem = {
                 </Row>
                 {contents
                 ->Belt.Array.map(c => {
-                  <Row marginBottom=0 marginBottomSm=24>
+                  <Row marginBottom=0 marginBottomSm=24 key={c.title}>
                     <Col col=Col.Three mb=16 mbSm=8>
                       <Heading
                         value={c.title}
