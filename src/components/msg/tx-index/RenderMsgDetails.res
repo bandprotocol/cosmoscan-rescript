@@ -214,7 +214,7 @@ let renderValue = v => {
         KVTable.Value(
           switch // render N/A if no price reported
           price.price {
-          | Some(price) => price->Belt.Float.toString
+          | Some(price) => price->Format.fPretty
           | None => "N/A"
           },
         ),
