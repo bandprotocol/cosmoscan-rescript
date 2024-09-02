@@ -1378,6 +1378,20 @@ module Feed = {
       })
     }
   }
+
+  module UpdateReferenceSourceConfig = {
+    type t = {
+      ipfsHash: string,
+      version: string,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        ipfsHash: json.required(list{"msg", "ipfs_hash"}, string),
+        version: json.required(list{"msg", "version"}, string),
+      })
+    }
+  }
 }
 
 type ibc_transfer_t = {
@@ -1434,6 +1448,7 @@ type rec msg_t =
   | SubmitClientMisbehaviourMsg(Client.t)
   | SubmitSignalPrices(Feed.SubmitSignalPrices.t)
   | SubmitSignals(Feed.SubmitSignals.t)
+  | UpdateReferenceSourceConfig(Feed.UpdateReferenceSourceConfig.t)
   | RecvPacketMsg(Channel.RecvPacket.decoded_t)
   | AcknowledgePacketMsg(Channel.AcknowledgePacket.t)
   | TimeoutMsg(Channel.Timeout.t)
@@ -1501,6 +1516,7 @@ let getBadge = msg => {
   | SubmitProposalMsg(_) => {name: "Submit Proposal", category: ProposalMsg}
   | SubmitSignalPrices(_) => {name: "Submit Signal Prices", category: FeedMsg}
   | SubmitSignals(_) => {name: "Submit Signal", category: FeedMsg}
+  | UpdateReferenceSourceConfig(_) => {name: "Update Reference Source Config", category: FeedMsg}
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
   | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
@@ -1667,6 +1683,9 @@ let rec decodeMsg = (json, isSuccess) => {
     | "/feeds.v1beta1.MsgSubmitSignals" =>
       let msg = json->mustDecode(Feed.SubmitSignals.decode)
       (SubmitSignals(msg), msg.delegator, false)
+    | "/feeds.v1beta1.MsgUpdateReferenceSourceConfig" =>
+      let msg = json->mustDecode(Feed.UpdateReferenceSourceConfig.decode)
+      (UpdateReferenceSourceConfig(msg), Address.Address(""), false)
     | "/feeds.v1beta1.MsgSubmitSignalPrices" =>
       let msg = json->mustDecode(Feed.SubmitSignalPrices.decode)
       (SubmitSignalPrices(msg), msg.validator, false)

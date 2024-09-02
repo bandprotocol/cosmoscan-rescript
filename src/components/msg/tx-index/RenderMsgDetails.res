@@ -1816,6 +1816,23 @@ module SubmitSignalPrices = {
   }
 }
 
+module UpdateReferenceSourceConfig = {
+  let factory = (msg: Msg.Feed.UpdateReferenceSourceConfig.t) => {
+    [
+      {
+        title: "IPFS Hash",
+        content: PlainText(msg.ipfsHash),
+        order: 1,
+      },
+      {
+        title: "Version",
+        content: PlainText(msg.version),
+        order: 2,
+      },
+    ]
+  }
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1874,6 +1891,7 @@ let getContent = msg => {
   | Msg.SetWithdrawAddressMsg(data) => SetWithdrawAddress.factory(data)
   | Msg.SubmitSignals(data) => SubmitSignals.factory(data)
   | Msg.SubmitSignalPrices(data) => SubmitSignalPrices.factory(data)
+  | Msg.UpdateReferenceSourceConfig(data) => UpdateReferenceSourceConfig.factory(data)
   | Msg.SubmitProposalMsg(m) =>
     switch m {
     | Msg.Gov.SubmitProposal.Success(data) => SubmitProposal.success(data)
