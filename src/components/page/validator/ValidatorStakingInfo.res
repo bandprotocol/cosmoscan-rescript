@@ -23,7 +23,8 @@ module ButtonSection = {
     let balanceAtStakeSub = DelegationSub.getStakeByValidator(delegatorAddress, validatorAddress)
     let allSub = Sub.all3(validatorInfoSub, accountSub, balanceAtStakeSub)
 
-    let delegate = () => validatorAddress->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
+    let delegate = () =>
+      Some(validatorAddress)->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
     let undelegate = () =>
       validatorAddress->SubmitMsg.Undelegate->SubmitTx->OpenModal->dispatchModal
     let redelegate = () =>

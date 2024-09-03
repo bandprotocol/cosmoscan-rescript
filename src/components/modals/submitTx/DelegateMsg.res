@@ -14,33 +14,39 @@ module Styles = {
 }
 
 @react.component
-let make = (~address, ~validator, ~setMsgsOpt) => {
+let make = (~address, ~validator: option<Address.t>, ~setMsgsOpt) => {
   let accountSub = AccountSub.get(address)
-  let validatorInfoSub = ValidatorSub.get(validator)
+  let validatorsSub = ValidatorSub.getList(~filter=Active, ())
 
-  let allSub = Sub.all2(accountSub, validatorInfoSub)
+  let allSub = Sub.all2(accountSub, validatorsSub)
 
   let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
+  let (validatorOpt, setValidatorOpt) = React.useState(_ => validator)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  React.useEffect1(_ => {
-    let msgsOpt = {
-      let amountValue = amount.value->Belt.Option.getWithDefault(0.)
+  React.useEffect2(_ => {
+    switch validatorOpt {
+    | Some(val) =>
+      let msgsOpt = {
+        let amountValue = amount.value->Belt.Option.getWithDefault(0.)
 
-      Some([
-        Msg.Input.DelegateMsg({
-          validatorAddress: validator,
-          delegatorAddress: address,
-          amount: amountValue->Coin.newUBANDFromAmount,
-          moniker: (),
-          identity: (),
-        }),
-      ])
+        Some([
+          Msg.Input.DelegateMsg({
+            validatorAddress: val,
+            delegatorAddress: address,
+            amount: amountValue->Coin.newUBANDFromAmount,
+            moniker: (),
+            identity: (),
+          }),
+        ])
+      }
+      setMsgsOpt(_ => msgsOpt)
+    | None => ()
     }
-    setMsgsOpt(_ => msgsOpt)
+
     None
-  }, [amount])
+  }, (amount, validatorOpt))
 
   <>
     <div className=Styles.container>
@@ -52,12 +58,18 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         weight=Heading.Regular
         color={theme.neutral_600}
       />
-      {switch allSub {
-      | Data((_, {moniker})) =>
+      // <Text value={validator->Address.toOperatorBech32} />
+      {switch validatorsSub {
+      | Data(validators) =>
         <div>
-          <Text value=moniker ellipsis=true align=Text.Right />
-          <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
+          {
+            let filteredValidators =
+              validators->Belt_Array.keep(validator => validator.commission !== 100.)
+            <ValidatorSelection filteredValidators setValidatorOpt />
+          }
         </div>
+      | Error(err) => <Text value={err.message} />
+      | NoData => <Text value={"No Data"} />
       | _ => <LoadingCensorBar width=300 height=34 />
       }}
     </div>

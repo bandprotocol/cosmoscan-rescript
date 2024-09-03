@@ -296,10 +296,14 @@ let make = (~address) => {
                               <Button variant=Button.Outline onClick={_ => send(chainID)} fsize=14>
                                 {"Send"->React.string}
                               </Button>
-                              // TODO: wire up
-                              <Button variant=Button.Outline fsize=14>
-                                {"Delegate"->React.string}
-                              </Button>
+                              {
+                                let delegate = () =>
+                                  None->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
+
+                                <Button variant=Button.Outline fsize=14 onClick={_ => delegate()}>
+                                  {"Delegate"->React.string}
+                                </Button>
+                              }
                             </div>}
                       </>
                     }
