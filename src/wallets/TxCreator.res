@@ -120,7 +120,7 @@ let signTx = async (account: AccountContext.t, rawTx) => {
 
 let broadcastTx = async (client, signedTx) => {
   try {
-    let response = await client->BandChainJS.Client.sendTxBlockMode(signedTx)
+    let response = await client->BandChainJS.Client.sendTxSyncMode(signedTx)
     Belt.Result.Ok({
       txHash: response.txhash->Hash.fromHex,
       code: response.code,
