@@ -14,14 +14,14 @@ module Styles = {
 }
 
 @react.component
-let make = (~address, ~validator: option<Address.t>, ~setMsgsOpt) => {
+let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
   let accountSub = AccountSub.get(address)
   let validatorsSub = ValidatorSub.getList(~filter=Active, ())
 
   let allSub = Sub.all2(accountSub, validatorsSub)
 
   let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
-  let (validatorOpt, setValidatorOpt) = React.useState(_ => validator)
+  let (validatorOpt, setValidatorOpt) = React.useState(_ => preselectValidator)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -65,7 +65,9 @@ let make = (~address, ~validator: option<Address.t>, ~setMsgsOpt) => {
           {
             let filteredValidators =
               validators->Belt_Array.keep(validator => validator.commission !== 100.)
-            <ValidatorSelection filteredValidators setValidatorOpt />
+            <ValidatorSelection
+              validatorOpt={preselectValidator} filteredValidators setValidatorOpt
+            />
           }
         </div>
       | Error(err) => <Text value={err.message} />

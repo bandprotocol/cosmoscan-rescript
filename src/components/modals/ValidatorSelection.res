@@ -51,16 +51,27 @@ type singleValue_t = {
 type indicatorSeparator_t = {display: string}
 
 @react.component
-let make = (~filteredValidators: array<Validator.t>, ~setValidatorOpt) => {
+let make = (
+  ~validatorOpt: option<Address.t>,
+  ~filteredValidators: array<Validator.t>,
+  ~setValidatorOpt,
+) => {
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
 
-  let (selectedValidator, setSelectedValidator) = React.useState(_ => {
-    open ReactSelect
-    {value: "N/A", label: "Enter or select validator to delegate to"}
-  })
-  let validatorList = filteredValidators->Belt_Array.map(({operatorAddress, moniker}) => {
+  let validatorList = filteredValidators->Belt.Array.map(({operatorAddress, moniker}) => {
     open ReactSelect
     {value: operatorAddress->Address.toOperatorBech32, label: moniker}
+  })
+  let (selectedValidator, setSelectedValidator) = React.useState(_ => {
+    open ReactSelect
+    switch validatorOpt {
+    | Some(val) =>
+      switch Belt.Array.getBy(filteredValidators, v => v.operatorAddress == val) {
+      | Some(v) => {value: v.operatorAddress->Address.toOperatorBech32, label: v.moniker}
+      | None => {value: "N/A", label: "Enter or select validator to delegate to"}
+      }
+    | None => {value: "N/A", label: "Enter or select validator to delegate to"}
+    }
   })
 
   // TODO: Hack styles for react-select
