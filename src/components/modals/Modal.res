@@ -37,6 +37,7 @@ module Styles = {
       borderRadius(#px(8)),
       overflow(#hidden),
       boxShadow(Shadow.box(~x=#zero, ~y=#px(2), ~blur=#px(4), Css.rgba(0, 0, 0, #num(0.2)))),
+      border(#px(1), #solid, theme.neutral_100),
       animation(
         ~duration=Config.modalFadingDutation,
         ~timingFunction=#cubicBezier(0.25, 0.46, 0.45, 0.94),
@@ -109,7 +110,6 @@ let make = () => {
           <Icon name="fal fa-times" color=theme.neutral_900 size=18 />
         </div>
         {switch modal {
-        | Connect(chainID) => <ConnectModal chainID />
         | SubmitTx(msg) => <SubmitTxModal msg />
         | ChainSelector(targetChain) => <ChainSelectorModal targetChain />
         | QRCode(address) => <QRCodeModal address />

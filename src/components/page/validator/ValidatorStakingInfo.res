@@ -254,10 +254,13 @@ module StakingInfo = {
 let make = (~validatorAddress) => {
   let trackingSub = TrackingSub.use()
   let (accountOpt, _) = React.useContext(AccountContext.context)
-  let (_, dispatchModal) = React.useContext(ModalContext.context)
   let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
+  let (accountBoxState, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
 
-  let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
+  let connect = () =>
+    accountBoxState == "noShow"
+      ? setAccountBoxState(_ => "connect")
+      : setAccountBoxState(_ => "noShow")
 
   <InfoContainer py=40>
     <Heading value="My Delegation" size=Heading.H4 />
@@ -266,14 +269,14 @@ let make = (~validatorAddress) => {
     | Some({address: delegatorAddress}) => <StakingInfo validatorAddress delegatorAddress />
     | None =>
       switch trackingSub {
-      | Data({chainID}) =>
+      | Data(_) =>
         <div
           className={Css.merge(list{CssHelper.flexBox(~direction=#column, ~justify=#center, ())})}>
           <Icon name="fal fa-link" size=32 color={isDarkMode ? theme.white : theme.black} />
           <VSpacing size=Spacing.sm />
           <Text value="Connect Wallet to see Delegation Info" size=Text.Body1 nowrap=true />
           <VSpacing size=Spacing.sm />
-          <Button px=24 py=7 variant=Outline onClick={_ => connect(chainID)}>
+          <Button px=24 py=7 variant=Outline onClick={_ => connect()}>
             {"Connect Wallet"->React.string}
           </Button>
         </div>
