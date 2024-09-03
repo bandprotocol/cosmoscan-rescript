@@ -1,6 +1,15 @@
 @react.component
 let make = (~address, ~hashtag: Route.account_tab_t) => {
   let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
+  let currentTime =
+    React.useContext(TimeContext.context)->MomentRe.Moment.format(Config.timestampUseFormat, _)
+  let (_, dispatchModal) = React.useContext(ModalContext.context)
+
+  let infoSub = React.useContext(GlobalContext.context)
+  let accountSub = AccountSub.get(address)
+  let balanceAtStakeSub = DelegationSub.getTotalStakeByDelegator(address)
+  let unbondingSub = UnbondingSub.getUnbondingBalance(address, currentTime)
+  let trackingSub = TrackingSub.use()
 
   let topPartAllSub = Sub.all5(infoSub, accountSub, balanceAtStakeSub, unbondingSub, trackingSub)
 

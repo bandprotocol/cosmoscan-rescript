@@ -35,7 +35,7 @@ module AccountDetailBtn = {
         CssHelper.clickable,
         CssHelper.mt(~size=16, ()),
       })}
-      route=Route.AccountIndexPage(address, Route.AccountDelegations)
+      route=Route.AccountIndexPage(address, Route.AccountPortfolio)
       onClick={_ => setAccountBoxState(_ => "noShow")}>
       <ReactSvg src={Images.circleUser} className={Styles.btnIcon} />
       <Text
