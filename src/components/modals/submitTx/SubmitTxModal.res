@@ -20,7 +20,7 @@ module Styles = {
     style(. [
       marginTop(#px(10)),
       transition(~duration=200, "all"),
-      maxHeight(show ? #px(100) : #zero),
+      maxHeight(show ? #px(170) : #zero),
       opacity(show ? 1. : 0.),
       overflow(#hidden),
     ])
@@ -84,17 +84,6 @@ module SubmitTxStep = {
       | Vote(proposalID, proposalName) =>
         <VoteMsg address={account.address} proposalID proposalName setMsgsOpt />
       }}
-      <EnhanceTxInput
-        width=300
-        inputData=memo
-        setInputData=setMemo
-        parse={newVal => {
-          newVal->Js.String.length <= 32 ? Result.Ok(newVal) : Err("Exceed limit length")
-        }}
-        msg="Memo (Optional)"
-        placeholder="Memo"
-        id="memoInput"
-      />
       <div
         onClick={_ => setShow(prev => !prev)}
         className={Css.merge(list{CssHelper.flexBox(~justify=#center, ()), Styles.toggle})}>
@@ -108,6 +97,17 @@ module SubmitTxStep = {
         <Icon name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.neutral_600} />
       </div>
       <div className={Styles.advancedOptions(show, theme)}>
+        <EnhanceTxInput
+          width=300
+          inputData=memo
+          setInputData=setMemo
+          parse={newVal => {
+            newVal->Js.String.length <= 32 ? Result.Ok(newVal) : Err("Exceed limit length")
+          }}
+          msg="Memo (Optional)"
+          placeholder="Memo"
+          id="memoInput"
+        />
         <ValueInput
           value={gasInput->Belt.Int.toString}
           setValue=setGasInput

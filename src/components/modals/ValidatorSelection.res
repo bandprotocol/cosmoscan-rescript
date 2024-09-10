@@ -21,6 +21,7 @@ type option_t = {
 }
 
 type input_t = {color: string}
+type valueContainer_t = {padding: string, flex: string, display: string, alignItems: string}
 
 type menu_t = {
   backgroundColor: string,
@@ -35,7 +36,6 @@ type container_t = {
 }
 
 type singleValue_t = {
-  margin: string,
   maxWidth: string,
   overflow: string,
   position: string,
@@ -68,9 +68,9 @@ let make = (
     | Some(val) =>
       switch Belt.Array.getBy(filteredValidators, v => v.operatorAddress == val) {
       | Some(v) => {value: v.operatorAddress->Address.toOperatorBech32, label: v.moniker}
-      | None => {value: "N/A", label: "Enter or select validator to delegate to"}
+      | None => {value: "N/A", label: "Select Validator"}
       }
-    | None => {value: "N/A", label: "Enter or select validator to delegate to"}
+    | None => {value: "N/A", label: "Select Validator"}
     }
   })
 
@@ -112,8 +112,13 @@ let make = (
           position: "relative",
           boxSizing: "border-box",
         },
+        ReactSelect.valueContainer: _ => {
+          display: "grid",
+          alignItems: "center",
+          flex: "1",
+          padding: "0px 16px",
+        },
         ReactSelect.singleValue: _ => {
-          margin: "0px 2px",
           maxWidth: "calc(100% - 8px)",
           overflow: "hidden",
           position: "absolute",

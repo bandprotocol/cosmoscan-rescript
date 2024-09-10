@@ -86,62 +86,62 @@ module DstValidatorSelection = {
     <div
       className={CssHelper.flexBox(~align=#flexStart, ~direction=#column, ())}
       id="redelegateContainer">
-      <ReactSelect
-        options=validatorList
-        onChange={newOption => {
-          let newVal = newOption
-          setSelectedValidator(_ => newVal)
-          setDstValidatorOpt(_ => Some(newVal.value->Address.fromBech32))
-        }}
-        value=selectedValidator
-        styles={
-          ReactSelect.control: _ => {
-            display: "flex",
-            height: "37px",
-            width: "100%",
-            fontSize: "14px",
-            color: theme.neutral_900->Theme.toString,
-            backgroundColor: theme.neutral_000->Theme.toString,
-            borderRadius: "8px",
-            border: `1px solid ${theme.neutral_300->Theme.toString}`,
-          },
-          ReactSelect.option: _ => {
-            fontSize: "14px",
-            height: "37px",
-            display: "flex",
-            alignItems: "center",
-            paddingLeft: "10px",
-            cursor: "pointer",
-            color: theme.neutral_900->Theme.toString,
-            backgroundColor: theme.neutral_000->Theme.toString,
-          },
-          ReactSelect.container: _ => {
-            width: "100%",
-            position: "relative",
-            boxSizing: "border-box",
-          },
-          ReactSelect.singleValue: _ => {
-            margin: "0px 2px",
-            maxWidth: "calc(100% - 8px)",
-            overflow: "hidden",
-            position: "absolute",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            top: "50%",
-            transform: "translateY(-50%)",
-            boxSizing: "border-box",
-            fontWeight: "300",
-            lineHeight: "1.3em",
-          },
-          ReactSelect.indicatorSeparator: _ => {display: "none"},
-          ReactSelect.input: _ => {color: theme.neutral_900->Theme.toString},
-          ReactSelect.menuList: _ => {
-            backgroundColor: theme.neutral_000->Theme.toString,
-            overflowY: "scroll",
-            maxHeight: "230px",
-          },
-        }
-      />
+      // <ReactSelect
+      //   options=validatorList
+      //   onChange={newOption => {
+      //     let newVal = newOption
+      //     setSelectedValidator(_ => newVal)
+      //     setDstValidatorOpt(_ => Some(newVal.value->Address.fromBech32))
+      //   }}
+      //   value=selectedValidator
+      //   styles={
+      //     ReactSelect.control: _ => {
+      //       display: "flex",
+      //       height: "37px",
+      //       width: "100%",
+      //       fontSize: "14px",
+      //       color: theme.neutral_900->Theme.toString,
+      //       backgroundColor: theme.neutral_000->Theme.toString,
+      //       borderRadius: "8px",
+      //       border: `1px solid ${theme.neutral_300->Theme.toString}`,
+      //     },
+      //     ReactSelect.option: _ => {
+      //       fontSize: "14px",
+      //       height: "37px",
+      //       display: "flex",
+      //       alignItems: "center",
+      //       paddingLeft: "10px",
+      //       cursor: "pointer",
+      //       color: theme.neutral_900->Theme.toString,
+      //       backgroundColor: theme.neutral_000->Theme.toString,
+      //     },
+      //     ReactSelect.container: _ => {
+      //       width: "100%",
+      //       position: "relative",
+      //       boxSizing: "border-box",
+      //     },
+      //     ReactSelect.singleValue: _ => {
+      //       margin: "0px 2px",
+      //       maxWidth: "calc(100% - 8px)",
+      //       overflow: "hidden",
+      //       position: "absolute",
+      //       textOverflow: "ellipsis",
+      //       whiteSpace: "nowrap",
+      //       top: "50%",
+      //       transform: "translateY(-50%)",
+      //       boxSizing: "border-box",
+      //       fontWeight: "300",
+      //       lineHeight: "1.3em",
+      //     },
+      //     ReactSelect.indicatorSeparator: _ => {display: "none"},
+      //     ReactSelect.input: _ => {color: theme.neutral_900->Theme.toString},
+      //     ReactSelect.menuList: _ => {
+      //       backgroundColor: theme.neutral_000->Theme.toString,
+      //       overflowY: "scroll",
+      //       maxHeight: "230px",
+      //     },
+      //   }
+      // />
       <VSpacing size=Spacing.sm />
       <Text value={"(" ++ selectedValidator.value ++ ")"} />
     </div>

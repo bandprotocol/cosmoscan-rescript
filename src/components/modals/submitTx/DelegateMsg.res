@@ -11,6 +11,20 @@ module Styles = {
     alignItems(#flexEnd),
     width(#px(330)),
   ])
+
+  let tooltips = (theme: Theme.t) =>
+    style(. [
+      display(#flex),
+      columnGap(#px(8)),
+      borderRadius(#px(4)),
+      backgroundColor(theme.neutral_100),
+      padding2(~v=#px(10), ~h=#px(16)),
+      marginBottom(#px(24)),
+    ])
+
+  let halfWidth = style(. [width(#percent(50.))])
+  let fullWidth = style(. [width(#percent(100.)), margin2(~v=#px(24), ~h=#zero)])
+  let test = style(. [backgroundColor(#hex("#FF0000")), height(#px(50))])
 }
 
 @react.component
@@ -20,7 +34,7 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
 
   let allSub = Sub.all2(accountSub, validatorsSub)
 
-  let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
+  let (amount, setAmount) = React.useState(_ => EnhanceTxInputV2.empty)
   let (validatorOpt, setValidatorOpt) = React.useState(_ => preselectValidator)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
@@ -50,13 +64,20 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
 
   <>
     <div className=Styles.container>
+      <div className={Styles.tooltips(theme)}>
+        <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
+        <Text
+          size={Body2}
+          value="Delegate your BAND to start earning staking rewards. Undelegated balances are locked for 21 days."
+        />
+      </div>
       <Heading
         value="Delegate to"
         size=Heading.H5
         marginBottom=8
         align=Heading.Left
         weight=Heading.Regular
-        color={theme.neutral_600}
+        color={theme.neutral_900}
       />
       // <Text value={validator->Address.toOperatorBech32} />
       {switch validatorsSub {
@@ -75,35 +96,61 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
       | _ => <LoadingCensorBar width=300 height=34 />
       }}
     </div>
-    <div className=Styles.container>
-      <Heading
-        value="Account Balance"
-        size=Heading.H5
-        marginBottom=8
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
-      />
-      {switch allSub {
-      | Data(({balance}, _)) =>
-        <div>
+    <div className={CssHelper.flexBox()}>
+      <div className={Styles.halfWidth}>
+        <Heading
+          value="Total BAND Bonded"
+          size=Heading.H5
+          align=Heading.Left
+          weight=Heading.Regular
+          color={theme.neutral_600}
+        />
+        {switch allSub {
+        | Data(({balance}, _)) =>
           <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
-          <Text value=" BAND" />
-        </div>
-      | _ => <LoadingCensorBar width=150 height=18 />
-      }}
+        | _ => <LoadingCensorBar width=150 height=18 />
+        }}
+      </div>
+      <div className={Styles.halfWidth}>
+        <Heading
+          value="Est. APR"
+          size=Heading.H5
+          align=Heading.Left
+          weight=Heading.Regular
+          color={theme.neutral_600}
+        />
+        {switch allSub {
+        | Data(({balance}, _)) =>
+          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
+        | _ => <LoadingCensorBar width=150 height=18 />
+        }}
+      </div>
+      <div className={Styles.fullWidth}>
+        <Heading
+          value="Current Delegated (BAND)"
+          size=Heading.H5
+          align=Heading.Left
+          weight=Heading.Regular
+          color={theme.neutral_600}
+        />
+        {switch allSub {
+        | Data(({balance}, _)) =>
+          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
+        | _ => <LoadingCensorBar width=150 height=18 />
+        }}
+      </div>
     </div>
     {switch allSub {
     | Data(({balance}, _)) =>
       //  TODO: hard-coded tx fee
       let maxValInUband = balance->Coin.getUBandAmountFromCoins -. 5000.
-      <EnhanceTxInput
+      <EnhanceTxInputV2
         width=300
         inputData=amount
         setInputData=setAmount
         parse={Parse.getBandAmount(maxValInUband)}
         maxValue={(maxValInUband /. 1e6)->Belt.Float.toString}
-        msg="Amount"
+        msg="Delegate Amount (BAND)"
         placeholder="0.000000"
         inputType="number"
         code=true
