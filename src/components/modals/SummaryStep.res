@@ -54,13 +54,47 @@ module Styles = {
   let confirmButton = style(. [flex(#num(1.))])
   let halfWidth = style(. [width(#percent(50.))])
   let fullWidth = style(. [width(#percent(100.)), margin2(~v=#px(24), ~h=#zero)])
+  let jsonDisplay = (theme: Theme.t) =>
+    style(. [
+      resize(#none),
+      fontSize(#px(12)),
+      color(theme.neutral_900),
+      backgroundColor(theme.neutral_000),
+      border(#px(1), #solid, theme.neutral_200),
+      borderRadius(#px(4)),
+      width(#percent(100.)),
+      height(#px(450)),
+      overflowY(#scroll),
+      margin2(~v=#px(16), ~h=#px(0)),
+      fontFamilies([
+        #custom("IBM Plex Mono"),
+        #custom("cousine"),
+        #custom("sfmono-regular"),
+        #custom("Consolas"),
+        #custom("Menlo"),
+        #custom("liberation mono"),
+        #custom("ubuntu mono"),
+        #custom("Courier"),
+        #monospace,
+      ]),
+    ])
 }
+
+type state_t =
+  | Preview(BandChainJS.Transaction.transaction_t)
+  | Signing
+  | Broadcasting
+  | Success(Hash.t)
+  | Error(string)
 
 @react.component
 let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
   let (tabIndex, setTabIndex) = React.useState(_ => 0)
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let trackingSub = TrackingSub.use()
+  let (_, dispatchModal) = React.useContext(ModalContext.context)
+  let client = React.useContext(ClientContext.context)
+  let (state, setState) = React.useState(_ => Preview(rawTx))
 
   let tab = (~name, ~active, ~setTab) => {
     <div key=name className={Styles.tabContainer(theme, active)} onClick={_ => setTab()}>
@@ -73,6 +107,33 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
     </div>
   }
 
+  let startBroadcast = async () => {
+    dispatchModal(DisableExit)
+    // setState(_ => Signing)
+    let signTxResult = await TxCreator.signTx(account, rawTx)
+    switch signTxResult {
+    | Ok(signedTx) =>
+      // setState(_ => Broadcasting)
+      let txResult = await client->TxCreator.broadcastTx(signedTx)
+      switch txResult {
+      | Ok(tx) =>
+        tx.success
+          ? {
+              setState(_ => Success(tx.txHash))
+            }
+          : {
+              Js.Console.error(tx)
+              setState(_ => Error(tx.code->TxResError.parse))
+            }
+
+      | Error(err) => setState(_ => Error(err))
+      }
+    | Error(err) => setState(_ => Error(err))
+    }
+
+    dispatchModal(EnableExit)
+  }
+
   <div className={Styles.container}>
     <div className={Styles.tabGroup(theme)}>
       {["summary", "json message"]
@@ -81,16 +142,30 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
       )
       ->React.array}
     </div>
-    {switch msgsOpt->Belt.Option.getWithDefault(_, [])->Belt.Array.get(0) {
-    | Some(msg) =>
-      switch msg {
-      | Msg.Input.DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
-        <DelegateSummary account validator={validatorAddress} amount />
+    {switch tabIndex {
+    | 0 =>
+      switch msgsOpt->Belt.Option.getWithDefault(_, [])->Belt.Array.get(0) {
+      | Some(msg) =>
+        switch msg {
+        | Msg.Input.DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
+          <DelegateSummary account validator={validatorAddress} amount />
+        // TODO: handle properly
+        | _ => <Text value={"fallback"} />
+        }
       // TODO: handle properly
-      | _ => <Text value={"fallback"} />
+      | None => <Text value={"no message"} />
       }
-    // TODO: handle properly
-    | None => <Text value={"no message"} />
+    | 1 =>
+      <textarea
+        className={Styles.jsonDisplay(theme)}
+        disabled=true
+        defaultValue={rawTx
+        ->BandChainJS.Transaction.getSignMessage
+        ->JsBuffer.toUTF8
+        ->Js.Json.parseExn
+        ->TxCreator.stringifyWithSpaces}
+      />
+    | _ => <Text value="tab index not valid" />
     }}
     <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
       <Text size={Body1} value="Chain" />
@@ -108,7 +183,13 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
       <Button variant=Button.Outline style={Styles.confirmButton} onClick={_ => onBack()}>
         {"Back"->React.string}
       </Button>
-      <Button style={Styles.confirmButton} onClick={_ => ()}> {"Confirm"->React.string} </Button>
+      <Button
+        style={Styles.confirmButton}
+        onClick={_ => {
+          let _ = startBroadcast()
+        }}>
+        {"Confirm"->React.string}
+      </Button>
     </div>
   </div>
 }

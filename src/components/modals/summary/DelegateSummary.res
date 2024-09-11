@@ -88,10 +88,10 @@ let make = (~account: AccountContext.t, ~validator: Address.t, ~amount) => {
         {switch infoSub {
         | Data({financial}) =>
           <Text
-            size={Body1}
+            size={Body2}
             code=true
-            value={(amount->Coin.getBandAmountFromCoin *. financial.usdPrice)
-              ->Format.fPretty(~digits=2)}
+            value={`$${(amount->Coin.getBandAmountFromCoin *. financial.usdPrice)
+                ->Format.fPretty(~digits=2)} USD`}
           />
         | _ => <LoadingCensorBar width=50 height=20 />
         }}
@@ -105,8 +105,8 @@ let make = (~account: AccountContext.t, ~validator: Address.t, ~amount) => {
           size={Body1}
           color={theme.neutral_900}
           code=true
-          value={`$${(stake.amount->Coin.getBandAmountFromCoin +.
-              amount->Coin.getBandAmountFromCoin)->Format.fPretty(~digits=6)} USD`}
+          value={(stake.amount->Coin.getBandAmountFromCoin +. amount->Coin.getBandAmountFromCoin)
+            ->Format.fPretty(~digits=6)}
         />
       | _ => <LoadingCensorBar width=150 height=18 />
       }}
