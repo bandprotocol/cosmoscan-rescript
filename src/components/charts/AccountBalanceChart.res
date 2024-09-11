@@ -61,7 +61,10 @@ let make = (~data, ~colors) => {
     if data->Belt.Array.every(each => each == 0.) {
       renderGraph([100.], [theme.neutral_300->Theme.toString])
     } else {
-      renderGraph(data, colors->Belt.Array.map(Theme.toString))
+      renderGraph(
+        data->Belt.Array.map(d => Js.Math.floor_float(d *. 100.0) /. 100.),
+        colors->Belt.Array.map(Theme.toString),
+      )
     }
     None
   })
