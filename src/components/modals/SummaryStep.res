@@ -78,6 +78,10 @@ module Styles = {
         #monospace,
       ]),
     ])
+  let resultContainer = style(. [minHeight(#px(400)), width(#percent(100.))])
+  let resultIcon = style(. [width(#px(48)), marginBottom(#px(16))])
+
+  let txhashContainer = style(. [cursor(#pointer)])
 }
 
 type state_t =
@@ -109,11 +113,11 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
 
   let startBroadcast = async () => {
     dispatchModal(DisableExit)
-    // setState(_ => Signing)
+    setState(_ => Signing)
     let signTxResult = await TxCreator.signTx(account, rawTx)
     switch signTxResult {
     | Ok(signedTx) =>
-      // setState(_ => Broadcasting)
+      setState(_ => Broadcasting)
       let txResult = await client->TxCreator.broadcastTx(signedTx)
       switch txResult {
       | Ok(tx) =>
@@ -135,61 +139,140 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
   }
 
   <div className={Styles.container}>
-    <div className={Styles.tabGroup(theme)}>
-      {["summary", "json message"]
-      ->Belt.Array.mapWithIndex((index, name) =>
-        tab(~name, ~active=index == tabIndex, ~setTab=() => setTabIndex(_ => index))
-      )
-      ->React.array}
-    </div>
-    {switch tabIndex {
-    | 0 =>
-      switch msgsOpt->Belt.Option.getWithDefault(_, [])->Belt.Array.get(0) {
-      | Some(msg) =>
-        switch msg {
-        | Msg.Input.DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
-          <DelegateSummary account validator={validatorAddress} amount />
-        // TODO: handle properly
-        | _ => <Text value={"fallback"} />
-        }
-      // TODO: handle properly
-      | None => <Text value={"no message"} />
-      }
-    | 1 =>
-      <textarea
-        className={Styles.jsonDisplay(theme)}
-        disabled=true
-        defaultValue={rawTx
-        ->BandChainJS.Transaction.getSignMessage
-        ->JsBuffer.toUTF8
-        ->Js.Json.parseExn
-        ->TxCreator.stringifyWithSpaces}
-      />
-    | _ => <Text value="tab index not valid" />
+    {switch state {
+    | Preview(rawTx) =>
+      <>
+        <div className={Styles.tabGroup(theme)}>
+          {["summary", "json message"]
+          ->Belt.Array.mapWithIndex((index, name) =>
+            tab(~name, ~active=index == tabIndex, ~setTab=() => setTabIndex(_ => index))
+          )
+          ->React.array}
+        </div>
+        {switch tabIndex {
+        | 0 =>
+          switch msgsOpt->Belt.Option.getWithDefault(_, [])->Belt.Array.get(0) {
+          | Some(msg) =>
+            switch msg {
+            | Msg.Input.DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
+              <DelegateSummary account validator={validatorAddress} amount />
+            // TODO: handle properly
+            | _ => <Text value={"fallback"} />
+            }
+          // TODO: handle properly
+          | None => <Text value={"no message"} />
+          }
+        | 1 =>
+          <textarea
+            className={Styles.jsonDisplay(theme)}
+            disabled=true
+            defaultValue={rawTx
+            ->BandChainJS.Transaction.getSignMessage
+            ->JsBuffer.toUTF8
+            ->Js.Json.parseExn
+            ->TxCreator.stringifyWithSpaces}
+          />
+        | _ => <Text value="tab index not valid" />
+        }}
+        <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
+          <Text size={Body1} value="Chain" />
+          {switch trackingSub {
+          | Data({chainID}) => <Text size={Body1} color={theme.neutral_900} value={chainID} />
+          | _ => <LoadingCensorBar width=100 height=20 />
+          }}
+        </div>
+        <div className={Styles.divider(theme)} />
+        <div className=Styles.info>
+          <Text value="Transaction Fee" size=Text.Body2 weight=Text.Medium nowrap=true block=true />
+          <Text value="0.005 BAND" />
+        </div>
+        <div className={Styles.buttonContainer}>
+          <Button variant=Button.Outline style={Styles.confirmButton} onClick={_ => onBack()}>
+            {"Back"->React.string}
+          </Button>
+          <Button
+            style={Styles.confirmButton}
+            onClick={_ => {
+              let _ = startBroadcast()
+            }}>
+            {"Confirm"->React.string}
+          </Button>
+        </div>
+      </>
+    | Success(txHash) =>
+      <div
+        className={Css.merge(list{
+          CssHelper.flexBox(~direction=#column, ~justify=#center, ()),
+          Styles.resultContainer,
+        })}>
+        <img alt="Success Icon" src=Images.success className=Styles.resultIcon />
+        <div id="successMsgContainer" className={CssHelper.mb(~size=16, ())}>
+          <Text
+            value="Broadcast transaction success"
+            size=Text.Body1
+            block=true
+            align=Text.Center
+            color={theme.neutral_900}
+          />
+        </div>
+        <Link className=Styles.txhashContainer route={Route.TxIndexPage(txHash)}>
+          <Button py=8 px=13 variant=Button.Outline onClick={_ => {dispatchModal(CloseModal)}}>
+            {"View Details"->React.string}
+          </Button>
+        </Link>
+      </div>
+    | Signing =>
+      <div
+        className={Css.merge(list{
+          CssHelper.flexBox(~direction=#column, ~justify=#center, ()),
+          Styles.resultContainer,
+        })}>
+        <div className={CssHelper.mb(~size=16, ())}>
+          <Icon name="fad fa-spinner-third fa-spin" size=48 />
+        </div>
+        <Text
+          value="Waiting for signing transaction"
+          size=Text.Body1
+          block=true
+          align=Text.Center
+          color={theme.neutral_900}
+        />
+      </div>
+    | Broadcasting =>
+      <div
+        className={Css.merge(list{
+          CssHelper.flexBox(~direction=#column, ~justify=#center, ()),
+          Styles.resultContainer,
+        })}>
+        <div className={CssHelper.mb(~size=16, ())}>
+          <Icon name="fad fa-spinner-third fa-spin" size=48 />
+        </div>
+        <Text
+          value="Waiting for broadcasting transaction"
+          size=Text.Body1
+          block=true
+          align=Text.Center
+          color={theme.neutral_900}
+        />
+      </div>
+    | Error(err) =>
+      <div
+        className={Css.merge(list{
+          CssHelper.flexBox(~direction=#column, ~justify=#center, ()),
+          Styles.resultContainer,
+        })}>
+        <img alt="Fail Icon" src=Images.fail className=Styles.resultIcon />
+        <div className={CssHelper.mb()}>
+          <Text
+            value="Broadcast transaction fail"
+            size=Text.Body1
+            block=true
+            align=Text.Center
+            color={theme.neutral_900}
+          />
+        </div>
+        <Text value=err color={theme.error_600} align=Text.Center breakAll=true />
+      </div>
     }}
-    <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
-      <Text size={Body1} value="Chain" />
-      {switch trackingSub {
-      | Data({chainID}) => <Text size={Body1} color={theme.neutral_900} value={chainID} />
-      | _ => <LoadingCensorBar width=100 height=20 />
-      }}
-    </div>
-    <div className={Styles.divider(theme)} />
-    <div className=Styles.info>
-      <Text value="Transaction Fee" size=Text.Body2 weight=Text.Medium nowrap=true block=true />
-      <Text value="0.005 BAND" />
-    </div>
-    <div className={Styles.buttonContainer}>
-      <Button variant=Button.Outline style={Styles.confirmButton} onClick={_ => onBack()}>
-        {"Back"->React.string}
-      </Button>
-      <Button
-        style={Styles.confirmButton}
-        onClick={_ => {
-          let _ = startBroadcast()
-        }}>
-        {"Confirm"->React.string}
-      </Button>
-    </div>
   </div>
 }

@@ -17,7 +17,6 @@ module CreateTxFlow = {
     let (rawTx, setRawTx) = React.useState(_ => None)
     let (msgsOpt, setMsgsOpt) = React.useState(_ => None)
     <>
-      // <SummaryStep onBack={_ => setRawTx(_ => None)} account msg />
       <SubmitTxStep account setRawTx isActive={rawTx->Belt.Option.isNone} msg msgsOpt setMsgsOpt />
       {rawTx->Belt.Option.mapWithDefault(React.null, tx =>
         <SummaryStep rawTx=tx onBack={_ => setRawTx(_ => None)} account msgsOpt />

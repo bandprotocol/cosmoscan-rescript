@@ -80,7 +80,6 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
         weight=Heading.Regular
         color={theme.neutral_900}
       />
-      // <Text value={validator->Address.toOperatorBech32} />
       {switch validatorsSub {
       | Data(validators) =>
         <div>
