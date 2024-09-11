@@ -118,7 +118,7 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
         id="delegateAmountInput"
         maxWarningMsg=true
       />
-    | _ => <EnhanceTxInput.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
+    | _ => <EnhanceTxInputV2.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
     }}
   </>
 }

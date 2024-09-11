@@ -123,7 +123,22 @@ let make = (
         <VSpacing size={#px(4)} />
         <Text value={`Available: ${maxValue'} BAND`} />
       </>
-    | None => React.null
+    | None =>
+      <div className={Styles.inputContainer}>
+        <input
+          id
+          value={inputData.text}
+          className={Css.merge(list{Styles.input(theme), code ? Styles.code : ""})}
+          placeholder
+          type_=inputType
+          spellCheck=false
+          autoFocus
+          onChange={event => {
+            let newText = ReactEvent.Form.target(event)["value"]
+            onNewText(newText)
+          }}
+        />
+      </div>
     }}
     {switch status {
     | Touched(Err(errMsg)) =>

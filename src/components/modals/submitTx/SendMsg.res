@@ -4,14 +4,14 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
   let (toAddress, setToAddress) = React.useState(_ => {
     switch receiver {
     | Some(receiver') => {
-        open EnhanceTxInput
+        open EnhanceTxInputV2
         {text: receiver'->Address.toBech32, value: Some(receiver')}
       }
 
-    | None => EnhanceTxInput.empty
+    | None => EnhanceTxInputV2.empty
     }
   })
-  let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
+  let (amount, setAmount) = React.useState(_ => EnhanceTxInputV2.empty)
 
   React.useEffect2(_ => {
     let msgsOpt = {
@@ -65,7 +65,7 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
       }}
     </div>
     <ChainSelector targetChain />
-    <EnhanceTxInput
+    <EnhanceTxInputV2
       width=302
       inputData=toAddress
       setInputData=setToAddress
@@ -77,16 +77,12 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
       code=true
       id="recipientAddressInput"
       placeholder="Insert recipient address"
-      autoFocus={switch toAddress.text {
-      | "" => true
-      | _ => false
-      }}
     />
     {switch accountSub {
     | Data({balance}) =>
       //  TODO: hard-coded tx fee
       let maxValInUband = balance->Coin.getUBandAmountFromCoins -. 5000.
-      <EnhanceTxInput
+      <EnhanceTxInputV2
         width=300
         inputData=amount
         setInputData=setAmount
@@ -104,7 +100,7 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
         maxWarningMsg=true
       />
     | _ =>
-      <EnhanceTxInput.Loading
+      <EnhanceTxInputV2.Loading
         msg="Send Amount (BAND)" code=true useMax=true placeholder="0.000000"
       />
     }}
