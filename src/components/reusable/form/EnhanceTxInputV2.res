@@ -22,14 +22,16 @@ module Styles = {
   let code = style(. [fontFamilies([#custom("Roboto Mono"), #monospace]), paddingBottom(#em(0.1))])
 
   let errMsg = style(. [position(#absolute), bottom(#px(7))])
-  let maxButton = style(. [
-    display(#flex),
-    position(#absolute),
-    right(#px(0)),
-    top(#px(0)),
-    height(#percent(100.)),
-    marginRight(#px(16)),
-  ])
+  let maxButton = (theme: Theme.t) =>
+    style(. [
+      display(#flex),
+      position(#absolute),
+      right(#px(0)),
+      top(#px(0)),
+      height(#percent(100.)),
+      marginRight(#px(16)),
+      selector("> button", [fontWeight(#bold), color(theme.primary_600)]),
+    ])
 }
 
 type input_t<'a> = {
@@ -97,9 +99,10 @@ let make = (
               onNewText(newText)
             }}
           />
-          <div className={Styles.maxButton}>
+          <div className={Styles.maxButton(theme)}>
             <Button
               variant=Button.Text({underline: false})
+              fsize=14
               onClick={_ =>
                 maxWarningMsg
                   ? {
@@ -154,7 +157,12 @@ module Loading = {
         {useMax
           ? <>
               <HSpacing size=Spacing.md />
-              <MaxButton disabled=true onClick={_ => ()} />
+              <div className={Styles.maxButton(theme)}>
+                <Button
+                  variant=Button.Text({underline: false}) fsize=14 onClick={_ => ()} disabled=true>
+                  {"Max"->React.string}
+                </Button>
+              </div>
             </>
           : React.null}
       </div>

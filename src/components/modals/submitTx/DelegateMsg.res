@@ -29,13 +29,14 @@ module Styles = {
 
 @react.component
 let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
-  let accountSub = AccountSub.get(address)
-  let validatorsSub = ValidatorSub.getList(~filter=Active, ())
-
-  let allSub = Sub.all2(accountSub, validatorsSub)
-
   let (amount, setAmount) = React.useState(_ => EnhanceTxInputV2.empty)
   let (validatorOpt, setValidatorOpt) = React.useState(_ => preselectValidator)
+
+  let accountSub = AccountSub.get(address)
+  let validatorsSub = ValidatorSub.getList(~filter=Active, ())
+  let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
+
+  let allSub = Sub.all2(accountSub, validatorsSub)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -96,50 +97,10 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
       | _ => <LoadingCensorBar width=300 height=34 />
       }}
     </div>
-    <div className={CssHelper.flexBox()}>
-      <div className={Styles.halfWidth}>
-        <Heading
-          value="Total BAND Bonded"
-          size=Heading.H5
-          align=Heading.Left
-          weight=Heading.Regular
-          color={theme.neutral_600}
-        />
-        {switch allSub {
-        | Data(({balance}, _)) =>
-          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
-        | _ => <LoadingCensorBar width=150 height=18 />
-        }}
-      </div>
-      <div className={Styles.halfWidth}>
-        <Heading
-          value="Est. APR"
-          size=Heading.H5
-          align=Heading.Left
-          weight=Heading.Regular
-          color={theme.neutral_600}
-        />
-        {switch allSub {
-        | Data(({balance}, _)) =>
-          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
-        | _ => <LoadingCensorBar width=150 height=18 />
-        }}
-      </div>
-      <div className={Styles.fullWidth}>
-        <Heading
-          value="Current Delegated (BAND)"
-          size=Heading.H5
-          align=Heading.Left
-          weight=Heading.Regular
-          color={theme.neutral_600}
-        />
-        {switch allSub {
-        | Data(({balance}, _)) =>
-          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
-        | _ => <LoadingCensorBar width=150 height=18 />
-        }}
-      </div>
-    </div>
+    {switch validatorOpt {
+    | Some(validator) => <ValidatorDelegationDetail address validator bondedTokenCountSub />
+    | None => <ValidatorDelegationDetail.NoData />
+    }}
     {switch allSub {
     | Data(({balance}, _)) =>
       //  TODO: hard-coded tx fee
