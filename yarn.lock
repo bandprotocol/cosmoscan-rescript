@@ -594,6 +594,24 @@
     node-fetch "^2.6.0"
     secp256k1 "^3.6.2"
 
+"@cosmostation/extension-client@^0.1.15":
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/@cosmostation/extension-client/-/extension-client-0.1.15.tgz#cdc6d8fce42217704c1c0d5814f0ee7ce27e8dab"
+  integrity sha512-HlXYJjFrNpjiV/GUKhri1UL8/bhlOIFFLpRF78YDSqq16x0+plIqx5CAvEusFcKTDpVfpeD5sfUHiKvP7euNFg==
+
+"@cosmostation/use-wallets@^2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@cosmostation/use-wallets/-/use-wallets-2.0.6.tgz#0da6cd2a87ed9fc3bf7cdec975c51ddaf5faad51"
+  integrity sha512-hILhjIs5oupjLInQKePSgDlK60kpT6Ok/R7afxlVzAXB3+MC4p+IgdWa5Ac9KHLewucWgizIZstiJ052hV0B/w==
+  dependencies:
+    "@cosmostation/wallets" "^2.0.5"
+    "@tanstack/react-query" "^4.35.3"
+
+"@cosmostation/wallets@^2.0.5":
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/@cosmostation/wallets/-/wallets-2.0.8.tgz#ac7d282a4ef5f8f59abea03f468a241cb8bd65f4"
+  integrity sha512-aATHn2jLjO+RFpw5PFgXZQjx/HuDls6D2FmZviuuxQXAdTTgwsSGaYFGwvmggoFFP2IEzhtZlFqod7rwuCosTQ==
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
@@ -956,6 +974,13 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@keplr-wallet/types@^0.12.12":
+  version "0.12.12"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/types/-/types-0.12.12.tgz#f4bd9e710d5e53504f6b53330abb45bedd9c20ae"
+  integrity sha512-fo6b8j9EXnJukGvZorifJWEm1BPIrvaTLuu5PqaU5k1ANDasm/FL1NaUuaTBVvhRjINtvVXqYpW/rVUinA9MBA==
+  dependencies:
+    long "^4.0.0"
+
 "@ledgerhq/devices@^5.51.1":
   version "5.51.1"
   resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-5.51.1.tgz#d741a4a5d8f17c2f9d282fd27147e6fe1999edb7"
@@ -1148,10 +1173,10 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
-"@reasonml-community/graphql-ppx@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.2.2.tgz#c8e07f8d826782219da1ddb7b2c01202bb343690"
-  integrity sha512-mgkETKdZ2QM1Xqlsg7nb30KaM7ojDpxy1rWdiZE5XLaA+oJgClMxA6ghF2b3TZL5f/XdQJ1rnd0p4LmXKnmpqQ==
+"@reasonml-community/graphql-ppx@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@reasonml-community/graphql-ppx/-/graphql-ppx-1.2.3.tgz#2a9df118560fdfc8121ed471a2ef8038a363bd60"
+  integrity sha512-4XQpzfeLAhaDFX4d/z9AQs9nV0f0y01TRAM/lqRtDcgu+0W9F64FmuWk/4kQ6G1Rvo75pYKrLPlOf53vfHb+Qw==
 
 "@rescript/react@^0.11.0":
   version "0.11.0"
@@ -1185,6 +1210,19 @@
     "@babel/runtime" "^7.22.6"
     content-type "^1.0.5"
     tslib "^2.6.1"
+
+"@tanstack/query-core@4.36.1":
+  version "4.36.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.36.1.tgz#79f8c1a539d47c83104210be2388813a7af2e524"
+  integrity sha512-DJSilV5+ytBP1FbFcEJovv4rnnm/CokuVvrBEtW/Va9DvuJ3HksbXUJEpI0aV1KtuL4ZoO9AVE6PyNLzF7tLeA==
+
+"@tanstack/react-query@^4.35.3":
+  version "4.36.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.36.1.tgz#acb589fab4085060e2e78013164868c9c785e5d2"
+  integrity sha512-y7ySVHFyyQblPl3J3eQBWpXZkliroki3ARnBKsdJchlgt7yJLRDUcf4B8soufgiYt3pEQIkBWBx1N9/ZPIeUWw==
+  dependencies:
+    "@tanstack/query-core" "4.36.1"
+    use-sync-external-store "^1.2.0"
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -5082,6 +5120,11 @@ lodash@^4.17.20, lodash@^4.17.21, lodash@^4.7.0:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
+long@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
+  integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
+
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
@@ -7207,6 +7250,11 @@ use-latest@^1.0.0:
   integrity sha512-d2TEuG6nSLKQLAfW3By8mKr8HurOlTkul0sOpxbClIv4SQ4iOd7BYr7VIzdbktUCnv7dua/60xzd8igMU6jmyw==
   dependencies:
     use-isomorphic-layout-effect "^1.0.0"
+
+use-sync-external-store@^1.2.0:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.2.tgz#c3b6390f3a30eba13200d2302dcdf1e7b57b2ef9"
+  integrity sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==
 
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"

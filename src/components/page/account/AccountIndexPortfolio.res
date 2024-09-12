@@ -133,6 +133,12 @@ let make = (~address) => {
   let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
   let (_, dispatchModal) = React.useContext(ModalContext.context)
   let qrCode = () => address->QRCode->OpenModal->dispatchModal
+  let (accountBoxState, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
+
+  let connect = () =>
+    accountBoxState == "noShow"
+      ? setAccountBoxState(_ => "connect")
+      : setAccountBoxState(_ => "noShow")
 
   let (accountOpt, _) = AccountContext.use()
   let send = chainID =>
@@ -149,7 +155,7 @@ let make = (~address) => {
           : ()
       | false => openSendModal()
       }
-    | None => dispatchModal(OpenModal(Connect(chainID)))
+    | None => connect()
     }
 
   let currentTime =

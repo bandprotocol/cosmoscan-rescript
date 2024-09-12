@@ -1,6 +1,42 @@
 @react.component
 let make = (~address, ~hashtag: Route.account_tab_t) => {
   let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
+  let (_, dispatchModal) = React.useContext(ModalContext.context)
+
+  let currentTime =
+    React.useContext(TimeContext.context)->MomentRe.Moment.format(Config.timestampUseFormat, _)
+
+  let infoSub = React.useContext(GlobalContext.context)
+  let accountSub = AccountSub.get(address)
+  let balanceAtStakeSub = DelegationSub.getTotalStakeByDelegator(address)
+  let unbondingSub = UnbondingSub.getUnbondingBalance(address, currentTime)
+  let trackingSub = TrackingSub.use()
+  let topPartAllSub = Sub.all5(infoSub, accountSub, balanceAtStakeSub, unbondingSub, trackingSub)
+
+  let sumBalance = (balance, amount, unbonding, reward, commission) => {
+    let availableBalance = balance->Coin.getBandAmountFromCoins
+    let balanceAtStakeAmount = amount->Coin.getBandAmountFromCoin
+    let unbondingAmount = unbonding->Coin.getBandAmountFromCoin
+    let rewardAmount = reward->Coin.getBandAmountFromCoin
+    let commissionAmount = commission->Coin.getBandAmountFromCoins
+
+    availableBalance +. balanceAtStakeAmount +. rewardAmount +. unbondingAmount +. commissionAmount
+  }
+  let send = (chainID, sender) => {
+    let openSendModal = () =>
+      SubmitMsg.Send(Some(address), IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
+
+    switch sender == address {
+    | true =>
+      open Webapi.Dom
+      window->Window.confirm("Are you sure you want to send tokens to yourself?")
+        ? openSendModal()
+        : ()
+    | false => openSendModal()
+    }
+  }
+
+  let qrCode = () => address->QRCode->OpenModal->dispatchModal
 
   <Section pt=24>
     <div className=CssHelper.container>

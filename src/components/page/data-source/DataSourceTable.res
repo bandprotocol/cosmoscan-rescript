@@ -212,7 +212,7 @@ module RenderBodyMobile = {
       <Row marginBottom={16} alignItems={Row.Center}>
         <Col colSm=Col.Five>
           <Text
-            value="Last Requested"
+            value="Last Updated"
             ellipsis=false
             color={theme.neutral_600}
             size={Body1}
@@ -322,7 +322,7 @@ let make = (~searchTerm) => {
           <div>
             <Text
               block=true
-              value="Last Requested"
+              value="Last Updated"
               size=Text.Caption
               weight=Text.Semibold
               transform=Text.Uppercase

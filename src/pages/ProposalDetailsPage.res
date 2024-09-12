@@ -56,8 +56,9 @@ module VoteButton = {
 
     let (accountOpt, _) = React.useContext(AccountContext.context)
     let (_, dispatchModal) = React.useContext(ModalContext.context)
+    let (_, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
 
-    let connect = chainID => dispatchModal(OpenModal(Connect(chainID)))
+    let connect = () => setAccountBoxState(_ => "noShow")
     let vote = () => Vote(proposalID, proposalName)->SubmitTx->OpenModal->dispatchModal
 
     switch accountOpt {
@@ -67,8 +68,8 @@ module VoteButton = {
       </Button>
     | None =>
       switch trackingSub {
-      | Data({chainID}) =>
-        <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => connect(chainID)}>
+      | Data(_) =>
+        <Button px=40 py=10 fsize=14 style={CssHelper.flexBox()} onClick={_ => connect()}>
           {"Vote"->React.string}
         </Button>
       | Error(err) =>

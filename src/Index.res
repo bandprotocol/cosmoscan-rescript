@@ -11,7 +11,9 @@ let make = () =>
           <ThemeContext.Provider>
             <ModalContext.Provider>
               <AccountContext.Provider>
-                <App />
+                <WalletPopupContext.Provider>
+                  <App />
+                </WalletPopupContext.Provider>
               </AccountContext.Provider>
             </ModalContext.Provider>
           </ThemeContext.Provider>

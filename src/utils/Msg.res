@@ -271,7 +271,10 @@ module Authz = {
         grantee: json.required(list{"msg", "grantee"}, address),
         url: json.optional(list{"msg", "url"}, string),
         expiration: json.required(list{"msg", "grant", "expiration"}, timeString),
-        msgTypeUrl: json.required(list{"msg", "grant", "authorization", "msg"}, string),
+        // TODO: on mainnet tx Hash 2ad08bcb4d4298faea49c0dcf9195a71db0731872e602dd3e777b16d56558afe
+        // render validator details on StakeAuthorization
+        // msgTypeUrl: json.required(list{"msg", "grant", "authorization", "msg"}, string),
+        msgTypeUrl: "",
       })
     }
   }
@@ -365,12 +368,13 @@ module FeeGrant = {
     }
   }
 
+  // TODO: remove decode allowance missing in transaction
   module GrantAllowance = {
     type t = {
       grantee: Address.t,
       granter: Address.t,
-      allowance: Allowance.t,
-      allowedMessages: list<string>,
+      // allowance: Allowance.t,
+      // allowedMessages: list<string>,
     }
 
     let decode = {
@@ -378,8 +382,8 @@ module FeeGrant = {
       buildObject(json => {
         granter: json.required(list{"msg", "granter"}, address),
         grantee: json.required(list{"msg", "grantee"}, address),
-        allowance: json.required(list{"msg", "allowance"}, Allowance.decoder),
-        allowedMessages: json.required(list{"msg", "allowance", "allowed_messages"}, list(string)),
+        // allowance: json.required(list{"msg", "allowance"}, Allowance.decoder),
+        // allowedMessages: json.required(list{"msg", "allowance", "allowed_messages"}, list(string)),
       })
     }
   }
