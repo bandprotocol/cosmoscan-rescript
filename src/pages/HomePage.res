@@ -25,6 +25,13 @@ let make = () => {
   let (accountOpt, dispatchAccount) = React.useContext(AccountContext.context)
   let (_, dispatchModal) = React.useContext(ModalContext.context)
 
+  let delegationsSub = DelegationSub.getStakeList(
+    Address.fromBech32("band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"),
+    ~pageSize=999,
+    ~page=1,
+    (),
+  )
+
   React.useEffect0(() => {
     let wallet = Wallet.createFromMnemonic("aa")
 
@@ -40,12 +47,31 @@ let make = () => {
     })
     ->ignore
 
-    SubmitMsg.Send(None, IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
+    SubmitMsg.WithdrawAllReward(Address.fromBech32("band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"))
+    ->SubmitTx
+    ->OpenModal
+    ->dispatchModal
     None
   })
 
   <Section pt=80 pb=80 pbSm=24 bg={theme.neutral_000} style=Styles.root>
-    React.null
+    <div className={Css.merge(list{CssHelper.container, Styles.content})} id="homePageContainer">
+      {switch delegationsSub {
+      | Data(delegations) => delegations
+        ->Belt.Array.map(d => <>
+          <Text value={d.moniker} size=Text.Body1 weight=Text.Semibold color=theme.neutral_900 />
+          <Text
+            value={d.operatorAddress->Address.toBech32}
+            size=Text.Body1
+            weight=Text.Semibold
+            color=theme.neutral_900
+          />
+        </>)
+        ->React.array
+
+      | _ => <Text value={"no data"} size=Text.Body1 weight=Text.Semibold color=theme.neutral_900 />
+      }}
+    </div>
     // {!isMobile
     //   ? <>
     //       <img

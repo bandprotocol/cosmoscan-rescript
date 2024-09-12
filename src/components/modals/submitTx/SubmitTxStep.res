@@ -58,12 +58,12 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
   let client = React.useContext(ClientContext.context)
   let (show, setShow) = React.useState(_ => false)
 
-  let defaultFee = 5000 // Hard code fee for sending transaction on cosmoscan
   let (memo, setMemo) = React.useState(_ => {
     open EnhanceTxInput
     {text: "", value: Some("")}
   })
   let (gasInput, setGasInput) = React.useState(_ => msg->SubmitMsg.defaultGasLimit)
+  let (fee, setFee) = React.useState(_ => msg->SubmitMsg.defaultFee)
 
   <div className={Css.merge(list{Styles.container, Styles.disable(isActive)})}>
     <Heading value={SubmitMsg.toString(msg)} size=Heading.H4 marginBottom=24 />
@@ -76,6 +76,18 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
     | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
     | WithdrawReward(validator) =>
       <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
+    | WithdrawAllReward(validator) => {
+        let delegationsQuery = DelegationQuery.getStakeList(account.address)
+
+        {
+          switch delegationsQuery {
+          | Data(delegations) =>
+            <WithdrawAllRewardMsg address={account.address} delegations setMsgsOpt />
+          | _ => React.null
+          }
+        }
+      }
+
     | Reinvest(validator, amount) =>
       <ReinvestMsg address={account.address} validator amount setMsgsOpt />
     | Vote(proposalID, proposalName) =>
@@ -119,7 +131,7 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
             account.address,
             msgsOpt->Belt.Option.getWithDefault(_, []),
             account.chainID,
-            defaultFee,
+            msg->SubmitMsg.defaultFee,
             gasInput,
             memo.value->Belt.Option.getWithDefault(""),
           )->Promise.then(rawTx => {
