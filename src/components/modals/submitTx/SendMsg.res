@@ -53,17 +53,6 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
   }, (toAddress, amount))
 
   <>
-    <Heading size=Heading.H5 value="Available Balance" marginBottom=8 />
-    <div className={CssHelper.mb(~size=24, ())}>
-      {switch accountSub {
-      | Data({balance}) =>
-        <div>
-          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
-          <Text value=" BAND" />
-        </div>
-      | _ => <LoadingCensorBar width=150 height=18 />
-      }}
-    </div>
     <ChainSelector targetChain />
     <EnhanceTxInputV2
       width=302
