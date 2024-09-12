@@ -134,6 +134,11 @@ let make = (~address) => {
   let (_, dispatchModal) = React.useContext(ModalContext.context)
   let qrCode = () => address->QRCode->OpenModal->dispatchModal
   let (accountBoxState, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
+  let (accountOpt, _) = AccountContext.use()
+  let isLoggedInAsOwner = switch accountOpt {
+  | Some({address: loggedInAddress}) if Address.isEqual(address, loggedInAddress) => true
+  | _ => false
+  }
 
   let connect = () =>
     accountBoxState == "noShow"
@@ -300,9 +305,12 @@ let make = (~address) => {
                                 let delegate = () =>
                                   None->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
 
-                                <Button variant=Button.Outline fsize=14 onClick={_ => delegate()}>
-                                  {"Delegate"->React.string}
-                                </Button>
+                                isLoggedInAsOwner
+                                  ? <Button
+                                      variant=Button.Outline fsize=14 onClick={_ => delegate()}>
+                                      {"Delegate"->React.string}
+                                    </Button>
+                                  : React.null
                               }
                             </div>}
                       </>

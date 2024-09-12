@@ -42,8 +42,23 @@ module RenderBody = {
         | _ => <LoadingCensorBar width=200 height=20 />
         }}
         // APR
-        // TODO: wire up
-        <Text value="10.12%" code=true size=Body1 />
+        {switch delegationsSub {
+        | Data({moniker, operatorAddress, identity}) => {
+            let aprSub = AprSub.use()
+            let validatorsSub = ValidatorSub.get(operatorAddress)
+            let allSub = Sub.all2(aprSub, validatorsSub)
+
+            switch allSub {
+            | Data((apr, {commission})) =>
+              <Text
+                value={(apr *. (100. -. commission) /. 100.)->Format.fPercent} code=true size=Body1
+              />
+            | _ => <LoadingCensorBar width=50 height=20 />
+            }
+          }
+
+        | _ => <LoadingCensorBar width=50 height=20 />
+        }}
         // Delegated Amount
         <div className={CssHelper.flexBox(~justify=#flexEnd, ())}>
           {switch delegationsSub {
@@ -93,12 +108,33 @@ module RenderBodyMobile = {
           (amount->Coin.getBandAmountFromCoin->Js.Float.toString ++
           (reward->Coin.getBandAmountFromCoin->Js.Float.toString ++
             reserveIndex->Belt.Int.toString))
+
       <MobileCard
         values={
           open InfoMobileCard
           [
             ("Validator Name", Validator({address: operatorAddress, moniker, identity})),
-            ("Est. APR", Percentage(19., Some(2))), // TODO: wire up
+            (
+              "Est. APR",
+              {
+                switch delegationsSub {
+                | Data({moniker, operatorAddress, identity}) => {
+                    let aprSub = AprSub.use()
+                    let validatorsSub = ValidatorSub.get(operatorAddress)
+                    let allSub = Sub.all2(aprSub, validatorsSub)
+
+                    switch allSub {
+                    | Data((apr, {commission})) =>
+                      Percentage(apr *. (100. -. commission) /. 100., Some(2))
+
+                    | _ => Loading(100)
+                    }
+                  }
+
+                | _ => Loading(100)
+                }
+              },
+            ),
             ("Delegated Amount", Coin({value: list{amount}, hasDenom: false})),
             ("Reward", Coin({value: list{reward}, hasDenom: false})),
           ]
