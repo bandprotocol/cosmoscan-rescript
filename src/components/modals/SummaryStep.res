@@ -156,6 +156,8 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
             switch msg {
             | Msg.Input.DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
               <DelegateSummary account validator={validatorAddress} amount />
+            | Msg.Input.SendMsg({fromAddress, toAddress, amount}) =>
+              <SendSummary fromAddress toAddress amount />
             // TODO: handle properly
             | _ => <Text value={"fallback"} />
             }
