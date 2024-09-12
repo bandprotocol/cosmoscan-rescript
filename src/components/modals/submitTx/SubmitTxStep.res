@@ -15,7 +15,6 @@ module Styles = {
   let nextBtn = style(. [width(#percent(100.)), marginTop(#px(24))])
 
   let info = style(. [display(#flex), justifyContent(#spaceBetween), alignItems(#center)])
-  let toggle = style(. [cursor(#pointer), zIndex(100)])
   let advancedOptions = (show, theme: Theme.t) =>
     style(. [
       marginTop(#px(10)),
@@ -82,17 +81,9 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
     | Vote(proposalID, proposalName) =>
       <VoteMsg address={account.address} proposalID proposalName setMsgsOpt />
     }}
-    <div
-      onClick={_ => setShow(prev => !prev)}
-      className={Css.merge(list{CssHelper.flexBox(~justify=#center, ()), Styles.toggle})}>
-      <Text
-        block=true
-        value={show ? "Hide Advanced Options" : "Show Advanced Options"}
-        weight=Text.Semibold
-        color={theme.neutral_900}
-      />
-      <HSpacing size=Spacing.xs />
-      <Icon name={show ? "fas fa-caret-up" : "fas fa-caret-down"} color={theme.neutral_600} />
+    <div className={CssHelper.flexBox()}>
+      <SwitchV2 checked=show onClick={_ => setShow(prev => !prev)} />
+      <Text block=true value="Advanced" weight=Text.Semibold color={theme.neutral_900} />
     </div>
     <div className={Styles.advancedOptions(show, theme)}>
       <EnhanceTxInput
