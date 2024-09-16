@@ -92,7 +92,7 @@ type state_t =
   | Error(string)
 
 @react.component
-let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
+let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
   let (tabIndex, setTabIndex) = React.useState(_ => 0)
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let trackingSub = TrackingSub.use()
@@ -137,6 +137,11 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
 
     dispatchModal(EnableExit)
   }
+  //  validatorAddress: Address.t,
+  //       delegatorAddress: Address.t,
+  //       amount: 'a,
+  //       moniker: 'b,
+  //       identity: 'c,
 
   <div className={Styles.container}>
     {switch state {
@@ -152,12 +157,22 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt) => {
         {switch tabIndex {
         | 0 =>
           switch msgsOpt->Belt.Option.getWithDefault(_, [])->Belt.Array.get(0) {
-          | Some(msg) =>
-            switch msg {
+          | Some(msg') =>
+            switch msg' {
             | Msg.Input.DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
               <DelegateSummary account validator={validatorAddress} amount />
             | Msg.Input.SendMsg({fromAddress, toAddress, amount}) =>
               <SendSummary fromAddress toAddress amount />
+            | Msg.Input.WithdrawRewardMsg({validatorAddress, delegatorAddress}) =>
+              switch msg {
+              | SubmitMsg.WithdrawAllReward(_) =>
+                <WithdrawAllRewardSummary address={delegatorAddress} />
+              | SubmitMsg.WithdrawReward(_) =>
+                // TODO: withdraw reward summary
+                <WithdrawAllRewardSummary address={delegatorAddress} />
+              | _ => <Text value={"unknown messages"} />
+              }
+
             // TODO: handle properly
             | _ => <Text value={"fallback"} />
             }

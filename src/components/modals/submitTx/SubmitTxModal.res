@@ -19,7 +19,7 @@ module CreateTxFlow = {
     <>
       <SubmitTxStep account setRawTx isActive={rawTx->Belt.Option.isNone} msg msgsOpt setMsgsOpt />
       {rawTx->Belt.Option.mapWithDefault(React.null, tx =>
-        <SummaryStep rawTx=tx onBack={_ => setRawTx(_ => None)} account msgsOpt />
+        <SummaryStep rawTx=tx onBack={_ => setRawTx(_ => None)} account msg msgsOpt />
       )}
     </>
   }

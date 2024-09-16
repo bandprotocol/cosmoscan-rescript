@@ -22,9 +22,8 @@ module Styles = {
 
 @react.component
 let make = (~address, ~setMsgsOpt, ~delegations: array<DelegationSub.Stake.t>) => {
-  // let validatorInfoSub = ValidatorSub.get(validator)
-  let delegationsSub = DelegationSub.getStakeList(address, ~pageSize=9999, ~page=1, ())
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
+  let delegationsSub = DelegationSub.getStakeList(address, ~pageSize=9999, ~page=1, ())
   let infoSub = React.useContext(GlobalContext.context)
 
   React.useEffect0(_ => {
