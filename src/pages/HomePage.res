@@ -57,11 +57,18 @@ let make = () => {
   <Section pt=80 pb=80 pbSm=24 bg={theme.neutral_000} style=Styles.root>
     <div className={Css.merge(list{CssHelper.container, Styles.content})} id="homePageContainer">
       {switch delegationsSub {
-      | Data(delegations) => delegations
+      | Data(delegations) =>
+        delegations
         ->Belt.Array.map(d => <>
           <Text value={d.moniker} size=Text.Body1 weight=Text.Semibold color=theme.neutral_900 />
           <Text
             value={d.operatorAddress->Address.toBech32}
+            size=Text.Body1
+            weight=Text.Semibold
+            color=theme.neutral_900
+          />
+          <Text
+            value={d.reward->Coin.getBandAmountFromCoin->Format.fPretty}
             size=Text.Body1
             weight=Text.Semibold
             color=theme.neutral_900

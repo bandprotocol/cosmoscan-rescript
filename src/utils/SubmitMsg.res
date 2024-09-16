@@ -14,8 +14,8 @@ let toString = x =>
   | Delegate(_) => "Delegate"
   | Undelegate(_) => "Undelegate"
   | Redelegate(_) => "Redelegate"
-  | WithdrawReward(_) => "Withdraw Reward"
-  | WithdrawAllReward(_) => "Withdraw All Reward"
+  | WithdrawReward(_) => "Claim Reward"
+  | WithdrawAllReward(_) => "Claim All Rewards"
   | Reinvest(_) => "Reinvest"
   | Vote(_) => "Vote"
   }

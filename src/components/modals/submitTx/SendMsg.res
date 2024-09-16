@@ -1,3 +1,9 @@
+module Styles = {
+  open CssJs
+
+  let container = style(. [paddingBottom(#px(24)), width(#px(500))])
+}
+
 @react.component
 let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
   let accountSub = AccountSub.get(address)
@@ -52,7 +58,7 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
     None
   }, (toAddress, amount))
 
-  <>
+  <div className=Styles.container>
     <ChainSelector targetChain />
     <EnhanceTxInputV2
       width=302
@@ -93,5 +99,5 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
         msg="Send Amount (BAND)" code=true useMax=true placeholder="0.000000"
       />
     }}
-  </>
+  </div>
 }

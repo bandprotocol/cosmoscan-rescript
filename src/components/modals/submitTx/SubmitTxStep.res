@@ -2,7 +2,6 @@ module Styles = {
   open CssJs
   let container = style(. [
     flexDirection(#column),
-    width(#px(468)),
     minHeight(#px(300)),
     height(#auto),
     padding(#px(32)),
