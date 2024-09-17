@@ -28,7 +28,11 @@ let make = (~address, ~validator) => {
         color={theme.neutral_900}
       />
       <Text
-        value={address->Address.toBech32} size={Body1} weight=Text.Regular color={theme.neutral_900}
+        value={address->Address.toBech32}
+        size={Body1}
+        weight=Text.Regular
+        color={theme.neutral_900}
+        code=true
       />
     </div>
     {switch validatorInfoSub {
@@ -39,7 +43,10 @@ let make = (~address, ~validator) => {
         </div>
         <Text value={validator.moniker} size={Body1} color={theme.neutral_900} weight={Semibold} />
         <Text
-          value={validator.operatorAddress->Address.toOperatorBech32} size={Body2} ellipsis=true
+          value={validator.operatorAddress->Address.toOperatorBech32}
+          size={Body2}
+          ellipsis=true
+          code=true
         />
       </div>
     | _ => <LoadingCensorBar width=50 height=20 />

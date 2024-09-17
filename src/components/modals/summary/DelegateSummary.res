@@ -40,6 +40,7 @@ let make = (~account: AccountContext.t, ~validator: Address.t, ~amount) => {
         size={Body1}
         weight=Text.Regular
         color={theme.neutral_900}
+        code=true
       />
     </div>
     <div className={CssHelper.mb(~size=24, ())}>
@@ -61,6 +62,7 @@ let make = (~account: AccountContext.t, ~validator: Address.t, ~amount) => {
             size={Body1}
             weight=Text.Regular
             color={theme.neutral_900}
+            code=true
           />
         </>
       | _ => <LoadingCensorBar width=150 height=18 />

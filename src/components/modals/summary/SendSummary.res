@@ -34,6 +34,7 @@ let make = (~fromAddress, ~toAddress, ~amount) => {
         size={Body1}
         weight=Text.Regular
         color={theme.neutral_900}
+        code=true
       />
     </div>
     <div className={CssHelper.mb(~size=24, ())}>
@@ -50,6 +51,7 @@ let make = (~fromAddress, ~toAddress, ~amount) => {
         size={Body1}
         weight=Text.Regular
         color={theme.neutral_900}
+        code=true
       />
     </div>
     <div>

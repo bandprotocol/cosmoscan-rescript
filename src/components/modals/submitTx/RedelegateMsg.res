@@ -82,7 +82,7 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
         <Text
           size={Body2}
-          value="Delegate your BAND to start earning staking rewards. Undelegated balances are locked for 21 days."
+          value="You can only redelegate a maximum of 7 times to/from the same validator pairs during any 21 day period."
         />
       </div>
       {switch validatorInfoSub {
@@ -93,7 +93,12 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
               <Text value="Redelegate from" size={Body2} />
             </div>
             <Text value={v.moniker} size={Body1} color={theme.neutral_900} weight={Semibold} />
-            <Text value={v.operatorAddress->Address.toOperatorBech32} size={Body2} ellipsis=true />
+            <Text
+              value={v.operatorAddress->Address.toOperatorBech32}
+              size={Body2}
+              ellipsis=true
+              code=true
+            />
           </div>
           <ValidatorDelegationDetail
             address validator bondedTokenCountSub isShowCurrentDelegated=false

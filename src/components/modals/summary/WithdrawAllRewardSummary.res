@@ -37,7 +37,11 @@ let make = (~address) => {
         color={theme.neutral_900}
       />
       <Text
-        value={address->Address.toBech32} size={Body1} weight=Text.Regular color={theme.neutral_900}
+        value={address->Address.toBech32}
+        size={Body1}
+        weight=Text.Regular
+        color={theme.neutral_900}
+        code=true
       />
     </div>
     <div>
@@ -72,6 +76,7 @@ let make = (~address) => {
                       value={delegation.operatorAddress->Address.toOperatorBech32}
                       size={Body2}
                       ellipsis=true
+                      code=true
                     />
                   </div>
                 </Col>

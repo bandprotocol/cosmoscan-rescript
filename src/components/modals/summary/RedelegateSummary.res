@@ -49,11 +49,21 @@ let make = (~address, ~validatorSourceAddress, ~validatorDestinationAddress, ~am
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   <div className=Styles.container>
-    <div className={Styles.tooltips(theme)}>
-      <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
+    <div className={CssHelper.mb(~size=24, ())}>
+      <Heading
+        value="Band Address"
+        size=Heading.H5
+        align=Heading.Left
+        weight=Heading.Regular
+        marginBottom=4
+        color={theme.neutral_900}
+      />
       <Text
-        size={Body2}
-        value="Delegate your BAND to start earning staking rewards. Undelegated balances are locked for 21 days."
+        value={address->Address.toBech32}
+        size={Body1}
+        weight=Text.Regular
+        color={theme.neutral_900}
+        code=true
       />
     </div>
     <div className={CssHelper.mb(~size=24, ())}>
@@ -65,7 +75,12 @@ let make = (~address, ~validatorSourceAddress, ~validatorDestinationAddress, ~am
               <Text value="Redelegate from" size={Body2} />
             </div>
             <Text value={v.moniker} size={Body1} color={theme.neutral_900} weight={Semibold} />
-            <Text value={v.operatorAddress->Address.toOperatorBech32} size={Body2} ellipsis=true />
+            <Text
+              value={v.operatorAddress->Address.toOperatorBech32}
+              size={Body2}
+              ellipsis=true
+              code=true
+            />
           </div>
           <ValidatorDelegationDetail
             address
@@ -86,7 +101,12 @@ let make = (~address, ~validatorSourceAddress, ~validatorDestinationAddress, ~am
               <Text value="Redelegate to" size={Body2} />
             </div>
             <Text value={v.moniker} size={Body1} color={theme.neutral_900} weight={Semibold} />
-            <Text value={v.operatorAddress->Address.toOperatorBech32} size={Body2} ellipsis=true />
+            <Text
+              value={v.operatorAddress->Address.toOperatorBech32}
+              size={Body2}
+              ellipsis=true
+              code=true
+            />
           </div>
           <ValidatorDelegationDetail
             address
