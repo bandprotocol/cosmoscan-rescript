@@ -47,7 +47,7 @@ let make = () => {
     })
     ->ignore
 
-    SubmitMsg.WithdrawAllReward(Address.fromBech32("band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"))
+    SubmitMsg.WithdrawReward(Address.fromBech32("band1kfj48adjsnrgu83lau6wc646q2uf65rftr0pem"))
     ->SubmitTx
     ->OpenModal
     ->dispatchModal

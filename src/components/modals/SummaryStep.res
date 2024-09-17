@@ -167,9 +167,9 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
               switch msg {
               | SubmitMsg.WithdrawAllReward(_) =>
                 <WithdrawAllRewardSummary address={delegatorAddress} />
-              | SubmitMsg.WithdrawReward(_) =>
+              | SubmitMsg.WithdrawReward(validator) =>
                 // TODO: withdraw reward summary
-                <WithdrawAllRewardSummary address={delegatorAddress} />
+                <WithdrawRewardSummary address={delegatorAddress} validator />
               | _ => <Text value={"unknown messages"} />
               }
 

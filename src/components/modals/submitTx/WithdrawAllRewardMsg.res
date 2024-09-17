@@ -101,12 +101,12 @@ let make = (~address, ~setMsgsOpt, ~delegations: array<DelegationSub.Stake.t>) =
             color={theme.neutral_600}
           />
           <div>
-            <Text
-              size={Xl}
-              weight={Bold}
+            <NumberCountUp
+              value={totalReward}
+              size={Text.Xl}
               color={theme.neutral_900}
-              code=true
-              value={totalReward->Format.fPretty(~digits=6)}
+              weight={Text.Bold}
+              decimals=6
             />
             <VSpacing size={#px(4)} />
             {switch infoSub {
