@@ -13,139 +13,26 @@ module Styles = {
       marginBottom(#px(24)),
     ])
 
+  let heading = (theme: Theme.t) =>
+    style(. [
+      borderBottom(#px(1), #solid, theme.neutral_300),
+      paddingBottom(#px(4)),
+      marginBottom(#px(4)),
+    ])
+
   let select = style(. [width(#px(1000)), height(#px(1))])
-}
+  let tooltips = (theme: Theme.t) =>
+    style(. [
+      display(#flex),
+      columnGap(#px(8)),
+      borderRadius(#px(4)),
+      backgroundColor(theme.neutral_100),
+      padding2(~v=#px(10), ~h=#px(16)),
+      marginBottom(#px(24)),
+    ])
 
-module DstValidatorSelection = {
-  type control_t = {
-    display: string,
-    height: string,
-    width: string,
-    fontSize: string,
-    backgroundColor: string,
-    borderRadius: string,
-    border: string,
-    color: string,
-  }
-
-  type option_t = {
-    display: string,
-    alignItems: string,
-    height: string,
-    fontSize: string,
-    paddingLeft: string,
-    cursor: string,
-    color: string,
-    backgroundColor: string,
-  }
-
-  type input_t = {color: string}
-
-  type menu_t = {
-    backgroundColor: string,
-    overflowY: string,
-    maxHeight: string,
-  }
-
-  type container_t = {
-    width: string,
-    position: string,
-    boxSizing: string,
-  }
-
-  type singleValue_t = {
-    margin: string,
-    maxWidth: string,
-    overflow: string,
-    position: string,
-    textOverflow: string,
-    whiteSpace: string,
-    top: string,
-    transform: string,
-    boxSizing: string,
-    fontWeight: string,
-    lineHeight: string,
-  }
-
-  type indicatorSeparator_t = {display: string}
-
-  @react.component
-  let make = (~filteredValidators: array<Validator.t>, ~setDstValidatorOpt) => {
-    let ({ThemeContext.theme: theme, isDarkMode}, _) = React.useContext(ThemeContext.context)
-
-    let (selectedValidator, setSelectedValidator) = React.useState(_ => {
-      open ReactSelect
-      {value: "N/A", label: "Enter or select validator to delegate to"}
-    })
-    let validatorList = filteredValidators->Belt_Array.map(({operatorAddress, moniker}) => {
-      open ReactSelect
-      {value: operatorAddress->Address.toOperatorBech32, label: moniker}
-    })
-
-    // TODO: Hack styles for react-select
-    <div
-      className={CssHelper.flexBox(~align=#flexStart, ~direction=#column, ())}
-      id="redelegateContainer">
-      // <ReactSelect
-      //   options=validatorList
-      //   onChange={newOption => {
-      //     let newVal = newOption
-      //     setSelectedValidator(_ => newVal)
-      //     setDstValidatorOpt(_ => Some(newVal.value->Address.fromBech32))
-      //   }}
-      //   value=selectedValidator
-      //   styles={
-      //     ReactSelect.control: _ => {
-      //       display: "flex",
-      //       height: "37px",
-      //       width: "100%",
-      //       fontSize: "14px",
-      //       color: theme.neutral_900->Theme.toString,
-      //       backgroundColor: theme.neutral_000->Theme.toString,
-      //       borderRadius: "8px",
-      //       border: `1px solid ${theme.neutral_300->Theme.toString}`,
-      //     },
-      //     ReactSelect.option: _ => {
-      //       fontSize: "14px",
-      //       height: "37px",
-      //       display: "flex",
-      //       alignItems: "center",
-      //       paddingLeft: "10px",
-      //       cursor: "pointer",
-      //       color: theme.neutral_900->Theme.toString,
-      //       backgroundColor: theme.neutral_000->Theme.toString,
-      //     },
-      //     ReactSelect.container: _ => {
-      //       width: "100%",
-      //       position: "relative",
-      //       boxSizing: "border-box",
-      //     },
-      //     ReactSelect.singleValue: _ => {
-      //       margin: "0px 2px",
-      //       maxWidth: "calc(100% - 8px)",
-      //       overflow: "hidden",
-      //       position: "absolute",
-      //       textOverflow: "ellipsis",
-      //       whiteSpace: "nowrap",
-      //       top: "50%",
-      //       transform: "translateY(-50%)",
-      //       boxSizing: "border-box",
-      //       fontWeight: "300",
-      //       lineHeight: "1.3em",
-      //     },
-      //     ReactSelect.indicatorSeparator: _ => {display: "none"},
-      //     ReactSelect.input: _ => {color: theme.neutral_900->Theme.toString},
-      //     ReactSelect.menuList: _ => {
-      //       backgroundColor: theme.neutral_000->Theme.toString,
-      //       overflowY: "scroll",
-      //       maxHeight: "230px",
-      //     },
-      //   }
-      // />
-      <VSpacing size=Spacing.sm />
-      <Text value={"(" ++ selectedValidator.value ++ ")"} />
-    </div>
-  }
+  let halfWidth = style(. [width(#percent(50.))])
+  let fullWidth = style(. [width(#percent(100.)), margin2(~v=#px(24), ~h=#zero)])
 }
 
 @react.component
@@ -153,12 +40,13 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
   let validatorInfoSub = ValidatorSub.get(validator)
   let validatorsSub = ValidatorSub.getList(~filter=Active, ())
   let delegationSub = DelegationSub.getStakeByValidator(address, validator)
+  let accountSub = AccountSub.get(address)
+  let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
 
-  let allSub = Sub.all3(validatorInfoSub, validatorsSub, delegationSub)
+  let allSub = Sub.all2(accountSub, validatorsSub)
 
   let (dstValidatorOpt, setDstValidatorOpt) = React.useState(_ => None)
-
-  let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
+  let (amount, setAmount) = React.useState(_ => EnhanceTxInputV2.empty)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -187,89 +75,79 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
     setMsgsOpt(_ => msgsOpt)
     None
   }, (dstValidatorOpt, amount))
+
   <>
-    <div className={Styles.warning(theme)}>
-      <Heading
-        value="Please read before proceeding:" size=Heading.H5 marginBottom=4 align=Heading.Left
-      />
-      <Text
-        value="You can only redelegate a maximum of 7 times to/from the same validator pairs during any 21 day period."
-      />
-    </div>
     <div className=Styles.container>
-      <Heading
-        value="Redelegate from"
-        size=Heading.H5
-        marginBottom=8
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
-      />
-      {switch allSub {
-      | Data(({moniker}, _, _)) =>
-        <div>
-          <Text value=moniker ellipsis=true align=Text.Right />
-          <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
+      <div className={Styles.tooltips(theme)}>
+        <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
+        <Text
+          size={Body2}
+          value="Delegate your BAND to start earning staking rewards. Undelegated balances are locked for 21 days."
+        />
+      </div>
+      {switch validatorInfoSub {
+      | Data(v) =>
+        <div className={CssHelper.mb(~size=24, ())}>
+          <div className={CssHelper.mb(~size=24, ())}>
+            <div className={Styles.heading(theme)}>
+              <Text value="Redelegate from" size={Body2} />
+            </div>
+            <Text value={v.moniker} size={Body1} color={theme.neutral_900} weight={Semibold} />
+            <Text value={v.operatorAddress->Address.toOperatorBech32} size={Body2} ellipsis=true />
+          </div>
+          <ValidatorDelegationDetail
+            address validator bondedTokenCountSub isShowCurrentDelegated=false
+          />
         </div>
       | _ => <LoadingCensorBar width=300 height=34 />
       }}
-    </div>
-    <div className=Styles.container>
       <Heading
         value="Redelegate to"
         size=Heading.H5
         marginBottom=8
         align=Heading.Left
         weight=Heading.Regular
-        color={theme.neutral_600}
+        color={theme.neutral_900}
       />
-      {switch allSub {
-      | Data(({operatorAddress}, validators, _)) =>
-        let filteredValidators =
-          validators->Belt_Array.keep(validator =>
-            validator.operatorAddress !== operatorAddress && validator.commission !== 100.
-          )
-        <DstValidatorSelection filteredValidators setDstValidatorOpt />
-      | _ => <LoadingCensorBar width=300 height=59 />
-      }}
-    </div>
-    <div className=Styles.container>
-      <Heading
-        value="Current Stake"
-        size=Heading.H5
-        marginBottom=8
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
-      />
-      {switch allSub {
-      | Data((_, _, {amount: stakedAmount})) =>
+      {switch validatorsSub {
+      | Data(validators) =>
         <div>
-          <Text
-            value={stakedAmount->Coin.getBandAmountFromCoin->Format.fPretty(~digits=6)} code=true
-          />
-          <Text value=" BAND" />
+          {
+            let filteredValidators =
+              validators->Belt_Array.keep(validator => validator.commission !== 100.)
+            <ValidatorSelection
+              validatorOpt={dstValidatorOpt} filteredValidators setValidatorOpt={setDstValidatorOpt}
+            />
+          }
         </div>
-      | _ => <LoadingCensorBar width=150 height=18 />
+      | Error(err) => <Text value={err.message} />
+      | NoData => <Text value={"No Data"} />
+      | _ => <LoadingCensorBar width=300 height=34 />
       }}
     </div>
+    {switch dstValidatorOpt {
+    | Some(validator) => <ValidatorDelegationDetail address validator bondedTokenCountSub />
+    | None => <ValidatorDelegationDetail.NoData />
+    }}
     {switch allSub {
-    | Data((_, _, {amount: stakedAmount})) =>
-      let maxValInUband = stakedAmount->Coin.getUBandAmountFromCoin
-      <EnhanceTxInput
+    | Data(({balance}, _)) =>
+      //  TODO: hard-coded tx fee
+      let maxValInUband = balance->Coin.getUBandAmountFromCoins -. 5000.
+      <EnhanceTxInputV2
         width=300
         inputData=amount
         setInputData=setAmount
         parse={Parse.getBandAmount(maxValInUband)}
         maxValue={(maxValInUband /. 1e6)->Belt.Float.toString}
-        msg="Amount"
+        msg="Delegate Amount (BAND)"
         placeholder="0.000000"
         inputType="number"
         code=true
         autoFocus=true
-        id="redelegateAmountInput"
+        id="delegateAmountInput"
+        maxWarningMsg=true
       />
-    | _ => <EnhanceTxInput.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
+    | _ => <EnhanceTxInputV2.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
     }}
   </>
 }

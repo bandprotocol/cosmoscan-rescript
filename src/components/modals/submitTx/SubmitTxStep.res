@@ -4,7 +4,7 @@ module Styles = {
     flexDirection(#column),
     minHeight(#px(300)),
     height(#auto),
-    padding(#px(32)),
+    padding(#px(24)),
     borderRadius(#px(5)),
     justifyContent(#flexStart),
   ])

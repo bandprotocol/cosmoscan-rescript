@@ -24,7 +24,6 @@ module Styles = {
 
   let halfWidth = style(. [width(#percent(50.))])
   let fullWidth = style(. [width(#percent(100.)), margin2(~v=#px(24), ~h=#zero)])
-  let test = style(. [backgroundColor(#hex("#FF0000")), height(#px(50))])
 }
 
 @react.component
@@ -86,9 +85,7 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
           {
             let filteredValidators =
               validators->Belt_Array.keep(validator => validator.commission !== 100.)
-            <ValidatorSelection
-              validatorOpt={preselectValidator} filteredValidators setValidatorOpt
-            />
+            <ValidatorSelection validatorOpt filteredValidators setValidatorOpt />
           }
         </div>
       | Error(err) => <Text value={err.message} />

@@ -161,9 +161,18 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
             switch msg' {
             | Msg.Input.DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
               <DelegateSummary account validator={validatorAddress} amount />
-            | Msg.Input.SendMsg({fromAddress, toAddress, amount}) =>
+            | SendMsg({fromAddress, toAddress, amount}) =>
               <SendSummary fromAddress toAddress amount />
-            | Msg.Input.WithdrawRewardMsg({validatorAddress, delegatorAddress}) =>
+            | RedelegateMsg({
+                validatorSourceAddress,
+                validatorDestinationAddress,
+                delegatorAddress,
+                amount,
+              }) =>
+              <RedelegateSummary
+                address={delegatorAddress} validatorSourceAddress validatorDestinationAddress amount
+              />
+            | WithdrawRewardMsg({validatorAddress, delegatorAddress}) =>
               switch msg {
               | SubmitMsg.WithdrawAllReward(_) =>
                 <WithdrawAllRewardSummary address={delegatorAddress} />
