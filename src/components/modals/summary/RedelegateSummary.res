@@ -39,12 +39,8 @@ module Styles = {
 
 @react.component
 let make = (~address, ~validatorSourceAddress, ~validatorDestinationAddress, ~amount) => {
-  let validatorSourceInfoSub = ValidatorSub.get(validatorSourceAddress)
-  let validatorDestinationInfoSub = ValidatorSub.get(validatorDestinationAddress)
-  let delegationSub = DelegationSub.getStakeByValidator(address, validatorSourceAddress)
-  let accountSub = AccountSub.get(address)
+  let delegationSub = DelegationSub.getStakeByValidator(address, validatorDestinationAddress)
   let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
-  let infoSub = React.useContext(GlobalContext.context)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -67,86 +63,24 @@ let make = (~address, ~validatorSourceAddress, ~validatorDestinationAddress, ~am
       />
     </div>
     <div className={CssHelper.mb(~size=24, ())}>
-      {switch validatorSourceInfoSub {
-      | Data(v) =>
-        <>
-          <div className={CssHelper.mb(~size=24, ())}>
-            <div className={Styles.heading(theme)}>
-              <Text value="Redelegate from" size={Body2} />
-            </div>
-            <Text value={v.moniker} size={Body1} color={theme.neutral_900} weight={Semibold} />
-            <Text
-              value={v.operatorAddress->Address.toOperatorBech32}
-              size={Body2}
-              ellipsis=true
-              code=true
-            />
-          </div>
-          <ValidatorDelegationDetail
-            address
-            validator={validatorSourceAddress}
-            bondedTokenCountSub
-            isShowCurrentDelegated=false
-          />
-        </>
-      | _ => <LoadingCensorBar width=300 height=34 />
-      }}
+      <ValidatorDetail heading="Redelegate from" validator={validatorSourceAddress} />
+      <ValidatorDelegationDetail
+        address validator={validatorSourceAddress} bondedTokenCountSub isShowCurrentDelegated=false
+      />
     </div>
     <div className={CssHelper.mb(~size=24, ())}>
-      {switch validatorDestinationInfoSub {
-      | Data(v) =>
-        <>
-          <div className={CssHelper.mb(~size=24, ())}>
-            <div className={Styles.heading(theme)}>
-              <Text value="Redelegate to" size={Body2} />
-            </div>
-            <Text value={v.moniker} size={Body1} color={theme.neutral_900} weight={Semibold} />
-            <Text
-              value={v.operatorAddress->Address.toOperatorBech32}
-              size={Body2}
-              ellipsis=true
-              code=true
-            />
-          </div>
-          <ValidatorDelegationDetail
-            address
-            validator={validatorSourceAddress}
-            bondedTokenCountSub
-            isShowCurrentDelegated=false
-          />
-        </>
-      | _ => <LoadingCensorBar width=300 height=34 />
-      }}
-    </div>
-    <div>
-      <Heading
-        value="Redelegate Amount (BAND)"
-        size=Heading.H5
-        align=Heading.Left
-        weight=Heading.Regular
-        marginBottom=4
-        color={theme.neutral_600}
+      <ValidatorDetail heading="Redelegate to" validator={validatorDestinationAddress} />
+      <ValidatorDelegationDetail
+        address
+        validator={validatorDestinationAddress}
+        bondedTokenCountSub
+        isShowCurrentDelegated=false
       />
-      <div className={Styles.summaryAmountContainer(theme)}>
-        <Text
-          size={Xl}
-          weight={Bold}
-          color={theme.neutral_900}
-          code=true
-          value={amount->Coin.getBandAmountFromCoin->Format.fPretty}
-        />
-        <VSpacing size={#px(4)} />
-        {switch infoSub {
-        | Data({financial}) =>
-          <Text
-            size={Body2}
-            code=true
-            value={`$${(amount->Coin.getBandAmountFromCoin *. financial.usdPrice)
-                ->Format.fPretty(~digits=2)} USD`}
-          />
-        | _ => <LoadingCensorBar width=50 height=20 />
-        }}
-      </div>
     </div>
+    {switch delegationSub {
+    | Data(delegation) =>
+      <SummaryAmountBox heading="Redelegate Amount (BAND)" amount maxValue={delegation.amount} />
+    | _ => <LoadingCensorBar width=300 height=60 />
+    }}
   </div>
 }

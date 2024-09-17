@@ -162,7 +162,13 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
             | Msg.Input.DelegateMsg({delegatorAddress, validatorAddress, amount}) =>
               <DelegateSummary account validator={validatorAddress} amount />
             | SendMsg({fromAddress, toAddress, amount}) =>
-              <SendSummary fromAddress toAddress amount />
+              <SendSummary
+                fromAddress
+                toAddress
+                amount={amount
+                ->Belt.List.get(0)
+                ->Belt.Option.getWithDefault(Coin.newCoin("uband", 0.))}
+              />
             | RedelegateMsg({
                 validatorSourceAddress,
                 validatorDestinationAddress,

@@ -35,22 +35,7 @@ let make = (~address, ~validator) => {
         code=true
       />
     </div>
-    {switch validatorInfoSub {
-    | Data(validator) =>
-      <div className={CssHelper.mb(~size=24, ())}>
-        <div className={Styles.heading(theme)}>
-          <Text value="Withdraw Delegation Reward From" size={Body2} />
-        </div>
-        <Text value={validator.moniker} size={Body1} color={theme.neutral_900} weight={Semibold} />
-        <Text
-          value={validator.operatorAddress->Address.toOperatorBech32}
-          size={Body2}
-          ellipsis=true
-          code=true
-        />
-      </div>
-    | _ => <LoadingCensorBar width=50 height=20 />
-    }}
+    <ValidatorDetail heading="Withdraw Delegation Reward From" validator />
     {switch delegationSub {
     | Data(delegation) =>
       <div className={CssHelper.mt(~size=24, ())}>

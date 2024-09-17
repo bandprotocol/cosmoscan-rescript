@@ -54,35 +54,6 @@ let make = (~fromAddress, ~toAddress, ~amount) => {
         code=true
       />
     </div>
-    <div>
-      <Heading
-        value="Amount (BAND)"
-        size=Heading.H5
-        align=Heading.Left
-        weight=Heading.Regular
-        marginBottom=4
-        color={theme.neutral_600}
-      />
-      <div className={Styles.amountContainer(theme)}>
-        <Text
-          size={Xl}
-          weight={Bold}
-          color={theme.neutral_900}
-          code=true
-          value={amount->Coin.getBandAmountFromCoins->Format.fPretty}
-        />
-        <VSpacing size={#px(4)} />
-        {switch infoSub {
-        | Data({financial}) =>
-          <Text
-            size={Body2}
-            code=true
-            value={`$${(amount->Coin.getBandAmountFromCoins *. financial.usdPrice)
-                ->Format.fPretty(~digits=2)} USD`}
-          />
-        | _ => <LoadingCensorBar width=50 height=20 />
-        }}
-      </div>
-    </div>
+    <SummaryAmountBox heading="Amount (BAND)" amount />
   </div>
 }

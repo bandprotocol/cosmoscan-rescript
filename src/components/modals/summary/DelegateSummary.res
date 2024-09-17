@@ -44,62 +44,15 @@ let make = (~account: AccountContext.t, ~validator: Address.t, ~amount) => {
       />
     </div>
     <div className={CssHelper.mb(~size=24, ())}>
-      <Heading
-        value="Delegate to"
-        size=Heading.H5
-        align=Heading.Left
-        weight=Heading.Regular
-        marginBottom=4
-        color={theme.neutral_900}
-        style={Styles.borderBottomLine(theme)}
-      />
-      {switch validatorsSub {
-      | Data({moniker, operatorAddress}) =>
-        <>
-          <Text value={moniker} size={Body1} weight=Text.Semibold color={theme.neutral_900} />
-          <Text
-            value={operatorAddress->Address.toBech32}
-            size={Body1}
-            weight=Text.Regular
-            color={theme.neutral_900}
-            code=true
-          />
-        </>
-      | _ => <LoadingCensorBar width=150 height=18 />
-      }}
+      <ValidatorDetail heading="Delegate to" validator />
     </div>
     <ValidatorDelegationDetail address={account.address} validator bondedTokenCountSub />
-    <div className={CssHelper.mb(~size=24, ())}>
-      <Heading
-        value="Delegate Amount (BAND)"
-        size=Heading.H5
-        align=Heading.Left
-        weight=Heading.Regular
-        marginBottom=4
-        color={theme.neutral_600}
-      />
-      <div className={Styles.delegateAmountContainer(theme)}>
-        <Text
-          size={Xl}
-          weight={Bold}
-          color={theme.neutral_900}
-          code=true
-          value={amount->Coin.getBandAmountFromCoin->Format.fPretty}
-        />
-        <VSpacing size={#px(4)} />
-        {switch infoSub {
-        | Data({financial}) =>
-          <Text
-            size={Body2}
-            code=true
-            value={`$${(amount->Coin.getBandAmountFromCoin *. financial.usdPrice)
-                ->Format.fPretty(~digits=2)} USD`}
-          />
-        | _ => <LoadingCensorBar width=50 height=20 />
-        }}
-      </div>
-    </div>
-    <div className={Css.merge(list{CssHelper.flexBox(~justify=#spaceBetween, ())})}>
+    <SummaryAmountBox heading="Delegate Amount (BAND)" amount />
+    <div
+      className={Css.merge(list{
+        CssHelper.flexBox(~justify=#spaceBetween, ()),
+        CssHelper.mt(~size=24, ()),
+      })}>
       <Text size={Body1} value="Total Delegation (BAND)" />
       {switch stakeSub {
       | Data(stake) =>
