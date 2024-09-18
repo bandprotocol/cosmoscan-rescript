@@ -52,8 +52,6 @@ module Styles = {
     columnGap(#px(16)),
   ])
   let confirmButton = style(. [flex(#num(1.))])
-  let halfWidth = style(. [width(#percent(50.))])
-  let fullWidth = style(. [width(#percent(100.)), margin2(~v=#px(24), ~h=#zero)])
   let jsonDisplay = (theme: Theme.t) =>
     style(. [
       resize(#none),

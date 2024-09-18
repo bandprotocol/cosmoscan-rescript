@@ -11,8 +11,6 @@ module Styles = {
 
   let disable = isActive => style(. [display(isActive ? #flex : #none)])
 
-  let nextBtn = style(. [width(#percent(100.)), marginTop(#px(24))])
-
   let info = style(. [display(#flex), justifyContent(#spaceBetween), alignItems(#center)])
   let advancedOptions = (show, theme: Theme.t) =>
     style(. [
@@ -24,6 +22,14 @@ module Styles = {
     ])
 
   let listContainer = style(. [width(#percent(100.)), marginBottom(#px(7))])
+  let confirmButton = style(. [flex(#num(1.))])
+  let buttonContainer = style(. [
+    display(#flex),
+    justifyContent(#spaceBetween),
+    alignItems(center),
+    columnGap(#px(16)),
+    marginTop(#px(24)),
+  ])
 }
 
 module ValueInput = {
@@ -54,6 +60,7 @@ module ValueInput = {
 let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~setMsgsOpt) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
+  let (_, dispatchModal) = React.useContext(ModalContext.context)
   let client = React.useContext(ClientContext.context)
   let (show, setShow) = React.useState(_ => false)
 
@@ -120,9 +127,15 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
       <Text value="Transaction Fee" size=Text.Body2 weight=Text.Medium nowrap=true block=true />
       <Text value="0.005 BAND" />
     </div>
-    <div id="nextButtonContainer">
+    <div className={Styles.buttonContainer} id="nextButtonContainer">
       <Button
-        style=Styles.nextBtn
+        variant=Button.Outline
+        style={Styles.confirmButton}
+        onClick={_ => ModalContext.CloseModal->dispatchModal}>
+        {"Cancel"->React.string}
+      </Button>
+      <Button
+        style=Styles.confirmButton
         disabled={gasInput <= 0}
         onClick={_ => {
           let _ = TxCreator.createRawTx(
