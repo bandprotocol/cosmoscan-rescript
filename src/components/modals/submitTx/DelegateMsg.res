@@ -1,16 +1,9 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [paddingBottom(#px(24))])
+  let container = style(. [paddingBottom(#px(24)), width(#px(500))])
 
   let info = style(. [display(#flex), justifyContent(#spaceBetween)])
-
-  let validator = style(. [
-    display(#flex),
-    flexDirection(#column),
-    alignItems(#flexEnd),
-    width(#px(330)),
-  ])
 
   let tooltips = (theme: Theme.t) =>
     style(. [

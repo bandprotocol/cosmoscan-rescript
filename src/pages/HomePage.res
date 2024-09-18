@@ -47,7 +47,7 @@ let make = () => {
     })
     ->ignore
 
-    SubmitMsg.Redelegate(Address.fromBech32("band1kfj48adjsnrgu83lau6wc646q2uf65rftr0pem"))
+    SubmitMsg.Undelegate(Address.fromBech32("band1kfj48adjsnrgu83lau6wc646q2uf65rftr0pem"))
     ->SubmitTx
     ->OpenModal
     ->dispatchModal

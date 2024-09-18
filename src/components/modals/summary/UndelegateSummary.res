@@ -12,8 +12,8 @@ module Styles = {
 }
 
 @react.component
-let make = (~address, ~validatorSourceAddress, ~validatorDestinationAddress, ~amount) => {
-  let delegationSub = DelegationSub.getStakeByValidator(address, validatorDestinationAddress)
+let make = (~address, ~validator, ~amount) => {
+  let delegationSub = DelegationSub.getStakeByValidator(address, validator)
   let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
@@ -37,23 +37,11 @@ let make = (~address, ~validatorSourceAddress, ~validatorDestinationAddress, ~am
       />
     </div>
     <div className={CssHelper.mb(~size=24, ())}>
-      <ValidatorDetail heading="Redelegate from" validator={validatorSourceAddress} />
-      <ValidatorDelegationDetail
-        address validator={validatorSourceAddress} bondedTokenCountSub isShowCurrentDelegated=false
-      />
-    </div>
-    <div className={CssHelper.mb(~size=24, ())}>
-      <ValidatorDetail heading="Redelegate to" validator={validatorDestinationAddress} />
-      <ValidatorDelegationDetail
-        address
-        validator={validatorDestinationAddress}
-        bondedTokenCountSub
-        isShowCurrentDelegated=false
-      />
+      <ValidatorDetail heading="Undelegate from" validator={validator} />
     </div>
     {switch delegationSub {
     | Data(delegation) =>
-      <SummaryAmountBox heading="Redelegate Amount (BAND)" amount maxValue={delegation.amount} />
+      <SummaryAmountBox heading="Undelegate Amount (BAND)" amount maxValue={delegation.amount} />
     | _ => <LoadingCensorBar width=300 height=60 />
     }}
   </div>

@@ -1,17 +1,7 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [paddingBottom(#px(24))])
-
-  let warning = (theme: Theme.t) =>
-    style(. [
-      display(#flex),
-      flexDirection(#column),
-      padding2(~v=#px(16), ~h=#px(24)),
-      backgroundColor(theme.neutral_100),
-      borderRadius(#px(4)),
-      marginBottom(#px(24)),
-    ])
+  let container = style(. [paddingBottom(#px(24)), width(#px(500))])
 
   let heading = (theme: Theme.t) =>
     style(. [
@@ -20,7 +10,6 @@ module Styles = {
       marginBottom(#px(4)),
     ])
 
-  let select = style(. [width(#px(1000)), height(#px(1))])
   let tooltips = (theme: Theme.t) =>
     style(. [
       display(#flex),
@@ -30,9 +19,6 @@ module Styles = {
       padding2(~v=#px(10), ~h=#px(16)),
       marginBottom(#px(24)),
     ])
-
-  let halfWidth = style(. [width(#percent(50.))])
-  let fullWidth = style(. [width(#percent(100.)), margin2(~v=#px(24), ~h=#zero)])
 }
 
 @react.component
@@ -40,10 +26,7 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
   let validatorInfoSub = ValidatorSub.get(validator)
   let validatorsSub = ValidatorSub.getList(~filter=Active, ())
   let delegationSub = DelegationSub.getStakeByValidator(address, validator)
-  let accountSub = AccountSub.get(address)
   let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
-
-  let allSub = Sub.all2(accountSub, validatorsSub)
 
   let (dstValidatorOpt, setDstValidatorOpt) = React.useState(_ => None)
   let (amount, setAmount) = React.useState(_ => EnhanceTxInputV2.empty)
@@ -134,10 +117,10 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
     | Some(validator) => <ValidatorDelegationDetail address validator bondedTokenCountSub />
     | None => <ValidatorDelegationDetail.NoData />
     }}
-    {switch allSub {
-    | Data(({balance}, _)) =>
+    {switch delegationSub {
+    | Data(delegation) =>
       //  TODO: hard-coded tx fee
-      let maxValInUband = balance->Coin.getUBandAmountFromCoins -. 5000.
+      let maxValInUband = delegation.amount->Coin.getUBandAmountFromCoin -. 5000.
       <EnhanceTxInputV2
         width=300
         inputData=amount

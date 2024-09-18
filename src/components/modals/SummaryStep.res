@@ -169,6 +169,8 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
                 ->Belt.List.get(0)
                 ->Belt.Option.getWithDefault(Coin.newCoin("uband", 0.))}
               />
+            | UndelegateMsg({validatorAddress, delegatorAddress, amount}) =>
+              <UndelegateSummary address={delegatorAddress} validator={validatorAddress} amount />
             | RedelegateMsg({
                 validatorSourceAddress,
                 validatorDestinationAddress,

@@ -2,16 +2,6 @@ module Styles = {
   open CssJs
 
   let summaryContainer = style(. [padding2(~v=#px(24), ~h=#px(0))])
-  let borderBottomLine = (theme: Theme.t) =>
-    style(. [borderBottom(#px(1), solid, theme.neutral_300)])
-  let currentDelegateHeader = (theme: Theme.t) =>
-    style(. [borderBottom(#px(1), solid, theme.neutral_200), margin2(~v=#px(4), ~h=#px(0))])
-
-  let delegateAmountContainer = (theme: Theme.t) =>
-    style(. [borderRadius(#px(8)), background(theme.neutral_100), padding2(~v=#px(12), ~h=#px(16))])
-
-  let halfWidth = style(. [width(#percent(50.))])
-  let fullWidth = style(. [width(#percent(100.)), margin2(~v=#px(24), ~h=#zero)])
 }
 
 @react.component
