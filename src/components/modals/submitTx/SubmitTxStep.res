@@ -71,6 +71,20 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
   let (gasInput, setGasInput) = React.useState(_ => msg->SubmitMsg.defaultGasLimit)
   let (fee, setFee) = React.useState(_ => msg->SubmitMsg.defaultFee)
 
+  React.useEffect1(_ => {
+    switch msgsOpt {
+    | Some(msgs) =>
+      setGasInput(_ =>
+        msg->SubmitMsg.baseGasLimit +
+          msgsOpt->Belt.Option.getWithDefault(_, [])->Belt.Array.length *
+            msg->SubmitMsg.defaultGasLimit
+      )
+    | None => ()
+    }
+
+    None
+  }, [msgsOpt])
+
   <div className={Css.merge(list{Styles.container, Styles.disable(isActive)})}>
     <Heading value={SubmitMsg.toString(msg)} size=Heading.H4 marginBottom=24 />
     {switch msg {
@@ -79,6 +93,18 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
     | Delegate(validator) =>
       <DelegateMsg address={account.address} preselectValidator={validator} setMsgsOpt />
     | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
+    | UndelegateAll(validator) => {
+        let delegationsQuery = DelegationQuery.getStakeList(account.address)
+
+        {
+          switch delegationsQuery {
+          | Data(delegations) =>
+            <UndelegateAllMsg address={account.address} delegations setMsgsOpt />
+          | _ => React.null
+          }
+        }
+      }
+
     | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
     | WithdrawReward(validator) =>
       <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
@@ -143,7 +169,9 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
             account.address,
             msgsOpt->Belt.Option.getWithDefault(_, []),
             account.chainID,
-            msg->SubmitMsg.defaultFee,
+            gasInput > msg->SubmitMsg.defaultGasLimit
+              ? (gasInput->Belt.Int.toFloat *. 0.003)->Js.Math.round->Belt.Float.toInt
+              : msg->SubmitMsg.defaultFee,
             gasInput,
             memo.value->Belt.Option.getWithDefault(""),
           )->Promise.then(rawTx => {

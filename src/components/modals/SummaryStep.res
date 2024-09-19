@@ -135,11 +135,6 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
 
     dispatchModal(EnableExit)
   }
-  //  validatorAddress: Address.t,
-  //       delegatorAddress: Address.t,
-  //       amount: 'a,
-  //       moniker: 'b,
-  //       identity: 'c,
 
   <div className={Styles.container}>
     {switch state {
@@ -168,7 +163,14 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
                 ->Belt.Option.getWithDefault(Coin.newCoin("uband", 0.))}
               />
             | UndelegateMsg({validatorAddress, delegatorAddress, amount}) =>
-              <UndelegateSummary address={delegatorAddress} validator={validatorAddress} amount />
+              switch msg {
+              | SubmitMsg.UndelegateAll(_) => <UndelegateAllSummary address={delegatorAddress} />
+              | SubmitMsg.Undelegate(validator) =>
+                // TODO: withdraw reward summary
+                <UndelegateSummary address={delegatorAddress} validator={validatorAddress} amount />
+              | _ => <Text value={"unknown messages"} />
+              }
+
             | RedelegateMsg({
                 validatorSourceAddress,
                 validatorDestinationAddress,
@@ -183,7 +185,6 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
               | SubmitMsg.WithdrawAllReward(_) =>
                 <WithdrawAllRewardSummary address={delegatorAddress} />
               | SubmitMsg.WithdrawReward(validator) =>
-                // TODO: withdraw reward summary
                 <WithdrawRewardSummary address={delegatorAddress} validator />
               | _ => <Text value={"unknown messages"} />
               }

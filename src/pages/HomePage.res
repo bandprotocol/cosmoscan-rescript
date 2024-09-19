@@ -33,7 +33,7 @@ let make = () => {
   )
 
   React.useEffect0(() => {
-    let wallet = Wallet.createFromMnemonic("aa")
+    let wallet = Wallet.createFromMnemonic("gg")
 
     wallet
     ->Wallet.getAddressAndPubKey
@@ -47,7 +47,7 @@ let make = () => {
     })
     ->ignore
 
-    SubmitMsg.Undelegate(Address.fromBech32("band1kfj48adjsnrgu83lau6wc646q2uf65rftr0pem"))
+    SubmitMsg.UndelegateAll(Address.fromBech32("band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"))
     ->SubmitTx
     ->OpenModal
     ->dispatchModal
@@ -55,30 +55,7 @@ let make = () => {
   })
 
   <Section pt=80 pb=80 pbSm=24 bg={theme.neutral_000} style=Styles.root>
-    <div className={Css.merge(list{CssHelper.container, Styles.content})} id="homePageContainer">
-      {switch delegationsSub {
-      | Data(delegations) =>
-        delegations
-        ->Belt.Array.map(d => <>
-          <Text value={d.moniker} size=Text.Body1 weight=Text.Semibold color=theme.neutral_900 />
-          <Text
-            value={d.operatorAddress->Address.toBech32}
-            size=Text.Body1
-            weight=Text.Semibold
-            color=theme.neutral_900
-          />
-          <Text
-            value={d.reward->Coin.getBandAmountFromCoin->Format.fPretty}
-            size=Text.Body1
-            weight=Text.Semibold
-            color=theme.neutral_900
-          />
-        </>)
-        ->React.array
-
-      | _ => <Text value={"no data"} size=Text.Body1 weight=Text.Semibold color=theme.neutral_900 />
-      }}
-    </div>
+    React.null
     // {!isMobile
     //   ? <>
     //       <img

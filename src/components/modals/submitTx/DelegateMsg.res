@@ -94,6 +94,7 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
     | Data(({balance}, _)) =>
       //  TODO: hard-coded tx fee
       let maxValInUband = balance->Coin.getUBandAmountFromCoins -. 5000.
+
       <EnhanceTxInputV2
         width=300
         inputData=amount

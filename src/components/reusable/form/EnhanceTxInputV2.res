@@ -171,7 +171,6 @@ module Loading = {
         />
         {useMax
           ? <>
-              <HSpacing size=Spacing.md />
               <div className={Styles.maxButton(theme)}>
                 <Button
                   variant=Button.Text({underline: false}) fsize=14 onClick={_ => ()} disabled=true>

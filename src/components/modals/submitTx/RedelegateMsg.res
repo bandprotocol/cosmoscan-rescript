@@ -120,7 +120,7 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
     {switch delegationSub {
     | Data(delegation) =>
       //  TODO: hard-coded tx fee
-      let maxValInUband = delegation.amount->Coin.getUBandAmountFromCoin -. 5000.
+      let maxValInUband = delegation.amount->Coin.getUBandAmountFromCoin
       <EnhanceTxInputV2
         width=300
         inputData=amount
