@@ -63,7 +63,7 @@ let make = (~address) => {
           <div className={Styles.delegationsContainer(theme)}>
             {delegations
             ->Belt.Array.map(delegation =>
-              <Row style={Styles.rewardDetailContainer(theme)}>
+              <Row style={Styles.rewardDetailContainer(theme)} key={delegation.moniker}>
                 <Col col=Col.Six>
                   <div>
                     <Text

@@ -30,7 +30,7 @@ let baseGasLimit = x =>
   | WithdrawReward(_)
   | Reinvest(_)
   | Redelegate(_) => 0
-  | WithdrawAllReward(_)
+  | WithdrawAllReward(_) => 30000
   | UndelegateAll(_) => 55000
   }
 
@@ -43,7 +43,7 @@ let defaultGasLimit = x =>
   | WithdrawReward(_)
   | Reinvest(_)
   | Redelegate(_) => 300000
-  | WithdrawAllReward(_)
+  | WithdrawAllReward(_) => 85000
   | UndelegateAll(_) => 152000
   }
 
