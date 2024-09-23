@@ -33,7 +33,7 @@ let make = () => {
   )
 
   React.useEffect0(() => {
-    let wallet = Wallet.createFromMnemonic("gg")
+    let wallet = Wallet.createFromMnemonic("aa")
 
     wallet
     ->Wallet.getAddressAndPubKey
@@ -47,7 +47,8 @@ let make = () => {
     })
     ->ignore
 
-    SubmitMsg.UndelegateAll(Address.fromBech32("band120q5vvspxlczc8c72j7c3c4rafyndaelqccksu"))
+    Address.fromBech32("bandvaloper15vuzc565qr5sdc8nduqejw5qj0tflh8c0pgrnl")
+    ->SubmitMsg.Reinvest
     ->SubmitTx
     ->OpenModal
     ->dispatchModal

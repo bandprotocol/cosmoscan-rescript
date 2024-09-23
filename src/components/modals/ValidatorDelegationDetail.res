@@ -40,6 +40,7 @@ let make = (
           />
           <Text
             size={Body1}
+            weight={Regular}
             color={theme.neutral_900}
             value={`${(votingPower /. 1e6)->Format.fPretty(~digits=0)} (${(votingPower /.
               bondedTokenCount.amount *. 100.)->Format.fPercent})`}
@@ -58,6 +59,7 @@ let make = (
           | Data(apr) =>
             <Text
               size={Xl}
+              weight={Regular}
               color={theme.neutral_900}
               value={(apr *. (100. -. commission) /. 100.)->Format.fPercent}
               code=true
@@ -84,6 +86,7 @@ let make = (
             | Data({amount}) =>
               <Text
                 size={Body1}
+                weight={Bold}
                 color={theme.neutral_900}
                 value={amount->Coin.getBandAmountFromCoin->Format.fPretty(~digits=6)}
                 code=true

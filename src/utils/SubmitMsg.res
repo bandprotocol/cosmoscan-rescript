@@ -6,7 +6,7 @@ type t =
   | Redelegate(Address.t)
   | WithdrawReward(Address.t)
   | WithdrawAllReward(Address.t)
-  | Reinvest(Address.t, float)
+  | Reinvest(Address.t)
   | Vote(ID.Proposal.t, string)
 
 let toString = x =>

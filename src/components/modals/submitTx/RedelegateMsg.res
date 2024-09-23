@@ -132,8 +132,7 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
         inputType="number"
         code=true
         autoFocus=true
-        id="delegateAmountInput"
-        maxWarningMsg=true
+        id="redelegateAmountInput"
       />
     | _ => <EnhanceTxInputV2.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
     }}

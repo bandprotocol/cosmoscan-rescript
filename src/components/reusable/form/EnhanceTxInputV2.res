@@ -58,6 +58,7 @@ let make = (
   ~inputType="text",
   ~autoFocus=false,
   ~maxWarningMsg=false,
+  ~maxValueText="Available",
   ~id,
 ) => {
   let (status, setStatus) = React.useState(_ => Untouched)
@@ -121,7 +122,7 @@ let make = (
           </div>
         </div>
         <VSpacing size={#px(4)} />
-        <Text value={`Available: ${maxValue'} BAND`} />
+        <Text value={`${maxValueText}: ${maxValue'} BAND`} />
       </>
     | None =>
       <div className={Styles.inputContainer}>

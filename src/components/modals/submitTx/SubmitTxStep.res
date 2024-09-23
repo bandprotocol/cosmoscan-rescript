@@ -120,8 +120,7 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
         }
       }
 
-    | Reinvest(validator, amount) =>
-      <ReinvestMsg address={account.address} validator amount setMsgsOpt />
+    | Reinvest(validator) => <ReinvestMsg address={account.address} validator setMsgsOpt />
     | Vote(proposalID, proposalName) =>
       <VoteMsg address={account.address} proposalID proposalName setMsgsOpt />
     }}

@@ -1,37 +1,57 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [paddingBottom(#px(24))])
+  let container = style(. [paddingBottom(#px(24)), width(#px(500))])
+
+  let info = style(. [display(#flex), justifyContent(#spaceBetween)])
+
+  let tooltips = (theme: Theme.t) =>
+    style(. [
+      display(#flex),
+      columnGap(#px(8)),
+      borderRadius(#px(4)),
+      backgroundColor(theme.neutral_100),
+      padding2(~v=#px(10), ~h=#px(16)),
+      marginBottom(#px(24)),
+    ])
+
+  let halfWidth = style(. [width(#percent(50.))])
+  let fullWidth = style(. [width(#percent(100.)), margin2(~v=#px(24), ~h=#zero)])
 }
 
 @react.component
-let make = (~address, ~validator, ~amount, ~setMsgsOpt) => {
-  let validatorInfoSub = ValidatorSub.get(validator)
+let make = (~address, ~validator: Address.t, ~setMsgsOpt) => {
+  let (amount, setAmount) = React.useState(_ => EnhanceTxInputV2.empty)
+  let (validatorOpt, setValidatorOpt) = React.useState(_ => Some(validator))
+
+  let validatorsSub = ValidatorSub.getList(~filter=Active, ())
+  let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
+  let delegationSub = DelegationSub.getStakeByValidator(address, validator)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
-  React.useEffect0(_ => {
-    let msgsOpt = {
-      Some([
-        Msg.Input.WithdrawRewardMsg({
-          delegatorAddress: address,
-          validatorAddress: validator,
-          amount: (),
-          moniker: (),
-          identity: (),
-        }),
-        Msg.Input.DelegateMsg({
-          validatorAddress: validator,
-          delegatorAddress: address,
-          amount: amount->Coin.newUBANDFromAmount,
-          moniker: (),
-          identity: (),
-        }),
-      ])
+  React.useEffect2(_ => {
+    switch validatorOpt {
+    | Some(val) =>
+      let msgsOpt = {
+        let amountValue = amount.value->Belt.Option.getWithDefault(0.)
+
+        Some([
+          Msg.Input.DelegateMsg({
+            validatorAddress: val,
+            delegatorAddress: address,
+            amount: amountValue->Coin.newUBANDFromAmount,
+            moniker: (),
+            identity: (),
+          }),
+        ])
+      }
+      setMsgsOpt(_ => msgsOpt)
+    | None => ()
     }
-    setMsgsOpt(_ => msgsOpt)
+
     None
-  })
+  }, (amount, validatorOpt))
 
   <>
     <div className=Styles.container>
@@ -41,36 +61,45 @@ let make = (~address, ~validator, ~amount, ~setMsgsOpt) => {
         marginBottom=8
         align=Heading.Left
         weight=Heading.Regular
-        color={theme.neutral_600}
+        color={theme.neutral_900}
       />
-      {switch validatorInfoSub {
-      | Data({moniker}) =>
+      {switch validatorsSub {
+      | Data(validators) =>
         <div>
-          <Text value=moniker ellipsis=true align=Text.Right />
-          <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
+          {
+            let filteredValidators =
+              validators->Belt_Array.keep(validator => validator.commission !== 100.)
+            <ValidatorSelection validatorOpt filteredValidators setValidatorOpt />
+          }
         </div>
+      | Error(err) => <Text value={err.message} />
+      | NoData => <Text value={"No Data"} />
       | _ => <LoadingCensorBar width=300 height=34 />
       }}
     </div>
-    <div className=Styles.container>
-      <Heading
-        value="Current Reward"
-        size=Heading.H5
-        marginBottom=8
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
+    {switch validatorOpt {
+    | Some(validator) => <ValidatorDelegationDetail address validator bondedTokenCountSub />
+    | None => <ValidatorDelegationDetail.NoData />
+    }}
+    {switch delegationSub {
+    | Data({reward}) =>
+      let maxValInUband = reward->Coin.getUBandAmountFromCoin->Js.Math.floor_float
+
+      <EnhanceTxInputV2
+        id="reinvestAmountInput"
+        width=300
+        inputData=amount
+        setInputData=setAmount
+        parse={Parse.getBandAmount(maxValInUband)}
+        maxValue={(maxValInUband /. 1e6)->Belt.Float.toString}
+        msg="Reinvest Amount (BAND)"
+        placeholder="0.000000"
+        inputType="number"
+        code=true
+        autoFocus=true
+        maxValueText="Current Reward"
       />
-      <div>
-        <Text
-          value={amount
-          ->Coin.newUBANDFromAmount
-          ->Coin.getBandAmountFromCoin
-          ->Format.fPretty(~digits=6)}
-          code=true
-        />
-        <Text value=" BAND" />
-      </div>
-    </div>
+    | _ => <EnhanceTxInputV2.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
+    }}
   </>
 }

@@ -71,7 +71,7 @@ let make = (~operatorAddress, ~rewardAmount) => {
       ->Belt.Array.map(action => <ActionItem key={action->SubmitMsg.toString} action />)
       ->React.array}
       <SeperatedLine mt=4 mb=4 />
-      {[SubmitMsg.WithdrawReward(operatorAddress), Reinvest(operatorAddress, rewardAmount)]
+      {[SubmitMsg.WithdrawReward(operatorAddress), Reinvest(operatorAddress)]
       ->Belt.Array.map(action => <ActionItem key={action->SubmitMsg.toString} action />)
       ->React.array}
     </div>
