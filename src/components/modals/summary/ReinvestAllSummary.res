@@ -1,7 +1,7 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [paddingBottom(#px(24)), width(#px(500))])
+  let container = style(. [padding2(~v=#px(24), ~h=#px(0)), width(#px(500))])
   let heading = style(. [paddingBottom(#px(8))])
 
   let delegationsContainer = (theme: Theme.t) =>
@@ -21,42 +21,42 @@ module Styles = {
 }
 
 @react.component
-let make = (~address, ~setMsgsOpt, ~delegations: array<DelegationSub.Stake.t>) => {
+let make = (~address) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let delegationsSub = DelegationSub.getStakeList(address, ~pageSize=9999, ~page=1, ())
   let infoSub = React.useContext(GlobalContext.context)
 
-  React.useEffect0(_ => {
-    let msgsOpt = {
-      Some(
-        delegations->Belt.Array.map(d => Msg.Input.UndelegateMsg({
-          validatorAddress: d.operatorAddress,
-          delegatorAddress: d.delegatorAddress,
-          amount: d.amount,
-          moniker: (),
-          identity: (),
-        })),
-      )
-    }
-    setMsgsOpt(_ => msgsOpt)
-
-    None
-  })
-
   <div className=Styles.container>
+    <div className={CssHelper.mb(~size=24, ())}>
+      <Heading
+        value="Band Address"
+        size=Heading.H5
+        align=Heading.Left
+        weight=Heading.Regular
+        marginBottom=4
+        color={theme.neutral_900}
+      />
+      <Text
+        value={address->Address.toBech32}
+        size={Body1}
+        weight=Text.Regular
+        color={theme.neutral_900}
+        code=true
+      />
+    </div>
     <Row style={Styles.heading}>
       <Col col=Col.Six>
-        <Text value="Undelegate from" size={Body2} />
+        <Text value="Reinvest from" size={Body2} />
       </Col>
       <Col col=Col.Six>
-        <Text value="Undelegate Amount (BAND)" size={Body2} />
+        <Text value="Reinvest Amount (BAND)" size={Body2} />
       </Col>
     </Row>
     {switch delegationsSub {
     | Data(delegations) =>
       let totalAmount =
         delegations->Belt.Array.reduce(0., (acc, delegation) =>
-          acc +. delegation.amount->Coin.getBandAmountFromCoin
+          acc +. delegation.reward->Coin.getBandAmountFromCoin
         )
       <>
         <div className={Styles.delegationsContainer(theme)}>
@@ -80,7 +80,7 @@ let make = (~address, ~setMsgsOpt, ~delegations: array<DelegationSub.Stake.t>) =
               </Col>
               <Col col=Col.Six>
                 <NumberCountUp
-                  value={delegation.amount->Coin.getBandAmountFromCoin}
+                  value={delegation.reward->Coin.getBandAmountFromCoin}
                   size={Text.Body1}
                   color={theme.neutral_900}
                   weight={Text.Semibold}
@@ -93,7 +93,7 @@ let make = (~address, ~setMsgsOpt, ~delegations: array<DelegationSub.Stake.t>) =
         </div>
         <div className={CssHelper.mt(~size=24, ())}>
           <Heading
-            value="Total Undelegate Amount (BAND)"
+            value="Total Reinvest Amount (BAND)"
             size=Heading.H5
             align=Heading.Left
             weight=Heading.Regular

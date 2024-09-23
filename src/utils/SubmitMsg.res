@@ -7,6 +7,7 @@ type t =
   | WithdrawReward(Address.t)
   | WithdrawAllReward(Address.t)
   | Reinvest(Address.t)
+  | ReinvestAll(Address.t)
   | Vote(ID.Proposal.t, string)
 
 let toString = x =>
@@ -19,6 +20,7 @@ let toString = x =>
   | WithdrawReward(_) => "Claim Reward"
   | WithdrawAllReward(_) => "Claim All Rewards"
   | Reinvest(_) => "Reinvest"
+  | ReinvestAll(_) => "Reinvest All"
   | Vote(_) => "Vote"
   }
 let baseGasLimit = x =>
@@ -30,6 +32,7 @@ let baseGasLimit = x =>
   | WithdrawReward(_)
   | Reinvest(_)
   | Redelegate(_) => 0
+  | ReinvestAll(_)
   | WithdrawAllReward(_) => 30000
   | UndelegateAll(_) => 55000
   }
@@ -43,6 +46,7 @@ let defaultGasLimit = x =>
   | WithdrawReward(_)
   | Reinvest(_)
   | Redelegate(_) => 300000
+  | ReinvestAll(_)
   | WithdrawAllReward(_) => 85000
   | UndelegateAll(_) => 152000
   }
@@ -56,6 +60,7 @@ let defaultFee = x =>
   | WithdrawReward(_)
   | Reinvest(_)
   | Redelegate(_) => 5000
+  | ReinvestAll(_)
   | WithdrawAllReward(_) => 7500
   | UndelegateAll(_) => 50000
   }

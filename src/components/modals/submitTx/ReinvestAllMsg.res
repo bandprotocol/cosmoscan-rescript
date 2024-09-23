@@ -29,10 +29,12 @@ let make = (~address, ~setMsgsOpt, ~delegations: array<DelegationSub.Stake.t>) =
   React.useEffect0(_ => {
     let msgsOpt = {
       Some(
-        delegations->Belt.Array.map(d => Msg.Input.UndelegateMsg({
+        delegations
+        ->Belt.Array.keep(d => d.reward->Coin.getBandAmountFromCoin != 0.)
+        ->Belt.Array.map(d => Msg.Input.DelegateMsg({
           validatorAddress: d.operatorAddress,
           delegatorAddress: d.delegatorAddress,
-          amount: d.amount,
+          amount: d.reward,
           moniker: (),
           identity: (),
         })),
@@ -46,17 +48,17 @@ let make = (~address, ~setMsgsOpt, ~delegations: array<DelegationSub.Stake.t>) =
   <div className=Styles.container>
     <Row style={Styles.heading}>
       <Col col=Col.Six>
-        <Text value="Undelegate from" size={Body2} />
+        <Text value="Reinvest from" size={Body2} />
       </Col>
       <Col col=Col.Six>
-        <Text value="Undelegate Amount (BAND)" size={Body2} />
+        <Text value="Reinvest Amount (BAND)" size={Body2} />
       </Col>
     </Row>
     {switch delegationsSub {
     | Data(delegations) =>
       let totalAmount =
         delegations->Belt.Array.reduce(0., (acc, delegation) =>
-          acc +. delegation.amount->Coin.getBandAmountFromCoin
+          acc +. delegation.reward->Coin.getBandAmountFromCoin
         )
       <>
         <div className={Styles.delegationsContainer(theme)}>
@@ -80,7 +82,7 @@ let make = (~address, ~setMsgsOpt, ~delegations: array<DelegationSub.Stake.t>) =
               </Col>
               <Col col=Col.Six>
                 <NumberCountUp
-                  value={delegation.amount->Coin.getBandAmountFromCoin}
+                  value={delegation.reward->Coin.getBandAmountFromCoin}
                   size={Text.Body1}
                   color={theme.neutral_900}
                   weight={Text.Semibold}
@@ -93,7 +95,7 @@ let make = (~address, ~setMsgsOpt, ~delegations: array<DelegationSub.Stake.t>) =
         </div>
         <div className={CssHelper.mt(~size=24, ())}>
           <Heading
-            value="Total Undelegate Amount (BAND)"
+            value="Total Reinvest Amount (BAND)"
             size=Heading.H5
             align=Heading.Left
             weight=Heading.Regular

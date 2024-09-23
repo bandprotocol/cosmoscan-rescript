@@ -158,6 +158,7 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
                 <DelegateSummary account validator={validatorAddress} amount />
               | SubmitMsg.Reinvest(_) =>
                 <ReinvestSummary account validator={validatorAddress} amount />
+              | SubmitMsg.ReinvestAll(_) => <ReinvestAllSummary address={delegatorAddress} />
 
               | _ => <Text value={"unknown messages"} />
               }

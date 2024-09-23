@@ -93,7 +93,7 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
     | Delegate(validator) =>
       <DelegateMsg address={account.address} preselectValidator={validator} setMsgsOpt />
     | Undelegate(validator) => <UndelegateMsg address={account.address} validator setMsgsOpt />
-    | UndelegateAll(validator) => {
+    | UndelegateAll(_) => {
         let delegationsQuery = DelegationQuery.getStakeList(account.address)
 
         {
@@ -108,7 +108,7 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
     | Redelegate(validator) => <RedelegateMsg address={account.address} validator setMsgsOpt />
     | WithdrawReward(validator) =>
       <WithdrawRewardMsg validator setMsgsOpt address={account.address} />
-    | WithdrawAllReward(validator) => {
+    | WithdrawAllReward(_) => {
         let delegationsQuery = DelegationQuery.getStakeList(account.address)
 
         {
@@ -121,6 +121,17 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
       }
 
     | Reinvest(validator) => <ReinvestMsg address={account.address} validator setMsgsOpt />
+    | ReinvestAll(_) => {
+        let delegationsQuery = DelegationQuery.getStakeList(account.address)
+
+        {
+          switch delegationsQuery {
+          | Data(delegations) => <ReinvestAllMsg address={account.address} delegations setMsgsOpt />
+          | _ => React.null
+          }
+        }
+      }
+
     | Vote(proposalID, proposalName) =>
       <VoteMsg address={account.address} proposalID proposalName setMsgsOpt />
     }}
