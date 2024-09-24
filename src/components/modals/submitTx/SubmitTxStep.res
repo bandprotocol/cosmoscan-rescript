@@ -57,7 +57,16 @@ module ValueInput = {
 }
 
 @react.component
-let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~setMsgsOpt) => {
+let make = (
+  ~account: AccountContext.t,
+  ~setRawTx,
+  ~isActive,
+  ~msg,
+  ~msgsOpt,
+  ~setMsgsOpt,
+  ~txFee,
+  ~setTxFee: (float => float) => unit,
+) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
   let (_, dispatchModal) = React.useContext(ModalContext.context)
@@ -73,12 +82,19 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
 
   React.useEffect1(_ => {
     switch msgsOpt {
-    | Some(msgs) =>
-      setGasInput(_ =>
-        msg->SubmitMsg.baseGasLimit +
-          msgsOpt->Belt.Option.getWithDefault(_, [])->Belt.Array.length *
-            msg->SubmitMsg.defaultGasLimit
-      )
+    | Some(msgs) => {
+        setGasInput(_ =>
+          msg->SubmitMsg.baseGasLimit +
+            msgsOpt->Belt.Option.getWithDefault(_, [])->Belt.Array.length *
+              msg->SubmitMsg.defaultGasLimit
+        )
+        setTxFee(_ =>
+          gasInput > msg->SubmitMsg.defaultGasLimit
+            ? (gasInput->Belt.Int.toFloat *. 0.003)->Js.Math.round
+            : msg->SubmitMsg.defaultFee->Belt.Int.toFloat
+        )
+      }
+
     | None => ()
     }
 
@@ -161,7 +177,7 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
     <SeperatedLine />
     <div className=Styles.info>
       <Text value="Transaction Fee" size=Text.Body2 weight=Text.Medium nowrap=true block=true />
-      <Text value="0.005 BAND" />
+      <Text value={`${(txFee /. 1e6)->Belt.Float.toString} BAND`} />
     </div>
     <div className={Styles.buttonContainer} id="nextButtonContainer">
       <Button
@@ -179,9 +195,7 @@ let make = (~account: AccountContext.t, ~setRawTx, ~isActive, ~msg, ~msgsOpt, ~s
             account.address,
             msgsOpt->Belt.Option.getWithDefault(_, []),
             account.chainID,
-            gasInput > msg->SubmitMsg.defaultGasLimit
-              ? (gasInput->Belt.Int.toFloat *. 0.003)->Js.Math.round->Belt.Float.toInt
-              : msg->SubmitMsg.defaultFee,
+            txFee->Belt.Float.toInt,
             gasInput,
             memo.value->Belt.Option.getWithDefault(""),
           )->Promise.then(rawTx => {

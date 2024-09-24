@@ -16,10 +16,14 @@ module CreateTxFlow = {
   let make = (~account, ~msg) => {
     let (rawTx, setRawTx) = React.useState(_ => None)
     let (msgsOpt, setMsgsOpt) = React.useState(_ => None)
+    let (txFee, setTxFee) = React.useState(_ => 0.)
+
     <>
-      <SubmitTxStep account setRawTx isActive={rawTx->Belt.Option.isNone} msg msgsOpt setMsgsOpt />
+      <SubmitTxStep
+        account setRawTx isActive={rawTx->Belt.Option.isNone} msg msgsOpt setMsgsOpt txFee setTxFee
+      />
       {rawTx->Belt.Option.mapWithDefault(React.null, tx =>
-        <SummaryStep rawTx=tx onBack={_ => setRawTx(_ => None)} account msg msgsOpt />
+        <SummaryStep rawTx=tx onBack={_ => setRawTx(_ => None)} account msg msgsOpt txFee />
       )}
     </>
   }

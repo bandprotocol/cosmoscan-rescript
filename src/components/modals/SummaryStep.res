@@ -90,7 +90,7 @@ type state_t =
   | Error(string)
 
 @react.component
-let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
+let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg, ~txFee) => {
   let (tabIndex, setTabIndex) = React.useState(_ => 0)
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let trackingSub = TrackingSub.use()
@@ -226,7 +226,7 @@ let make = (~rawTx, ~onBack, ~account: AccountContext.t, ~msgsOpt, ~msg) => {
         <div className={Styles.divider(theme)} />
         <div className=Styles.info>
           <Text value="Transaction Fee" size=Text.Body2 weight=Text.Medium nowrap=true block=true />
-          <Text value="0.005 BAND" />
+          <Text value={`${(txFee /. 1e6)->Belt.Float.toString} BAND`} />
         </div>
         <div className={Styles.buttonContainer}>
           <Button variant=Button.Outline style={Styles.confirmButton} onClick={_ => onBack()}>
