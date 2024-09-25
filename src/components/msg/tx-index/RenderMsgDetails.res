@@ -31,7 +31,7 @@ module Calldata = {
           data={calldata->JsBuffer.toHex(~with0x=false)} title="Copy as bytes" width=125
         />
       </div>
-      {Obi.decode(schema, "input", calldata)->Belt.Option.mapWithDefault(failed, calldataKVs =>
+      {Obi2.decode(schema, Obi2.Input, calldata)->Belt.Option.mapWithDefault(failed, calldataKVs =>
         <KVTable
           rows={calldataKVs->Belt.Array.map(({fieldName, fieldValue}) => [
             KVTable.Value(fieldName),
@@ -65,6 +65,8 @@ type content_inner_t =
   | MultiSendInputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | MultiSendOutputList(Belt.List.t<Msg.Bank.MultiSend.send_tx_t>)
   | ExecList(list<Msg.msg_t>)
+  | SignalList(Belt.List.t<Feeds.Signal.t>)
+  | SignalPriceList(Belt.List.t<Feeds.SignalPrice.t>)
   | None
 
 type content_t = {
@@ -189,6 +191,32 @@ let renderValue = v => {
           output.coins
           ->Coin.getBandAmountFromCoins
           ->Belt.Float.toString,
+        ),
+      ])}
+    />
+  | SignalList(signals) =>
+    <KVTable
+      headers=["Signal ID", "Power"]
+      rows={signals
+      ->Belt.List.toArray
+      ->Belt.Array.map(signal => [
+        KVTable.Value(signal.id),
+        KVTable.Value(signal.power->Belt.Float.toString),
+      ])}
+    />
+  | SignalPriceList(prices) =>
+    <KVTable
+      headers=["Signal", "Price"]
+      rows={prices
+      ->Belt.List.toArray
+      ->Belt.Array.map(price => [
+        KVTable.Value(price.signalId),
+        KVTable.Value(
+          switch // render N/A if no price reported
+          price.price {
+          | Some(price) => price->Format.fPretty
+          | None => "N/A"
+          },
         ),
       ])}
     />
@@ -1754,6 +1782,57 @@ module Transfer = {
   let failed = (msg: Msg.Application.Transfer.fail_t) => msg->factory([])
 }
 
+module SubmitSignals = {
+  let factory = (msg: Msg.Feed.SubmitSignals.t) => {
+    [
+      {
+        title: "Validator",
+        content: Address(msg.delegator),
+        order: 1,
+      },
+      {
+        title: "Signals",
+        content: SignalList(msg.signals),
+        order: 2,
+      },
+    ]
+  }
+}
+
+module SubmitSignalPrices = {
+  let factory = (msg: Msg.Feed.SubmitSignalPrices.t) => {
+    [
+      {
+        title: "Validator",
+        content: Address(msg.validator),
+        order: 1,
+      },
+      {
+        title: "Prices",
+        content: SignalPriceList(msg.prices),
+        order: 2,
+      },
+    ]
+  }
+}
+
+module UpdateReferenceSourceConfig = {
+  let factory = (msg: Msg.Feed.UpdateReferenceSourceConfig.t) => {
+    [
+      {
+        title: "IPFS Hash",
+        content: PlainText(msg.ipfsHash),
+        order: 1,
+      },
+      {
+        title: "Version",
+        content: PlainText(msg.version),
+        order: 2,
+      },
+    ]
+  }
+}
+
 let getContent = msg => {
   switch msg {
   | Msg.CreateDataSourceMsg(m) =>
@@ -1810,6 +1889,9 @@ let getContent = msg => {
     }
   | Msg.UnjailMsg(data) => Unjail.factory(data)
   | Msg.SetWithdrawAddressMsg(data) => SetWithdrawAddress.factory(data)
+  | Msg.SubmitSignals(data) => SubmitSignals.factory(data)
+  | Msg.SubmitSignalPrices(data) => SubmitSignalPrices.factory(data)
+  | Msg.UpdateReferenceSourceConfig(data) => UpdateReferenceSourceConfig.factory(data)
   | Msg.SubmitProposalMsg(m) =>
     switch m {
     | Msg.Gov.SubmitProposal.Success(data) => SubmitProposal.success(data)
@@ -1895,7 +1977,7 @@ module MessageItem = {
             ->Belt.List.toArray
             ->Belt.Array.mapWithIndex((i, msg) => {
               let contents = getContent(msg)
-              <div className={Styles.subMsgContainer(theme)}>
+              <div className={Styles.subMsgContainer(theme)} key={i->Belt.Int.toString}>
                 <Row marginBottom=0 marginBottomSm=24>
                   <Col col=Col.Three mb=16 mbSm=8>
                     <Heading
@@ -1919,7 +2001,7 @@ module MessageItem = {
                 </Row>
                 {contents
                 ->Belt.Array.map(c => {
-                  <Row marginBottom=0 marginBottomSm=24>
+                  <Row marginBottom=0 marginBottomSm=24 key={c.title}>
                     <Col col=Col.Three mb=16 mbSm=8>
                       <Heading
                         value={c.title}

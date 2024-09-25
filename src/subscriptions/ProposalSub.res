@@ -3,6 +3,7 @@ module ProposalType = {
     | SoftwareUpgrade
     | ParameterChange
     | CommunityPoolSpend
+    | UpdateFeedParams
     | Undefined
 
   let parse = proposalType => {
@@ -10,6 +11,7 @@ module ProposalType = {
     | "SoftwareUpgrade" => SoftwareUpgrade
     | "ParameterChange" => ParameterChange
     | "CommunityPoolSpend" => CommunityPoolSpend
+    | "/feeds.v1beta1.MsgUpdateParams" => UpdateFeedParams
     | _ => Undefined
     }
   }
@@ -19,6 +21,7 @@ module ProposalType = {
     | CommunityPoolSpend => "Community Pool Spend"
     | SoftwareUpgrade => "Software Upgrade"
     | ParameterChange => "Parameter Change"
+    | UpdateFeedParams => "Update Feed Params"
     | Undefined => "Undefined"
     }
   }
@@ -40,6 +43,25 @@ module Content = {
   type community_pool_spend_t = {
     recipient: Address.t,
     amount: list<Coin.t>,
+  }
+
+  type feed_params_t = {
+    admin: Address.t,
+    allowable_block_time_discrepancy: int,
+    grace_period: int,
+    min_interval: int,
+    max_interval: int,
+    power_step_threshold: int,
+    max_current_feeds: int,
+    cooldown_time: int,
+    min_deviation_basis_point: int,
+    max_deviation_basis_point: int,
+    current_feeds_update_interval: int,
+  }
+
+  type update_feed_params_t = {
+    authority: Address.t,
+    params: feed_params_t,
   }
 
   let decodeParameterChangeContent = {
@@ -74,12 +96,50 @@ module Content = {
       }
     })
   }
+
+  let decodeFeedParams = {
+    open JsonUtils.Decode
+
+    buildObject(json => {
+      {
+        admin: switch json.required(list{"admin"}, string)->Address.fromBech32Opt {
+        | Some(add) => add
+        | None => Address.Address("N/A")
+        },
+        allowable_block_time_discrepancy: json.required(
+          list{"allowable_block_time_discrepancy"},
+          int,
+        ),
+        grace_period: json.required(list{"grace_period"}, int),
+        min_interval: json.required(list{"min_interval"}, int),
+        max_interval: json.required(list{"max_interval"}, int),
+        power_step_threshold: json.required(list{"power_step_threshold"}, int),
+        max_current_feeds: json.required(list{"max_current_feeds"}, int),
+        cooldown_time: json.required(list{"cooldown_time"}, int),
+        min_deviation_basis_point: json.required(list{"min_deviation_basis_point"}, int),
+        max_deviation_basis_point: json.required(list{"max_deviation_basis_point"}, int),
+        current_feeds_update_interval: json.required(list{"current_feeds_update_interval"}, int),
+      }
+    })
+  }
+
+  let decodeUpdateFeedParamsContent = {
+    open JsonUtils.Decode
+
+    buildObject(json => {
+      {
+        authority: json.required(list{"authority"}, address),
+        params: json.required(list{"params"}, decodeFeedParams),
+      }
+    })
+  }
 }
 
 type content_t =
   | SoftwareUpgrade(Content.sofeware_upgrade_t)
   | ParameterChange(array<Content.parameter_change_t>)
   | CommunityPoolSpend(Content.community_pool_spend_t)
+  | UpdateFeedParams(Content.update_feed_params_t)
   | Unknown
 
 type proposal_status_t =
@@ -184,6 +244,11 @@ let decodeContent = (json, proposalType) => {
     | CommunityPoolSpend => {
         let contentObj = json->mustDecode(Content.decodeCommunityPoolSpendContent)
         CommunityPoolSpend(contentObj)
+      }
+
+    | UpdateFeedParams => {
+        let contentObj = json->mustDecode(Content.decodeUpdateFeedParamsContent)
+        UpdateFeedParams(contentObj)
       }
 
     | _ => Unknown

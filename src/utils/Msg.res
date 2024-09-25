@@ -1350,6 +1350,50 @@ module Application = {
   }
 }
 
+module Feed = {
+  module SubmitSignalPrices = {
+    type t = {
+      validator: Address.t,
+      prices: list<Feeds.SignalPrice.t>,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        validator: json.required(list{"msg", "validator"}, string)->Address.fromBech32,
+        prices: json.required(list{"msg", "prices"}, list(Feeds.SignalPrice.decode)),
+      })
+    }
+  }
+
+  module SubmitSignals = {
+    type t = {
+      delegator: Address.t,
+      signals: list<Feeds.Signal.t>,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        delegator: json.required(list{"msg", "delegator"}, string)->Address.fromBech32,
+        signals: json.required(list{"msg", "signals"}, list(Feeds.Signal.decode)),
+      })
+    }
+  }
+
+  module UpdateReferenceSourceConfig = {
+    type t = {
+      ipfsHash: string,
+      version: string,
+    }
+    let decode = {
+      open JsonUtils.Decode
+      buildObject(json => {
+        ipfsHash: json.required(list{"msg", "ipfs_hash"}, string),
+        version: json.required(list{"msg", "version"}, string),
+      })
+    }
+  }
+}
+
 type ibc_transfer_t = {
   sourcePort: string,
   sourceChannel: string,
@@ -1402,6 +1446,9 @@ type rec msg_t =
   | UpdateClientMsg(Client.t)
   | UpgradeClientMsg(Client.t)
   | SubmitClientMisbehaviourMsg(Client.t)
+  | SubmitSignalPrices(Feed.SubmitSignalPrices.t)
+  | SubmitSignals(Feed.SubmitSignals.t)
+  | UpdateReferenceSourceConfig(Feed.UpdateReferenceSourceConfig.t)
   | RecvPacketMsg(Channel.RecvPacket.decoded_t)
   | AcknowledgePacketMsg(Channel.AcknowledgePacket.t)
   | TimeoutMsg(Channel.Timeout.t)
@@ -1434,6 +1481,7 @@ type msg_cat_t =
   | ProposalMsg
   | OracleMsg
   | IBCMsg
+  | FeedMsg
   | UnknownMsg
 
 type badge_theme_t = {
@@ -1466,6 +1514,9 @@ let getBadge = msg => {
   | UnjailMsg(_) => {name: "Unjail", category: ValidatorMsg}
   | SetWithdrawAddressMsg(_) => {name: "Set Withdraw Address", category: ValidatorMsg}
   | SubmitProposalMsg(_) => {name: "Submit Proposal", category: ProposalMsg}
+  | SubmitSignalPrices(_) => {name: "Submit Signal Prices", category: FeedMsg}
+  | SubmitSignals(_) => {name: "Submit Signal", category: FeedMsg}
+  | UpdateReferenceSourceConfig(_) => {name: "Update Reference Source Config", category: FeedMsg}
   | DepositMsg(_) => {name: "Deposit", category: ProposalMsg}
   | VoteMsg(_) => {name: "Vote", category: ProposalMsg}
   | VoteWeightedMsg(_) => {name: "Vote Weighted", category: ProposalMsg}
@@ -1629,7 +1680,15 @@ let rec decodeMsg = (json, isSuccess) => {
     | "/cosmos.slashing.v1beta1.MsgUnjail" =>
       let msg = json->mustDecode(Slashing.Unjail.decode)
       (UnjailMsg(msg), msg.address, false)
-
+    | "/feeds.v1beta1.MsgSubmitSignals" =>
+      let msg = json->mustDecode(Feed.SubmitSignals.decode)
+      (SubmitSignals(msg), msg.delegator, false)
+    | "/feeds.v1beta1.MsgUpdateReferenceSourceConfig" =>
+      let msg = json->mustDecode(Feed.UpdateReferenceSourceConfig.decode)
+      (UpdateReferenceSourceConfig(msg), Address.Address(""), false)
+    | "/feeds.v1beta1.MsgSubmitSignalPrices" =>
+      let msg = json->mustDecode(Feed.SubmitSignalPrices.decode)
+      (SubmitSignalPrices(msg), msg.validator, false)
     | "/cosmos.gov.v1beta1.MsgSubmitProposal" =>
       isSuccess
         ? {

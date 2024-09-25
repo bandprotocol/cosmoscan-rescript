@@ -186,22 +186,19 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
 
     availableBalance +. balanceAtStakeAmount +. rewardAmount +. unbondingAmount +. commissionAmount
   }
-  let send = chainID =>
-    switch accountOpt {
-    | Some({address: sender}) =>
-      let openSendModal = () =>
-        SubmitMsg.Send(Some(address), IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
+  let send = (chainID, sender) => {
+    let openSendModal = () =>
+      SubmitMsg.Send(Some(address), IBCConnectionQuery.BAND)->SubmitTx->OpenModal->dispatchModal
 
-      switch sender == address {
-      | true =>
-        open Webapi.Dom
-        window->Window.confirm("Are you sure you want to send tokens to yourself?")
-          ? openSendModal()
-          : ()
-      | false => openSendModal()
-      }
-    | None => dispatchModal(OpenModal(Connect(chainID)))
+    switch sender == address {
+    | true =>
+      open Webapi.Dom
+      window->Window.confirm("Are you sure you want to send tokens to yourself?")
+        ? openSendModal()
+        : ()
+    | false => openSendModal()
     }
+  }
 
   let qrCode = () => address->QRCode->OpenModal->dispatchModal
 
@@ -244,9 +241,15 @@ let make = (~address, ~hashtag: Route.account_tab_t) => {
                     ? React.null
                     : switch topPartAllSub {
                       | Data((_, _, _, _, {chainID})) =>
-                        <Button variant=Button.Outline onClick={_ => send(chainID)}>
-                          {"Send BAND"->React.string}
-                        </Button>
+                        switch accountOpt {
+                        | Some(account) =>
+                          <Button
+                            variant=Button.Outline onClick={_ => send(chainID, account.address)}>
+                            {"Send BAND"->React.string}
+                          </Button>
+                        | None => React.null
+                        }
+
                       | _ => <LoadingCensorBar width=90 height=26 />
                       }}
                 </div>

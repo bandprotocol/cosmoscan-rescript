@@ -10,6 +10,21 @@ type tx_response = {
   rawLog: string,
 }
 
+// import { SignDoc } from '@bandprotocol/bandchain.js/proto/cosmos/tx/v1beta1/tx_pb'
+module SignDoc = {
+  type t
+
+  @send external getChainId: t => string = "getChainId"
+  @send external getBodyBytes_asU8: t => array<int> = "getBodyBytes_asU8"
+  @send external getBodyBytes_asB64: t => string = "getBodyBytes_asB64"
+  @send external getAuthInfoBytes_asU8: t => array<int> = "getAuthInfoBytes_asU8"
+  @send external getAuthInfoBytes_asB64: t => string = "getAuthInfoBytes_asB64"
+  @send external getAccountNumber: t => int = "getAccountNumber"
+
+  @module("@bandprotocol/bandchain.js/proto/cosmos/tx/v1beta1/tx_pb") @scope("SignDoc") @val
+  external deserializeBinary: array<int> => t = "deserializeBinary"
+}
+
 module Client = {
   type t
   type reference_data_t = {
@@ -160,7 +175,14 @@ module Message = {
 }
 
 module Transaction = {
-  type transaction_t
+  type transaction_t = {
+    msgs: array<Message.t>,
+    accountNum?: int,
+    sequence?: int,
+    chainId?: string,
+    fee: Fee.t,
+    memo: string,
+  }
 
   @module("@bandprotocol/bandchain.js") @new external create: unit => transaction_t = "Transaction"
   @send external withMessages: (transaction_t, Message.t) => unit = "withMessages"
@@ -183,4 +205,26 @@ module Obi = {
   @send external encodeOutput: (t, 'a) => JsBuffer.t = "encodeOutput"
   @send external decodeInput: (t, JsBuffer.t) => 'a = "decodeInput"
   @send external decodeOutput: (t, JsBuffer.t) => 'a = "decodeOutput"
+}
+
+module Signal = {
+  type t
+
+  @module("@bandprotocol/bandchain.js") @new external create: unit => t = "Signal"
+  @send external getId: t => string = "getId"
+  @send external setId: (t, string) => unit = "setId"
+  @send external getPower: t => string = "getPower"
+  @send external setPower: (t, string) => unit = "setPower"
+}
+
+module SignalPrice = {
+  type t
+
+  @module("@bandprotocol/bandchain.js") @new external create: unit => t = "SignalPrice"
+  @send external getPriceStatus: t => string = "getPriceStatus"
+  @send external setPriceStatus: (t, string) => unit = "setPriceStatus"
+  @send external getSignalId: t => string = "getSignalId"
+  @send external setSignalId: (t, string) => unit = "setSignalId"
+  @send external getPrice: t => int = "getPrice"
+  @send external setPrice: (t, int) => unit = "setPrice"
 }

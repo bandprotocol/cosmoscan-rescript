@@ -99,8 +99,9 @@ let create = (ledgerApp, accountIndex) => {
   })
 }
 
-let sign = (x, message) => {
-  let responsePromise = LedgerJS.sign(x.app, x.path, message)
+let sign = (x, rawTx) => {
+  let jsonTxStr = rawTx->BandChainJS.Transaction.getSignMessage->JsBuffer.toUTF8
+  let responsePromise = LedgerJS.sign(x.app, x.path, jsonTxStr)
   responsePromise->Promise.then(response => {
     response.signature->Secp256k1.signatureImport->JsBuffer.from->Promise.resolve
   })

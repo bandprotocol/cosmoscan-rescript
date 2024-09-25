@@ -66,6 +66,10 @@
 @module("./right-arrow.svg") external rightArrow: string = "default"
 @module("./long-arrow-dark.svg") external longArrowDark: string = "default"
 @module("./long-arrow-light.svg") external longArrowLight: string = "default"
+@module("./log-out.svg") external logOut: string = "default"
+@module("./circle-arrow-upright.svg") external arrowUpright: string = "default"
+@module("./circle-arrow-bottomleft.svg") external arrowBottomleft: string = "default"
+@module("./circle-user.svg") external circleUser: string = "default"
 
 // BG
 @module("./not-found-bg.svg") external notFoundBg: string = "default"
@@ -92,3 +96,13 @@
 @module("./icon-group.svg") external groupIconSidebar: string = "default"
 @module("./icon-TSS.svg") external tssIconSidebar: string = "default"
 @module("./icon-proposal.svg") external proposalIconSidebar: string = "default"
+
+// Wallet
+@module("./keplr.png") external keplr: string = "default"
+@module("./cosmostation.png") external cosmostation: string = "default"
+@module("./ledger.png") external ledger: string = "default"
+@module("./mnemonic.png") external mnemonic: string = "default"
+@module("./leap.png") external leap: string = "default"
+
+// Feed module
+@module("./feed-msg-icon.svg") external feedIcon: string = "default"
