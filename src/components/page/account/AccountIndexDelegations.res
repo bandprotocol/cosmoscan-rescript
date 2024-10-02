@@ -226,10 +226,8 @@ let make = (~address) => {
             />
             <Text value="Delegate BAND to start earning staking rewards." />
             <Link route=Route.ValidatorsPage className="">
-              <Button variant=Outline>
-                <Text
-                  value="See All Validators" weight=Semibold color=theme.neutral_900 size=Body1
-                />
+              <Button px=24 py=8 fsize=14 variant=Button.Outline>
+                {"See All Validators"->React.string}
               </Button>
             </Link>
           </EmptyContainer>
