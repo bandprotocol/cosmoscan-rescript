@@ -2,11 +2,12 @@ module Styles = {
   open CssJs
   let container = style(. [
     flexDirection(#column),
-    minHeight(#px(300)),
     height(#auto),
     padding(#px(24)),
     borderRadius(#px(5)),
     justifyContent(#flexStart),
+    overflow(#scroll),
+    maxHeight(#calc(#sub, #vh(100.), #px(32))),
   ])
 
   let disable = isActive => style(. [display(isActive ? #flex : #none)])
@@ -18,7 +19,7 @@ module Styles = {
       transition(~duration=200, "all"),
       maxHeight(show ? #px(170) : #zero),
       opacity(show ? 1. : 0.),
-      overflow(#hidden),
+      overflow(show ? #visible : #hidden),
     ])
 
   let listContainer = style(. [width(#percent(100.)), marginBottom(#px(7))])
