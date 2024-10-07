@@ -12,13 +12,13 @@ module Styles = {
       display(#flex),
       backgroundColor(theme.neutral_200),
       borderRadius(#px(30)),
-      width(#px(65)),
       alignItems(#center),
       justifyContent(#center),
       fontSize(#px(10)),
       cursor(#pointer),
       color(Theme.black),
-      height(#px(20)),
+      fontWeight(#semiBold),
+      padding2(~v=#px(8), ~h=#px(12)),
     ])
   let showContainer = style(. [display(#flex), marginTop(#px(10))])
 }
@@ -40,7 +40,7 @@ let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string, ~showSe
     msgLength > msgCount ? setOverflowed(_ => true) : ()
     None
   })
-  <>
+  <div>
     <div ref={ReactDOM.Ref.domRef(msgEl)} className={Styles.msgContainer(overflowed)}>
       {messages
       ->Belt.List.toArray
@@ -70,5 +70,5 @@ let make = (~txHash: Hash.t, ~messages, ~success: bool, ~errMsg: string, ~showSe
           </div>
         </div>
       : React.null}
-  </>
+  </div>
 }

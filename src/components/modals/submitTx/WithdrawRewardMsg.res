@@ -1,7 +1,13 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [paddingBottom(#px(24))])
+  let container = style(. [paddingBottom(#px(24)), width(#px(500))])
+  let heading = (theme: Theme.t) =>
+    style(. [
+      borderBottom(#px(1), #solid, theme.neutral_300),
+      paddingBottom(#px(4)),
+      marginBottom(#px(4)),
+    ])
 
   let validator = style(. [
     display(#flex),
@@ -15,8 +21,7 @@ module Styles = {
 let make = (~address, ~validator, ~setMsgsOpt) => {
   let validatorInfoSub = ValidatorSub.get(validator)
   let delegationSub = DelegationSub.getStakeByValidator(address, validator)
-
-  let allSub = Sub.all2(validatorInfoSub, delegationSub)
+  let infoSub = React.useContext(GlobalContext.context)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -38,46 +43,40 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
 
   <>
     <div className=Styles.container>
-      <Heading
-        value="Withdraw Delegation Rewards"
-        size=Heading.H5
-        marginBottom=8
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
-      />
-      <VSpacing size=Spacing.sm />
-      {switch allSub {
-      | Data(({moniker}, _)) =>
-        <div>
-          <Text value=moniker ellipsis=true align=Text.Right />
-          <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
-        </div>
-      | _ => <LoadingCensorBar width=300 height=34 />
-      }}
-    </div>
-    <div className=Styles.container>
-      <Heading
-        value="Current Reward"
-        size=Heading.H5
-        marginBottom=8
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
-      />
-      <VSpacing size=Spacing.sm />
-      {switch allSub {
-      | Data((_, {reward})) =>
-        <div>
-          <NumberCountUp
-            value={reward->Coin.getBandAmountFromCoin}
-            weight=Text.Thin
-            spacing={Text.Em(0.)}
-            size=Text.Body2
+      <ValidatorDetail heading="Withdraw Delegation Reward From" validator />
+      {switch delegationSub {
+      | Data(delegation) =>
+        <div className={CssHelper.mt(~size=24, ())}>
+          <Heading
+            value="Claim Reward (BAND)"
+            size=Heading.H5
+            align=Heading.Left
+            weight=Heading.Regular
+            marginBottom=4
+            color={theme.neutral_600}
           />
-          <Text value=" BAND" />
+          <div>
+            <NumberCountUp
+              value={delegation.reward->Coin.getBandAmountFromCoin}
+              size={Text.Xl}
+              color={theme.neutral_900}
+              weight={Text.Bold}
+              decimals=6
+            />
+            <VSpacing size={#px(4)} />
+            {switch infoSub {
+            | Data({financial}) =>
+              <Text
+                size={Body2}
+                code=true
+                value={`$${(delegation.reward->Coin.getBandAmountFromCoin *. financial.usdPrice)
+                    ->Format.fPretty(~digits=2)} USD`}
+              />
+            | _ => <LoadingCensorBar width=50 height=20 />
+            }}
+          </div>
         </div>
-      | _ => <LoadingCensorBar width=150 height=18 />
+      | _ => <LoadingCensorBar.CircleSpin height=180 />
       }}
     </div>
   </>

@@ -186,7 +186,7 @@ module Balance = {
         <Text
           value="Error occur while getting BAND price" weight=Text.Medium color=theme.error_600
         />
-      | (_, _) => <LoadingCensorBar mt=16 mb=16 fullWidth=true height=30 />
+      | (_, _) => <LoadingCensorBar mt=16 mb=16 fullWidth=true height=116 />
       }
     }
   }

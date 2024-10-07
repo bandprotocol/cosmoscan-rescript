@@ -1,27 +1,34 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [paddingBottom(#px(24))])
+  let container = style(. [paddingBottom(#px(24)), width(#px(500))])
 
   let info = style(. [display(#flex), justifyContent(#spaceBetween)])
 
-  let validator = style(. [
-    display(#flex),
-    flexDirection(#column),
-    alignItems(#flexEnd),
-    width(#px(330)),
-  ])
+  let tooltips = (theme: Theme.t) =>
+    style(. [
+      display(#flex),
+      columnGap(#px(8)),
+      borderRadius(#px(4)),
+      backgroundColor(theme.neutral_100),
+      padding2(~v=#px(10), ~h=#px(16)),
+      marginBottom(#px(24)),
+    ])
+
+  let halfWidth = style(. [width(#percent(50.))])
+  let fullWidth = style(. [width(#percent(100.)), margin2(~v=#px(24), ~h=#zero)])
 }
 
 @react.component
 let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
+  let (amount, setAmount) = React.useState(_ => EnhanceTxInputV2.empty)
+  let (validatorOpt, setValidatorOpt) = React.useState(_ => preselectValidator)
+
   let accountSub = AccountSub.get(address)
   let validatorsSub = ValidatorSub.getList(~filter=Active, ())
+  let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
 
   let allSub = Sub.all2(accountSub, validatorsSub)
-
-  let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
-  let (validatorOpt, setValidatorOpt) = React.useState(_ => preselectValidator)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -50,24 +57,28 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
 
   <>
     <div className=Styles.container>
+      <div className={Styles.tooltips(theme)}>
+        <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
+        <Text
+          size={Body2}
+          value="Delegate your BAND to start earning staking rewards. Undelegated balances are locked for 21 days."
+        />
+      </div>
       <Heading
         value="Delegate to"
         size=Heading.H5
         marginBottom=8
         align=Heading.Left
         weight=Heading.Regular
-        color={theme.neutral_600}
+        color={theme.neutral_900}
       />
-      // <Text value={validator->Address.toOperatorBech32} />
       {switch validatorsSub {
       | Data(validators) =>
         <div>
           {
             let filteredValidators =
               validators->Belt_Array.keep(validator => validator.commission !== 100.)
-            <ValidatorSelection
-              validatorOpt={preselectValidator} filteredValidators setValidatorOpt
-            />
+            <ValidatorSelection validatorOpt filteredValidators setValidatorOpt />
           }
         </div>
       | Error(err) => <Text value={err.message} />
@@ -75,35 +86,22 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
       | _ => <LoadingCensorBar width=300 height=34 />
       }}
     </div>
-    <div className=Styles.container>
-      <Heading
-        value="Account Balance"
-        size=Heading.H5
-        marginBottom=8
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
-      />
-      {switch allSub {
-      | Data(({balance}, _)) =>
-        <div>
-          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
-          <Text value=" BAND" />
-        </div>
-      | _ => <LoadingCensorBar width=150 height=18 />
-      }}
-    </div>
+    {switch validatorOpt {
+    | Some(validator) => <ValidatorDelegationDetail address validator bondedTokenCountSub />
+    | None => <ValidatorDelegationDetail.NoData />
+    }}
     {switch allSub {
     | Data(({balance}, _)) =>
       //  TODO: hard-coded tx fee
       let maxValInUband = balance->Coin.getUBandAmountFromCoins -. 5000.
-      <EnhanceTxInput
+
+      <EnhanceTxInputV2
         width=300
         inputData=amount
         setInputData=setAmount
         parse={Parse.getBandAmount(maxValInUband)}
         maxValue={(maxValInUband /. 1e6)->Belt.Float.toString}
-        msg="Amount"
+        msg="Delegate Amount (BAND)"
         placeholder="0.000000"
         inputType="number"
         code=true
@@ -111,7 +109,7 @@ let make = (~address, ~preselectValidator: option<Address.t>, ~setMsgsOpt) => {
         id="delegateAmountInput"
         maxWarningMsg=true
       />
-    | _ => <EnhanceTxInput.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
+    | _ => <EnhanceTxInputV2.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
     }}
   </>
 }

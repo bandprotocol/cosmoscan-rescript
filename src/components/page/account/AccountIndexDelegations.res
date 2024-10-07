@@ -20,7 +20,6 @@ module RenderBody = {
     ~templateColumns,
     ~isLoggedInAsOwner,
   ) => {
-    let (_, dispatchModal) = React.useContext(ModalContext.context)
     let (accountOpt, _) = React.useContext(AccountContext.context)
     let ({ThemeContext.theme: theme}, _) = ThemeContext.use()
 
@@ -167,6 +166,7 @@ let make = (~address) => {
   let pageSize = 5
   let delegationsCountSub = DelegationSub.getStakeCountByDelegator(address)
   let delegationsSub = DelegationSub.getStakeList(address, ~pageSize, ~page, ())
+  let (_, dispatchModal) = React.useContext(ModalContext.context)
 
   let ({ThemeContext.theme: theme, isDarkMode}, _) = ThemeContext.use()
   let (accountOpt, _) = AccountContext.use()
@@ -251,8 +251,7 @@ let make = (~address) => {
           fsize=14
           variant=Button.Text({underline: false})
           onClick={_ => {
-            open Webapi.Dom
-            window->Window.alert("Undelegate all")
+            address->SubmitMsg.UndelegateAll->SubmitTx->OpenModal->dispatchModal
           }}>
           {"Undelegate All"->React.string}
         </Button>
@@ -262,8 +261,7 @@ let make = (~address) => {
           fsize=14
           variant=Button.Outline
           onClick={_ => {
-            open Webapi.Dom
-            window->Window.alert("Claim All Rewards")
+            address->SubmitMsg.WithdrawAllReward->SubmitTx->OpenModal->dispatchModal
           }}>
           {"Claim All Rewards"->React.string}
         </Button>

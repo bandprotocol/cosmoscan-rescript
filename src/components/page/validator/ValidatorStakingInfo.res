@@ -159,8 +159,7 @@ module StakingInfo = {
       validatorAddress->SubmitMsg.WithdrawReward->SubmitTx->OpenModal->dispatchModal
     }
 
-    let reinvest = reward =>
-      (validatorAddress, reward)->SubmitMsg.Reinvest->SubmitTx->OpenModal->dispatchModal
+    let reinvest = () => validatorAddress->SubmitMsg.Reinvest->SubmitTx->OpenModal->dispatchModal
     <>
       <Row>
         <Col col=Col.Six>
@@ -238,7 +237,7 @@ module StakingInfo = {
                   px=20
                   py=8
                   variant=Button.Text({underline: true})
-                  onClick={_ => reinvest(reward)}
+                  onClick={_ => reinvest()}
                   disabled=disable>
                   {"Reinvest"->React.string}
                 </Button>

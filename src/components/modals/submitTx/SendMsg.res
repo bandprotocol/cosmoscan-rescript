@@ -1,17 +1,23 @@
+module Styles = {
+  open CssJs
+
+  let container = style(. [paddingBottom(#px(24)), width(#px(500))])
+}
+
 @react.component
 let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
   let accountSub = AccountSub.get(address)
   let (toAddress, setToAddress) = React.useState(_ => {
     switch receiver {
     | Some(receiver') => {
-        open EnhanceTxInput
+        open EnhanceTxInputV2
         {text: receiver'->Address.toBech32, value: Some(receiver')}
       }
 
-    | None => EnhanceTxInput.empty
+    | None => EnhanceTxInputV2.empty
     }
   })
-  let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
+  let (amount, setAmount) = React.useState(_ => EnhanceTxInputV2.empty)
 
   React.useEffect2(_ => {
     let msgsOpt = {
@@ -52,20 +58,9 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
     None
   }, (toAddress, amount))
 
-  <>
-    <Heading size=Heading.H5 value="Available Balance" marginBottom=8 />
-    <div className={CssHelper.mb(~size=24, ())}>
-      {switch accountSub {
-      | Data({balance}) =>
-        <div>
-          <Text value={balance->Coin.getBandAmountFromCoins->Format.fPretty(~digits=6)} code=true />
-          <Text value=" BAND" />
-        </div>
-      | _ => <LoadingCensorBar width=150 height=18 />
-      }}
-    </div>
+  <div className=Styles.container>
     <ChainSelector targetChain />
-    <EnhanceTxInput
+    <EnhanceTxInputV2
       width=302
       inputData=toAddress
       setInputData=setToAddress
@@ -77,16 +72,12 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
       code=true
       id="recipientAddressInput"
       placeholder="Insert recipient address"
-      autoFocus={switch toAddress.text {
-      | "" => true
-      | _ => false
-      }}
     />
     {switch accountSub {
     | Data({balance}) =>
       //  TODO: hard-coded tx fee
       let maxValInUband = balance->Coin.getUBandAmountFromCoins -. 5000.
-      <EnhanceTxInput
+      <EnhanceTxInputV2
         width=300
         inputData=amount
         setInputData=setAmount
@@ -104,9 +95,9 @@ let make = (~address, ~receiver, ~setMsgsOpt, ~targetChain) => {
         maxWarningMsg=true
       />
     | _ =>
-      <EnhanceTxInput.Loading
+      <EnhanceTxInputV2.Loading
         msg="Send Amount (BAND)" code=true useMax=true placeholder="0.000000"
       />
     }}
-  </>
+  </div>
 }

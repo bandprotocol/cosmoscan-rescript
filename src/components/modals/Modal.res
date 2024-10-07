@@ -15,6 +15,7 @@ module Styles = {
       zIndex(10),
       backgroundColor(#rgba(0, 0, 0, #num(0.5))),
       position(#fixed),
+      zIndex(999),
       animation(
         ~duration=Config.modalFadingDutation,
         ~timingFunction=#cubicBezier(0.25, 0.46, 0.45, 0.94),

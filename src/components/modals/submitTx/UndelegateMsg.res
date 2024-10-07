@@ -1,15 +1,20 @@
 module Styles = {
   open CssJs
 
-  let container = style(. [paddingBottom(#px(24))])
+  let container = style(. [paddingBottom(#px(24)), width(#px(500))])
 
-  let warning = (theme: Theme.t) =>
+  let heading = (theme: Theme.t) =>
     style(. [
-      display(#flex),
-      flexDirection(#column),
-      padding2(~v=#px(16), ~h=#px(24)),
-      backgroundColor(theme.neutral_100),
+      borderBottom(#px(1), #solid, theme.neutral_300),
+      paddingBottom(#px(4)),
+      marginBottom(#px(4)),
+    ])
+
+  let tooltips = (theme: Theme.t) =>
+    style(. [
       borderRadius(#px(4)),
+      backgroundColor(theme.neutral_100),
+      padding2(~v=#px(10), ~h=#px(16)),
       marginBottom(#px(24)),
     ])
 }
@@ -17,11 +22,12 @@ module Styles = {
 @react.component
 let make = (~address, ~validator, ~setMsgsOpt) => {
   let validatorInfoSub = ValidatorSub.get(validator)
+  let validatorsSub = ValidatorSub.getList(~filter=Active, ())
   let delegationSub = DelegationSub.getStakeByValidator(address, validator)
+  let bondedTokenCountSub = ValidatorSub.getTotalBondedAmount()
 
-  let allSub = Sub.all2(validatorInfoSub, delegationSub)
-
-  let (amount, setAmount) = React.useState(_ => EnhanceTxInput.empty)
+  let (dstValidatorOpt, setDstValidatorOpt) = React.useState(_ => None)
+  let (amount, setAmount) = React.useState(_ => EnhanceTxInputV2.empty)
 
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
 
@@ -43,74 +49,65 @@ let make = (~address, ~validator, ~setMsgsOpt) => {
   }, [amount])
 
   <>
-    <div className={Styles.warning(theme)}>
-      <Heading
-        value="Please read before proceeding:" size=Heading.H5 marginBottom=4 align=Heading.Left
-      />
-      <VSpacing size=Spacing.xs />
-      <Text
-        value="1. Undelegated balance are locked for 21 days. After the unbonding period, the balance will automatically be added to your account"
-      />
-      <VSpacing size=Spacing.xs />
-      <Text
-        value="2. You can have a maximum of 7 pending unbonding transactions at any one time."
-      />
-    </div>
     <div className=Styles.container>
-      <Heading
-        value="Undelegate from"
-        size=Heading.H5
-        marginBottom=8
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
-      />
-      {switch allSub {
-      | Data(({moniker}, _)) =>
-        <div>
-          <Text value=moniker ellipsis=true align=Text.Right />
-          <Text value={"(" ++ validator->Address.toOperatorBech32 ++ ")"} code=true block=true />
+      <div className={Styles.tooltips(theme)}>
+        <div
+          className={CssJs.merge(. [
+            CssHelper.flexBox(~cGap=#px(8), ()),
+            CssHelper.mb(~size=8, ()),
+          ])}>
+          <Icon name="fal fa-info-circle" size=16 color={theme.neutral_600} />
+          <Text
+            size={Body2}
+            color={theme.neutral_900}
+            weight={Semibold}
+            value="Please read before proceeding:"
+          />
         </div>
+        <Text
+          size={Body2}
+          color={theme.neutral_900}
+          value="1. Undelegated balance are locked for 21 days. After the unbonding period, the balance will automatically be added to your account"
+        />
+        <Text
+          size={Body2}
+          color={theme.neutral_900}
+          value="2. You can have a maximum of 7 pending unbonding transactions at any one time."
+        />
+      </div>
+      {switch validatorInfoSub {
+      | Data(v) =>
+        <div>
+          <div className={Styles.heading(theme)}>
+            <Text value="Undelegate from" size={Body2} />
+          </div>
+          <Text value={v.moniker} size={Body1} color={theme.neutral_900} weight={Semibold} />
+          <Text
+            value={v.operatorAddress->Address.toOperatorBech32} size={Body2} ellipsis=true code=true
+          />
+        </div>
+
       | _ => <LoadingCensorBar width=300 height=34 />
       }}
     </div>
-    <div className=Styles.container>
-      <Heading
-        value="Current Stake"
-        size=Heading.H5
-        marginBottom=8
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
-      />
-      {switch allSub {
-      | Data((_, {amount: stakedAmount})) =>
-        <div>
-          <Text
-            value={stakedAmount->Coin.getBandAmountFromCoin->Format.fPretty(~digits=6)} code=true
-          />
-          <Text value=" BAND" />
-        </div>
-      | _ => <LoadingCensorBar width=150 height=18 />
-      }}
-    </div>
-    {switch allSub {
-    | Data((_, {amount: stakedAmount})) =>
-      let maxValInUband = stakedAmount->Coin.getUBandAmountFromCoin
-      <EnhanceTxInput
+    {switch delegationSub {
+    | Data(delegation) =>
+      //  TODO: hard-coded tx fee
+      let maxValInUband = delegation.amount->Coin.getUBandAmountFromCoin
+      <EnhanceTxInputV2
         width=300
         inputData=amount
         setInputData=setAmount
         parse={Parse.getBandAmount(maxValInUband)}
         maxValue={(maxValInUband /. 1e6)->Belt.Float.toString}
-        msg="Amount"
+        msg="Undelegate Amount (BAND)"
         placeholder="0.000000"
         inputType="number"
         code=true
         autoFocus=true
         id="undelegateAmountInput"
       />
-    | _ => <EnhanceTxInput.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
+    | _ => <EnhanceTxInputV2.Loading msg="Amount" code=true useMax=true placeholder="0.000000" />
     }}
   </>
 }

@@ -15,7 +15,12 @@ module Styles = {
 }
 
 @react.component
-let make = (~address, ~validator, ~bondedTokenCountSub: Sub.variant<Coin.t>) => {
+let make = (
+  ~address,
+  ~validator,
+  ~bondedTokenCountSub: Sub.variant<Coin.t>,
+  ~isShowCurrentDelegated=true,
+) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let validatorsSub = ValidatorSub.get(validator)
   let valBondSub = Sub.all2(validatorsSub, bondedTokenCountSub)
@@ -35,6 +40,7 @@ let make = (~address, ~validator, ~bondedTokenCountSub: Sub.variant<Coin.t>) => 
           />
           <Text
             size={Body1}
+            weight={Regular}
             color={theme.neutral_900}
             value={`${(votingPower /. 1e6)->Format.fPretty(~digits=0)} (${(votingPower /.
               bondedTokenCount.amount *. 100.)->Format.fPercent})`}
@@ -53,6 +59,7 @@ let make = (~address, ~validator, ~bondedTokenCountSub: Sub.variant<Coin.t>) => 
           | Data(apr) =>
             <Text
               size={Xl}
+              weight={Regular}
               color={theme.neutral_900}
               value={(apr *. (100. -. commission) /. 100.)->Format.fPercent}
               code=true
@@ -63,29 +70,32 @@ let make = (~address, ~validator, ~bondedTokenCountSub: Sub.variant<Coin.t>) => 
       </>
     | _ => <LoadingCensorBar width=150 height=18 />
     }}
-    <div className={Styles.fullWidth}>
-      <Heading
-        value="Current Delegated (BAND)"
-        size=Heading.H5
-        align=Heading.Left
-        weight=Heading.Regular
-        color={theme.neutral_600}
-      />
-      <div className={Styles.currentDelegateHeader(theme)} />
-      {
-        let stakeSub = DelegationSub.getStakeByValidator(address, validator)
-        switch stakeSub {
-        | Data({amount}) =>
-          <Text
-            size={Body1}
-            color={theme.neutral_900}
-            value={amount->Coin.getBandAmountFromCoin->Format.fPretty(~digits=6)}
-            code=true
+    {isShowCurrentDelegated
+      ? <div className={Styles.fullWidth}>
+          <Heading
+            value="Current Delegated (BAND)"
+            size=Heading.H5
+            align=Heading.Left
+            weight=Heading.Regular
+            color={theme.neutral_600}
           />
-        | _ => <LoadingCensorBar width=150 height=18 />
-        }
-      }
-    </div>
+          <div className={Styles.currentDelegateHeader(theme)} />
+          {
+            let stakeSub = DelegationSub.getStakeByValidator(address, validator)
+            switch stakeSub {
+            | Data({amount}) =>
+              <Text
+                size={Body1}
+                weight={Bold}
+                color={theme.neutral_900}
+                value={amount->Coin.getBandAmountFromCoin->Format.fPretty(~digits=6)}
+                code=true
+              />
+            | _ => <LoadingCensorBar width=150 height=18 />
+            }
+          }
+        </div>
+      : React.null}
   </div>
 }
 
