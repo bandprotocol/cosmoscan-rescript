@@ -243,7 +243,7 @@ module RenderBody = {
               {switch validatorSub {
               | Data({operatorAddress, commission}) =>
                 let delegate = () =>
-                  operatorAddress->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
+                  Some(operatorAddress)->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
                 <Button
                   variant=Button.Outline
                   onClick={_ => {

@@ -1,12 +1,21 @@
 @react.component
-let make = (~value, ~size, ~weight, ~spacing=?, ~color=?, ~code=true, ~smallNumber=false) => {
+let make = (
+  ~value,
+  ~size,
+  ~weight,
+  ~spacing=?,
+  ~color=?,
+  ~decimals=2,
+  ~code=true,
+  ~smallNumber=false,
+) => {
   let ({ThemeContext.theme: theme}, _) = React.useContext(ThemeContext.context)
   let countUp = CountUp.context(
     CountUp.props(
       ~start=value,
       ~end=value,
       ~delay=0,
-      ~decimals=2,
+      ~decimals,
       ~duration=4,
       ~useEasing=false,
       ~separator=",",

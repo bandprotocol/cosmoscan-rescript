@@ -23,7 +23,8 @@ module ButtonSection = {
     let balanceAtStakeSub = DelegationSub.getStakeByValidator(delegatorAddress, validatorAddress)
     let allSub = Sub.all3(validatorInfoSub, accountSub, balanceAtStakeSub)
 
-    let delegate = () => validatorAddress->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
+    let delegate = () =>
+      Some(validatorAddress)->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
     let undelegate = () =>
       validatorAddress->SubmitMsg.Undelegate->SubmitTx->OpenModal->dispatchModal
     let redelegate = () =>
@@ -273,10 +274,12 @@ let make = (~validatorAddress) => {
         <div
           className={Css.merge(list{CssHelper.flexBox(~direction=#column, ~justify=#center, ())})}>
           <Icon name="fal fa-link" size=32 color={isDarkMode ? theme.white : theme.black} />
-          <VSpacing size={#px(16)} />
-          <Text value="Please connect to make request" size=Text.Body1 nowrap=true />
-          <VSpacing size={#px(16)} />
-          <Button px=20 py=5 onClick={_ => connect()}> {"Connect"->React.string} </Button>
+          <VSpacing size=Spacing.sm />
+          <Text value="Connect Wallet to see Delegation Info" size=Text.Body1 nowrap=true />
+          <VSpacing size=Spacing.sm />
+          <Button px=24 py=7 variant=Outline onClick={_ => connect()}>
+            {"Connect Wallet"->React.string}
+          </Button>
         </div>
       | Error(err) =>
         // log for err details

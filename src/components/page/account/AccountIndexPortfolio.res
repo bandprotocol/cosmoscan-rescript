@@ -69,10 +69,10 @@ module BalanceDetails = {
               ? <Text value="-" size=Body1 weight=Bold />
               : isCountup
               ? <NumberCountUp
-                value=amount size=Text.Body1 weight=Text.Bold color=theme.neutral_900
+                value=amount size=Text.Body1 weight=Text.Bold color=theme.neutral_900 decimals=6
               />
               : <Text
-                  value={amount->Format.fPretty}
+                  value={amount->Format.fPretty(~digits=6)}
                   size=Text.Body1
                   weight=Text.Bold
                   nowrap=true
@@ -134,6 +134,11 @@ let make = (~address) => {
   let (_, dispatchModal) = React.useContext(ModalContext.context)
   let qrCode = () => address->QRCode->OpenModal->dispatchModal
   let (accountBoxState, setAccountBoxState, _, _) = React.useContext(WalletPopupContext.context)
+  let (accountOpt, _) = AccountContext.use()
+  let isLoggedInAsOwner = switch accountOpt {
+  | Some({address: loggedInAddress}) if Address.isEqual(address, loggedInAddress) => true
+  | _ => false
+  }
 
   let connect = () =>
     accountBoxState == "noShow"
@@ -230,38 +235,9 @@ let make = (~address) => {
                     commission,
                   )
                   let totalBalanceUSD = totalBalanceBAND *. financial.usdPrice
-                  let adjustedText =
-                    totalBalanceBAND->Format.fPretty(~digits=2)->Js.String2.split(".")
 
                   <>
-                    <div className={CssHelper.flexBox(~align=#flexEnd, ())}>
-                      // TODO: use NumberCountUp?
-                      <Text
-                        value={adjustedText->Belt.Array.get(0)->Belt.Option.getWithDefault("0")}
-                        size=Huge
-                        color=theme.neutral_900
-                        weight=Bold
-                        height=Px(36)
-                        code=true
-                      />
-                      <Text
-                        value={"." ++
-                        adjustedText->Belt.Array.get(1)->Belt.Option.getWithDefault("0")}
-                        size=Xl
-                        weight=Bold
-                        code=true
-                        nowrap=true
-                        color=theme.neutral_900
-                      />
-                      <HSpacing size=Spacing.sm />
-                      <Text
-                        value="BAND"
-                        size=Text.Body1
-                        code=false
-                        weight=Text.Thin
-                        color=theme.neutral_900
-                      />
-                    </div>
+                    <TotalBalanceBandRender totalBalanceBAND />
                     <VSpacing size=Spacing.xs />
                     <div className={CssHelper.flexBox()}>
                       <Text value="$" size=Body1 code=true />
@@ -281,7 +257,8 @@ let make = (~address) => {
                 <>
                   <LoadingCensorBar width=200 height=30 mb=8 mt=8 mbSm=8 />
                   <LoadingCensorBar width=150 height=20 />
-                  // TODO: Add loading state
+                  <VSpacing size=Spacing.xl />
+                  <LoadingCensorBar.CircleSpin size={180} height={200} />
                 </>
               }}
             </Col>
@@ -324,10 +301,17 @@ let make = (~address) => {
                               <Button variant=Button.Outline onClick={_ => send(chainID)} fsize=14>
                                 {"Send"->React.string}
                               </Button>
-                              // TODO: wire up
-                              <Button variant=Button.Outline fsize=14>
-                                {"Delegate"->React.string}
-                              </Button>
+                              {
+                                let delegate = () =>
+                                  None->SubmitMsg.Delegate->SubmitTx->OpenModal->dispatchModal
+
+                                isLoggedInAsOwner
+                                  ? <Button
+                                      variant=Button.Outline fsize=14 onClick={_ => delegate()}>
+                                      {"Delegate"->React.string}
+                                    </Button>
+                                  : React.null
+                              }
                             </div>}
                       </>
                     }

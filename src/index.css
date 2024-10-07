@@ -262,3 +262,13 @@ select::-ms-expand {
   width: 100%;
   height: auto;
 }
+
+/* Hide Arrows From Input Number */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}

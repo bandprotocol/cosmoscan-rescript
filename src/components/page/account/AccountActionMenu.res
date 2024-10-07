@@ -64,7 +64,7 @@ let make = (~operatorAddress, ~rewardAmount) => {
     </Button>
     <div className={Styles.menuPanel(show, theme)}>
       {[
-        SubmitMsg.Delegate(operatorAddress),
+        SubmitMsg.Delegate(Some(operatorAddress)),
         Undelegate(operatorAddress),
         Redelegate(operatorAddress),
       ]

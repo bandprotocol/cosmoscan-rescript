@@ -1,6 +1,6 @@
 type t =
   | Send(option<Address.t>, IBCConnectionQuery.target_chain_t)
-  | Delegate(Address.t)
+  | Delegate(option<Address.t>)
   | Undelegate(Address.t)
   | Redelegate(Address.t)
   | WithdrawReward(Address.t)
