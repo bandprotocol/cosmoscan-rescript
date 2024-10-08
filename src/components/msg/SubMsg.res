@@ -128,6 +128,9 @@ let make = (~msg: Msg.result_t, ~showSender) => {
       | Msg.Gov.SubmitProposal.Failure(f) =>
         <ProposalMsg.SubmitProposal.Fail title={f.title->Belt.Option.getWithDefault("")} />
       }
+    | SubmitSignals(_)
+    | SubmitSignalPrices(_)
+    | UpdateReferenceSourceConfig(_) => React.null
     | DepositMsg(msg) =>
       switch msg {
       | Msg.Gov.Deposit.Success(m) =>

@@ -206,3 +206,25 @@ module Obi = {
   @send external decodeInput: (t, JsBuffer.t) => 'a = "decodeInput"
   @send external decodeOutput: (t, JsBuffer.t) => 'a = "decodeOutput"
 }
+
+module Signal = {
+  type t
+
+  @module("@bandprotocol/bandchain.js") @new external create: unit => t = "Signal"
+  @send external getId: t => string = "getId"
+  @send external setId: (t, string) => unit = "setId"
+  @send external getPower: t => string = "getPower"
+  @send external setPower: (t, string) => unit = "setPower"
+}
+
+module SignalPrice = {
+  type t
+
+  @module("@bandprotocol/bandchain.js") @new external create: unit => t = "SignalPrice"
+  @send external getPriceStatus: t => string = "getPriceStatus"
+  @send external setPriceStatus: (t, string) => unit = "setPriceStatus"
+  @send external getSignalId: t => string = "getSignalId"
+  @send external setSignalId: (t, string) => unit = "setSignalId"
+  @send external getPrice: t => int = "getPrice"
+  @send external setPrice: (t, int) => unit = "setPrice"
+}

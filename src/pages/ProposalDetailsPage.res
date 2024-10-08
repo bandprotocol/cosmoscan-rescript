@@ -301,6 +301,174 @@ let make = (~proposalID) => {
                     </Col>
                   </Row>
                 </>
+              | UpdateFeedParams(data) =>
+                <>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="Autority"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <AddressRender address={data.authority} />
+                    </Col>
+                  </Row>
+                  <Heading value="Params" size=Heading.H4 weight=Heading.Medium />
+                  <VSpacing size={#px(24)} />
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="Admin" size=Heading.H4 weight=Heading.Thin color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <AddressRender address={data.params.admin} />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="allowable_block_time_discrepancy"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text
+                        value={data.params.allowable_block_time_discrepancy->Belt.Int.toString}
+                        code=true
+                      />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="grace_period"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text value={data.params.grace_period->Belt.Int.toString} code=true />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="min_interval"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text value={data.params.min_interval->Belt.Int.toString} code=true />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="max_interval"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text value={data.params.max_interval->Belt.Int.toString} code=true />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="power_step_threshold"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text value={data.params.power_step_threshold->Belt.Int.toString} code=true />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="max_current_feeds"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text value={data.params.max_current_feeds->Belt.Int.toString} code=true />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="cooldown_time"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text value={data.params.cooldown_time->Belt.Int.toString} code=true />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="min_deviation_basis_point"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text
+                        value={data.params.min_deviation_basis_point->Belt.Int.toString} code=true
+                      />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="max_deviation_basis_point"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text
+                        value={data.params.max_deviation_basis_point->Belt.Int.toString} code=true
+                      />
+                    </Col>
+                  </Row>
+                  <Row marginBottom=24>
+                    <Col col=Col.Four mbSm=8>
+                      <Heading
+                        value="current_feeds_update_interval"
+                        size=Heading.H4
+                        weight=Heading.Thin
+                        color={theme.neutral_600}
+                      />
+                    </Col>
+                    <Col col=Col.Eight>
+                      <Text
+                        value={data.params.current_feeds_update_interval->Belt.Int.toString}
+                        code=true
+                      />
+                    </Col>
+                  </Row>
+                </>
               | _ => <Text value="Unable to show the proposal messages" />
               }}
             </InfoContainer>

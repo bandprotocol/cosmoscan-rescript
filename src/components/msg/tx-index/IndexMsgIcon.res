@@ -30,6 +30,7 @@ let make = (~category: Msg.msg_cat_t) => {
     | ProposalMsg => <Icon name="fal fa-file" color=theme.white size=14 />
     | OracleMsg => <Icon name="fal fa-globe" color=theme.white size=14 />
     | IBCMsg => <img src=Images.ibcIcon />
+    | FeedMsg => <img src=Images.feedIcon width="24" height="24" />
     | _ => <Icon name="fal fa-question" color=theme.white size=14 />
     }}
   </div>
